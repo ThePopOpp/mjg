@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Email Sequence · The Stewardship Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+<style>
+  /* ── PRINT ────────────────────────────────────────── */
+  @page { size: Letter portrait; margin: 0.4in; }
+  @media print {
+    html, body { background: #ffffff !important; }
+    .doc-head { padding: 0 0 18px !important; border-bottom: 1px solid #ddd !important; }
+    .timeline { display: none !important; }
+    .stage { padding: 18px 0 0 !important; gap: 0 !important; max-width: 100% !important; }
+    .email-row {
+      grid-template-columns: 150px 1fr !important;
+      gap: 20px !important;
+      break-inside: avoid;
+      break-before: page;
+      page-break-before: always;
+      padding-top: 18px;
+    }
+    #e01 { break-before: auto !important; page-break-before: auto !important; }
+    .email-row .meta { position: static !important; }
+    .meta .num { font-size: 40px !important; }
+    .email { box-shadow: none !important; border: 1px solid #d8d4cb !important; break-inside: avoid; }
+    .email-body { padding: 20px 24px 24px !important; }
+    .email-body p { font-size: 13px !important; line-height: 1.55 !important; margin: 0 0 10px !important; }
+    .email-body p.lead { font-size: 14px !important; }
+    .subject { font-size: 19px !important; }
+    .reflection-block p { font-size: 15px !important; }
+    .quote-pull { font-size: 16px !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+  :root { --font-display: "Fraunces", "Source Serif 4", Georgia, serif; }
+  .mjg-logo { display: inline-flex; align-items: center; justify-content: center; }
+  .mjg-logo svg { width: 100%; height: 100%; display:block; }
+  .mjg-logo .l-main { fill: currentColor; }
+  .mjg-logo .l-g { fill: var(--mjg-g, #c9a96e); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "ss01","cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Showcase header */
+  .doc-head {
+    max-width: 1100px; margin: 0 auto;
+    padding: 64px 32px 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .doc-eyebrow {
+    font-family: var(--font-mono); font-size: 12px;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted-foreground);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .doc-eyebrow::before { content: "✦"; color: var(--accent); }
+  .doc-title {
+    font-family: var(--font-display);
+    font-weight: 600; font-size: 56px;
+    letter-spacing: -0.035em; line-height: 1;
+    margin: 12px 0 16px; max-width: 18ch;
+  }
+  .doc-title em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .doc-sub {
+    font-size: 18px; line-height: 1.55; color: var(--muted-foreground);
+    max-width: 64ch; margin: 0;
+  }
+  .timeline {
+    display: flex; gap: 0; align-items: center;
+    margin-top: 32px;
+    padding: 14px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted-foreground);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    overflow-x: auto;
+  }
+  .timeline > div {
+    flex: 1; display: flex; flex-direction: column; gap: 4px;
+    padding: 0 12px;
+    border-right: 1px dashed var(--border);
+    min-width: 120px;
+  }
+  .timeline > div:last-child { border-right: 0; }
+  .timeline strong { color: var(--foreground); font-family: var(--font-display); font-size: 14px; letter-spacing: -0.01em; text-transform: none; font-weight: 500; }
+  .timeline .day { color: var(--accent); }
+
+  /* Email rows */
+  .stage {
+    max-width: 1100px; margin: 0 auto;
+    padding: 48px 32px 96px;
+    display: flex; flex-direction: column;
+    gap: 56px;
+  }
+  .email-row {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .email-row .meta {
+    position: sticky; top: 32px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .meta .num {
+    font-family: var(--font-display);
+    font-weight: 600; font-size: 56px;
+    letter-spacing: -0.035em; line-height: 1;
+    color: var(--foreground);
+  }
+  .meta .num em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .meta .when {
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted-foreground);
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px;
+  }
+  .meta .when .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  .meta .label-stack { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; }
+  .meta .label-name { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted-foreground); }
+  .meta .label-val { font-size: 13px; color: var(--foreground); font-weight: 500; }
+
+  /* Email card (a faux mail client) */
+  .email {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(12,20,25,.04), 0 8px 24px rgba(12,20,25,.06);
+    overflow: hidden;
+  }
+  .email-head {
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .email-head .from-row { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--brand-navy); color: var(--brand-cream);
+    display: grid; place-items: center;
+    font-family: var(--font-display); font-weight: 600; font-size: 13px;
+    letter-spacing: -0.02em;
+  }
+  .avatar em { color: var(--brand-gold-2); font-style: italic; font-weight: 400; }
+  .from-name { font-size: 13px; font-weight: 500; color: var(--foreground); }
+  .from-addr { font-size: 12px; color: var(--muted-foreground); margin-left: 6px; }
+  .to-row { font-size: 12px; color: var(--muted-foreground); }
+  .subject {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 600;
+    letter-spacing: -0.015em; line-height: 1.2;
+    color: var(--foreground);
+    margin: 4px 0 0;
+  }
+  .preview {
+    font-size: 12px; color: var(--muted-foreground);
+    margin-top: 4px;
+  }
+  .meta-pill-row {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .meta-pill {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted-foreground);
+    padding: 3px 8px;
+    background: var(--muted);
+    border-radius: 9999px;
+  }
+  .meta-pill.accent { color: var(--accent); background: var(--accent-soft); }
+
+  .email-body {
+    padding: 28px 32px 32px;
+  }
+  .email-body p {
+    font-size: 15px; line-height: 1.65;
+    color: var(--foreground);
+    margin: 0 0 14px;
+  }
+  .email-body p.lead {
+    font-size: 17px; color: var(--foreground);
+    margin-bottom: 18px;
+  }
+  .email-body p.muted { color: var(--muted-foreground); font-size: 14px; }
+  .email-body em { font-style: italic; }
+  .email-body .salutation {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 500;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  .email-body .signature {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-display);
+    font-size: 14px;
+  }
+  .email-body .signature .name { font-weight: 600; color: var(--foreground); letter-spacing: -0.01em; }
+  .email-body .signature .role {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted-foreground); margin-top: 4px;
+  }
+
+  /* Email body widgets */
+  .pdf-card {
+    margin: 18px 0;
+    padding: 18px 20px;
+    background: var(--brand-navy); color: var(--brand-cream);
+    border-radius: 12px;
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
+  }
+  .pdf-icon {
+    width: 44px; height: 56px; border-radius: 6px;
+    background: var(--brand-cream);
+    display: grid; place-items: center;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    color: var(--brand-navy);
+    letter-spacing: 0.06em;
+  }
+  .pdf-meta { display: flex; flex-direction: column; gap: 2px; }
+  .pdf-name { font-family: var(--font-display); font-size: 15px; font-weight: 500; color: var(--brand-cream); }
+  .pdf-spec { font-family: var(--font-mono); font-size: 11px; color: rgba(241,237,228,.6); letter-spacing: 0.05em; }
+  .pdf-card a {
+    background: var(--brand-gold-2); color: var(--brand-navy);
+    padding: 9px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 500;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  .reflection-block {
+    margin: 18px 0;
+    padding: 16px 20px;
+    background: var(--accent-soft);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+  }
+  .reflection-block .label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--accent) 70%, var(--foreground));
+  }
+  .reflection-block p {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.45;
+    color: var(--foreground);
+    margin: 4px 0 0;
+  }
+
+  .cta-block {
+    margin: 22px 0 6px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    background: var(--brand-navy);
+    color: var(--brand-cream);
+    border-radius: 10px;
+    font-size: 14px; font-weight: 500;
+    text-decoration: none;
+  }
+  .cta-block.outline {
+    background: transparent; color: var(--foreground);
+    border: 1px solid var(--border-strong);
+  }
+  .cta-block.gold {
+    background: var(--accent); color: var(--accent-foreground);
+  }
+
+  .area-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+    margin: 16px 0;
+  }
+  .area-tile {
+    padding: 10px 12px;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 11px; color: var(--muted-foreground);
+  }
+  .area-tile.lowest {
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    color: color-mix(in srgb, var(--accent) 80%, var(--foreground));
+    font-weight: 500;
+  }
+  .area-tile strong { display:block; color: var(--foreground); font-family: var(--font-display); font-size: 13px; font-weight: 600; letter-spacing: -0.005em; margin-bottom: 2px; }
+  .area-tile.lowest strong { color: var(--accent); }
+
+  .quote-pull {
+    margin: 22px 0;
+    padding: 4px 0 4px 22px;
+    border-left: 2px solid var(--accent);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 19px; line-height: 1.4;
+    color: var(--foreground);
+  }
+
+  .chapter-callout {
+    margin: 18px 0;
+    padding: 18px 22px;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center;
+  }
+  .chapter-callout .num {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 36px; line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--foreground);
+  }
+  .chapter-callout .num em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .chapter-callout h5 {
+    margin: 0 0 4px;
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .chapter-callout p { margin: 0; font-size: 13px; color: var(--muted-foreground); line-height: 1.5; }
+
+  .email-foot {
+    padding: 18px 32px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--muted);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .email-foot .marks { display: inline-flex; align-items: center; gap: 10px; }
+  .mark-mjg {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: var(--brand-navy); color: var(--brand-cream);
+    font-family: var(--font-display); font-weight: 600; font-size: 11px;
+    display: grid; place-items: center; letter-spacing: -0.04em;
+  }
+  .mark-mjg em { color: var(--brand-gold-2); font-style: italic; font-weight: 400; }
+  .email-foot .small {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+    color: var(--muted-foreground); text-transform: uppercase;
+  }
+  .email-foot .links {
+    display: inline-flex; gap: 16px;
+    font-size: 11px; color: var(--muted-foreground);
+  }
+  .email-foot .links a { color: var(--muted-foreground); text-decoration: underline; text-underline-offset: 2px; }
+
+  @media (max-width: 800px) {
+    .email-row { grid-template-columns: 1fr; gap: 16px; }
+    .email-row .meta { position: static; }
+    .area-grid { grid-template-columns: repeat(2, 1fr); }
+    .doc-title { font-size: 40px; }
+    .pdf-card { grid-template-columns: 1fr; }
+    .chapter-callout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="doc-head">
+  <span class="doc-eyebrow">The Stewardship Blueprint · Email Sequence v1.0</span>
+  <h1 class="doc-title">The <em>onboarding</em> sequence</h1>
+  <p class="doc-sub">Five emails sent over ten days after a reader downloads the Created for More Check-In. The voice is steady, the design is quiet, and every send earns its place — built from the same tokens as the book microsite and the lead magnet itself.</p>
+  <div class="timeline">
+    <div><span class="day">Day 0</span><strong>01 · Welcome</strong>Deliver the PDF</div>
+    <div><span class="day">Day 2</span><strong>02 · Find your one</strong>Surface the lowest area</div>
+    <div><span class="day">Day 4</span><strong>03 · Chapter 1</strong>Created for More</div>
+    <div><span class="day">Day 7</span><strong>04 · Reflection</strong>One question to sit with</div>
+    <div><span class="day">Day 10</span><strong>05 · Join the journey</strong>Early access invite</div>
+  </div>
+</header>
+
+<main class="stage">
+
+<!-- ─── EMAIL 01 ─────────────────────────────── -->
+<div class="email-row" id="e01">
+  <div class="meta">
+    <div class="num"><em>01</em></div>
+    <span class="when"><span class="dot"></span>Day 0 · Immediate</span>
+    <div class="label-stack">
+      <span class="label-name">Goal</span>
+      <span class="label-val">Deliver the PDF, set the tone.</span>
+    </div>
+    <div class="label-stack">
+      <span class="label-name">Open rate target</span>
+      <span class="label-val">55–65%</span>
+    </div>
+  </div>
+  <article class="email">
+    <div class="email-head">
+      <div class="from-row">
+        <div class="avatar mjg-logo" style="width:64px; height:24px; border-radius:6px; padding:4px 6px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></div>
+        <span class="from-name">Michael J. Gauthier</span>
+        <span class="from-addr">&lt;mike@michaeljgauthier.com&gt;</span>
+      </div>
+      <div class="to-row">to <strong style="color:var(--foreground); font-weight:500;">you</strong>  ·  Friday at 9:02 AM</div>
+      <h2 class="subject">Your Created for More Check-In is here ✦</h2>
+      <p class="preview">A short note before you open it — and one question to start with…</p>
+      <div class="meta-pill-row">
+        <span class="meta-pill accent">Welcome</span>
+        <span class="meta-pill">Transactional</span>
+        <span class="meta-pill">Day 0</span>
+      </div>
+    </div>
+    <div class="email-body">
+      <p class="salutation">Hi friend,</p>
+      <p class="lead">Thank you for downloading the <em>Created for More Check-In</em>. You'll find it attached below.</p>
+      <p>Most people don't drift because they don't care. They drift because life gets full. This guide is a quiet 10–15 minute reflection — not a test you pass or fail. Just an honest look at the direction of your life.</p>
+
+      <a href="#" class="pdf-card" style="text-decoration:none;">
+        <div class="pdf-icon">PDF</div>
+        <div class="pdf-meta">
+          <span class="pdf-name">Created for More Check-In</span>
+          <span class="pdf-spec">14 pages  ·  2.4 MB  ·  Letter</span>
+        </div>
+        <span style="background: var(--brand-gold-2); color: var(--brand-navy); padding: 9px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;">Download ↓</span>
+      </a>
+
+      <p>If you only do one thing today, do this: <em>print the first three pages and read them with a coffee in hand.</em> Don't try to score yourself yet. Just read.</p>
+
+      <div class="reflection-block">
+        <span class="label">✦  Before you begin</span>
+        <p>"What kind of life am I actually building?"</p>
+      </div>
+
+      <p>I'll send a short note in a couple of days to help you make sense of what you find.</p>
+
+      <div class="signature">
+        <div class="name">Michael</div>
+        <div class="role">Author · The Stewardship Blueprint</div>
+      </div>
+    </div>
+    <div class="email-foot">
+      <div class="marks">
+        <span class="mark-mjg mjg-logo" style="width:54px; height:20px; border-radius:5px; padding:3px 5px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></span>
+        <span class="small">MichaelJGauthier.com</span>
+      </div>
+      <div class="links">
+        <a href="#">Manage preferences</a>
+        <a href="#">Unsubscribe</a>
+      </div>
+    </div>
+  </article>
+</div>
+
+<!-- ─── EMAIL 02 ─────────────────────────────── -->
+<div class="email-row" id="e02">
+  <div class="meta">
+    <div class="num"><em>02</em></div>
+    <span class="when"><span class="dot"></span>Day 2 · Tue 8:00 AM</span>
+    <div class="label-stack">
+      <span class="label-name">Goal</span>
+      <span class="label-val">Surface the one area to focus on.</span>
+    </div>
+    <div class="label-stack">
+      <span class="label-name">Personalization</span>
+      <span class="label-val">Lowest section ({{lowest_section}})</span>
+    </div>
+  </div>
+  <article class="email">
+    <div class="email-head">
+      <div class="from-row">
+        <div class="avatar mjg-logo" style="width:64px; height:24px; border-radius:6px; padding:4px 6px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></div>
+        <span class="from-name">Michael J. Gauthier</span>
+        <span class="from-addr">&lt;mike@michaeljgauthier.com&gt;</span>
+      </div>
+      <div class="to-row">to <strong style="color:var(--foreground); font-weight:500;">you</strong>  ·  Tuesday at 8:00 AM</div>
+      <h2 class="subject">Did one area stand out to you?</h2>
+      <p class="preview">Most readers find one section that quietly demands attention. Here's what to do with it.</p>
+      <div class="meta-pill-row">
+        <span class="meta-pill accent">Find your one</span>
+        <span class="meta-pill">Day 2</span>
+      </div>
+    </div>
+    <div class="email-body">
+      <p class="salutation">Hi friend,</p>
+      <p>If you've worked through the Check-In, you may have noticed something already: one section quietly stood lower than the others.</p>
+      <p>That's not failure. That's a signal. <em>Awareness is where stewardship begins.</em></p>
+
+      <p style="font-size: 13px; color: var(--muted-foreground); margin-bottom: 8px;">A quick reminder of the five areas:</p>
+
+      <div class="area-grid">
+        <div class="area-tile"><strong>Purpose</strong>Direction</div>
+        <div class="area-tile lowest"><strong>Family</strong>Lowest area</div>
+        <div class="area-tile"><strong>Fitness</strong>Energy</div>
+        <div class="area-tile"><strong>Fun</strong>Joy</div>
+        <div class="area-tile"><strong>Finances</strong>Stewardship</div>
+      </div>
+
+      <p class="muted">Note: in the live email, the personalized "lowest area" is highlighted based on the score the reader submitted. If they haven't submitted yet, all five tiles are neutral.</p>
+
+      <div class="reflection-block">
+        <span class="label">✦  Today's prompt</span>
+        <p>"Which area of my life is asking for my attention right now?"</p>
+      </div>
+
+      <p>Here's what I'd suggest. Don't try to fix the whole area. Pick <em>one small action</em> for this week. Just one. Then tell one person about it.</p>
+
+      <a href="#" class="cta-block">Open your worksheet → page 12</a>
+
+      <div class="signature">
+        <div class="name">Michael</div>
+        <div class="role">Author · The Stewardship Blueprint</div>
+      </div>
+    </div>
+    <div class="email-foot">
+      <div class="marks">
+        <span class="mark-mjg mjg-logo" style="width:54px; height:20px; border-radius:5px; padding:3px 5px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></span>
+        <span class="small">MichaelJGauthier.com</span>
+      </div>
+      <div class="links">
+        <a href="#">Manage preferences</a>
+        <a href="#">Unsubscribe</a>
+      </div>
+    </div>
+  </article>
+</div>
+
+<!-- ─── EMAIL 03 ─────────────────────────────── -->
+<div class="email-row" id="e03">
+  <div class="meta">
+    <div class="num"><em>03</em></div>
+    <span class="when"><span class="dot"></span>Day 4 · Thu 7:30 AM</span>
+    <div class="label-stack">
+      <span class="label-name">Goal</span>
+      <span class="label-val">Bridge from check-in to the book.</span>
+    </div>
+    <div class="label-stack">
+      <span class="label-name">CTR target</span>
+      <span class="label-val">12–18%</span>
+    </div>
+  </div>
+  <article class="email">
+    <div class="email-head">
+      <div class="from-row">
+        <div class="avatar mjg-logo" style="width:64px; height:24px; border-radius:6px; padding:4px 6px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></div>
+        <span class="from-name">Michael J. Gauthier</span>
+        <span class="from-addr">&lt;mike@michaeljgauthier.com&gt;</span>
+      </div>
+      <div class="to-row">to <strong style="color:var(--foreground); font-weight:500;">you</strong>  ·  Thursday at 7:30 AM</div>
+      <h2 class="subject">A short excerpt from Chapter 1</h2>
+      <p class="preview">Why most of us are building lives we didn't actually choose.</p>
+      <div class="meta-pill-row">
+        <span class="meta-pill accent">Chapter excerpt</span>
+        <span class="meta-pill">Day 4</span>
+      </div>
+    </div>
+    <div class="email-body">
+      <p class="salutation">Hi friend,</p>
+      <p>The Check-In is one tool. <em>The Stewardship Blueprint</em> is the larger conversation it lives inside.</p>
+      <p>Here's a short passage from Chapter 1. It's the moment that shaped why I'm writing the whole thing.</p>
+
+      <div class="quote-pull">"Most of us race through our days without pausing to ask whether the life we're building is the one we actually want. The danger is rarely laziness. The danger is motion without direction."</div>
+
+      <div class="chapter-callout">
+        <div class="num">0<em>1</em></div>
+        <div>
+          <h5>Created for More</h5>
+          <p>Living by default vs. living by design — the wake-up call this whole book is built on.</p>
+        </div>
+      </div>
+
+      <p>If that resonated, the full chapter is free to read at the link below. No login, no paywall — I'm publishing as I write.</p>
+
+      <a href="#" class="cta-block">✦  Read Chapter 1 in full</a>
+      <a href="#" class="cta-block outline" style="margin-left: 10px;">Or browse the overview</a>
+
+      <div class="signature">
+        <div class="name">Michael</div>
+        <div class="role">Author · The Stewardship Blueprint</div>
+      </div>
+    </div>
+    <div class="email-foot">
+      <div class="marks">
+        <span class="mark-mjg mjg-logo" style="width:54px; height:20px; border-radius:5px; padding:3px 5px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></span>
+        <span class="small">MichaelJGauthier.com</span>
+      </div>
+      <div class="links">
+        <a href="#">Manage preferences</a>
+        <a href="#">Unsubscribe</a>
+      </div>
+    </div>
+  </article>
+</div>
+
+<!-- ─── EMAIL 04 ─────────────────────────────── -->
+<div class="email-row" id="e04">
+  <div class="meta">
+    <div class="num"><em>04</em></div>
+    <span class="when"><span class="dot"></span>Day 7 · Sun 4:00 PM</span>
+    <div class="label-stack">
+      <span class="label-name">Goal</span>
+      <span class="label-val">One question to sit with on a Sunday.</span>
+    </div>
+    <div class="label-stack">
+      <span class="label-name">Format</span>
+      <span class="label-val">Plain-text style, very short</span>
+    </div>
+  </div>
+  <article class="email">
+    <div class="email-head">
+      <div class="from-row">
+        <div class="avatar mjg-logo" style="width:64px; height:24px; border-radius:6px; padding:4px 6px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></div>
+        <span class="from-name">Michael J. Gauthier</span>
+        <span class="from-addr">&lt;mike@michaeljgauthier.com&gt;</span>
+      </div>
+      <div class="to-row">to <strong style="color:var(--foreground); font-weight:500;">you</strong>  ·  Sunday at 4:00 PM</div>
+      <h2 class="subject">One question for a quiet Sunday</h2>
+      <p class="preview">It only takes a minute. But it changes the rest of the week.</p>
+      <div class="meta-pill-row">
+        <span class="meta-pill accent">Reflection</span>
+        <span class="meta-pill">Day 7</span>
+      </div>
+    </div>
+    <div class="email-body">
+      <p class="salutation">Hi friend,</p>
+      <p>I won't keep you long today.</p>
+      <p>Most weeks I save one question for Sunday — a single line I'll let sit with me for the next seven days. Here's this week's:</p>
+
+      <div class="reflection-block" style="margin: 22px 0; padding: 22px 24px;">
+        <span class="label">✦  This week's question</span>
+        <p style="font-size: 22px;">"Who is receiving the best version of me, and who is receiving what is left over?"</p>
+      </div>
+
+      <p class="muted">No reply required. No homework. Just the question.</p>
+
+      <p>If something stirs as you sit with it, you can hit reply — every message comes to my inbox and I read them all.</p>
+
+      <div class="signature">
+        <div class="name">Michael</div>
+        <div class="role">Author · The Stewardship Blueprint</div>
+      </div>
+    </div>
+    <div class="email-foot">
+      <div class="marks">
+        <span class="mark-mjg mjg-logo" style="width:54px; height:20px; border-radius:5px; padding:3px 5px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></span>
+        <span class="small">MichaelJGauthier.com</span>
+      </div>
+      <div class="links">
+        <a href="#">Manage preferences</a>
+        <a href="#">Unsubscribe</a>
+      </div>
+    </div>
+  </article>
+</div>
+
+<!-- ─── EMAIL 05 ─────────────────────────────── -->
+<div class="email-row" id="e05">
+  <div class="meta">
+    <div class="num"><em>05</em></div>
+    <span class="when"><span class="dot"></span>Day 10 · Wed 9:30 AM</span>
+    <div class="label-stack">
+      <span class="label-name">Goal</span>
+      <span class="label-val">Convert reader → early-access member.</span>
+    </div>
+    <div class="label-stack">
+      <span class="label-name">CTR target</span>
+      <span class="label-val">8–12%</span>
+    </div>
+  </div>
+  <article class="email">
+    <div class="email-head">
+      <div class="from-row">
+        <div class="avatar mjg-logo" style="width:64px; height:24px; border-radius:6px; padding:4px 6px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></div>
+        <span class="from-name">Michael J. Gauthier</span>
+        <span class="from-addr">&lt;mike@michaeljgauthier.com&gt;</span>
+      </div>
+      <div class="to-row">to <strong style="color:var(--foreground); font-weight:500;">you</strong>  ·  Wednesday at 9:30 AM</div>
+      <h2 class="subject">Walk with me as I write the book</h2>
+      <p class="preview">Early chapter drafts, reflection worksheets, and live Q&amp;A — all free.</p>
+      <div class="meta-pill-row">
+        <span class="meta-pill accent">Join the journey</span>
+        <span class="meta-pill">Day 10</span>
+      </div>
+    </div>
+    <div class="email-body">
+      <p class="salutation">Hi friend,</p>
+      <p>The Check-In was the first step. The book is the longer journey — and I'm writing it in public, chapter by chapter, while it's still being shaped.</p>
+      <p>Early readers receive the most:</p>
+
+      <div style="display: grid; gap: 8px; margin: 16px 0;">
+        <div style="display:flex; gap: 12px; padding: 12px 14px; background: var(--muted); border-radius: 10px; align-items:flex-start;">
+          <span style="color: var(--accent); margin-top:1px;">✦</span>
+          <div><strong style="font-size: 14px; font-weight:500;">Early chapter drafts</strong> <span style="color: var(--muted-foreground); font-size: 13px;">— delivered before public release</span></div>
+        </div>
+        <div style="display:flex; gap: 12px; padding: 12px 14px; background: var(--muted); border-radius: 10px; align-items:flex-start;">
+          <span style="color: var(--accent); margin-top:1px;">✦</span>
+          <div><strong style="font-size: 14px; font-weight:500;">Reflection worksheets</strong> <span style="color: var(--muted-foreground); font-size: 13px;">— one per pillar, designed to print</span></div>
+        </div>
+        <div style="display:flex; gap: 12px; padding: 12px 14px; background: var(--muted); border-radius: 10px; align-items:flex-start;">
+          <span style="color: var(--accent); margin-top:1px;">✦</span>
+          <div><strong style="font-size: 14px; font-weight:500;">Live Q&amp;A invites</strong> <span style="color: var(--muted-foreground); font-size: 13px;">— small-group calls as chapters release</span></div>
+        </div>
+        <div style="display:flex; gap: 12px; padding: 12px 14px; background: var(--muted); border-radius: 10px; align-items:flex-start;">
+          <span style="color: var(--accent); margin-top:1px;">✦</span>
+          <div><strong style="font-size: 14px; font-weight:500;">Blueprint actions</strong> <span style="color: var(--muted-foreground); font-size: 13px;">— short weekly steps you can actually take</span></div>
+        </div>
+      </div>
+
+      <p>It's free. Your input shapes the book. And if it's not for you, you can leave with one click.</p>
+
+      <a href="#" class="cta-block gold">✦  Join the journey →</a>
+
+      <p style="margin-top: 24px;">Either way, I'm grateful you're here.</p>
+
+      <div class="signature">
+        <div class="name">Michael</div>
+        <div class="role">Author · The Stewardship Blueprint</div>
+      </div>
+    </div>
+    <div class="email-foot">
+      <div class="marks">
+        <span class="mark-mjg mjg-logo" style="width:54px; height:20px; border-radius:5px; padding:3px 5px; background: var(--brand-navy); color: var(--brand-cream);"><svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="fill-rule:evenodd;clip-rule:evenodd;"><path class="l-main" d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z"/><path class="l-main" d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z"/><path class="l-main" d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z"/><path class="l-g" d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z"/></svg></span>
+        <span class="small">MichaelJGauthier.com</span>
+      </div>
+      <div class="links">
+        <a href="#">Manage preferences</a>
+        <a href="#">Unsubscribe</a>
+      </div>
+    </div>
+  </article>
+</div>
+
+</main>
+
+<script>
+  // Auto-print once fonts and layout are ready
+  (async () => {
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+    await new Promise(r => setTimeout(r, 500));
+    window.print();
+  })();
+</script>
+</body>
+</html>

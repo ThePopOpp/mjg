@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Created for More Check-In · The Stewardship Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+<style>
+  /* Override design-system display font with Fraunces for titles */
+  :root {
+    --font-display: "Fraunces", "Source Serif 4", Georgia, serif;
+  }
+  /* ── Print-first PDF layout ───────────────────────────────────── */
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; background: #d6d3cb; }
+  body {
+    font-family: var(--font-sans);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01","cv11";
+  }
+
+  @page { size: 8.5in 11in; margin: 0; }
+
+  .page {
+    position: relative;
+    width: 8.5in; height: 11in;
+    margin: 24px auto;
+    background: var(--brand-cream);
+    box-shadow: 0 4px 24px rgba(0,0,0,.12);
+    overflow: hidden;
+    page-break-after: always;
+    color: var(--foreground);
+    padding: 0.7in 0.85in 0.6in;
+  }
+  @media print {
+    body { background: white; }
+    .page { margin: 0; box-shadow: none; }
+    .toolbar { display: none !important; }
+  }
+
+  /* Floating screen toolbar */
+  .toolbar {
+    position: fixed; top: 16px; right: 16px; z-index: 100;
+    display: flex; gap: 8px;
+    background: white; border: 1px solid var(--border);
+    border-radius: 9999px; padding: 4px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    font-family: var(--font-sans);
+  }
+  .toolbar button {
+    appearance: none; border: 0; background: transparent;
+    padding: 8px 14px; font-size: 12px;
+    border-radius: 9999px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    color: #5a6975;
+  }
+  .toolbar button:hover { background: var(--brand-beige); color: var(--brand-navy); }
+  .toolbar .primary { background: var(--brand-navy); color: var(--brand-cream); }
+  .toolbar .primary:hover { background: var(--brand-navy); color: var(--brand-gold-2); }
+
+  /* Common elements */
+  .pg-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #d4cdba;
+    margin-bottom: 28px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6b6757;
+  }
+  .pg-header .left { display: inline-flex; align-items: center; gap: 8px; }
+  .pg-header .left .star { color: var(--brand-gold); font-size: 11px; }
+  .pg-footer {
+    position: absolute;
+    left: 0.85in; right: 0.85in; bottom: 0.5in;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #6b6757;
+    padding-top: 10px;
+    border-top: 1px solid #d4cdba;
+  }
+  .pg-footer .ornament { color: var(--brand-gold); }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #6b6757;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .eyebrow::before { content: "✦"; color: var(--brand-gold); font-size: 13px; }
+
+  h1.cover-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 64px;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+    margin: 0;
+    color: var(--brand-navy);
+  }
+  h1.cover-title em { font-style: italic; font-weight: 400; color: var(--brand-gold); }
+
+  h2.page-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 40px;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    margin: 0 0 14px;
+    color: var(--brand-navy);
+  }
+  h2.page-title em { font-style: italic; font-weight: 400; color: var(--brand-gold); }
+
+  h3.sub { font-family: var(--font-display); font-weight: 600; font-size: 22px; letter-spacing: -0.015em; margin: 0 0 8px; color: var(--brand-navy); }
+
+  p.body { font-size: 13px; line-height: 1.65; color: #2a3742; margin: 0 0 12px; }
+  p.body.lg { font-size: 14.5px; line-height: 1.6; }
+  p.body em { font-style: italic; color: var(--brand-navy); }
+
+  .pull {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 1.45;
+    color: var(--brand-navy);
+    border-left: 2px solid var(--brand-gold);
+    padding: 4px 0 4px 18px;
+    margin: 18px 0;
+  }
+
+  .divider {
+    height: 1px; background: #d4cdba; margin: 18px 0;
+  }
+  .gold-divider {
+    width: 48px; height: 2px; background: var(--brand-gold);
+    margin: 12px 0 18px;
+  }
+
+  /* ── Cover ─────────────────────────────── */
+  .cover { padding: 0; background: var(--brand-navy); color: var(--brand-cream); display: grid; grid-template-rows: auto 1fr auto; }
+  .cover-top {
+    padding: 0.7in 0.85in 0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(241,237,228,.55);
+  }
+  .cover-mid { padding: 0 0.85in; display: flex; flex-direction: column; justify-content: center; }
+  .cover-eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--brand-gold-2);
+    display: inline-flex; align-items: center; gap: 10px;
+    margin-bottom: 36px;
+  }
+  .cover-mid h1 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 96px; letter-spacing: -0.035em; line-height: 0.95;
+    margin: 0;
+    color: var(--brand-cream);
+  }
+  .cover-mid h1 em { font-style: italic; font-weight: 400; color: var(--brand-gold-2); }
+  .cover-sub {
+    font-family: var(--font-display);
+    font-size: 19px; line-height: 1.45;
+    color: rgba(241,237,228,.75);
+    margin: 28px 0 0; max-width: 36ch;
+    font-weight: 400;
+  }
+  .cover-pull {
+    margin-top: 60px;
+    padding: 22px 26px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-left: 3px solid var(--brand-gold-2);
+    border-radius: 4px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--brand-cream);
+    max-width: 5.6in;
+  }
+  .cover-bot {
+    padding: 0 0.85in 0.7in;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    color: rgba(241,237,228,.55);
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .cover-bot .author {
+    font-family: var(--font-display); font-style: normal;
+    text-transform: none; letter-spacing: -0.005em;
+    color: var(--brand-cream); font-size: 18px; font-weight: 600;
+  }
+  .cover-bot .role { color: rgba(241,237,228,.5); font-size: 10px; }
+
+  /* MJG mark — wordmark logo */
+  .mjg-mark {
+    width: 96px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .mjg-mark svg { width: 100%; height: 100%; }
+
+  /* Welcome page */
+  .welcome-grid {
+    display: grid; grid-template-columns: 1fr 1.6fr; gap: 32px;
+    align-items: start;
+  }
+  .signature-card {
+    background: white; border: 1px solid #d4cdba; border-radius: 12px;
+    padding: 22px;
+  }
+  .signature-card .name { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--brand-navy); }
+  .signature-card .title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #6b6757; margin-top: 4px; }
+
+  /* Why list */
+  .why-list { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+  .why-item {
+    display: grid; grid-template-columns: 28px 1fr; gap: 16px;
+    padding-bottom: 16px; border-bottom: 1px dashed #d4cdba;
+  }
+  .why-item:last-child { border-bottom: 0; }
+  .why-num {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+    color: var(--brand-gold); padding-top: 2px;
+  }
+  .why-item h4 { margin: 0 0 4px; font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--brand-navy); letter-spacing: -0.01em; }
+  .why-item p { margin: 0; font-size: 13px; line-height: 1.6; color: #2a3742; }
+
+  /* How-to scoring table */
+  .score-table {
+    width: 100%; border-collapse: collapse;
+    background: white; border: 1px solid #d4cdba; border-radius: 10px; overflow: hidden;
+    font-size: 12px;
+  }
+  .score-table th {
+    background: var(--brand-navy); color: var(--brand-cream);
+    text-align: left; padding: 12px 14px;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    font-weight: 500;
+  }
+  .score-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #ece6d8;
+    line-height: 1.5;
+    vertical-align: top;
+    color: #2a3742;
+  }
+  .score-table tr:last-child td { border-bottom: 0; }
+  .score-table .num {
+    font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--brand-navy);
+    width: 50px;
+  }
+  .score-table .meaning { font-weight: 600; color: var(--brand-navy); width: 1.7in; }
+
+  /* Section pages */
+  .section-page-head {
+    display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center;
+    margin-bottom: 22px;
+  }
+  .section-num-badge {
+    width: 64px; height: 64px;
+    background: var(--brand-navy); color: var(--brand-cream);
+    border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+  }
+  .section-num-badge .lbl { font-size: 9px; letter-spacing: 0.16em; opacity: 0.7; }
+  .section-num-badge .n { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1; margin-top: 2px; }
+
+  .core-q {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 16px; line-height: 1.5;
+    color: var(--brand-navy);
+    background: white; border: 1px solid #e4dec9;
+    border-left: 3px solid var(--brand-gold);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 0 0 24px;
+  }
+  .core-q b {
+    display: block;
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6b6757;
+    margin-bottom: 4px;
+  }
+
+  /* Statement rows with checkboxes */
+  .stmt-table {
+    width: 100%; border-collapse: collapse;
+    background: white; border: 1px solid #d4cdba; border-radius: 10px; overflow: hidden;
+    font-size: 13px;
+  }
+  .stmt-table th {
+    background: #f4ead7; color: var(--brand-navy);
+    padding: 10px 12px;
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    font-weight: 500;
+    text-align: center;
+    border-bottom: 1px solid #e4dec9;
+  }
+  .stmt-table th.stmt-h { text-align: left; padding-left: 18px; }
+  .stmt-table td.stmt {
+    padding: 14px 18px; line-height: 1.45; color: #2a3742;
+    border-bottom: 1px solid #ece6d8;
+  }
+  .stmt-table td.box {
+    padding: 14px 6px; text-align: center;
+    border-bottom: 1px solid #ece6d8;
+    vertical-align: middle;
+    width: 0.5in;
+  }
+  .stmt-table tr:last-child td { border-bottom: 0; }
+  .stmt-table .checkbox {
+    width: 18px; height: 18px; border-radius: 4px;
+    border: 1.5px solid #b8b09c; background: var(--brand-cream);
+    display: inline-block;
+  }
+  .section-score {
+    margin-top: 16px;
+    display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #6b6757;
+  }
+  .section-score .blank {
+    display: inline-block;
+    width: 60px; height: 32px;
+    border: 1px solid #b8b09c;
+    border-radius: 6px;
+    background: white;
+    margin: 0 4px;
+  }
+
+  /* Total scoring page */
+  .totals-table {
+    width: 100%; border-collapse: collapse;
+    background: white; border: 1px solid #d4cdba; border-radius: 10px; overflow: hidden;
+  }
+  .totals-table tr { border-bottom: 1px solid #ece6d8; }
+  .totals-table tr:last-child { border-bottom: 0; }
+  .totals-table td {
+    padding: 16px 20px;
+    font-size: 14px; color: #2a3742;
+  }
+  .totals-table td:first-child { font-weight: 500; color: var(--brand-navy); }
+  .totals-table td:last-child {
+    text-align: right;
+    font-family: var(--font-display); font-size: 16px; color: var(--brand-navy);
+  }
+  .totals-table tr.total td {
+    background: var(--brand-navy); color: var(--brand-cream);
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 18px;
+    padding: 18px 20px;
+  }
+  .totals-table .blank {
+    display: inline-block;
+    min-width: 50px; padding: 4px 10px;
+    border-bottom: 1.5px solid #b8b09c;
+    text-align: center;
+  }
+  .totals-table tr.total .blank {
+    border-bottom-color: var(--brand-gold-2);
+    color: var(--brand-cream);
+  }
+
+  /* Tier card (score-result band) */
+  .tier-card {
+    background: white;
+    border: 1px solid #d4cdba;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+  .tier-range {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 22px; letter-spacing: -0.02em;
+    color: var(--brand-navy);
+    line-height: 1;
+  }
+  .tier-range .of { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; color: #6b6757; margin-top: 4px; font-weight: 500; }
+  .tier-card h4 {
+    margin: 0 0 6px;
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    color: var(--brand-navy); letter-spacing: -0.01em;
+  }
+  .tier-card p {
+    margin: 0 0 8px;
+    font-size: 12.5px; line-height: 1.55; color: #2a3742;
+  }
+  .tier-card .reflection {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 12.5px; line-height: 1.5;
+    color: var(--brand-navy);
+    padding-left: 12px; border-left: 2px solid var(--brand-gold);
+    margin-top: 6px;
+  }
+  .tier-card.aligned     { background: linear-gradient(180deg, #f4ead7 0%, white 60%); }
+  .tier-card.aware       { background: linear-gradient(180deg, #ece6d8 0%, white 60%); }
+  .tier-card.drifting    { background: white; }
+  .tier-card.rebuild     { background: white; border-color: #c4b89a; }
+
+  /* Next-step page */
+  .step {
+    display: grid; grid-template-columns: 32px 1fr; gap: 16px;
+    margin-bottom: 18px;
+    align-items: start;
+  }
+  .step-num {
+    width: 28px; height: 28px;
+    background: var(--brand-navy); color: var(--brand-cream);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  }
+  .step h4 {
+    margin: 0 0 8px;
+    font-family: var(--font-display); font-size: 15px; font-weight: 600;
+    color: var(--brand-navy); letter-spacing: -0.01em;
+  }
+  .step .write-line {
+    height: 22px;
+    border-bottom: 1px solid #c4b89a;
+    margin-top: 6px;
+  }
+  .step .write-line.short { width: 70%; }
+
+  .circle-pill-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .circle-pill {
+    padding: 8px 14px;
+    border: 1.5px solid #c4b89a;
+    border-radius: 9999px;
+    background: white;
+    font-size: 12px; color: var(--brand-navy);
+    font-weight: 500;
+  }
+
+  /* Reflection questions */
+  .qlist {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-top: 8px;
+  }
+  .qlist .q {
+    display: grid; grid-template-columns: 24px 1fr; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px dashed #d4cdba;
+  }
+  .qlist .q:last-child { border-bottom: 0; }
+  .qlist .qn {
+    font-family: var(--font-mono); font-size: 11px; color: var(--brand-gold);
+    padding-top: 1px;
+  }
+  .qlist p { margin: 0; font-size: 13px; line-height: 1.55; color: #2a3742; }
+
+  /* Final CTA page */
+  .cta-page {
+    padding: 0;
+    background: var(--brand-navy);
+    color: var(--brand-cream);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+  .cta-top { padding: 0.7in 0.85in 0;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(241,237,228,.55);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .cta-mid { padding: 0 0.85in; display: flex; flex-direction: column; justify-content: center; }
+  .cta-mid h2 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 56px; letter-spacing: -0.03em; line-height: 1;
+    margin: 0 0 22px; color: var(--brand-cream);
+    max-width: 12ch;
+  }
+  .cta-mid h2 em { font-style: italic; font-weight: 400; color: var(--brand-gold-2); }
+  .cta-mid p { margin: 0 0 14px; color: rgba(241,237,228,.75); font-size: 14px; line-height: 1.6; max-width: 5.5in; }
+
+  .channels {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-top: 28px; max-width: 5.5in;
+  }
+  .channel {
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .channel .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brand-gold-2); margin-bottom: 6px; }
+  .channel .val { font-family: var(--font-display); font-weight: 500; font-size: 16px; color: var(--brand-cream); }
+  .channel .sub { font-size: 11px; color: rgba(241,237,228,.55); margin-top: 4px; }
+
+  .cta-bot { padding: 0 0.85in 0.7in;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    color: rgba(241,237,228,.5);
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .cta-bot .closing-line {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 13px; letter-spacing: -0.005em; text-transform: none;
+    color: var(--brand-gold-2);
+    max-width: 4.2in; line-height: 1.45;
+  }
+
+  /* Stamps */
+  .stamp {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    background: #f4ead7;
+    border: 1px solid #e4dec9;
+    border-radius: 9999px;
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--brand-navy);
+  }
+
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="window.print()" class="primary">⎙  Print / Save as PDF</button>
+  <button onclick="document.querySelector('.page').scrollIntoView()">↑ Cover</button>
+</div>
+
+<!-- ─────── Page 1: COVER ─────── -->
+<div class="page cover">
+  <div class="cover-top">
+    <span>The Stewardship Blueprint</span>
+    <span>Created for More · Companion Guide</span>
+  </div>
+  <div class="cover-mid">
+    <span class="cover-eyebrow">✦  A 14-page Reflection Guide</span>
+    <h1>Created<br/>for <em>More</em><br/>Check-In</h1>
+    <p class="cover-sub">See where you're aligned, where you're drifting, and what needs your attention next.</p>
+    <div class="cover-pull">
+      "You were not created merely to keep up. You were created to steward a life that matters."
+    </div>
+  </div>
+  <div class="cover-bot">
+    <div>
+      <div class="author">Michael J. Gauthier</div>
+      <div class="role">Author · Financial Planner · Life Designer</div>
+    </div>
+    <div class="mjg-mark" aria-label="MJG" style="width: 110px; height: 40px;">
+      <svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;" aria-hidden="true"><g><path d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z" style="fill:#f1ede4;"></path><path d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z" style="fill:#f1ede4;fill-rule:nonzero;"></path><path d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z" style="fill:#f1ede4;fill-rule:nonzero;"></path><path d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z" style="fill:#c9a96e;fill-rule:nonzero;"></path></g></svg>
+    </div>
+  </div>
+</div>
+
+<!-- ─────── Page 2: WELCOME ─────── -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Created for More · The Stewardship Blueprint</span>
+    <span>Page 02 / 14</span>
+  </div>
+
+  <span class="eyebrow">Welcome</span>
+  <h2 class="page-title">Welcome from <em>Michael</em></h2>
+  <div class="gold-divider"></div>
+
+  <p class="body lg">Most people do not drift because they do not care. They drift because life gets full. Responsibilities grow. Calendars fill. Work expands. Family needs attention. Financial pressure builds. Health gets pushed aside. Joy becomes something we hope to get back to someday.</p>
+
+  <p class="body">And somewhere along the way, many people stop asking one of the most important questions they could ever ask:</p>
+
+  <div class="pull">What kind of life am I actually building?</div>
+
+  <p class="body">The Created for More Check-In is not designed to make you feel guilty or overwhelmed. It is not a test you pass or fail. It is a simple reflection tool to help you pause, look honestly at the direction of your life, and identify one area that may need your attention next.</p>
+
+  <p class="body">You do not need to fix everything today. You simply need to begin noticing. <em>Because awareness is where stewardship begins.</em></p>
+
+  <div class="divider"></div>
+
+  <p class="body" style="font-size:12px; color:#5a6975;">I approach this work from a Christian faith perspective because that is the lens through which I have learned to understand life, purpose, family, work, money, and legacy. But this guide is faith-based, not faith-exclusive. Wherever you are starting from, you are welcome here. The invitation is simple: <em>slow down, think deeply, and begin paying attention to the life you are building.</em></p>
+
+  <div class="pg-footer"><span>MichaelJGauthier.com</span><span class="ornament">✦</span><span>The Stewardship Blueprint</span></div>
+</div>
+
+<!-- ─────── Page 3: WHY THIS MATTERS ─────── -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Created for More · The Stewardship Blueprint</span>
+    <span>Page 03 / 14</span>
+  </div>
+
+  <span class="eyebrow">The Case for Reflection</span>
+  <h2 class="page-title">Why this <em>check-in</em> matters</h2>
+  <div class="gold-divider"></div>
+
+  <div class="why-list">
+    <div class="why-item">
+      <div class="why-num">01</div>
+      <div>
+        <h4>Busyness can disguise drift</h4>
+        <p>Most people are not doing nothing. They are doing everything. The danger is not usually laziness — it's motion without direction.</p>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-num">02</div>
+      <div>
+        <h4>Success does not always equal alignment</h4>
+        <p>A person can be successful and still be misaligned. Productive and still exhausted. Responsible and still reactive. Impressive from a distance and unsettled up close.</p>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-num">03</div>
+      <div>
+        <h4>Reflection is where transformation begins</h4>
+        <p>Before you can redesign your life, you have to see your life clearly. <em>You cannot steward what you refuse to examine.</em></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider" style="margin-top: 28px;"></div>
+
+  <p class="body">This check-in will help you evaluate <em>five key areas</em> of your life — Purpose, Family, Fitness, Fun, and Finances — which connect to the larger Stewardship Blueprint framework: faith, purpose, relationships, health, joy, resources, guardrails, habits, energy, and legacy.</p>
+
+  <div class="pg-footer"><span>MichaelJGauthier.com</span><span class="ornament">✦</span><span>The Stewardship Blueprint</span></div>
+</div>
+
+<!-- ─────── Page 4: HOW TO USE ─────── -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Created for More · The Stewardship Blueprint</span>
+    <span>Page 04 / 14</span>
+  </div>
+
+  <span class="eyebrow">Instructions</span>
+  <h2 class="page-title">How to use the <em>check-in</em></h2>
+  <div class="gold-divider"></div>
+
+  <p class="body">Set aside <em>10 to 15 quiet minutes</em>. You can complete this quickly, but do not rush through it. The value is not in the score alone. The value is in the honesty.</p>
+  <p class="body">For each statement, rate yourself from 1 to 5.</p>
+
+  <table class="score-table" style="margin-top: 14px;">
+    <thead>
+      <tr><th style="width:50px;">Score</th><th style="width:1.7in;">Meaning</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="meaning">Strongly Disagree</td><td>This is rarely true in my life right now.</td></tr>
+      <tr><td class="num">2</td><td class="meaning">Disagree</td><td>This is occasionally true, but not consistently.</td></tr>
+      <tr><td class="num">3</td><td class="meaning">Neutral / Unsure</td><td>This is somewhat true, but I have room to grow.</td></tr>
+      <tr><td class="num">4</td><td class="meaning">Agree</td><td>This is mostly true in my life.</td></tr>
+      <tr><td class="num">5</td><td class="meaning">Strongly Agree</td><td>This is consistently true and intentionally protected.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pull" style="margin-top: 26px;">Answer based on what is actually true, not what you wish were true.</div>
+
+  <p class="body" style="font-size:12px; color:#5a6975;">Your calendar, habits, energy, relationships, spending, and recurring thoughts often tell the truth before your intentions do.</p>
+
+  <div class="pg-footer"><span>MichaelJGauthier.com</span><span class="ornament">✦</span><span>The Stewardship Blueprint</span></div>
+</div>
+
+<!-- ─────── Pages 5-9: FIVE SECTIONS ─────── -->
+<!-- Macro template via repeated markup -->
+
+<!-- Section 1 -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Section 01 of 05</span>
+    <span>Page 05 / 14</span>
+  </div>
+  <div class="section-page-head">
+    <div class="section-num-badge"><span class="lbl">SECTION</span><span class="n">01</span></div>
+    <div>
+      <h2 class="page-title" style="margin: 0;">Purpose &amp; <em>Direction</em></h2>
+      <span class="eyebrow" style="margin-top: 8px;">Five statements · 25 points</span>
+    </div>
+  </div>
+  <div class="core-q"><b>Core Question</b>Am I living with clarity about what kind of life I am building?</div>
+
+  <table class="stmt-table">
+    <thead>
+      <tr><th class="stmt-h">Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="stmt">I regularly slow down to reflect on the direction of my life.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I have clarity about what matters most in this season.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">My calendar reflects my stated priorities.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I am building my life around purpose, not just pressure or expectation.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I can identify where I may be drifting and what needs my attention.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-score">Section Score <span class="blank"></span> / 25</div>
+
+  <div class="pg-footer"><span>Section 01 · Purpose &amp; Direction</span><span class="ornament">✦</span><span>MichaelJGauthier.com</span></div>
+</div>
+
+<!-- Section 2 -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Section 02 of 05</span>
+    <span>Page 06 / 14</span>
+  </div>
+  <div class="section-page-head">
+    <div class="section-num-badge"><span class="lbl">SECTION</span><span class="n">02</span></div>
+    <div>
+      <h2 class="page-title" style="margin: 0;">Family &amp; <em>Relationships</em></h2>
+      <span class="eyebrow" style="margin-top: 8px;">Five statements · 25 points</span>
+    </div>
+  </div>
+  <div class="core-q"><b>Core Question</b>Are the people who matter most receiving my best?</div>
+
+  <table class="stmt-table">
+    <thead><tr><th class="stmt-h">Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+    <tbody>
+      <tr><td class="stmt">I am intentionally investing in my closest relationships.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">The people I love are receiving my presence, not just my provision.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I have healthy rhythms for connection with family, friends, or community.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I am leading, serving, or encouraging the people entrusted to me.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I am not allowing busyness to consistently crowd out relationships.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-score">Section Score <span class="blank"></span> / 25</div>
+
+  <div class="pg-footer"><span>Section 02 · Family &amp; Relationships</span><span class="ornament">✦</span><span>MichaelJGauthier.com</span></div>
+</div>
+
+<!-- Section 3 -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Section 03 of 05</span>
+    <span>Page 07 / 14</span>
+  </div>
+  <div class="section-page-head">
+    <div class="section-num-badge"><span class="lbl">SECTION</span><span class="n">03</span></div>
+    <div>
+      <h2 class="page-title" style="margin: 0;">Fitness &amp; <em>Energy</em></h2>
+      <span class="eyebrow" style="margin-top: 8px;">Five statements · 25 points</span>
+    </div>
+  </div>
+  <div class="core-q"><b>Core Question</b>Am I stewarding my body and energy well enough to live with purpose?</div>
+
+  <table class="stmt-table">
+    <thead><tr><th class="stmt-h">Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+    <tbody>
+      <tr><td class="stmt">I am caring for my physical health with intention.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I have enough energy to be present for what matters most.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">My sleep, movement, nutrition, and recovery support the life I want to build.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I recognize when I am depleted and need renewal.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I see my health as capacity for calling, service, and stewardship.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-score">Section Score <span class="blank"></span> / 25</div>
+
+  <div class="pg-footer"><span>Section 03 · Fitness &amp; Energy</span><span class="ornament">✦</span><span>MichaelJGauthier.com</span></div>
+</div>
+
+<!-- Section 4 -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Section 04 of 05</span>
+    <span>Page 08 / 14</span>
+  </div>
+  <div class="section-page-head">
+    <div class="section-num-badge"><span class="lbl">SECTION</span><span class="n">04</span></div>
+    <div>
+      <h2 class="page-title" style="margin: 0;">Fun, Joy &amp; <em>Meaningful Experiences</em></h2>
+      <span class="eyebrow" style="margin-top: 8px;">Five statements · 25 points</span>
+    </div>
+  </div>
+  <div class="core-q"><b>Core Question</b>Am I making room for joy, adventure, rest, and meaningful experiences?</div>
+
+  <table class="stmt-table">
+    <thead><tr><th class="stmt-h">Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+    <tbody>
+      <tr><td class="stmt">I make time for activities and experiences that bring joy and renewal.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I schedule meaningful moments instead of hoping they happen accidentally.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I am creating memories with the people I love.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I allow space for rest, celebration, adventure, or play.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">My life includes more than responsibility, productivity, and obligation.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-score">Section Score <span class="blank"></span> / 25</div>
+
+  <div class="pg-footer"><span>Section 04 · Fun &amp; Meaningful Experiences</span><span class="ornament">✦</span><span>MichaelJGauthier.com</span></div>
+</div>
+
+<!-- Section 5 -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Section 05 of 05</span>
+    <span>Page 09 / 14</span>
+  </div>
+  <div class="section-page-head">
+    <div class="section-num-badge"><span class="lbl">SECTION</span><span class="n">05</span></div>
+    <div>
+      <h2 class="page-title" style="margin: 0;">Finances &amp; <em>Stewardship</em></h2>
+      <span class="eyebrow" style="margin-top: 8px;">Five statements · 25 points</span>
+    </div>
+  </div>
+  <div class="core-q"><b>Core Question</b>Is money serving my purpose, or shaping my identity?</div>
+
+  <table class="stmt-table">
+    <thead><tr><th class="stmt-h">Statement</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+    <tbody>
+      <tr><td class="stmt">I see money as a tool, not the ultimate goal.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">My spending reflects my values and priorities.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I have clarity about what financial stewardship looks like in this season.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I am using resources for provision, generosity, freedom, and impact.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+      <tr><td class="stmt">I am not allowing fear, comparison, status, or accumulation to define success.</td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td><td class="box"><span class="checkbox"></span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-score">Section Score <span class="blank"></span> / 25</div>
+
+  <div class="pg-footer"><span>Section 05 · Finances &amp; Stewardship</span><span class="ornament">✦</span><span>MichaelJGauthier.com</span></div>
+</div>
+
+<!-- ─────── Page 10: SCORE TOTALS ─────── -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Created for More · The Stewardship Blueprint</span>
+    <span>Page 10 / 14</span>
+  </div>
+
+  <span class="eyebrow">Tally</span>
+  <h2 class="page-title">Score your <em>check-in</em></h2>
+  <div class="gold-divider"></div>
+
+  <p class="body">Add each section score and then calculate your total out of 125. <em>This is not a pass/fail test.</em> It is a reflection tool designed to help you notice where alignment is strong and where drift may be showing up.</p>
+
+  <table class="totals-table" style="margin-top: 18px;">
+    <tr><td>Purpose &amp; Direction</td><td><span class="blank">&nbsp;</span> / 25</td></tr>
+    <tr><td>Family &amp; Relationships</td><td><span class="blank">&nbsp;</span> / 25</td></tr>
+    <tr><td>Fitness &amp; Energy</td><td><span class="blank">&nbsp;</span> / 25</td></tr>
+    <tr><td>Fun &amp; Meaningful Experiences</td><td><span class="blank">&nbsp;</span> / 25</td></tr>
+    <tr><td>Finances &amp; Stewardship</td><td><span class="blank">&nbsp;</span> / 25</td></tr>
+    <tr class="total"><td>Total Score</td><td><span class="blank">&nbsp;</span> / 125</td></tr>
+  </table>
+
+  <div class="pull" style="margin-top: 28px;">The point is not to judge your life. The point is to see it clearly enough to steward it wisely.</div>
+
+  <div class="pg-footer"><span>MichaelJGauthier.com</span><span class="ornament">✦</span><span>The Stewardship Blueprint</span></div>
+</div>
+
+<!-- ─────── Page 11: WHAT YOUR SCORE TELLS YOU (TIERS) ─────── -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Created for More · The Stewardship Blueprint</span>
+    <span>Page 11 / 14</span>
+  </div>
+
+  <span class="eyebrow">Score Tiers</span>
+  <h2 class="page-title">What your score may be <em>telling you</em></h2>
+  <div class="gold-divider"></div>
+
+  <div class="tier-card aligned">
+    <div class="tier-range">100–125<span class="of">of 125</span></div>
+    <div>
+      <h4>Aligned and Intentional</h4>
+      <p>You appear to be living with a meaningful level of clarity and intentionality. The next step is not complacency — it is protection. What is healthy should be guarded, strengthened, and sustained.</p>
+      <div class="reflection">"What rhythm, relationship, habit, or priority do I need to protect?"</div>
+    </div>
+  </div>
+
+  <div class="tier-card aware">
+    <div class="tier-range">75–99<span class="of">of 125</span></div>
+    <div>
+      <h4>Aware but Stretched</h4>
+      <p>You likely have meaningful alignment in some areas, but you may also feel stretched, reactive, or inconsistent. This is a common place for responsible people. You are not off track, but busyness may be beginning to create drift.</p>
+      <div class="reflection">"Where am I giving too much attention to urgency and not enough to importance?"</div>
+    </div>
+  </div>
+
+  <div class="tier-card drifting">
+    <div class="tier-range">50–74<span class="of">of 125</span></div>
+    <div>
+      <h4>Drifting in Key Areas</h4>
+      <p>Your score may indicate that parts of your life are being shaped more by default than by design. This is not a reason for shame. It is a reason to pause, pay attention, and begin making intentional adjustments.</p>
+      <div class="reflection">"Which area of my life is asking for my attention right now?"</div>
+    </div>
+  </div>
+
+  <div class="tier-card rebuild">
+    <div class="tier-range">&lt; 50<span class="of">of 125</span></div>
+    <div>
+      <h4>Time to Pause and Rebuild</h4>
+      <p>This may be a season where you need deeper reflection, support, and realignment. Do not try to fix everything at once. Start with one area. <em>Awareness is the beginning of stewardship.</em></p>
+      <div class="reflection">"What is one honest step I can take this week?"</div>
+    </div>
+  </div>
+
+  <div class="pg-footer"><span>MichaelJGauthier.com</span><span class="ornament">✦</span><span>The Stewardship Blueprint</span></div>
+</div>
+
+<!-- ─────── Page 12: NEXT STEP ─────── -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Created for More · The Stewardship Blueprint</span>
+    <span>Page 12 / 14</span>
+  </div>
+
+  <span class="eyebrow">Action</span>
+  <h2 class="page-title">Identify your <em>next step</em></h2>
+  <div class="gold-divider"></div>
+
+  <p class="body">Insight becomes powerful when it turns into action. <em>Do not try to redesign your entire life in one day.</em> Begin with one faithful next step.</p>
+
+  <div class="step" style="margin-top: 22px;">
+    <div class="step-num">1</div>
+    <div>
+      <h4>Circle your lowest section</h4>
+      <div class="circle-pill-row">
+        <span class="circle-pill">Purpose</span>
+        <span class="circle-pill">Family</span>
+        <span class="circle-pill">Fitness</span>
+        <span class="circle-pill">Fun</span>
+        <span class="circle-pill">Finances</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div>
+      <h4>Complete this sentence</h4>
+      <p class="body" style="margin: 4px 0 4px; font-style: italic;">In this season, I sense I need to pay attention to:</p>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div>
+      <h4>Choose one small action</h4>
+      <p class="body" style="margin: 4px 0 4px; font-style: italic;">This week, I will:</p>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div>
+      <h4>Choose one conversation</h4>
+      <p class="body" style="margin: 4px 0 4px; font-style: italic;">One person I may need to talk with about this is:</p>
+      <div class="write-line short"></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div>
+      <h4>Choose one rhythm</h4>
+      <p class="body" style="margin: 4px 0 4px; font-style: italic;">One rhythm, habit, or calendar adjustment that could help is:</p>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <div class="pg-footer"><span style="font-style:italic; text-transform:none; letter-spacing:0; font-family:var(--font-display);">Begin with one faithful next step.</span><span class="ornament">✦</span><span>MichaelJGauthier.com</span></div>
+</div>
+
+<!-- ─────── Page 13: REFLECTION QUESTIONS ─────── -->
+<div class="page">
+  <div class="pg-header">
+    <span class="left"><span class="star">✦</span> Created for More · The Stewardship Blueprint</span>
+    <span>Page 13 / 14</span>
+  </div>
+
+  <span class="eyebrow">Going Deeper</span>
+  <h2 class="page-title">Reflection <em>questions</em></h2>
+  <div class="gold-divider"></div>
+
+  <p class="body">Use these questions to continue the work of awareness. You do not need to answer them all at once. Let one or two become a starting point for prayer, journaling, conversation, or planning.</p>
+
+  <div class="qlist">
+    <div class="q"><div class="qn">01</div><p>What kind of life am I actually building right now?</p></div>
+    <div class="q"><div class="qn">02</div><p>Where am I confusing busyness with faithfulness?</p></div>
+    <div class="q"><div class="qn">03</div><p>What does my calendar reveal about my true priorities?</p></div>
+    <div class="q"><div class="qn">04</div><p>What does my spending reveal about what I value, fear, or desire?</p></div>
+    <div class="q"><div class="qn">05</div><p>Who is receiving the best version of me, and who is receiving what is left over?</p></div>
+    <div class="q"><div class="qn">06</div><p>Where am I living by default rather than by design?</p></div>
+    <div class="q"><div class="qn">07</div><p>What area of my life feels most misaligned right now?</p></div>
+    <div class="q"><div class="qn">08</div><p>What would change if I saw my life not merely as something I own, but as something entrusted to me?</p></div>
+    <div class="q"><div class="qn">09</div><p>What is one area where I need to stop drifting and begin stewarding?</p></div>
+    <div class="q"><div class="qn">10</div><p>What is one step I can take this week?</p></div>
+  </div>
+
+  <div class="pg-footer"><span>MichaelJGauthier.com</span><span class="ornament">✦</span><span>The Stewardship Blueprint</span></div>
+</div>
+
+<!-- ─────── Page 14: JOIN THE JOURNEY (CTA) ─────── -->
+<div class="page cta-page">
+  <div class="cta-top">
+    <span>The Stewardship Blueprint</span>
+    <span>Page 14 / 14</span>
+  </div>
+  <div class="cta-mid">
+    <span class="cover-eyebrow" style="margin-bottom: 24px;">✦  Join the Journey</span>
+    <h2>Walk with me as I <em>write the book</em>.</h2>
+    <p>The Created for More Check-In is only a beginning. I am currently writing <em>The Stewardship Blueprint</em>, a book and movement designed to help people design their life, steward their resources, and build a legacy that matters.</p>
+    <p>This journey is about more than money. It is about faith, family, fitness, fun, finances, guardrails, habits, energy, and legacy — about learning to live <em>by design</em> rather than drift by default.</p>
+
+    <div class="channels">
+      <div class="channel">
+        <div class="lbl">Website</div>
+        <div class="val">MichaelJGauthier.com</div>
+        <div class="sub">Articles, tools, and weekly reflections</div>
+      </div>
+      <div class="channel">
+        <div class="lbl">LinkedIn</div>
+        <div class="val">Michael J. Gauthier</div>
+        <div class="sub">Behind-the-scenes book updates</div>
+      </div>
+      <div class="channel">
+        <div class="lbl">The Book</div>
+        <div class="val">Early Access — Free</div>
+        <div class="sub">Chapters 1 &amp; 2 available now</div>
+      </div>
+      <div class="channel">
+        <div class="lbl">Speaking &amp; Events</div>
+        <div class="val">Contact for inquiries</div>
+        <div class="sub">Audiences, churches, organizations</div>
+      </div>
+    </div>
+  </div>
+  <div class="cta-bot">
+    <div class="closing-line">"You were not created merely to keep up. You were created to steward a life that matters."</div>
+    <div class="mjg-mark" aria-label="MJG" style="width: 120px; height: 44px;">
+      <svg viewBox="0 0 317 117" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;" aria-hidden="true"><g><path d="M161.904,115.061l-46.337,-0l0,-113.486l68.324,-0l-0,76.939c-0.111,8.762 -3.771,13.31 -10.648,13.31c-6.765,-0 -10.536,-4.492 -10.87,-13.088l-30.833,-0c-0.095,22.326 12.963,33.516 30.364,36.325Z" style="fill:#f1ede4;"></path><path d="M0,1.553l0,113.574l30.168,-0l-0,-66.104l0.887,-0l25.288,65.217l18.19,0l25.288,-64.773l0.887,-0l0,65.66l30.169,-0l-0,-113.574l-38.376,-0l-26.398,64.328l-1.33,0l-26.398,-64.328l-38.375,-0Z" style="fill:#f1ede4;fill-rule:nonzero;"></path><path d="M214.043,33.375c0.079,-0.199 0.158,-0.398 0.238,-0.597l0,45.736c-0.009,1.741 -0.126,3.438 -0.347,5.087c-0.082,-0.211 -0.162,-0.424 -0.241,-0.637c0.231,-1.676 0.35,-3.369 0.35,-5.064l0,-44.525Z" style="fill:#f1ede4;fill-rule:nonzero;"></path><path d="M283.798,39.041l31.166,-0c-2.384,-22.793 -23.07,-39.041 -49.911,-39.041c-30.611,0 -55.456,21.073 -55.456,58.562c-0,35.935 22.515,58.117 55.678,58.117c29.725,0 51.02,-18.189 51.02,-49.244l0,-15.75l-50.354,-0l-0,21.961l20.629,-0c-0.277,9.871 -7.264,16.193 -21.073,16.193c-15.971,-0 -24.179,-11.757 -24.179,-31.721c-0,-19.687 8.873,-31.277 24.401,-31.277c9.649,-0 16.193,4.436 18.079,12.2Z" style="fill:#c9a96e;fill-rule:nonzero;"></path></g></svg>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
