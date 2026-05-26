@@ -1,2 +1,5 @@
 main/.git/
 main/.claude/
+.env
+.env.*
+!.env.example
