@@ -1,0 +1,1653 @@
+<!--
+  ============================================================
+  MJG360 &middot; ABOUT PAGE
+  Paste into Bricks Builder > Code block on /about-us/
+  No nav needed &mdash; just drop this block in.
+  ============================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Geist:wght@300;400;500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+<script src="https://www.google.com/recaptcha/api.js?render=6Lcb3bAsAAAAAHUSz6uACjVAu9pOftduxnJ6g-C4"></script>
+
+<style>
+/* ── Tokens ──────────────────────────────────────────────── */
+:root {
+  --bg:           #F7F5F2;
+  --bg-white:     #ffffff;
+  --bg-dark:      #0f0f0f;
+  --bg-dark-2:    #161616;
+  --border:       #e4e1d9;
+  --border-dark:  rgba(255,255,255,.08);
+  --text:         #111110;
+  --text-muted:   #6b6a64;
+  --text-faint:   #9b9a94;
+  --gold:         #9E6F2E;
+  --gold-dark:    #C9A46E;
+  --gold-light:   #fdf4e8;
+  --gold-mid:     #edd9a8;
+  --radius:       10px;
+  --radius-lg:    16px;
+  --font-d:       'Cormorant Garamond', Georgia, serif;
+  --font-b:       'Geist', system-ui, sans-serif;
+  --max:          1100px;
+  --gap:          88px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+img { display: block; max-width: 100%; }
+a   { color: inherit; text-decoration: none; }
+
+.about-page {
+  font-family: var(--font-b);
+  -webkit-font-smoothing: antialiased;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.about-page .wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ── Shared ──────────────────────────────────────────────── */
+.about-page .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-light);
+  border: 1px solid var(--gold-mid);
+  border-radius: 100px;
+  padding: 4px 13px;
+}
+.about-page .badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.about-page .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-b);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 22px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .16s;
+  white-space: nowrap;
+}
+.about-page .btn-dark {
+  background: var(--bg-dark);
+  color: #fff;
+  border-color: var(--bg-dark);
+}
+.about-page .btn-dark:hover { background: #1e1e1c; }
+
+.about-page .btn-outline {
+  background: transparent;
+  color: var(--text);
+  border-color: #ccc9c0;
+}
+.about-page .btn-outline:hover { background: #edece8; }
+
+.about-page .btn-gold {
+  background: var(--gold);
+  color: #fff;
+  border-color: var(--gold);
+}
+.about-page .btn-gold:hover { background: #7d5820; }
+
+.about-page .section-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 14px;
+}
+.about-page .section-title {
+  font-family: var(--font-d);
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  line-height: 1.1;
+  color: var(--text);
+}
+.about-page .section-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+.about-page .section-desc {
+  font-size: 15.5px;
+  color: var(--text-muted);
+  line-height: 1.78;
+  font-weight: 300;
+}
+.about-page .divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* ══ HERO ════════════════════════════════════════════════ */
+.about-hero {
+  padding: 80px 0 0;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.about-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: .5;
+  pointer-events: none;
+}
+.about-hero::after {
+  content: '';
+  position: absolute;
+  top: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(158,111,46,.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.about-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: flex-end;
+  padding-bottom: 0;
+}
+
+/* Left: copy */
+.about-hero-copy {
+  padding-bottom: 64px;
+}
+.about-hero-copy .badge { margin-bottom: 24px; }
+
+.about-hero-name {
+  font-family: var(--font-d);
+  font-size: clamp(44px, 5.5vw, 70px);
+  font-weight: 400;
+  letter-spacing: -.03em;
+  line-height: 1.05;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.about-hero-name em {
+  font-style: italic;
+  color: var(--gold);
+}
+.about-hero-cred {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-faint);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.about-hero-tagline {
+  font-family: var(--font-d);
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 420px;
+  margin-bottom: 36px;
+}
+.about-hero-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Right: photo card */
+.about-hero-photo {
+  position: relative;
+  align-self: flex-end;
+}
+.about-photo-frame {
+  width: 100%;
+  aspect-ratio: 3/4;
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  background: linear-gradient(160deg, #e8e4db 0%, #d4cfc4 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+}
+.about-photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+/* Monogram fallback if image doesn't load */
+.about-photo-monogram {
+  font-family: var(--font-d);
+  font-size: 120px;
+  font-weight: 300;
+  color: rgba(0,0,0,.12);
+  letter-spacing: -.04em;
+  line-height: 1;
+  padding-bottom: 40px;
+  user-select: none;
+}
+.about-photo-badge {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+}
+.about-photo-badge-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+.about-photo-badge-val {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+
+/* ══ STATS BAR ═══════════════════════════════════════════ */
+.about-stats {
+  background: var(--bg-dark);
+  padding: 40px 0;
+}
+.about-stats-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.about-stat-item {
+  flex: 1;
+  min-width: 180px;
+  text-align: center;
+  padding: 16px 24px;
+  position: relative;
+}
+.about-stat-item + .about-stat-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 1px;
+  background: rgba(255,255,255,.1);
+}
+.about-stat-num {
+  font-family: var(--font-d);
+  font-size: 38px;
+  font-weight: 300;
+  letter-spacing: -.03em;
+  color: var(--gold-dark);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.about-stat-label {
+  font-size: 12px;
+  color: rgba(255,255,255,.45);
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* ══ BIO SECTION ═════════════════════════════════════════ */
+.about-bio {
+  padding: var(--gap) 0;
+  background: var(--bg);
+}
+.about-bio-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.about-bio-left {}
+
+.about-bio-body {
+  font-size: 15.5px;
+  color: var(--text-muted);
+  line-height: 1.82;
+  font-weight: 300;
+  margin-top: 20px;
+}
+.about-bio-body p + p { margin-top: 18px; }
+.about-bio-body em {
+  font-family: var(--font-d);
+  font-style: italic;
+  color: var(--text);
+}
+.about-bio-body strong { font-weight: 500; color: var(--text); }
+
+.about-bio-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+/* Right column: callout cards */
+.about-bio-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.about-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 28px;
+  transition: box-shadow .2s;
+}
+.about-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); }
+
+.about-card-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 10px;
+}
+.about-card-title {
+  font-family: var(--font-d);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -.015em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.about-card-body {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+.about-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gold);
+  margin-top: 14px;
+  transition: gap .15s;
+}
+.about-card-link:hover { gap: 8px; }
+.about-card-link svg { stroke: var(--gold); }
+
+/* Credential pill list */
+.about-creds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.about-cred-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 5px 12px;
+}
+.about-cred-pill svg {
+  width: 10px; height: 10px;
+  stroke: var(--gold);
+}
+
+/* ══ SCRIPTURE SECTION ═══════════════════════════════════ */
+.about-scripture {
+  background: var(--bg-dark);
+  padding: 80px 0;
+  position: relative;
+  overflow: hidden;
+}
+.about-scripture::before {
+  content: '\201C';
+  position: absolute;
+  top: -40px; left: -20px;
+  font-family: var(--font-d);
+  font-size: 320px;
+  line-height: 1;
+  color: rgba(255,255,255,.025);
+  pointer-events: none;
+}
+.about-scripture-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.about-scripture-ref {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 24px;
+}
+.about-scripture-text {
+  font-family: var(--font-d);
+  font-size: clamp(20px, 2.8vw, 28px);
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(255,255,255,.88);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+.about-scripture-attribution {
+  font-size: 13px;
+  color: rgba(255,255,255,.35);
+  font-weight: 300;
+}
+
+/* ══ STORY TIMELINE ══════════════════════════════════════ */
+.about-story {
+  padding: var(--gap) 0;
+  background: var(--bg);
+}
+
+.about-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 48px;
+  position: relative;
+  max-width: 680px;
+}
+.about-timeline::before {
+  content: '';
+  position: absolute;
+  top: 8px; bottom: 8px;
+  left: 28px;
+  width: 1px;
+  background: var(--border);
+}
+.about-tl-item {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 24px;
+  padding-bottom: 40px;
+  position: relative;
+}
+.about-tl-item:last-child { padding-bottom: 0; }
+
+.about-tl-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--gold);
+  margin: 4px auto 0;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.about-tl-year {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.about-tl-head {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -.01em;
+}
+.about-tl-body {
+  font-size: 14.5px;
+  color: var(--text-muted);
+  line-height: 1.72;
+  font-weight: 300;
+}
+
+/* ══ JOIN DARK CARD ══════════════════════════════════════ */
+.about-join {
+  padding: var(--gap) 0;
+  background: var(--bg);
+}
+.about-join-card {
+  background: var(--bg-dark);
+  border-radius: 20px;
+  padding: 64px 72px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 64px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.about-join-card::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(ellipse, rgba(201,164,110,.14) 0%, transparent 65%);
+  pointer-events: none;
+}
+.about-join-card::after {
+  content: '"';
+  position: absolute;
+  bottom: -24px; right: 56px;
+  font-family: var(--font-d);
+  font-size: 260px;
+  line-height: 1;
+  color: rgba(255,255,255,.03);
+  pointer-events: none;
+}
+.about-join-ey {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(201,164,110,.85);
+  margin-bottom: 16px;
+}
+.about-join-title {
+  font-family: var(--font-d);
+  font-size: clamp(28px, 3.2vw, 42px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.about-join-title em { font-style: italic; color: #e8cc98; }
+.about-join-desc {
+  font-size: 14.5px;
+  color: rgba(255,255,255,.48);
+  line-height: 1.72;
+  font-weight: 300;
+  max-width: 380px;
+}
+.about-join-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.about-join-btn-primary {
+  background: var(--gold-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 24px;
+  font-family: var(--font-b);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .15s;
+}
+.about-join-btn-primary:hover { background: #b5904d; }
+.about-join-btn-ghost {
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.7);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius);
+  padding: 12px 24px;
+  font-family: var(--font-b);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .15s;
+}
+.about-join-btn-ghost:hover { background: rgba(255,255,255,.11); }
+
+/* Form card */
+.about-form-card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--radius-lg);
+  padding: 30px 26px;
+  width: 296px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+.about-form-label {
+  font-size: 10.5px;
+  color: rgba(255,255,255,.38);
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+.about-form-input {
+  width: 100%;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius);
+  padding: 10px 13px;
+  font-family: var(--font-b);
+  font-size: 13.5px;
+  color: #fff;
+  outline: none;
+  transition: border-color .15s;
+  -webkit-appearance: none;
+}
+.about-form-input::placeholder { color: rgba(255,255,255,.2); }
+.about-form-input:focus { border-color: rgba(201,164,110,.5); }
+.about-form-submit {
+  width: 100%;
+  background: var(--gold-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 11px;
+  font-family: var(--font-b);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s;
+}
+.about-form-submit:hover { background: #b5904d; }
+.about-form-note {
+  font-size: 10.5px;
+  color: rgba(255,255,255,.25);
+  line-height: 1.55;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .about-hero-inner,
+  .about-bio-grid,
+  .about-join-card { grid-template-columns: 1fr; }
+  .about-join-card { padding: 44px 28px; gap: 36px; }
+  .about-form-card { width: 100%; }
+  .about-hero-photo { order: -1; }
+  .about-photo-frame { aspect-ratio: 4/3; border-radius: 16px; }
+  .about-hero-copy { padding-bottom: 0; }
+  .about-hero { padding: 48px 0 0; }
+}
+</style>
+
+<style>
+/* ── Nav variables (scoped so they don't clash with page :root) ── */
+nav {
+  --nv-bg:       #ffffff;
+  --nv-text:     #111110;
+  --nv-border:   rgba(17,17,17,0.1);
+  --nv-btn-bg:   #111110;
+  --nv-btn-text: #ffffff;
+  --nv-ctrl-bg:  rgba(17,17,17,0.06);
+  --nv-ctrl-bdr: rgba(17,17,17,0.16);
+  --nv-ctrl-hov: rgba(17,17,17,0.1);
+}
+[data-theme="dark"] nav {
+  --nv-bg:       #0f0f0f;
+  --nv-text:     #f7f5f2;
+  --nv-border:   rgba(255,255,255,0.08);
+  --nv-btn-bg:   #f7f5f2;
+  --nv-btn-text: #111110;
+  --nv-ctrl-bg:  rgba(255,255,255,0.08);
+  --nv-ctrl-bdr: rgba(255,255,255,0.18);
+  --nv-ctrl-hov: rgba(255,255,255,0.12);
+}
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+  background: var(--nv-bg);
+  border-bottom: 1px solid var(--nv-border);
+}
+.nav-inner {
+  max-width: 1160px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+.nav-logo img { height: 36px; width: auto; display: block; }
+.nav-logo-text {
+  font-family: 'DM Serif Display', 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--nv-text);
+  letter-spacing: -0.02em;
+}
+.nav-logo-text .gold { color: #C9A46E; }
+[data-theme="dark"] .nav-logo-text .gold { color: #C9A46E; }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.875rem !important;
+  color: var(--nv-text) !important;
+  text-decoration: none !important;
+  transition: opacity 0.2s;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+.nav-links a:hover { opacity: 0.7; }
+.nav-link-plain {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  color: var(--nv-text);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.nav-link-plain:hover { opacity: 0.7; }
+.nav-links .nav-btn-cta {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 500;
+  color: var(--nv-btn-text) !important;
+  background: var(--nv-btn-bg) !important;
+  border: 1px solid var(--nv-btn-bg) !important;
+  border-radius: 6px;
+  padding: 0.55rem 1.25rem !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.nav-links .nav-btn-cta:hover { opacity: 0.9; }
+.nav-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px; height: 42px;
+  background: var(--nv-ctrl-bg);
+  border: 1px solid var(--nv-ctrl-bdr);
+  color: var(--nv-text);
+  border-radius: 14px;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.nav-theme-toggle:hover { background: var(--nv-ctrl-hov); transform: translateY(-1px); }
+.nav-mobile-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px; height: 42px;
+  background: var(--nv-ctrl-bg);
+  border: 1px solid var(--nv-ctrl-bdr);
+  color: var(--nv-text);
+  border-radius: 14px;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.nav-links.open { display: flex; }
+@media (max-width: 768px) {
+  .nav-mobile-toggle { display: inline-flex; }
+  .nav-links {
+    position: absolute;
+    top: 60px; left: 0; right: 0;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem 1.75rem;
+    background: var(--nv-bg);
+    border-bottom: 1px solid var(--nv-border);
+    display: none;
+  }
+  .nav-links li { width: 100%; }
+  .nav-links a, .nav-link-plain, .nav-btn-cta { width: 100%; }
+  .nav-btn-cta { text-align: center; justify-content: center; }
+}
+
+/* ── Audio modal + player ────────────────────────────────── */
+:root {
+  --ap-bg:       #191815;
+  --ap-gold:     #c9a46e;
+  --ap-gold-dark:#a8833f;
+  --ap-muted:    #a5a296;
+  --ap-radius:   60px;
+  --ap-font:     'Geist', system-ui, sans-serif;
+}
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.audio-modal-card {
+  background: linear-gradient(180deg, rgba(30,24,19,0.97), rgba(10,8,6,0.99));
+  border-radius: 32px;
+  padding: 2rem;
+  max-width: 520px;
+  width: 92%;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.6);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.ap-wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 16px; font-family: var(--ap-font); -webkit-font-smoothing: antialiased; }
+.ap-meta { text-align: center; max-width: 520px; }
+.ap-meta-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ap-gold); margin-bottom: 6px; }
+.ap-meta-title { font-size: 18px; font-weight: 500; color: #f1eee3; line-height: 1.3; margin-bottom: 4px; }
+.ap-meta-sub { font-size: 13px; color: var(--ap-muted); font-weight: 300; }
+.ap-progress-wrap { width: 100%; max-width: 520px; display: flex; align-items: center; gap: 10px; }
+.ap-time { font-size: 11px; font-weight: 500; color: var(--ap-muted); min-width: 34px; letter-spacing: .02em; }
+.ap-time.right { text-align: right; }
+.ap-track { flex: 1; height: 3px; background: #e0ddd6; border-radius: 10px; cursor: pointer; -webkit-appearance: none; appearance: none; }
+.ap-track::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--ap-gold); cursor: pointer; margin-top: -5px; box-shadow: 0 0 0 3px rgba(201,164,110,.2); }
+.ap-track::-webkit-slider-runnable-track { height: 3px; border-radius: 10px; background: linear-gradient(to right, var(--ap-gold) 0%, var(--ap-gold) var(--ap-pct, 0%), #e0ddd6 var(--ap-pct, 0%), #e0ddd6 100%); }
+.ap-pill { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 520px; background: var(--ap-bg); border-radius: var(--ap-radius); padding: 10px 20px 10px 18px; gap: 0; box-shadow: 0 8px 32px rgba(0,0,0,.22), 0 2px 8px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.04); position: relative; }
+.ap-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%; transition: transform .15s, opacity .15s; -webkit-tap-highlight-color: transparent; color: var(--ap-muted); flex-shrink: 0; }
+.ap-btn:hover { opacity: .75; transform: scale(1.06); }
+.ap-btn-play { width: 72px; height: 72px; border-radius: 50%; background: var(--ap-gold); box-shadow: 0 4px 16px rgba(201,164,110,.45), 0 1px 4px rgba(0,0,0,.2); flex-shrink: 0; margin: -16px 0; color: #fff; transition: background .15s, transform .15s; }
+.ap-btn-play:hover { background: #d9b47e; opacity: 1; }
+.ap-icon-play { display: block; }
+.ap-icon-pause { display: none; }
+.ap-playing .ap-icon-play { display: none; }
+.ap-playing .ap-icon-pause { display: block; }
+.ap-loop-badge { position: relative; }
+.ap-loop-count { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-54%); font-size: 9px; font-weight: 700; color: var(--ap-muted); pointer-events: none; line-height: 1; }
+.ap-btn.ap-active { color: var(--ap-gold); }
+.ap-btn.ap-active .ap-loop-count { color: var(--ap-gold); }
+.ap-vol-wrap { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 520px; justify-content: flex-end; }
+.ap-vol-icon { color: #a5a296; flex-shrink: 0; }
+.ap-vol-slider { width: 90px; height: 3px; -webkit-appearance: none; appearance: none; background: #e0ddd6; border-radius: 10px; outline: none; cursor: pointer; }
+.ap-vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--ap-gold); cursor: pointer; margin-top: -4px; }
+.ap-vol-slider::-webkit-slider-runnable-track { height: 3px; border-radius: 10px; background: linear-gradient(to right, var(--ap-gold) 0%, var(--ap-gold) var(--ap-vol-pct, 80%), #e0ddd6 var(--ap-vol-pct, 80%), #e0ddd6 100%); }
+.ap-audio { display: none; }
+</style>
+
+<nav>
+  <div class="nav-inner">
+    <a href="https://blueprint.michaeljgauthier.com/" class="nav-logo">
+      <img id="nav-logo-img"
+        src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        data-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        data-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg"
+        alt="Michael J. Gauthier" />
+      <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
+    </a>
+    <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open menu" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/mission">Mission</a></li>
+      <li><button id="listen-btn" class="nav-link-plain" type="button">Listen</button></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/resources">Resources</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+      <li><a href="#" id="join-btn" class="nav-btn-cta">Join the Journey</a></li>
+      <li><button id="nav-theme-toggle" class="nav-theme-toggle" type="button" aria-label="Toggle dark mode"><svg id="nav-theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg></button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Audio Modal -->
+<div class="modal-overlay" id="audioModal">
+  <div class="audio-modal-card">
+    <button class="modal-close" id="audio-modal-close">✕</button>
+    <div class="ap-wrap" id="mjg-player-modal">
+      <div class="ap-meta">
+        <p class="ap-meta-eyebrow">The Stewardship Blueprint</p>
+        <p class="ap-meta-title">Audiobook Preview</p>
+        <p class="ap-meta-sub">Michael J. Gauthier &middot; 2 hours</p>
+      </div>
+      <div class="ap-progress-wrap">
+        <span class="ap-time left" id="ap-cur-modal">0:00</span>
+        <input class="ap-track" id="ap-seek-modal" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek" style="--ap-pct:0%" />
+        <span class="ap-time right" id="ap-dur-modal">0:00</span>
+      </div>
+      <div class="ap-pill" id="ap-pill-modal">
+        <button class="ap-btn" id="ap-lib-modal" aria-label="Library" title="Library">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="9" y="13" width="20" height="16" rx="4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><rect x="12" y="10" width="14" height="4" rx="2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="14.5" y="7.5" width="9" height="3" rx="1.5" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M21.5 18.5v-3.5l-5 1v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16.5" cy="23" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="21.5" cy="22" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+        <button class="ap-btn" id="ap-rew-modal" aria-label="Rewind 10s" title="−10s">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M11.5 15.5A9.5 9.5 0 1 1 9 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 16l1.5-3.5L13 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-family="Geist,system-ui" font-size="8" font-weight="600">10</text></svg>
+        </button>
+        <button class="ap-btn ap-btn-play" id="ap-play-modal" aria-label="Play">
+          <svg class="ap-icon-play" width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M11 8.5l12 6.5-12 6.5V8.5z" fill="white"/></svg>
+          <svg class="ap-icon-pause" width="30" height="30" viewBox="0 0 30 30" fill="none"><rect x="9" y="8" width="4" height="14" rx="2" fill="white"/><rect x="17" y="8" width="4" height="14" rx="2" fill="white"/></svg>
+        </button>
+        <button class="ap-btn" id="ap-fwd-modal" aria-label="Forward 10s" title="+10s">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M26.5 15.5A9.5 9.5 0 1 0 29 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M30 16l-1.5-3.5L25 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-family="Geist,system-ui" font-size="8" font-weight="600">10</text></svg>
+        </button>
+        <button class="ap-btn ap-loop-badge" id="ap-loop-modal" aria-label="Loop" title="Loop">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M9 21a10 10 0 1 0 1-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M9 11.5L9 17.5H15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="ap-loop-count">1</span>
+        </button>
+      </div>
+      <div class="ap-vol-wrap">
+        <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/></svg>
+        <input class="ap-vol-slider" id="ap-vol-modal" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" style="--ap-vol-pct:80%" />
+        <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/><path d="M11 4.5c1.5 1 2 2 2 3.5s-.5 2.5-2 3.5"/><path d="M13 2c2 1.5 3 3 3 6s-1 4.5-3 6"/></svg>
+      </div>
+      <audio class="ap-audio" id="mjg-audio-modal" preload="metadata">
+        <source src="https://michaeljgauthier.com/wp-content/uploads/2026/04/The-Stewardship-Blueprint-Chapters-1-and-2-Summary.wav" type="audio/wav" />
+      </audio>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var logoImg = document.getElementById('nav-logo-img');
+  var themeBtn = document.getElementById('nav-theme-toggle');
+  var themeIcon = document.getElementById('nav-theme-icon');
+  var mobileBtn = document.getElementById('nav-mobile-toggle');
+  var navLinks = document.getElementById('nav-links');
+  var SUN = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  var MOON = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+
+  function setTheme(t) {
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem('theme', t);
+    if (themeIcon) themeIcon.innerHTML = t === 'dark' ? MOON : SUN;
+    if (logoImg) logoImg.src = t === 'dark' ? logoImg.dataset.dark : logoImg.dataset.light;
+  }
+  var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  setTheme(saved);
+  if (themeBtn) themeBtn.addEventListener('click', function() { setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); });
+  var HAMBURGER_SVG = '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
+  var CLOSE_SVG = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  function openMobileMenu() { if (!navLinks) return; navLinks.classList.add('open'); if (mobileBtn) { mobileBtn.querySelector('svg').innerHTML = CLOSE_SVG; mobileBtn.setAttribute('aria-label', 'Close menu'); } }
+  function closeMobileMenu() { if (!navLinks) return; navLinks.classList.remove('open'); if (mobileBtn) { mobileBtn.querySelector('svg').innerHTML = HAMBURGER_SVG; mobileBtn.setAttribute('aria-label', 'Open menu'); } }
+  if (mobileBtn) mobileBtn.addEventListener('click', function() { navLinks && navLinks.classList.contains('open') ? closeMobileMenu() : openMobileMenu(); });
+  if (navLinks) navLinks.addEventListener('click', function(e) { if (e.target.closest('a, button')) closeMobileMenu(); });
+  document.addEventListener('click', function(e) { if (navLinks && navLinks.classList.contains('open') && !e.target.closest('nav')) closeMobileMenu(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && navLinks && navLinks.classList.contains('open')) closeMobileMenu(); });
+
+  // Audio modal
+  function openAudioModal() {
+    document.getElementById('audioModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeAudioModal() {
+    document.getElementById('audioModal').classList.remove('open');
+    document.body.style.overflow = '';
+    var a = document.getElementById('mjg-audio-modal');
+    if (a) { a.pause(); }
+    var pill = document.getElementById('ap-pill-modal');
+    if (pill) pill.classList.remove('ap-playing');
+  }
+
+  document.getElementById('listen-btn').addEventListener('click', openAudioModal);
+  document.getElementById('audio-modal-close').addEventListener('click', closeAudioModal);
+  document.getElementById('audioModal').addEventListener('click', function(e) { if (e.target.id === 'audioModal') closeAudioModal(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAudioModal(); });
+
+  // "Join the Journey" &mdash; opens modal
+  document.getElementById('join-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (typeof openJourneyModal === 'function') openJourneyModal();
+  });
+
+  // Audio player
+  document.addEventListener('DOMContentLoaded', function() {
+    var audio = document.getElementById('mjg-audio-modal');
+    var pill = document.getElementById('ap-pill-modal');
+    var btnPlay = document.getElementById('ap-play-modal');
+    var btnRew = document.getElementById('ap-rew-modal');
+    var btnFwd = document.getElementById('ap-fwd-modal');
+    var btnLoop = document.getElementById('ap-loop-modal');
+    var seekBar = document.getElementById('ap-seek-modal');
+    var volBar = document.getElementById('ap-vol-modal');
+    var curEl = document.getElementById('ap-cur-modal');
+    var durEl = document.getElementById('ap-dur-modal');
+    if (!audio || !pill || !btnPlay) return;
+    var loopMode = false, isDragging = false;
+    function fmt(s) { if (!s || isNaN(s)) return '0:00'; var m = Math.floor(s/60); return m + ':' + String(Math.floor(s%60)).padStart(2,'0'); }
+    btnPlay.addEventListener('click', function() {
+      if (audio.paused) { audio.play().then(function(){ pill.classList.add('ap-playing'); }).catch(function(){}); }
+      else { audio.pause(); pill.classList.remove('ap-playing'); }
+    });
+    btnRew.addEventListener('click', function() { audio.currentTime = Math.max(0, audio.currentTime - 10); });
+    btnFwd.addEventListener('click', function() { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); });
+    btnLoop.addEventListener('click', function() { loopMode = !loopMode; audio.loop = loopMode; btnLoop.classList.toggle('ap-active', loopMode); });
+    audio.addEventListener('timeupdate', function() {
+      if (isDragging) return;
+      var pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      seekBar.value = pct; seekBar.style.setProperty('--ap-pct', pct + '%');
+      curEl.textContent = fmt(audio.currentTime);
+    });
+    audio.addEventListener('loadedmetadata', function() { durEl.textContent = fmt(audio.duration); });
+    audio.addEventListener('ended', function() { pill.classList.remove('ap-playing'); seekBar.value = 0; seekBar.style.setProperty('--ap-pct','0%'); curEl.textContent = '0:00'; });
+    seekBar.addEventListener('input', function() { isDragging = true; var pct = parseFloat(seekBar.value); seekBar.style.setProperty('--ap-pct', pct + '%'); if (audio.duration) curEl.textContent = fmt((pct/100)*audio.duration); });
+    seekBar.addEventListener('change', function() { if (audio.duration) audio.currentTime = (parseFloat(seekBar.value)/100)*audio.duration; isDragging = false; });
+    audio.volume = parseFloat(volBar.value);
+    volBar.addEventListener('input', function() { audio.volume = parseFloat(volBar.value); volBar.style.setProperty('--ap-vol-pct', parseFloat(volBar.value)*100 + '%'); });
+  });
+})();
+</script>
+
+<div class="about-page">
+
+  <!-- ══ HERO ═══════════════════════════════════════════════ -->
+  <section class="about-hero">
+    <div class="wrap">
+      <div class="about-hero-inner">
+
+        <!-- Left: copy -->
+        <div class="about-hero-copy">
+          <div class="badge">
+            <span class="badge-dot"></span>
+            About Michael
+          </div>
+
+          <h1 class="about-hero-name">
+            Michael J.<br/><em>Gauthier</em>
+          </h1>
+          <p class="about-hero-cred">CFP&reg; &middot; Author &middot; Financial Steward</p>
+          <p class="about-hero-tagline">
+            "Using God-given resources for God-given purposes."
+          </p>
+
+          <div class="about-hero-btns">
+            <a href="#" data-open-join-modal class="btn btn-dark">
+              Join the Movement
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+            <a href="https://blueprint.michaeljgauthier.com/contact" class="btn btn-outline">Contact Michael</a>
+          </div>
+        </div>
+
+        <!-- Right: photo -->
+        <div class="about-hero-photo">
+          <div class="about-photo-frame">
+            <img
+              src="https://michaeljgauthier.com/wp-content/uploads/2026/04/Gauthier-Family-840x1020-1.png"
+              alt="The Gauthier Family"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <!-- Monogram fallback -->
+            <div class="about-photo-monogram" style="display:none; position:absolute;inset:0;align-items:flex-end;justify-content:center;padding-bottom:40px;">MJG</div>
+
+            <div class="about-photo-badge">
+              <p class="about-photo-badge-label">Gauthier</p>
+              <p class="about-photo-badge-val">Family</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ STATS BAR ══════════════════════════════════════════ -->
+  <div class="about-stats">
+    <div class="wrap">
+      <div class="about-stats-grid">
+        <div class="about-stat-item">
+          <div class="about-stat-num">2013</div>
+          <div class="about-stat-label">Left Wall Street to follow his calling</div>
+        </div>
+        <div class="about-stat-item">
+          <div class="about-stat-num">CFP&reg;</div>
+          <div class="about-stat-label">Certified Financial Planner</div>
+        </div>
+        <div class="about-stat-item">
+          <div class="about-stat-num">25K</div>
+          <div class="about-stat-label">People to educate &amp; inspire</div>
+        </div>
+        <div class="about-stat-item">
+          <div class="about-stat-num">$1B+</div>
+          <div class="about-stat-label">Impact investment goal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BIO ════════════════════════════════════════════════ -->
+  <section class="about-bio">
+    <div class="wrap">
+      <div class="about-bio-grid">
+
+        <!-- Left: bio -->
+        <div class="about-bio-left">
+          <p class="section-eyebrow">My Story</p>
+          <h2 class="section-title">A Leap of <em>Faith</em></h2>
+
+          <div class="about-bio-body">
+            <p>
+              Hello, I'm Michael J. Gauthier, CFP&reg;. My journey in financial planning has been one of faith, growth, and a deep desire to help others.
+            </p>
+            <p>
+              In 2013, I took a leap of faith and left my secure job at a national Wall Street firm to create something new. This calling led to the founding of <strong>Strategic Income Group</strong> &mdash; a wealth management company focused on empowering people from all walks of life to become better stewards of their money.
+            </p>
+            <p>
+              Since then, my mission has continued to evolve. I am passionate about teaching others how to use their <em>God-given resources for God-given purposes</em>. Over the years, my faith journey has profoundly shaped my work and life.
+            </p>
+            <p>
+              Through <em>The Stewardship Blueprint</em>, I'm sharing the framework I wish I'd had earlier &mdash; a practical, faith-rooted guide to designing a life of meaning, generosity, and lasting impact.
+            </p>
+          </div>
+
+          <div class="about-bio-btns">
+            <a href="https://blueprint.michaeljgauthier.com/resources" class="btn btn-dark">Read The Blueprint</a>
+            <a href="https://blueprint.michaeljgauthier.com/mission" class="btn btn-outline">Our Mission</a>
+          </div>
+        </div>
+
+        <!-- Right: cards -->
+        <div class="about-bio-right">
+
+          <div class="about-card">
+            <p class="about-card-eyebrow">The Stewardship Blueprint</p>
+            <p class="about-card-title">Why I'm Writing This Book</p>
+            <p class="about-card-body">
+              After years in faith-based financial planning, I saw a pattern: many people pursue money and status but feel unsatisfied. I began writing this book to help others discover what it means to be <em style="font-family:var(--font-d);font-style:italic;">created for more</em> &mdash; and to stop building the wrong life.
+            </p>
+            <a href="https://blueprint.michaeljgauthier.com/resources" class="about-card-link">
+              Start Designing Your Life
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M2 6.5h9M7 2l4.5 4.5L7 11"/></svg>
+            </a>
+          </div>
+
+          <div class="about-card">
+            <p class="about-card-eyebrow">Professional Background</p>
+            <p class="about-card-title">Strategic Income Group</p>
+            <p class="about-card-body">
+              Founded to help families build a solid financial foundation rooted in Biblical principles &mdash; not just wealth accumulation, but purposeful stewardship and generosity.
+            </p>
+            <div class="about-creds">
+              <span class="about-cred-pill">
+                <svg viewBox="0 0 10 10" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M2 5l2 2 4-4"/></svg>
+                Certified Financial Planner
+              </span>
+              <span class="about-cred-pill">
+                <svg viewBox="0 0 10 10" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M2 5l2 2 4-4"/></svg>
+                Wealth Management
+              </span>
+              <span class="about-cred-pill">
+                <svg viewBox="0 0 10 10" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M2 5l2 2 4-4"/></svg>
+                Biblical Finance
+              </span>
+              <span class="about-cred-pill">
+                <svg viewBox="0 0 10 10" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M2 5l2 2 4-4"/></svg>
+                Impact Investing
+              </span>
+            </div>
+            <a href="tel:+14804667070" class="about-card-link">
+              (480) 466-7070
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M2 6.5h9M7 2l4.5 4.5L7 11"/></svg>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" style="max-width:var(--max);margin:0 auto;padding:0 28px;border-color:#e4e1d9;" />
+
+  <!-- ══ SCRIPTURE ═══════════════════════════════════════════ -->
+  <section class="about-scripture">
+    <div class="wrap">
+      <div class="about-scripture-inner">
+        <p class="about-scripture-ref">One of my favorite scriptures &middot; 1 Timothy 6:17&ndash;19 (NIV)</p>
+        <blockquote class="about-scripture-text">
+          "Command those who are rich in this present world not to be arrogant nor to put their hope in wealth, which is so uncertain, but to put their hope in God, who richly provides us with everything for our enjoyment. Command them to do good, to be rich in good deeds, and to be generous and willing to share. In this way, they will lay up treasure for themselves as a firm foundation for the coming age, so that they may take hold of the life that is truly life."
+        </blockquote>
+        <p class="about-scripture-attribution">1 Timothy 6:17&ndash;19 &middot; New International Version</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ STORY TIMELINE ══════════════════════════════════════ -->
+  <section class="about-story">
+    <div class="wrap">
+      <p class="section-eyebrow">The Journey</p>
+      <h2 class="section-title">A Life Designed,<br/>Not <em>Drifted</em></h2>
+
+      <div class="about-timeline">
+
+        <div class="about-tl-item">
+          <div><div class="about-tl-dot"></div></div>
+          <div>
+            <p class="about-tl-year">Early Career</p>
+            <p class="about-tl-head">Wall Street &amp; National Firms</p>
+            <p class="about-tl-body">Built foundational expertise in wealth management and financial planning at a national Wall Street firm &mdash; gaining the skills that would later serve a very different mission.</p>
+          </div>
+        </div>
+
+        <div class="about-tl-item">
+          <div><div class="about-tl-dot"></div></div>
+          <div>
+            <p class="about-tl-year">2013</p>
+            <p class="about-tl-head">The Leap of Faith</p>
+            <p class="about-tl-body">Left the security of a prestigious firm to follow his calling &mdash; founding Strategic Income Group with a singular conviction: that financial planning, rooted in Biblical principles, can transform lives and communities.</p>
+          </div>
+        </div>
+
+        <div class="about-tl-item">
+          <div><div class="about-tl-dot"></div></div>
+          <div>
+            <p class="about-tl-year">Present</p>
+            <p class="about-tl-head">The Stewardship Blueprint</p>
+            <p class="about-tl-body">Now writing the book he wishes existed &mdash; a practical, faith-rooted framework for designing a life of purpose, generosity, and lasting impact. Chapters 1 &amp; 2 are live and available now.</p>
+          </div>
+        </div>
+
+        <div class="about-tl-item">
+          <div><div class="about-tl-dot" style="background:var(--border);box-shadow:none;border-color:var(--border);"></div></div>
+          <div>
+            <p class="about-tl-year">The Goal</p>
+            <p class="about-tl-head">25,000 People. $1 Billion in Impact.</p>
+            <p class="about-tl-body">The mission is clear and ambitious: to educate and inspire 25,000 people to positively transform communities through charitable contributions and impact investments &mdash; totaling $1 billion or more.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ JOIN THE MOVEMENT ═══════════════════════════════════ -->
+  <section class="about-join">
+    <div class="wrap">
+      <div class="about-join-card">
+
+        <div style="position:relative;z-index:1;">
+          <p class="about-join-ey">✦ Walk With Me</p>
+          <h2 class="about-join-title">
+            Join Me as I Write<br/><em>The Blueprint</em>
+          </h2>
+          <p class="about-join-desc">
+            Get early chapter drafts, reflection worksheets, and blueprint action steps delivered to your inbox &mdash; before anyone else sees them.
+          </p>
+          <div class="about-join-actions">
+            <a href="#" data-open-join-modal class="about-join-btn-primary">
+              Join the Movement
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+            <a href="https://blueprint.michaeljgauthier.com/mission" class="about-join-btn-ghost">Our Mission</a>
+          </div>
+        </div>
+
+        <div class="about-form-card">
+          <div>
+            <label class="about-form-label">First Name</label>
+            <input type="text" class="about-form-input" placeholder="Michael" />
+          </div>
+          <div>
+            <label class="about-form-label">Email Address</label>
+            <input type="email" class="about-form-input" placeholder="you@example.com" />
+          </div>
+          <button class="about-form-submit" data-open-join-modal type="button">Join the Journey &rarr;</button>
+          <p class="about-form-note">No spam. Your info is used only to send Blueprint updates. Unsubscribe anytime.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div><!-- /about-page -->
+
+<!-- ── Footer ───────────────────────────────────────────────── -->
+<style>
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 3rem 1.5rem 2rem;
+  font-family: 'Roboto', sans-serif;
+}
+[data-theme="dark"] footer { background: #0f0f0f; border-top-color: rgba(255,255,255,0.08); }
+.footer-container { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 2rem; }
+.footer-section { display: flex; flex-direction: column; gap: 1rem; }
+.footer-section.logo-section { grid-column: 1; }
+.footer-section h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 600; color: var(--text); }
+[data-theme="dark"] .footer-section h3 { color: #f7f5f2; }
+.footer-logo { width: 60px; height: auto; margin-bottom: 0.5rem; }
+.footer-description { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; max-width: 200px; }
+footer a { color: var(--text-muted); text-decoration: none; }
+.footer-links { display: flex; flex-direction: column; gap: 0.75rem; list-style: none; margin: 0; padding: 0; }
+.footer-links li { margin: 0; }
+.footer-links a { font-size: 0.85rem; color: var(--text-muted); transition: color 0.2s; }
+.footer-links a:hover { color: var(--gold); }
+[data-theme="dark"] .footer-links a { color: rgba(255,255,255,0.5); }
+[data-theme="dark"] .footer-links a:hover { color: var(--gold-dark); }
+.footer-divider { border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 1.5rem; }
+[data-theme="dark"] .footer-divider { border-top-color: rgba(255,255,255,0.08); }
+.sub-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; max-width: 1160px; margin: 0 auto; }
+.sub-footer-text { font-size: 0.8rem; color: var(--text-muted); }
+[data-theme="dark"] .sub-footer-text { color: rgba(255,255,255,0.5); }
+.sub-footer-domain { margin-right: 0.25rem; }
+.gold-j { color: var(--gold); font-weight: 600; }
+[data-theme="dark"] .gold-j { color: var(--gold-dark); }
+.social-icons { display: flex; gap: 1rem; align-items: center; }
+.social-icon { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--text-muted); transition: color 0.2s; }
+.social-icon:hover { color: var(--gold); }
+[data-theme="dark"] .social-icon { color: rgba(255,255,255,0.5); }
+[data-theme="dark"] .social-icon:hover { color: var(--gold-dark); }
+.social-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: currentColor; }
+@media (max-width: 900px) {
+  .footer-container { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .footer-section.logo-section { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  footer { padding: 2rem 1rem 1.5rem; }
+  .footer-container { grid-template-columns: 1fr; gap: 1.5rem; }
+  .sub-footer { flex-direction: column; text-align: center; }
+  .footer-section.logo-section { grid-column: 1; }
+}
+</style>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-section logo-section">
+      <img id="footer-logo" class="footer-logo"
+        src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        alt="Michael J. Gauthier"
+        data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+      <p class="footer-description">Welcome to my personal mission: Encouraging others to use their God given resources for God given purposes</p>
+    </div>
+    <div class="footer-section">
+      <h3>Explore</h3>
+      <ul class="footer-links">
+        <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/resources">Resources</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Account</h3>
+      <ul class="footer-links">
+        <li><a href="https://michaeljgauthier.com/login/">Login</a></li>
+        <li><a href="https://michaeljgauthier.com/register/">Register</a></li>
+        <li><a href="tel:+14804667070">Call Us</a></li>
+        <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Contact</h3>
+      <ul class="footer-links">
+        <li><a href="tel:+14804667070">(480) 466-7070</a></li>
+        <li><a href="https://www.google.com/maps/dir//2330+W+Ray+Rd+Ste+%233,+Chandler,+AZ+85224/@33.3208879,-111.964255,45043m/data=!3m1!1e3!4m8!4m7!1m0!1m5!1m1!1s0x872b07386c66f17d:0x86e4537f11354256!2m2!1d-111.8818538!2d33.3209151" target="_blank">2330 W Ray Rd Ste #3,<br>Chandler, AZ 85224</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-divider">
+    <div class="sub-footer">
+      <div class="sub-footer-text">
+        <span id="dynamic-year" class="sub-footer-domain"></span>
+        <span class="sub-footer-domain"> © Michael<span class="gold-j">J.</span>Gauthier.com</span>
+        <span class="sub-footer-rights"> - All rights reserved.</span>
+      </div>
+      <div class="social-icons">
+        <a href="https://www.facebook.com/StrategicIncomeGroup" class="social-icon" aria-label="Facebook" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"></path></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/michaeljgauthier/" class="social-icon" aria-label="LinkedIn" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"></path><circle cx="4" cy="4" r="2"></circle></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script>
+(function() {
+  var yr = document.getElementById('dynamic-year');
+  if (yr) yr.textContent = new Date().getFullYear();
+  function syncFooterLogo(theme) {
+    var logo = document.getElementById('footer-logo');
+    if (!logo) return;
+    logo.src = theme === 'dark' ? logo.dataset.logoDark : logo.dataset.logoLight;
+  }
+  syncFooterLogo(document.documentElement.dataset.theme || 'light');
+  new MutationObserver(function(m) {
+    m.forEach(function(r) { if (r.attributeName === 'data-theme') syncFooterLogo(document.documentElement.dataset.theme); });
+  }).observe(document.documentElement, { attributes: true });
+})();
+</script>
+
+<!-- ── Journey Modal ────────────────────────────────────────── -->
+<style>
+#journeyModal { --jm-surface:#ffffff; --jm-surface-alt:#f3efe7; --jm-bg:#F7F5F2; --jm-text:#111110; --jm-text-muted:#6b6a64; --jm-border:#e4e1d9; --jm-gold:#9E6F2E; --jm-gold-hover:#7d5721; }
+[data-theme="dark"] #journeyModal { --jm-surface:#161616; --jm-surface-alt:#1f1f1f; --jm-bg:#0f0f0f; --jm-text:#f7f5f2; --jm-text-muted:#a5a296; --jm-border:rgba(255,255,255,0.08); --jm-gold:#C9A46E; --jm-gold-hover:#d4b07f; }
+#journeyModal.modal-overlay { z-index: 1002; }
+#journeyModal .jm-box { background:var(--jm-surface); border-radius:20px; padding:2.5rem; max-width:500px; width:90%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); position:relative; }
+#journeyModal .jm-close { position:absolute; top:1.5rem; right:1.5rem; width:32px; height:32px; background:transparent; border:1px solid var(--jm-border); border-radius:8px; cursor:pointer; color:var(--jm-text-muted); font-size:20px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+#journeyModal .jm-close:hover { color:var(--jm-text); border-color:var(--jm-text-muted); }
+#journeyModal .jm-header { margin-bottom:2rem; }
+#journeyModal .jm-header h2 { font-family:'Cormorant Garamond',Georgia,serif; font-size:2rem; margin-bottom:0.5rem; color:var(--jm-text); }
+#journeyModal .jm-header h2 em { font-style:italic; color:var(--jm-gold); }
+#journeyModal .jm-form { display:flex; flex-direction:column; gap:1.25rem; }
+#journeyModal .jm-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+#journeyModal .jm-group { display:flex; flex-direction:column; gap:0.5rem; }
+#journeyModal .jm-group label { font-size:0.85rem; font-weight:600; color:var(--jm-text); letter-spacing:0.05em; font-family:'Roboto',sans-serif; }
+#journeyModal .jm-helper { font-size:0.82rem; color:var(--jm-text-muted); line-height:1.4; margin-top:-0.25rem; }
+#journeyModal .jm-form input, #journeyModal .jm-form textarea, #journeyModal .jm-form select { padding:0.85rem; border:1px solid var(--jm-border); border-radius:10px; font-family:'Roboto',sans-serif; font-size:0.95rem; background:var(--jm-bg); color:var(--jm-text); transition:border-color 0.2s; }
+#journeyModal .jm-form input:focus, #journeyModal .jm-form textarea:focus, #journeyModal .jm-form select:focus { outline:none; border-color:var(--jm-gold); box-shadow:0 0 0 3px rgba(158,111,46,0.1); }
+#journeyModal .jm-form textarea { resize:vertical; min-height:100px; }
+#journeyModal .jm-agreement { display:flex; gap:1rem; align-items:flex-start; padding:1rem; background:var(--jm-surface-alt); border-radius:10px; font-size:0.85rem; line-height:1.6; color:var(--jm-text-muted); font-family:'Roboto',sans-serif; }
+#journeyModal .jm-agreement input[type="checkbox"] { width:20px; height:20px; cursor:pointer; flex-shrink:0; margin-top:0.15rem; }
+#journeyModal .jm-submit { padding:0.95rem; border-radius:10px; font-weight:600; border:none; cursor:pointer; transition:all 0.2s; background:var(--jm-gold); color:#fff; font-family:'Roboto',sans-serif; font-size:1rem; }
+#journeyModal .jm-submit:hover { background:var(--jm-gold-hover); }
+#journeyModal .jm-hidden { display:none !important; }
+#journeyModal .jm-show { display:flex !important; flex-direction:column; gap:0.5rem; }
+.jm-notif-wrap { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:12px; pointer-events:none; }
+.jm-notif { display:flex; align-items:flex-start; gap:14px; background:#fff; border:1px solid #9E6F2E; border-radius:12px; padding:16px 20px; box-shadow:0 10px 40px rgba(0,0,0,0.12); max-width:380px; animation:jmSlideIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events:auto; }
+[data-theme="dark"] .jm-notif { background:#161616; }
+.jm-notif-icon { flex-shrink:0; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(201,164,110,0.12); color:#C9A46E; font-size:14px; font-weight:bold; }
+.jm-notif-body { flex:1; }
+.jm-notif-title { font-size:15px; font-weight:600; color:#111110; margin-bottom:4px; font-family:'Roboto',sans-serif; }
+[data-theme="dark"] .jm-notif-title { color:#f7f5f2; }
+.jm-notif-desc { font-size:14px; color:#6b6a64; line-height:1.5; font-family:'Roboto',sans-serif; }
+[data-theme="dark"] .jm-notif-desc { color:#a5a296; }
+.jm-notif-x { flex-shrink:0; background:transparent; border:none; color:#6b6a64; cursor:pointer; font-size:18px; padding:0; line-height:1; transition:color 0.2s; }
+@keyframes jmSlideIn { from { transform:translateX(400px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+@keyframes jmSlideOut { from { transform:translateX(0); opacity:1; } to { transform:translateX(400px); opacity:0; } }
+.jm-notif.jm-removing { animation:jmSlideOut 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+@media (max-width:640px) { .jm-notif-wrap { left:12px; right:12px; top:12px; } #journeyModal .jm-row { grid-template-columns:1fr; } }
+</style>
+
+<div class="modal-overlay" id="journeyModal">
+  <div class="jm-box">
+    <button class="jm-close" id="jm-close-btn">&#x2715;</button>
+    <div class="jm-header"><h2>Join <em>The Journey</em></h2></div>
+    <form class="jm-form" id="journeyForm">
+      <input type="hidden" name="recaptcha_token" id="journeyRecaptchaToken" value="" />
+      <div class="jm-row">
+        <div class="jm-group"><label for="jm-firstName">First Name *</label><input type="text" id="jm-firstName" name="first_name" required></div>
+        <div class="jm-group"><label for="jm-lastName">Last Name *</label><input type="text" id="jm-lastName" name="last_name" required></div>
+      </div>
+      <div class="jm-row">
+        <div class="jm-group"><label for="jm-phone">Phone Number *</label><input type="tel" id="jm-phone" name="phone" required></div>
+        <div class="jm-group"><label for="jm-email">Email Address *</label><input type="email" id="jm-email" name="email" required></div>
+      </div>
+      <div class="jm-group">
+        <label for="jm-questions">Questions &amp; Comments</label>
+        <textarea id="jm-questions" name="questions" placeholder="Share any thoughts or questions..."></textarea>
+      </div>
+      <div class="jm-group">
+        <label for="jm-hearAbout">How did you hear about us? *</label>
+        <select id="jm-hearAbout" name="hear_about" required>
+          <option value="">Select an option...</option>
+          <option value="Google">Google</option>
+          <option value="AI">AI</option>
+          <option value="YouTube">YouTube</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Facebook">Facebook</option>
+          <option value="Church">Church</option>
+          <option value="Friend">Friend</option>
+          <option value="Family">Family</option>
+          <option value="Strategic Income Group">Strategic Income Group</option>
+          <option value="Other">Other</option>
+        </select>
+        <p class="jm-helper">Select the option that best describes how you found us.</p>
+      </div>
+      <div class="jm-group jm-hidden" id="jm-churchField">
+        <label for="jm-churchInput">Church Name</label>
+        <input type="text" id="jm-churchInput" placeholder="Enter your church name...">
+      </div>
+      <div class="jm-group jm-hidden" id="jm-otherField">
+        <label for="jm-otherInput">Please specify</label>
+        <input type="text" id="jm-otherInput" placeholder="Please tell us how you heard about us...">
+      </div>
+      <div class="jm-agreement">
+        <input type="checkbox" id="jm-agree" name="agree" required>
+        <label for="jm-agree" style="margin:0;font-size:inherit;">I agree to The Stewardship Blueprint's <a href="#" style="color:var(--jm-gold);text-decoration:none;">Privacy Policy</a> and <a href="#" style="color:var(--jm-gold);text-decoration:none;">Terms of Service</a>. I understand I'll receive updates and resources related to stewardship and biblical principles of financial integrity.</label>
+      </div>
+      <button type="submit" class="jm-submit">Join The Journey</button>
+    </form>
+  </div>
+</div>
+
+<script>
+var FLUENT_CRM_URL = 'https://michaeljgauthier.com/?fluentcrm=1&route=contact&hash=59309c3d-3d3c-4995-8600-5619e6f1f2bd';
+var JM_RECAPTCHA_KEY = '6Lcb3bAsAAAAAHUSz6uACjVAu9pOftduxnJ6g-C4';
+
+function openJourneyModal() {
+  document.getElementById('journeyModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeJourneyModal() {
+  document.getElementById('journeyModal').classList.remove('open');
+  document.getElementById('journeyForm').reset();
+  var cf = document.getElementById('jm-churchField'), of = document.getElementById('jm-otherField');
+  var ci = document.getElementById('jm-churchInput'), oi = document.getElementById('jm-otherInput');
+  cf.classList.add('jm-hidden'); cf.classList.remove('jm-show');
+  of.classList.add('jm-hidden'); of.classList.remove('jm-show');
+  ci.required = false; ci.name = ''; oi.required = false; oi.name = '';
+  document.body.style.overflow = '';
+}
+document.getElementById('jm-hearAbout').addEventListener('change', function() {
+  var val = this.value;
+  var cf = document.getElementById('jm-churchField'), of = document.getElementById('jm-otherField');
+  var ci = document.getElementById('jm-churchInput'), oi = document.getElementById('jm-otherInput');
+  if (val === 'Church') {
+    cf.classList.remove('jm-hidden'); cf.classList.add('jm-show'); ci.required = true; ci.name = 'church_name';
+    of.classList.add('jm-hidden'); of.classList.remove('jm-show'); oi.required = false; oi.name = ''; oi.value = '';
+  } else if (val === 'Other') {
+    of.classList.remove('jm-hidden'); of.classList.add('jm-show'); oi.required = true; oi.name = 'other_source';
+    cf.classList.add('jm-hidden'); cf.classList.remove('jm-show'); ci.required = false; ci.name = ''; ci.value = '';
+  } else {
+    cf.classList.add('jm-hidden'); cf.classList.remove('jm-show'); ci.required = false; ci.name = ''; ci.value = '';
+    of.classList.add('jm-hidden'); of.classList.remove('jm-show'); oi.required = false; oi.name = ''; oi.value = '';
+  }
+});
+document.getElementById('jm-close-btn').addEventListener('click', closeJourneyModal);
+document.getElementById('journeyModal').addEventListener('click', function(e) { if (e.target.id === 'journeyModal') closeJourneyModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('journeyModal').classList.contains('open')) closeJourneyModal(); });
+document.getElementById('journeyForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var form = e.target;
+  var submitBtn = form.querySelector('.jm-submit');
+  submitBtn.disabled = true; submitBtn.textContent = 'Submitting...';
+  var doSubmit = function(token) {
+    var formData = new FormData(form);
+    formData.set('recaptcha_token', token);
+    var data = {};
+    formData.forEach(function(v, k) { data[k] = v; });
+    data.form_type = 'journey_signup';
+    data.source = 'Join The Journey Modal';
+    // add church/other conditionally
+    var ci = document.getElementById('jm-churchInput'), oi = document.getElementById('jm-otherInput');
+    if (ci.name) data.church_name = ci.value;
+    if (oi.name) data.other_source = oi.value;
+    fetch(FLUENT_CRM_URL, { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data) })
+      .then(function() { showJMNotif('Welcome! Check your email for next steps.'); closeJourneyModal(); })
+      .catch(function() { showJMNotif('Something went wrong. Please try again.'); submitBtn.disabled = false; submitBtn.textContent = 'Join The Journey'; });
+  };
+  if (window.grecaptcha) { grecaptcha.ready(function() { grecaptcha.execute(JM_RECAPTCHA_KEY, {action:'journey_signup'}).then(doSubmit).catch(function(){ doSubmit(''); }); }); } else { doSubmit(''); }
+});
+function showJMNotif(msg) {
+  var wrap = document.getElementById('jm-notif-wrap');
+  if (!wrap) { wrap = document.createElement('div'); wrap.id = 'jm-notif-wrap'; wrap.className = 'jm-notif-wrap'; document.body.appendChild(wrap); }
+  var n = document.createElement('div'); n.className = 'jm-notif';
+  n.innerHTML = '<div class="jm-notif-icon">✓</div><div class="jm-notif-body"><div class="jm-notif-title">Welcome!</div><div class="jm-notif-desc">' + msg + '</div></div><button class="jm-notif-x" aria-label="Close">×</button>';
+  wrap.appendChild(n);
+  var rm = function() { n.classList.add('jm-removing'); setTimeout(function(){ n.remove(); }, 300); };
+  n.querySelector('.jm-notif-x').addEventListener('click', rm);
+  setTimeout(rm, 5000);
+}
+// Wire all data-open-join-modal triggers
+document.querySelectorAll('[data-open-join-modal]').forEach(function(el) {
+  el.addEventListener('click', function(e) { e.preventDefault(); openJourneyModal(); });
+});
+</script>

@@ -1,0 +1,1491 @@
+<!--
+  ============================================================
+  MJG360 &middot; MISSION PAGE
+  Paste into Bricks Builder > Code block on /mission/
+  No nav needed &mdash; just drop this block in.
+  ============================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Geist:wght@300;400;500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+<script src="https://www.google.com/recaptcha/api.js?render=6Lcb3bAsAAAAAHUSz6uACjVAu9pOftduxnJ6g-C4"></script>
+
+<style>
+/* ── Tokens ──────────────────────────────────────────────── */
+:root {
+  --bg:           #F7F5F2;
+  --bg-white:     #ffffff;
+  --bg-dark:      #0f0f0f;
+  --bg-dark-2:    #161616;
+  --border:       #e4e1d9;
+  --text:         #111110;
+  --text-muted:   #6b6a64;
+  --text-faint:   #9b9a94;
+  --gold:         #9E6F2E;
+  --gold-dark:    #C9A46E;
+  --gold-light:   #fdf4e8;
+  --gold-mid:     #edd9a8;
+  --radius:       10px;
+  --radius-lg:    16px;
+  --font-d:       'Cormorant Garamond', Georgia, serif;
+  --font-b:       'Geist', system-ui, sans-serif;
+  --max:          1100px;
+  --gap:          88px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+img { display: block; max-width: 100%; }
+a   { color: inherit; text-decoration: none; }
+
+.mission-page {
+  font-family: var(--font-b);
+  -webkit-font-smoothing: antialiased;
+  color: var(--text);
+  background: var(--bg);
+}
+.mission-page .wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+.mission-page .divider {
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Shared utilities ────────────────────────────────────── */
+.mission-page .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-light);
+  border: 1px solid var(--gold-mid);
+  border-radius: 100px;
+  padding: 4px 13px;
+}
+.mission-page .badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.mission-page .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-b);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 22px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .16s;
+  white-space: nowrap;
+}
+.mission-page .btn-dark {
+  background: var(--bg-dark);
+  color: #fff;
+  border-color: var(--bg-dark);
+}
+.mission-page .btn-dark:hover { background: #1e1e1c; }
+.mission-page .btn-outline {
+  background: transparent;
+  color: var(--text);
+  border-color: #ccc9c0;
+}
+.mission-page .btn-outline:hover { background: #edece8; }
+
+/* ══ HERO ════════════════════════════════════════════════ */
+.mission-hero {
+  padding: 88px 0 96px;
+  background: var(--bg-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dot-grid texture */
+.mission-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+/* Gold glow */
+.mission-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 500px;
+  background: radial-gradient(ellipse, rgba(201,164,110,.1) 0%, transparent 68%);
+  pointer-events: none;
+}
+
+.mission-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.mission-hero-inner .badge { animation: mfadeUp .5s ease both; }
+
+.mission-hero-headline {
+  font-family: var(--font-d);
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 400;
+  letter-spacing: -.03em;
+  line-height: 1.08;
+  color: #fff;
+  max-width: 780px;
+  animation: mfadeUp .55s .1s ease both;
+}
+.mission-hero-headline em {
+  font-style: italic;
+  color: var(--gold-dark);
+}
+
+.mission-hero-sub {
+  font-size: 16.5px;
+  color: rgba(255,255,255,.5);
+  max-width: 560px;
+  font-weight: 300;
+  line-height: 1.72;
+  animation: mfadeUp .55s .2s ease both;
+}
+
+.mission-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: mfadeUp .55s .3s ease both;
+}
+.mission-btn-gold {
+  background: var(--gold-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 26px;
+  font-family: var(--font-b);
+  font-size: 14.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .15s;
+}
+.mission-btn-gold:hover { background: #b5904d; }
+.mission-btn-ghost {
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.7);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius);
+  padding: 12px 24px;
+  font-family: var(--font-b);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .15s;
+}
+.mission-btn-ghost:hover { background: rgba(255,255,255,.12); }
+
+@keyframes mfadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══ MISSION STATEMENT ═══════════════════════════════════ */
+.mission-statement {
+  padding: var(--gap) 0;
+  background: var(--bg);
+}
+.mission-statement-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.mission-statement-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 14px;
+}
+.mission-statement-title {
+  font-family: var(--font-d);
+  font-size: clamp(30px, 3.8vw, 46px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  line-height: 1.12;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.mission-statement-title em { font-style: italic; color: var(--gold); }
+.mission-statement-body {
+  font-size: 15.5px;
+  color: var(--text-muted);
+  line-height: 1.8;
+  font-weight: 300;
+}
+.mission-statement-body p + p { margin-top: 16px; }
+.mission-statement-body em {
+  font-family: var(--font-d);
+  font-style: italic;
+  color: var(--text);
+}
+.mission-statement-body strong { color: var(--text); font-weight: 500; }
+
+/* Mission card on right */
+.mission-card-main {
+  background: var(--bg-dark);
+  border-radius: 20px;
+  padding: 44px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.mission-card-main::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold-dark), transparent);
+}
+.mission-card-main::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; right: -60px;
+  width: 280px; height: 280px;
+  background: radial-gradient(ellipse, rgba(201,164,110,.1) 0%, transparent 65%);
+  pointer-events: none;
+}
+.mission-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(201,164,110,.7);
+  margin-bottom: 14px;
+}
+.mission-card-quote {
+  font-family: var(--font-d);
+  font-size: clamp(18px, 2.2vw, 24px);
+  font-style: italic;
+  font-weight: 300;
+  color: #fff;
+  line-height: 1.55;
+  position: relative;
+  z-index: 1;
+}
+.mission-card-sep {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,.08);
+  margin: 28px 0;
+}
+.mission-card-scripture-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(201,164,110,.65);
+  margin-bottom: 10px;
+}
+.mission-card-scripture {
+  font-family: var(--font-d);
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(255,255,255,.6);
+  line-height: 1.6;
+}
+.mission-card-scripture-ref {
+  font-size: 11.5px;
+  color: rgba(255,255,255,.3);
+  margin-top: 8px;
+}
+
+/* ══ IMPACT SCORE ════════════════════════════════════════ */
+.mission-impact {
+  padding: var(--gap) 0;
+  background: var(--bg-dark-2);
+  border-top: 1px solid rgba(255,255,255,.05);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.mission-impact-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+/* Progress toward goal */
+.mission-impact-left {}
+.mission-impact-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(201,164,110,.7);
+  margin-bottom: 16px;
+}
+.mission-impact-heading {
+  font-family: var(--font-d);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.mission-impact-heading em { font-style: italic; color: var(--gold-dark); }
+.mission-impact-desc {
+  font-size: 14.5px;
+  color: rgba(255,255,255,.45);
+  line-height: 1.72;
+  font-weight: 300;
+  margin-bottom: 36px;
+}
+
+/* Score display */
+.mission-score-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+}
+.mission-score-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(201,164,110,.65);
+  margin-bottom: 12px;
+}
+.mission-score-date {
+  font-size: 11px;
+  color: rgba(255,255,255,.3);
+  margin-bottom: 8px;
+}
+.mission-score-val {
+  font-family: var(--font-d);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 300;
+  letter-spacing: -.03em;
+  color: var(--gold-dark);
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+/* Progress bar */
+.mission-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mission-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255,255,255,.3);
+}
+.mission-progress-bar {
+  height: 6px;
+  background: rgba(255,255,255,.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.mission-progress-fill {
+  height: 100%;
+  /* $96,061,108 / $1,000,000,000 = 9.6% */
+  width: 9.6%;
+  background: linear-gradient(90deg, var(--gold-dark), #e8cc98);
+  border-radius: 10px;
+  transition: width 1.4s cubic-bezier(.4,0,.2,1);
+}
+.mission-progress-pct {
+  font-size: 11px;
+  color: var(--gold-dark);
+  font-weight: 500;
+}
+
+/* Right: pillars */
+.mission-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mission-pillar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  transition: border-color .18s;
+}
+.mission-pillar:hover { border-color: rgba(201,164,110,.2); }
+.mission-pillar-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: rgba(201,164,110,.1);
+  border: 1px solid rgba(201,164,110,.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.mission-pillar-icon svg {
+  width: 18px; height: 18px;
+  stroke: var(--gold-dark);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mission-pillar-title {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.mission-pillar-sub {
+  font-size: 12.5px;
+  color: rgba(255,255,255,.35);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* ══ VALUES ══════════════════════════════════════════════ */
+.mission-values {
+  padding: var(--gap) 0;
+  background: var(--bg);
+}
+.mission-values-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.mission-values-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 14px;
+}
+.mission-values-title {
+  font-family: var(--font-d);
+  font-size: clamp(30px, 3.8vw, 46px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  color: var(--text);
+  line-height: 1.1;
+}
+.mission-values-title em { font-style: italic; color: var(--gold); }
+
+.mission-values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.mission-val-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  transition: box-shadow .2s, transform .2s;
+}
+.mission-val-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,.07);
+  transform: translateY(-2px);
+}
+.mission-val-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--gold-light);
+  border: 1px solid var(--gold-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.mission-val-icon svg {
+  width: 20px; height: 20px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mission-val-title {
+  font-family: var(--font-d);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -.01em;
+  margin-bottom: 10px;
+}
+.mission-val-body {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ══ SCRIPTURE BREAK ══════════════════════════════════════ */
+.mission-proverbs {
+  background: var(--bg-dark);
+  padding: 72px 0;
+  position: relative;
+  overflow: hidden;
+}
+.mission-proverbs::before {
+  content: '\201C';
+  position: absolute;
+  top: -40px; right: -10px;
+  font-family: var(--font-d);
+  font-size: 280px;
+  line-height: 1;
+  color: rgba(255,255,255,.025);
+  pointer-events: none;
+}
+.mission-proverbs-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.mission-proverbs-ref {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  opacity: .8;
+  margin-bottom: 24px;
+}
+.mission-proverbs-text {
+  font-family: var(--font-d);
+  font-size: clamp(22px, 3vw, 32px);
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(255,255,255,.88);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.mission-proverbs-attr {
+  font-size: 13px;
+  color: rgba(255,255,255,.3);
+}
+
+/* ══ JOIN CTA ════════════════════════════════════════════ */
+.mission-join {
+  padding: var(--gap) 0;
+  background: var(--bg);
+}
+.mission-join-card {
+  background: var(--bg-dark);
+  border-radius: 20px;
+  padding: 64px 72px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 64px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.mission-join-card::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(ellipse, rgba(201,164,110,.13) 0%, transparent 65%);
+  pointer-events: none;
+}
+.mission-join-content { position: relative; z-index: 1; }
+.mission-join-ey {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(201,164,110,.85);
+  margin-bottom: 14px;
+}
+.mission-join-title {
+  font-family: var(--font-d);
+  font-size: clamp(28px, 3.2vw, 42px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.mission-join-title em { font-style: italic; color: #e8cc98; }
+.mission-join-desc {
+  font-size: 14.5px;
+  color: rgba(255,255,255,.45);
+  line-height: 1.72;
+  font-weight: 300;
+  max-width: 400px;
+  margin-bottom: 28px;
+}
+.mission-join-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Stats mini-grid on right */
+.mission-join-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+.mission-join-stat {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  text-align: center;
+}
+.mission-join-stat-num {
+  font-family: var(--font-d);
+  font-size: 30px;
+  font-weight: 300;
+  letter-spacing: -.02em;
+  color: var(--gold-dark);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.mission-join-stat-label {
+  font-size: 11.5px;
+  color: rgba(255,255,255,.35);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 860px) {
+  :root { --gap: 64px; }
+  .mission-statement-grid,
+  .mission-impact-inner,
+  .mission-join-card { grid-template-columns: 1fr; gap: 40px; }
+  .mission-join-card { padding: 44px 28px; }
+  .mission-values-grid { grid-template-columns: 1fr 1fr; }
+  .mission-join-stats { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .mission-values-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<style>
+/* Nav variables */
+nav { --nv-bg: #ffffff; --nv-text: #111110; --nv-border: rgba(17,17,17,0.1); --nv-btn-bg: #111110; --nv-btn-text: #ffffff; --nv-ctrl-bg: rgba(17,17,17,0.06); --nv-ctrl-bdr: rgba(17,17,17,0.16); --nv-ctrl-hov: rgba(17,17,17,0.1); }
+[data-theme="dark"] nav { --nv-bg: #0f0f0f; --nv-text: #f7f5f2; --nv-border: rgba(255,255,255,0.08); --nv-btn-bg: #f7f5f2; --nv-btn-text: #111110; --nv-ctrl-bg: rgba(255,255,255,0.08); --nv-ctrl-bdr: rgba(255,255,255,0.18); --nv-ctrl-hov: rgba(255,255,255,0.12); }
+nav { position: sticky; top: 0; z-index: 200; width: 100%; font-family: 'Roboto', sans-serif; background: var(--nv-bg); border-bottom: 1px solid var(--nv-border); }
+.nav-inner { max-width: 1160px; width: 100%; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; min-height: 60px; }
+.nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+.nav-logo img { height: 36px; width: auto; display: block; }
+.nav-logo-text { font-family: 'DM Serif Display', 'Cormorant Garamond', Georgia, serif; font-size: 0.95rem; font-style: italic; color: var(--nv-text); letter-spacing: -0.02em; }
+.nav-logo-text .gold { color: #C9A46E; }
+.nav-links { display: flex; align-items: center; gap: 1.75rem; list-style: none; }
+.nav-links a { font-family: 'Roboto', sans-serif !important; font-size: 0.875rem !important; color: var(--nv-text) !important; text-decoration: none !important; transition: opacity 0.2s; background: none !important; border: none !important; padding: 0 !important; }
+.nav-links a:hover { opacity: 0.7; }
+.nav-link-plain { background: none; border: none; padding: 0; font-family: 'Roboto', sans-serif; font-size: 0.875rem; color: var(--nv-text); cursor: pointer; transition: opacity 0.2s; }
+.nav-link-plain:hover { opacity: 0.7; }
+.nav-links .nav-btn-cta { display: inline-flex; align-items: center; font-family: 'Roboto', sans-serif !important; font-size: 0.875rem !important; font-weight: 500; color: var(--nv-btn-text) !important; background: var(--nv-btn-bg) !important; border: 1px solid var(--nv-btn-bg) !important; border-radius: 6px; padding: 0.55rem 1.25rem !important; text-decoration: none !important; cursor: pointer; transition: opacity 0.2s; }
+.nav-links .nav-btn-cta:hover { opacity: 0.9; }
+.nav-theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; background: var(--nv-ctrl-bg); border: 1px solid var(--nv-ctrl-bdr); color: var(--nv-text); border-radius: 14px; padding: 0; cursor: pointer; transition: background 0.2s, transform 0.2s; flex-shrink: 0; }
+.nav-theme-toggle:hover { background: var(--nv-ctrl-hov); transform: translateY(-1px); }
+.nav-mobile-toggle { display: none; align-items: center; justify-content: center; width: 42px; height: 42px; background: var(--nv-ctrl-bg); border: 1px solid var(--nv-ctrl-bdr); color: var(--nv-text); border-radius: 14px; padding: 0; cursor: pointer; }
+.nav-links.open { display: flex; }
+@media (max-width: 768px) {
+  .nav-mobile-toggle { display: inline-flex; }
+  .nav-links { position: absolute; top: 60px; left: 0; right: 0; flex-direction: column; gap: 1rem; padding: 1.25rem 1.5rem 1.75rem; background: var(--nv-bg); border-bottom: 1px solid var(--nv-border); display: none; }
+  .nav-links li { width: 100%; }
+  .nav-links a, .nav-link-plain, .nav-btn-cta { width: 100%; }
+  .nav-btn-cta { text-align: center; justify-content: center; }
+}
+/* Audio modal + player */
+:root { --ap-bg: #191815; --ap-gold: #c9a46e; --ap-gold-dark: #a8833f; --ap-muted: #a5a296; --ap-radius: 60px; --ap-font: 'Geist', system-ui, sans-serif; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.audio-modal-card { background: linear-gradient(180deg, rgba(30,24,19,0.97), rgba(10,8,6,0.99)); border-radius: 32px; padding: 2rem; max-width: 520px; width: 92%; position: relative; }
+.modal-close { position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.modal-close:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.ap-wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 16px; font-family: var(--ap-font); -webkit-font-smoothing: antialiased; }
+.ap-meta { text-align: center; } .ap-meta-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ap-gold); margin-bottom: 6px; }
+.ap-meta-title { font-size: 18px; font-weight: 500; color: #f1eee3; line-height: 1.3; margin-bottom: 4px; } .ap-meta-sub { font-size: 13px; color: var(--ap-muted); font-weight: 300; }
+.ap-progress-wrap { width: 100%; max-width: 520px; display: flex; align-items: center; gap: 10px; }
+.ap-time { font-size: 11px; font-weight: 500; color: var(--ap-muted); min-width: 34px; letter-spacing: .02em; } .ap-time.right { text-align: right; }
+.ap-track { flex: 1; height: 3px; background: #e0ddd6; border-radius: 10px; cursor: pointer; -webkit-appearance: none; appearance: none; }
+.ap-track::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--ap-gold); cursor: pointer; margin-top: -5px; }
+.ap-track::-webkit-slider-runnable-track { height: 3px; border-radius: 10px; background: linear-gradient(to right, var(--ap-gold) 0%, var(--ap-gold) var(--ap-pct, 0%), #e0ddd6 var(--ap-pct, 0%), #e0ddd6 100%); }
+.ap-pill { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 520px; background: var(--ap-bg); border-radius: var(--ap-radius); padding: 10px 20px 10px 18px; box-shadow: 0 8px 32px rgba(0,0,0,.22); position: relative; }
+.ap-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%; transition: transform .15s, opacity .15s; color: var(--ap-muted); flex-shrink: 0; }
+.ap-btn:hover { opacity: .75; transform: scale(1.06); }
+.ap-btn-play { width: 72px; height: 72px; border-radius: 50%; background: var(--ap-gold); flex-shrink: 0; margin: -16px 0; color: #fff; transition: background .15s; }
+.ap-btn-play:hover { background: #d9b47e; opacity: 1; }
+.ap-icon-play { display: block; } .ap-icon-pause { display: none; }
+.ap-playing .ap-icon-play { display: none; } .ap-playing .ap-icon-pause { display: block; }
+.ap-loop-badge { position: relative; } .ap-loop-count { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-54%); font-size: 9px; font-weight: 700; color: var(--ap-muted); pointer-events: none; }
+.ap-btn.ap-active { color: var(--ap-gold); }
+.ap-vol-wrap { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 520px; justify-content: flex-end; }
+.ap-vol-icon { color: #a5a296; flex-shrink: 0; }
+.ap-vol-slider { width: 90px; height: 3px; -webkit-appearance: none; appearance: none; background: #e0ddd6; border-radius: 10px; outline: none; cursor: pointer; }
+.ap-vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--ap-gold); cursor: pointer; margin-top: -4px; }
+.ap-vol-slider::-webkit-slider-runnable-track { height: 3px; border-radius: 10px; background: linear-gradient(to right, var(--ap-gold) 0%, var(--ap-gold) var(--ap-vol-pct, 80%), #e0ddd6 var(--ap-vol-pct, 80%), #e0ddd6 100%); }
+.ap-audio { display: none; }
+</style>
+
+<nav>
+  <div class="nav-inner">
+    <a href="https://blueprint.michaeljgauthier.com/" class="nav-logo">
+      <img id="nav-logo-img" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" alt="Michael J. Gauthier" />
+      <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
+    </a>
+    <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open menu" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/mission">Mission</a></li>
+      <li><button id="listen-btn" class="nav-link-plain" type="button">Listen</button></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/resources">Resources</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+      <li><a href="#" id="join-btn" class="nav-btn-cta">Join the Journey</a></li>
+      <li><button id="nav-theme-toggle" class="nav-theme-toggle" type="button" aria-label="Toggle dark mode"><svg id="nav-theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg></button></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="audioModal">
+  <div class="audio-modal-card">
+    <button class="modal-close" id="audio-modal-close">&#x2715;</button>
+    <div class="ap-wrap">
+      <div class="ap-meta"><p class="ap-meta-eyebrow">The Stewardship Blueprint</p><p class="ap-meta-title">Audiobook Preview</p><p class="ap-meta-sub">Michael J. Gauthier &middot; 2 hours</p></div>
+      <div class="ap-progress-wrap"><span class="ap-time left" id="ap-cur-modal">0:00</span><input class="ap-track" id="ap-seek-modal" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek" style="--ap-pct:0%" /><span class="ap-time right" id="ap-dur-modal">0:00</span></div>
+      <div class="ap-pill" id="ap-pill-modal">
+        <button class="ap-btn" id="ap-lib-modal" aria-label="Library"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="9" y="13" width="20" height="16" rx="4" stroke="currentColor" stroke-width="1.4"/><rect x="12" y="10" width="14" height="4" rx="2" stroke="currentColor" stroke-width="1.3"/><rect x="14.5" y="7.5" width="9" height="3" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M21.5 18.5v-3.5l-5 1v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="16.5" cy="23" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="21.5" cy="22" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg></button>
+        <button class="ap-btn" id="ap-rew-modal" aria-label="Rewind 10s"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M11.5 15.5A9.5 9.5 0 1 1 9 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 16l1.5-3.5L13 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-size="8" font-weight="600">10</text></svg></button>
+        <button class="ap-btn ap-btn-play" id="ap-play-modal" aria-label="Play"><svg class="ap-icon-play" width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M11 8.5l12 6.5-12 6.5V8.5z" fill="white"/></svg><svg class="ap-icon-pause" width="30" height="30" viewBox="0 0 30 30" fill="none"><rect x="9" y="8" width="4" height="14" rx="2" fill="white"/><rect x="17" y="8" width="4" height="14" rx="2" fill="white"/></svg></button>
+        <button class="ap-btn" id="ap-fwd-modal" aria-label="Forward 10s"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M26.5 15.5A9.5 9.5 0 1 0 29 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M30 16l-1.5-3.5L25 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-size="8" font-weight="600">10</text></svg></button>
+        <button class="ap-btn ap-loop-badge" id="ap-loop-modal" aria-label="Loop"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M9 21a10 10 0 1 0 1-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M9 11.5L9 17.5H15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="ap-loop-count">1</span></button>
+      </div>
+      <div class="ap-vol-wrap">
+        <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/></svg>
+        <input class="ap-vol-slider" id="ap-vol-modal" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" style="--ap-vol-pct:80%" />
+        <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/><path d="M11 4.5c1.5 1 2 2 2 3.5s-.5 2.5-2 3.5"/><path d="M13 2c2 1.5 3 3 3 6s-1 4.5-3 6"/></svg>
+      </div>
+      <audio class="ap-audio" id="mjg-audio-modal" preload="metadata"><source src="https://michaeljgauthier.com/wp-content/uploads/2026/04/The-Stewardship-Blueprint-Chapters-1-and-2-Summary.wav" type="audio/wav" /></audio>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var logoImg = document.getElementById('nav-logo-img');
+  var themeBtn = document.getElementById('nav-theme-toggle');
+  var themeIcon = document.getElementById('nav-theme-icon');
+  var mobileBtn = document.getElementById('nav-mobile-toggle');
+  var navLinks = document.getElementById('nav-links');
+  var SUN = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  var MOON = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  function setTheme(t) { document.documentElement.dataset.theme = t; localStorage.setItem('theme', t); if (themeIcon) themeIcon.innerHTML = t === 'dark' ? MOON : SUN; if (logoImg) logoImg.src = t === 'dark' ? logoImg.dataset.dark : logoImg.dataset.light; }
+  var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  setTheme(saved);
+  if (themeBtn) themeBtn.addEventListener('click', function() { setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); });
+  var HAMBURGER_SVG = '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
+  var CLOSE_SVG = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  function openMobileMenu() { if (!navLinks) return; navLinks.classList.add('open'); if (mobileBtn) { mobileBtn.querySelector('svg').innerHTML = CLOSE_SVG; mobileBtn.setAttribute('aria-label', 'Close menu'); } }
+  function closeMobileMenu() { if (!navLinks) return; navLinks.classList.remove('open'); if (mobileBtn) { mobileBtn.querySelector('svg').innerHTML = HAMBURGER_SVG; mobileBtn.setAttribute('aria-label', 'Open menu'); } }
+  if (mobileBtn) mobileBtn.addEventListener('click', function() { navLinks && navLinks.classList.contains('open') ? closeMobileMenu() : openMobileMenu(); });
+  if (navLinks) navLinks.addEventListener('click', function(e) { if (e.target.closest('a, button')) closeMobileMenu(); });
+  document.addEventListener('click', function(e) { if (navLinks && navLinks.classList.contains('open') && !e.target.closest('nav')) closeMobileMenu(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && navLinks && navLinks.classList.contains('open')) closeMobileMenu(); });
+  function openAudioModal() { document.getElementById('audioModal').classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeAudioModal() { document.getElementById('audioModal').classList.remove('open'); document.body.style.overflow = ''; var a = document.getElementById('mjg-audio-modal'); if (a) a.pause(); var p = document.getElementById('ap-pill-modal'); if (p) p.classList.remove('ap-playing'); }
+  document.getElementById('listen-btn').addEventListener('click', openAudioModal);
+  document.getElementById('audio-modal-close').addEventListener('click', closeAudioModal);
+  document.getElementById('audioModal').addEventListener('click', function(e) { if (e.target.id === 'audioModal') closeAudioModal(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAudioModal(); });
+  document.getElementById('join-btn').addEventListener('click', function(e) { e.preventDefault(); if (typeof openJourneyModal === 'function') openJourneyModal(); });
+  document.addEventListener('DOMContentLoaded', function() {
+    var audio = document.getElementById('mjg-audio-modal'), pill = document.getElementById('ap-pill-modal'), btnPlay = document.getElementById('ap-play-modal'), btnRew = document.getElementById('ap-rew-modal'), btnFwd = document.getElementById('ap-fwd-modal'), btnLoop = document.getElementById('ap-loop-modal'), seekBar = document.getElementById('ap-seek-modal'), volBar = document.getElementById('ap-vol-modal'), curEl = document.getElementById('ap-cur-modal'), durEl = document.getElementById('ap-dur-modal');
+    if (!audio || !pill || !btnPlay) return;
+    var loopMode = false, isDragging = false;
+    function fmt(s) { if (!s || isNaN(s)) return '0:00'; return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0'); }
+    btnPlay.addEventListener('click', function() { if (audio.paused) { audio.play().then(function(){ pill.classList.add('ap-playing'); }).catch(function(){}); } else { audio.pause(); pill.classList.remove('ap-playing'); } });
+    btnRew.addEventListener('click', function() { audio.currentTime = Math.max(0, audio.currentTime - 10); });
+    btnFwd.addEventListener('click', function() { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); });
+    btnLoop.addEventListener('click', function() { loopMode = !loopMode; audio.loop = loopMode; btnLoop.classList.toggle('ap-active', loopMode); });
+    audio.addEventListener('timeupdate', function() { if (isDragging) return; var pct = audio.duration ? (audio.currentTime/audio.duration)*100 : 0; seekBar.value = pct; seekBar.style.setProperty('--ap-pct', pct+'%'); curEl.textContent = fmt(audio.currentTime); });
+    audio.addEventListener('loadedmetadata', function() { durEl.textContent = fmt(audio.duration); });
+    audio.addEventListener('ended', function() { pill.classList.remove('ap-playing'); seekBar.value = 0; seekBar.style.setProperty('--ap-pct','0%'); curEl.textContent = '0:00'; });
+    seekBar.addEventListener('input', function() { isDragging = true; var pct = parseFloat(seekBar.value); seekBar.style.setProperty('--ap-pct', pct+'%'); if (audio.duration) curEl.textContent = fmt((pct/100)*audio.duration); });
+    seekBar.addEventListener('change', function() { if (audio.duration) audio.currentTime = (parseFloat(seekBar.value)/100)*audio.duration; isDragging = false; });
+    audio.volume = parseFloat(volBar.value);
+    volBar.addEventListener('input', function() { audio.volume = parseFloat(volBar.value); volBar.style.setProperty('--ap-vol-pct', parseFloat(volBar.value)*100+'%'); });
+  });
+})();
+</script>
+
+<div class="mission-page">
+
+  <!-- ══ HERO ═══════════════════════════════════════════════ -->
+  <section class="mission-hero">
+    <div class="wrap">
+      <div class="mission-hero-inner">
+
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Our Mission
+        </div>
+
+        <h1 class="mission-hero-headline">
+          Using God-Given Resources<br/>for <em>God-Given Purposes</em>
+        </h1>
+
+        <p class="mission-hero-sub">
+          Our mission is clear and ambitious: to educate and inspire 25,000 people to positively transform communities through charitable contributions and impact investments of $1 billion or more.
+        </p>
+
+        <div class="mission-hero-actions">
+          <a href="#" data-open-join-modal class="mission-btn-gold">
+            Join the Movement
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+          <a href="https://blueprint.michaeljgauthier.com/about" class="mission-btn-ghost">About Michael</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MISSION STATEMENT ══════════════════════════════════ -->
+  <section class="mission-statement">
+    <div class="wrap">
+      <div class="mission-statement-grid">
+
+        <!-- Left -->
+        <div>
+          <p class="mission-statement-eyebrow">What Drives Us</p>
+          <h2 class="mission-statement-title">
+            A Mission Rooted in<br/><em>Faith &amp; Purpose</em>
+          </h2>
+
+          <div class="mission-statement-body" style="margin-top:20px;">
+            <p>
+              In today's world, it's easy to become overwhelmed by financial pressures. Many people are carrying debt, struggling to save, and unsure of how to use their resources to make a meaningful impact.
+            </p>
+            <p>
+              Through education and guidance, I want to help change this narrative. By adopting principles of <strong>stewardship, generosity, and intentionality</strong>, we can transform not only our own financial lives but also the lives of those around us.
+            </p>
+            <p>
+              It's not just about accumulating wealth &mdash; it's about using that wealth wisely and for <em>purposes that glorify God</em>.
+            </p>
+          </div>
+
+          <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="#" data-open-join-modal class="btn btn-dark">
+              Join the Movement
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+            <a href="https://blueprint.michaeljgauthier.com/about" class="btn btn-outline">About Michael</a>
+          </div>
+        </div>
+
+        <!-- Right: mission card -->
+        <div class="mission-card-main">
+          <p class="mission-card-label">&#10022; Mission Statement</p>
+          <p class="mission-card-quote">
+            "To educate and inspire 25,000 people to positively transform communities through charitable contributions and making impact investments of $1 billion+."
+          </p>
+
+          <div class="mission-card-sep"></div>
+
+          <p class="mission-card-scripture-label">Proverbs 21:5</p>
+          <p class="mission-card-scripture">
+            "The plans of the diligent lead to profit as surely as haste leads to poverty."
+          </p>
+          <p class="mission-card-scripture-ref">Proverbs 21:5 &middot; New International Version</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ IMPACT SCORE ════════════════════════════════════════ -->
+  <section class="mission-impact">
+    <div class="wrap">
+      <div class="mission-impact-inner">
+
+        <!-- Left: score + progress -->
+        <div class="mission-impact-left">
+          <p class="mission-impact-eyebrow">&#10022; Impact Score</p>
+          <h2 class="mission-impact-heading">
+            Tracking Progress<br/>Toward <em>$1 Billion</em>
+          </h2>
+          <p class="mission-impact-desc">
+            Every dollar given, every investment made with purpose &mdash; it all counts. This is our running total of the real-world impact created by our community.
+          </p>
+
+          <div class="mission-score-card">
+            <p class="mission-score-label">Current Impact Score</p>
+            <p class="mission-score-date" id="impact-score-date">As of April 10, 2026</p>
+            <p class="mission-score-val" id="impact-score-val">$96,061,108</p>
+
+            <div class="mission-progress-wrap">
+              <div class="mission-progress-labels">
+                <span>$0</span>
+                <span class="mission-progress-pct" id="impact-score-pct">9.6% of goal</span>
+                <span>$1B</span>
+              </div>
+              <div class="mission-progress-bar">
+                <div class="mission-progress-fill" id="impact-score-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: pillars of impact -->
+        <div>
+          <p style="font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(201,164,110,.65);margin-bottom:20px;">How We Get There</p>
+          <div class="mission-pillars">
+
+            <div class="mission-pillar">
+              <div class="mission-pillar-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <div>
+                <p class="mission-pillar-title">Financial Education</p>
+                <p class="mission-pillar-sub">Teaching Biblical stewardship principles to individuals, families &amp; churches</p>
+              </div>
+            </div>
+
+            <div class="mission-pillar">
+              <div class="mission-pillar-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+              <div>
+                <p class="mission-pillar-title">Intentional Giving</p>
+                <p class="mission-pillar-sub">Empowering generous, purposeful charitable contributions</p>
+              </div>
+            </div>
+
+            <div class="mission-pillar">
+              <div class="mission-pillar-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+              </div>
+              <div>
+                <p class="mission-pillar-title">Impact Investing</p>
+                <p class="mission-pillar-sub">Aligning investments with values for lasting community transformation</p>
+              </div>
+            </div>
+
+            <div class="mission-pillar">
+              <div class="mission-pillar-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+              </div>
+              <div>
+                <p class="mission-pillar-title">Community Building</p>
+                <p class="mission-pillar-sub">A movement of 25,000 inspired, purposeful stewards</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ VALUES ══════════════════════════════════════════════ -->
+  <section class="mission-values">
+    <div class="wrap">
+      <div class="mission-values-header">
+        <p class="mission-values-eyebrow">What We Stand For</p>
+        <h2 class="mission-values-title">Core <em>Values</em></h2>
+      </div>
+
+      <div class="mission-values-grid">
+
+        <div class="mission-val-card">
+          <div class="mission-val-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <p class="mission-val-title">Stewardship</p>
+          <p class="mission-val-body">Managing every resource &mdash; time, money, and talent &mdash; as a sacred trust, not a personal possession. We're caretakers, not owners.</p>
+        </div>
+
+        <div class="mission-val-card">
+          <div class="mission-val-icon">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </div>
+          <p class="mission-val-title">Generosity</p>
+          <p class="mission-val-body">Giving freely and joyfully, knowing that generosity doesn't diminish us &mdash; it multiplies our impact and transforms communities.</p>
+        </div>
+
+        <div class="mission-val-card">
+          <div class="mission-val-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <p class="mission-val-title">Intentionality</p>
+          <p class="mission-val-body">Living by design, not by default. Every financial decision is an opportunity to reflect our values and move toward our calling.</p>
+        </div>
+
+        <div class="mission-val-card">
+          <div class="mission-val-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <p class="mission-val-title">Education</p>
+          <p class="mission-val-body">Equipping people with the knowledge, tools, and frameworks they need to make wise, purposeful financial decisions rooted in truth.</p>
+        </div>
+
+        <div class="mission-val-card">
+          <div class="mission-val-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <p class="mission-val-title">Community</p>
+          <p class="mission-val-body">We don't journey alone. Transformation happens together &mdash; through shared learning, encouragement, and accountability.</p>
+        </div>
+
+        <div class="mission-val-card">
+          <div class="mission-val-icon">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="mission-val-title">Purpose</p>
+          <p class="mission-val-body">Aligning our lives and resources with something greater than ourselves &mdash; a calling that outlasts us and shapes generations to come.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PROVERBS SCRIPTURE ══════════════════════════════════ -->
+  <section class="mission-proverbs">
+    <div class="wrap">
+      <div class="mission-proverbs-inner">
+        <p class="mission-proverbs-ref">Proverbs 21:5 &middot; New International Version</p>
+        <blockquote class="mission-proverbs-text">
+          "The plans of the diligent lead to profit as surely as haste leads to poverty."
+        </blockquote>
+        <p class="mission-proverbs-attr">It&rsquo;s not just about accumulating wealth &mdash; it&rsquo;s about using that wealth wisely and for purposes that glorify God.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ JOIN CTA ════════════════════════════════════════════ -->
+  <section class="mission-join">
+    <div class="wrap">
+      <div class="mission-join-card">
+
+        <div class="mission-join-content">
+          <p class="mission-join-ey">&#10022; Be Part of the Movement</p>
+          <h2 class="mission-join-title">
+            Ready to Use Your Resources<br/>for <em>God-Given Purposes?</em>
+          </h2>
+          <p class="mission-join-desc">
+            Join a community of people committed to living generously, investing with purpose, and transforming communities through wise stewardship.
+          </p>
+          <div class="mission-join-btns">
+            <a href="#" data-open-join-modal class="mission-btn-gold">
+              Join the Movement
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+            <a href="https://blueprint.michaeljgauthier.com/contact" class="mission-btn-ghost">Contact Michael</a>
+          </div>
+        </div>
+
+        <!-- Mini stat grid -->
+        <div class="mission-join-stats">
+          <div class="mission-join-stat">
+            <p class="mission-join-stat-num">25K</p>
+            <p class="mission-join-stat-label">People to inspire</p>
+          </div>
+          <div class="mission-join-stat">
+            <p class="mission-join-stat-num">$1B</p>
+            <p class="mission-join-stat-label">Impact goal</p>
+          </div>
+          <div class="mission-join-stat">
+            <p class="mission-join-stat-num">$96M</p>
+            <p class="mission-join-stat-label">Achieved to date</p>
+          </div>
+          <div class="mission-join-stat">
+            <p class="mission-join-stat-num">2013</p>
+            <p class="mission-join-stat-label">Mission founded</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div><!-- /mission-page -->
+
+<!-- ── Footer ───────────────────────────────────────────────── -->
+<style>
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 3rem 1.5rem 2rem;
+  font-family: 'Roboto', sans-serif;
+}
+[data-theme="dark"] footer { background: #0f0f0f; border-top-color: rgba(255,255,255,0.08); }
+.footer-container { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 2rem; }
+.footer-section { display: flex; flex-direction: column; gap: 1rem; }
+.footer-section.logo-section { grid-column: 1; }
+.footer-section h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 600; color: var(--text); }
+[data-theme="dark"] .footer-section h3 { color: #f7f5f2; }
+.footer-logo { width: 60px; height: auto; margin-bottom: 0.5rem; }
+.footer-description { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; max-width: 200px; }
+footer a { color: var(--text-muted); text-decoration: none; }
+.footer-links { display: flex; flex-direction: column; gap: 0.75rem; list-style: none; margin: 0; padding: 0; }
+.footer-links li { margin: 0; }
+.footer-links a { font-size: 0.85rem; color: var(--text-muted); transition: color 0.2s; }
+.footer-links a:hover { color: var(--gold); }
+[data-theme="dark"] .footer-links a { color: rgba(255,255,255,0.5); }
+[data-theme="dark"] .footer-links a:hover { color: var(--gold-dark); }
+.footer-divider { border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 1.5rem; }
+[data-theme="dark"] .footer-divider { border-top-color: rgba(255,255,255,0.08); }
+.sub-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; max-width: 1160px; margin: 0 auto; }
+.sub-footer-text { font-size: 0.8rem; color: var(--text-muted); }
+[data-theme="dark"] .sub-footer-text { color: rgba(255,255,255,0.5); }
+.sub-footer-domain { margin-right: 0.25rem; }
+.gold-j { color: var(--gold); font-weight: 600; }
+[data-theme="dark"] .gold-j { color: var(--gold-dark); }
+.social-icons { display: flex; gap: 1rem; align-items: center; }
+.social-icon { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--text-muted); transition: color 0.2s; }
+.social-icon:hover { color: var(--gold); }
+[data-theme="dark"] .social-icon { color: rgba(255,255,255,0.5); }
+[data-theme="dark"] .social-icon:hover { color: var(--gold-dark); }
+.social-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: currentColor; }
+@media (max-width: 900px) {
+  .footer-container { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .footer-section.logo-section { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  footer { padding: 2rem 1rem 1.5rem; }
+  .footer-container { grid-template-columns: 1fr; gap: 1.5rem; }
+  .sub-footer { flex-direction: column; text-align: center; }
+  .footer-section.logo-section { grid-column: 1; }
+}
+</style>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-section logo-section">
+      <img id="footer-logo" class="footer-logo"
+        src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        alt="Michael J. Gauthier"
+        data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+      <p class="footer-description">Welcome to my personal mission: Encouraging others to use their God given resources for God given purposes</p>
+    </div>
+    <div class="footer-section">
+      <h3>Explore</h3>
+      <ul class="footer-links">
+        <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/resources">Resources</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Account</h3>
+      <ul class="footer-links">
+        <li><a href="https://michaeljgauthier.com/login/">Login</a></li>
+        <li><a href="https://michaeljgauthier.com/register/">Register</a></li>
+        <li><a href="tel:+14804667070">Call Us</a></li>
+        <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Contact</h3>
+      <ul class="footer-links">
+        <li><a href="tel:+14804667070">(480) 466-7070</a></li>
+        <li><a href="https://www.google.com/maps/dir//2330+W+Ray+Rd+Ste+%233,+Chandler,+AZ+85224/@33.3208879,-111.964255,45043m/data=!3m1!1e3!4m8!4m7!1m0!1m5!1m1!1s0x872b07386c66f17d:0x86e4537f11354256!2m2!1d-111.8818538!2d33.3209151" target="_blank">2330 W Ray Rd Ste #3,<br>Chandler, AZ 85224</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-divider">
+    <div class="sub-footer">
+      <div class="sub-footer-text">
+        <span id="dynamic-year" class="sub-footer-domain"></span>
+        <span class="sub-footer-domain"> © Michael<span class="gold-j">J.</span>Gauthier.com</span>
+        <span class="sub-footer-rights"> - All rights reserved.</span>
+      </div>
+      <div class="social-icons">
+        <a href="https://www.facebook.com/StrategicIncomeGroup" class="social-icon" aria-label="Facebook" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"></path></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/michaeljgauthier/" class="social-icon" aria-label="LinkedIn" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"></path><circle cx="4" cy="4" r="2"></circle></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script>
+(function() {
+  var yr = document.getElementById('dynamic-year');
+  if (yr) yr.textContent = new Date().getFullYear();
+  function syncFooterLogo(theme) {
+    var logo = document.getElementById('footer-logo');
+    if (!logo) return;
+    logo.src = theme === 'dark' ? logo.dataset.logoDark : logo.dataset.logoLight;
+  }
+  syncFooterLogo(document.documentElement.dataset.theme || 'light');
+  new MutationObserver(function(m) {
+    m.forEach(function(r) { if (r.attributeName === 'data-theme') syncFooterLogo(document.documentElement.dataset.theme); });
+  }).observe(document.documentElement, { attributes: true });
+})();
+</script>
+
+<!-- ── Journey Modal ────────────────────────────────────────── -->
+<style>
+#journeyModal { --jm-surface:#ffffff; --jm-surface-alt:#f3efe7; --jm-bg:#F7F5F2; --jm-text:#111110; --jm-text-muted:#6b6a64; --jm-border:#e4e1d9; --jm-gold:#9E6F2E; --jm-gold-hover:#7d5721; }
+[data-theme="dark"] #journeyModal { --jm-surface:#161616; --jm-surface-alt:#1f1f1f; --jm-bg:#0f0f0f; --jm-text:#f7f5f2; --jm-text-muted:#a5a296; --jm-border:rgba(255,255,255,0.08); --jm-gold:#C9A46E; --jm-gold-hover:#d4b07f; }
+#journeyModal.modal-overlay { z-index: 1002; }
+#journeyModal .jm-box { background:var(--jm-surface); border-radius:20px; padding:2.5rem; max-width:500px; width:90%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); position:relative; }
+#journeyModal .jm-close { position:absolute; top:1.5rem; right:1.5rem; width:32px; height:32px; background:transparent; border:1px solid var(--jm-border); border-radius:8px; cursor:pointer; color:var(--jm-text-muted); font-size:20px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+#journeyModal .jm-close:hover { color:var(--jm-text); border-color:var(--jm-text-muted); }
+#journeyModal .jm-header { margin-bottom:2rem; }
+#journeyModal .jm-header h2 { font-family:'Cormorant Garamond',Georgia,serif; font-size:2rem; margin-bottom:0.5rem; color:var(--jm-text); }
+#journeyModal .jm-header h2 em { font-style:italic; color:var(--jm-gold); }
+#journeyModal .jm-form { display:flex; flex-direction:column; gap:1.25rem; }
+#journeyModal .jm-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+#journeyModal .jm-group { display:flex; flex-direction:column; gap:0.5rem; }
+#journeyModal .jm-group label { font-size:0.85rem; font-weight:600; color:var(--jm-text); letter-spacing:0.05em; font-family:'Roboto',sans-serif; }
+#journeyModal .jm-helper { font-size:0.82rem; color:var(--jm-text-muted); line-height:1.4; margin-top:-0.25rem; }
+#journeyModal .jm-form input, #journeyModal .jm-form textarea, #journeyModal .jm-form select { padding:0.85rem; border:1px solid var(--jm-border); border-radius:10px; font-family:'Roboto',sans-serif; font-size:0.95rem; background:var(--jm-bg); color:var(--jm-text); transition:border-color 0.2s; }
+#journeyModal .jm-form input:focus, #journeyModal .jm-form textarea:focus, #journeyModal .jm-form select:focus { outline:none; border-color:var(--jm-gold); box-shadow:0 0 0 3px rgba(158,111,46,0.1); }
+#journeyModal .jm-form textarea { resize:vertical; min-height:100px; }
+#journeyModal .jm-agreement { display:flex; gap:1rem; align-items:flex-start; padding:1rem; background:var(--jm-surface-alt); border-radius:10px; font-size:0.85rem; line-height:1.6; color:var(--jm-text-muted); font-family:'Roboto',sans-serif; }
+#journeyModal .jm-agreement input[type="checkbox"] { width:20px; height:20px; cursor:pointer; flex-shrink:0; margin-top:0.15rem; }
+#journeyModal .jm-submit { padding:0.95rem; border-radius:10px; font-weight:600; border:none; cursor:pointer; transition:all 0.2s; background:var(--jm-gold); color:#fff; font-family:'Roboto',sans-serif; font-size:1rem; }
+#journeyModal .jm-submit:hover { background:var(--jm-gold-hover); }
+#journeyModal .jm-hidden { display:none !important; }
+#journeyModal .jm-show { display:flex !important; flex-direction:column; gap:0.5rem; }
+.jm-notif-wrap { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:12px; pointer-events:none; }
+.jm-notif { display:flex; align-items:flex-start; gap:14px; background:#fff; border:1px solid #9E6F2E; border-radius:12px; padding:16px 20px; box-shadow:0 10px 40px rgba(0,0,0,0.12); max-width:380px; animation:jmSlideIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events:auto; }
+[data-theme="dark"] .jm-notif { background:#161616; }
+.jm-notif-icon { flex-shrink:0; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(201,164,110,0.12); color:#C9A46E; font-size:14px; font-weight:bold; }
+.jm-notif-body { flex:1; }
+.jm-notif-title { font-size:15px; font-weight:600; color:#111110; margin-bottom:4px; font-family:'Roboto',sans-serif; }
+[data-theme="dark"] .jm-notif-title { color:#f7f5f2; }
+.jm-notif-desc { font-size:14px; color:#6b6a64; line-height:1.5; font-family:'Roboto',sans-serif; }
+[data-theme="dark"] .jm-notif-desc { color:#a5a296; }
+.jm-notif-x { flex-shrink:0; background:transparent; border:none; color:#6b6a64; cursor:pointer; font-size:18px; padding:0; line-height:1; transition:color 0.2s; }
+@keyframes jmSlideIn { from { transform:translateX(400px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+@keyframes jmSlideOut { from { transform:translateX(0); opacity:1; } to { transform:translateX(400px); opacity:0; } }
+.jm-notif.jm-removing { animation:jmSlideOut 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+@media (max-width:640px) { .jm-notif-wrap { left:12px; right:12px; top:12px; } #journeyModal .jm-row { grid-template-columns:1fr; } }
+</style>
+
+<div class="modal-overlay" id="journeyModal">
+  <div class="jm-box">
+    <button class="jm-close" id="jm-close-btn">&#x2715;</button>
+    <div class="jm-header"><h2>Join <em>The Journey</em></h2></div>
+    <form class="jm-form" id="journeyForm">
+      <input type="hidden" name="recaptcha_token" id="journeyRecaptchaToken" value="" />
+      <div class="jm-row">
+        <div class="jm-group"><label for="jm-firstName">First Name *</label><input type="text" id="jm-firstName" name="first_name" required></div>
+        <div class="jm-group"><label for="jm-lastName">Last Name *</label><input type="text" id="jm-lastName" name="last_name" required></div>
+      </div>
+      <div class="jm-row">
+        <div class="jm-group"><label for="jm-phone">Phone Number *</label><input type="tel" id="jm-phone" name="phone" required></div>
+        <div class="jm-group"><label for="jm-email">Email Address *</label><input type="email" id="jm-email" name="email" required></div>
+      </div>
+      <div class="jm-group">
+        <label for="jm-questions">Questions &amp; Comments</label>
+        <textarea id="jm-questions" name="questions" placeholder="Share any thoughts or questions..."></textarea>
+      </div>
+      <div class="jm-group">
+        <label for="jm-hearAbout">How did you hear about us? *</label>
+        <select id="jm-hearAbout" name="hear_about" required>
+          <option value="">Select an option...</option>
+          <option value="Google">Google</option>
+          <option value="AI">AI</option>
+          <option value="YouTube">YouTube</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Facebook">Facebook</option>
+          <option value="Church">Church</option>
+          <option value="Friend">Friend</option>
+          <option value="Family">Family</option>
+          <option value="Strategic Income Group">Strategic Income Group</option>
+          <option value="Other">Other</option>
+        </select>
+        <p class="jm-helper">Select the option that best describes how you found us.</p>
+      </div>
+      <div class="jm-group jm-hidden" id="jm-churchField">
+        <label for="jm-churchInput">Church Name</label>
+        <input type="text" id="jm-churchInput" placeholder="Enter your church name...">
+      </div>
+      <div class="jm-group jm-hidden" id="jm-otherField">
+        <label for="jm-otherInput">Please specify</label>
+        <input type="text" id="jm-otherInput" placeholder="Please tell us how you heard about us...">
+      </div>
+      <div class="jm-agreement">
+        <input type="checkbox" id="jm-agree" name="agree" required>
+        <label for="jm-agree" style="margin:0;font-size:inherit;">I agree to The Stewardship Blueprint's <a href="#" style="color:var(--jm-gold);text-decoration:none;">Privacy Policy</a> and <a href="#" style="color:var(--jm-gold);text-decoration:none;">Terms of Service</a>. I understand I'll receive updates and resources related to stewardship and biblical principles of financial integrity.</label>
+      </div>
+      <button type="submit" class="jm-submit">Join The Journey</button>
+    </form>
+  </div>
+</div>
+
+<script>
+var FLUENT_CRM_URL = 'https://michaeljgauthier.com/?fluentcrm=1&route=contact&hash=59309c3d-3d3c-4995-8600-5619e6f1f2bd';
+var JM_RECAPTCHA_KEY = '6Lcb3bAsAAAAAHUSz6uACjVAu9pOftduxnJ6g-C4';
+
+function openJourneyModal() {
+  document.getElementById('journeyModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeJourneyModal() {
+  document.getElementById('journeyModal').classList.remove('open');
+  document.getElementById('journeyForm').reset();
+  var cf = document.getElementById('jm-churchField'), of = document.getElementById('jm-otherField');
+  var ci = document.getElementById('jm-churchInput'), oi = document.getElementById('jm-otherInput');
+  cf.classList.add('jm-hidden'); cf.classList.remove('jm-show');
+  of.classList.add('jm-hidden'); of.classList.remove('jm-show');
+  ci.required = false; ci.name = ''; oi.required = false; oi.name = '';
+  document.body.style.overflow = '';
+}
+document.getElementById('jm-hearAbout').addEventListener('change', function() {
+  var val = this.value;
+  var cf = document.getElementById('jm-churchField'), of = document.getElementById('jm-otherField');
+  var ci = document.getElementById('jm-churchInput'), oi = document.getElementById('jm-otherInput');
+  if (val === 'Church') {
+    cf.classList.remove('jm-hidden'); cf.classList.add('jm-show'); ci.required = true; ci.name = 'church_name';
+    of.classList.add('jm-hidden'); of.classList.remove('jm-show'); oi.required = false; oi.name = ''; oi.value = '';
+  } else if (val === 'Other') {
+    of.classList.remove('jm-hidden'); of.classList.add('jm-show'); oi.required = true; oi.name = 'other_source';
+    cf.classList.add('jm-hidden'); cf.classList.remove('jm-show'); ci.required = false; ci.name = ''; ci.value = '';
+  } else {
+    cf.classList.add('jm-hidden'); cf.classList.remove('jm-show'); ci.required = false; ci.name = ''; ci.value = '';
+    of.classList.add('jm-hidden'); of.classList.remove('jm-show'); oi.required = false; oi.name = ''; oi.value = '';
+  }
+});
+document.getElementById('jm-close-btn').addEventListener('click', closeJourneyModal);
+document.getElementById('journeyModal').addEventListener('click', function(e) { if (e.target.id === 'journeyModal') closeJourneyModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('journeyModal').classList.contains('open')) closeJourneyModal(); });
+document.getElementById('journeyForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var form = e.target;
+  var submitBtn = form.querySelector('.jm-submit');
+  submitBtn.disabled = true; submitBtn.textContent = 'Submitting...';
+  var doSubmit = function(token) {
+    var formData = new FormData(form);
+    formData.set('recaptcha_token', token);
+    var data = {};
+    formData.forEach(function(v, k) { data[k] = v; });
+    data.form_type = 'journey_signup';
+    data.source = 'Join The Journey Modal';
+    var ci = document.getElementById('jm-churchInput'), oi = document.getElementById('jm-otherInput');
+    if (ci.name) data.church_name = ci.value;
+    if (oi.name) data.other_source = oi.value;
+    fetch(FLUENT_CRM_URL, { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data) })
+      .then(function() { showJMNotif('Welcome! Check your email for next steps.'); closeJourneyModal(); })
+      .catch(function() { showJMNotif('Something went wrong. Please try again.'); submitBtn.disabled = false; submitBtn.textContent = 'Join The Journey'; });
+  };
+  if (window.grecaptcha) { grecaptcha.ready(function() { grecaptcha.execute(JM_RECAPTCHA_KEY, {action:'journey_signup'}).then(doSubmit).catch(function(){ doSubmit(''); }); }); } else { doSubmit(''); }
+});
+function showJMNotif(msg) {
+  var wrap = document.getElementById('jm-notif-wrap');
+  if (!wrap) { wrap = document.createElement('div'); wrap.id = 'jm-notif-wrap'; wrap.className = 'jm-notif-wrap'; document.body.appendChild(wrap); }
+  var n = document.createElement('div'); n.className = 'jm-notif';
+  n.innerHTML = '<div class="jm-notif-icon">✓</div><div class="jm-notif-body"><div class="jm-notif-title">Welcome!</div><div class="jm-notif-desc">' + msg + '</div></div><button class="jm-notif-x" aria-label="Close">×</button>';
+  wrap.appendChild(n);
+  var rm = function() { n.classList.add('jm-removing'); setTimeout(function(){ n.remove(); }, 300); };
+  n.querySelector('.jm-notif-x').addEventListener('click', rm);
+  setTimeout(rm, 5000);
+}
+document.querySelectorAll('[data-open-join-modal]').forEach(function(el) {
+  el.addEventListener('click', function(e) { e.preventDefault(); openJourneyModal(); });
+});
+</script>
+
+<!-- ── Dynamic Impact Score ──────────────────────────────────── -->
+<script>
+(function() {
+  var GOAL = 1000000000;
+  var API  = 'https://michaeljgauthier.com/wp-json/blueprint/v1/impact-score';
+
+  function fmtDollars(n) {
+    return '$' + Number(n).toLocaleString('en-US');
+  }
+
+  function fmtDate(raw) {
+    if (!raw) return '';
+    // Jet Engine stores datetime as a Unix timestamp (integer string)
+    var ts = parseInt(raw, 10);
+    var d;
+    if (!isNaN(ts) && ts > 100000000) {
+      d = new Date(ts * 1000);
+    } else {
+      // Fallback: try parsing as a date string (e.g. "2026-04-10 00:00:00")
+      d = new Date(raw.replace(' ', 'T'));
+    }
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function applyScore(score, dateRaw) {
+    var pct     = Math.min((score / GOAL) * 100, 100);
+    var pctText = (pct % 1 === 0 ? pct.toFixed(0) : pct.toFixed(1)) + '% of goal';
+
+    var valEl  = document.getElementById('impact-score-val');
+    var dateEl = document.getElementById('impact-score-date');
+    var pctEl  = document.getElementById('impact-score-pct');
+    var fillEl = document.getElementById('impact-score-fill');
+
+    if (valEl)  valEl.textContent  = fmtDollars(score);
+    if (dateEl) dateEl.textContent = 'As of ' + fmtDate(dateRaw);
+    if (pctEl)  pctEl.textContent  = pctText;
+    if (fillEl) {
+      // Let the page paint first so the CSS transition fires
+      requestAnimationFrame(function() {
+        fillEl.style.width = pct.toFixed(3) + '%';
+      });
+    }
+  }
+
+  fetch(API, { cache: 'no-cache' })
+    .then(function(res) { return res.ok ? res.json() : Promise.reject(res.status); })
+    .then(function(data) {
+      var score = parseInt(String(data.impact_score).replace(/[^0-9]/g, ''), 10);
+      if (score > 0) applyScore(score, data.impact_score_date);
+    })
+    .catch(function() { /* keep hardcoded fallback values */ });
+})();
+</script>

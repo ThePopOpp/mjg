@@ -1,0 +1,2377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Stewardship Blueprint — Michael J. Gauthier</title>
+  <meta name="description" content="A guide to designing a life that matters — faith, purpose, family, finances, and legacy. Join the journey as Michael J. Gauthier writes The Stewardship Blueprint." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=DM+Serif+Display&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font-display: 'DM Serif Display', serif;
+      --font-body: 'Roboto', sans-serif;
+      --background: #ffffff;
+      --surface: #fafaf9;
+      --surface-alt: #f5f4f0;
+      --text: #111110;
+      --text-muted: #6b6860;
+      --gold: #C9A46E;
+      --gold-hover: #9E6F2E;
+      --border: #e8e6e0;
+      --nav-background: #ffffff;
+      --nav-text: #111110;
+      --btn-bg: #111110;
+      --btn-text: #ffffff;
+      --bg: var(--background);
+      --bg-alt: var(--surface);
+      --bg-tan: var(--surface-alt);
+      --muted: var(--text-muted);
+      --control-bg: rgba(17,17,17,0.06);
+      --control-border: rgba(17,17,17,0.16);
+      --control-hover: rgba(17,17,17,0.1);
+      --control-text: #111111;
+    }
+
+    [data-theme="dark"] {
+      --control-bg: rgba(255,255,255,0.08);
+      --control-border: rgba(255,255,255,0.18);
+      --control-hover: rgba(255,255,255,0.12);
+      --control-text: #f7f5f2;
+      --background: #0f0f0f;
+      --surface: #161616;
+      --surface-alt: #1f1f1f;
+      --text: #f7f5f2;
+      --text-muted: #bfb6a7;
+      --gold: #C9A46E;
+      --gold-hover: #9E6F2E;
+      --border: rgba(255,255,255,0.08);
+      --nav-background: #0f0f0f;
+      --nav-text: #f7f5f2;
+      --btn-bg: #f7f5f2;
+      --btn-text: #0f0f0f;
+      --control-bg: rgba(255,255,255,0.08);
+      --control-border: rgba(255,255,255,0.18);
+      --control-hover: rgba(255,255,255,0.12);
+      --control-text: #f7f5f2;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    /* ── NOTIFICATION ── */
+    .notification-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
+    }
+    .notification {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      max-width: 420px;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+    [data-theme="dark"] .notification {
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .notification.success {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(201,164,110,0.05) 100%);
+    }
+    .notification-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(201,164,110,0.12);
+      color: var(--gold);
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .notification-content {
+      flex: 1;
+    }
+    .notification-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .notification-description {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .notification-close {
+      flex-shrink: 0;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .notification-close:hover {
+      color: var(--text);
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+    .notification.removing {
+      animation: slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @media (max-width: 640px) {
+      .notification-container {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+      }
+      .notification {
+        max-width: none;
+      }
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      background: var(--nav-background);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1160px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 60px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    .nav-logo img {
+      height: 36px;
+      width: auto;
+      display: block;
+    }
+    .nav-logo-text {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--nav-text);
+      letter-spacing: -0.02em;
+    }
+    .nav-logo-text .gold {
+      color: var(--gold);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      color: var(--nav-text);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-link-plain {
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: var(--nav-text);
+      cursor: pointer;
+      transition: color 0.2s;
+      text-align: left;
+    }
+    .nav-link-plain:hover { color: var(--text); }
+    .nav-links .btn-dark {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+    }
+    .nav-links .btn-dark:hover { opacity: 0.95; }
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      background: var(--control-bg);
+      border: 1px solid var(--control-border);
+      color: var(--control-text);
+      border-radius: 14px;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, border-color 0.2s;
+    }
+    .mobile-menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      background: var(--control-bg);
+      border: 1px solid var(--control-border);
+      color: var(--control-text);
+      border-radius: 14px;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, border-color 0.2s;
+    }
+    .theme-toggle:hover,
+    .mobile-menu-toggle:hover { background: var(--control-hover); transform: translateY(-1px); }
+    .nav-links.open { display: flex; }
+    @media (max-width: 768px) {
+      .mobile-menu-toggle { display: inline-flex; }
+      .nav-links {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem 1.75rem;
+        background: var(--nav-background);
+        border-bottom: 1px solid var(--border);
+        display: none;
+      }
+      .nav-links li { width: 100%; }
+      .nav-links a,
+      .nav-links .theme-toggle,
+      .nav-links .btn-dark { width: 100%; }
+      .nav-links .theme-toggle { justify-content: center; }
+      .nav-links .btn-dark { text-align: center; }
+      .hero,
+      .coming-soon,
+      .signup,
+      .author,
+      footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.55rem 1.25rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      border: 1px solid transparent;
+    }
+    .btn-dark {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+    }
+    .btn-dark:hover { background: #2a2a28; }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--text);
+    }
+    .btn-outline:hover { background: var(--bg-tan); }
+    .btn-gold {
+      background: var(--gold);
+      color: #fff;
+      border-color: var(--gold);
+    }
+    .btn-gold:hover { background: var(--gold-hover); border-color: var(--gold-hover); }
+    .btn-lg { padding: 0.75rem 1.75rem; font-size: 1rem; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 6rem 1.5rem 5rem;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(181,135,58,0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(181,135,58,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+    .hero-glow {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(181,135,58,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: var(--gold-light);
+      border: 1px solid rgba(181,135,58,0.25);
+      padding: 0.3rem 0.85rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--text);
+      max-width: 800px;
+      margin: 0 auto 1.25rem;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto 2.25rem;
+      line-height: 1.7;
+    }
+    .hero-ctas { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+    .hero-meta {
+      margin-top: 2.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    .hero-meta span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      vertical-align: middle;
+      margin: 0 0.5rem;
+    }
+
+    :root {
+      --ap-bg:          #191815;
+      --ap-surface:     rgba(255,255,255,.06);
+      --ap-border:      rgba(255,255,255,.08);
+      --ap-gold:        #c9a46e;
+      --ap-gold-dark:   #a8833f;
+      --ap-text:        #f1eee3;
+      --ap-muted:       #a5a296;
+      --ap-track:       rgba(255,255,255,.12);
+      --ap-radius:      60px;
+      --ap-font:        'Geist', system-ui, sans-serif;
+    }
+
+    .ap-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      padding: 24px;
+      font-family: var(--ap-font);
+      -webkit-font-smoothing: antialiased;
+    }
+    .ap-meta {
+      text-align: center;
+      max-width: 520px;
+    }
+    .ap-meta-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ap-gold);
+      margin-bottom: 6px;
+    }
+    .ap-meta-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #1a1916;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .ap-meta-sub {
+      font-size: 13px;
+      color: #8a8880;
+      font-weight: 300;
+    }
+    .ap-progress-wrap {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ap-time {
+      font-size: 11px;
+      font-weight: 500;
+      color: #8a8880;
+      min-width: 34px;
+      letter-spacing: .02em;
+    }
+    .ap-time.right { text-align: right; }
+    .ap-track {
+      flex: 1;
+      height: 3px;
+      background: #e0ddd6;
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .ap-track::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: var(--ap-gold);
+      cursor: pointer;
+      margin-top: -5px;
+      box-shadow: 0 0 0 3px rgba(201,164,110,.2);
+      transition: box-shadow .15s;
+    }
+    .ap-track::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 5px rgba(201,164,110,.25);
+    }
+    .ap-track::-webkit-slider-thumb::-moz-range-thumb {
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: var(--ap-gold);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 0 3px rgba(201,164,110,.2);
+    }
+    .ap-track::-webkit-slider-runnable-track {
+      height: 3px;
+      border-radius: 10px;
+      background: linear-gradient(
+        to right,
+        var(--ap-gold) 0%,
+        var(--ap-gold) var(--ap-pct, 0%),
+        #e0ddd6 var(--ap-pct, 0%),
+        #e0ddd6 100%
+      );
+    }
+    .ap-track::-moz-range-track {
+      height: 3px;
+      border-radius: 10px;
+      background: #e0ddd6;
+    }
+    .ap-track::-moz-range-progress {
+      background: var(--ap-gold);
+      height: 3px;
+      border-radius: 10px;
+    }
+    .ap-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 520px;
+      background: var(--ap-bg);
+      border-radius: var(--ap-radius);
+      padding: 10px 20px 10px 18px;
+      gap: 0;
+      box-shadow:
+        0 8px 32px rgba(0,0,0,.22),
+        0 2px 8px rgba(0,0,0,.14),
+        inset 0 1px 0 rgba(255,255,255,.04);
+      position: relative;
+    }
+    .ap-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border-radius: 50%;
+      transition: transform .15s, opacity .15s;
+      -webkit-tap-highlight-color: transparent;
+      color: var(--ap-muted);
+      flex-shrink: 0;
+    }
+    .ap-btn:hover  { opacity: .75; transform: scale(1.06); }
+    .ap-btn:active { transform: scale(.94); opacity: 1; }
+    .ap-btn svg { display: block; }
+    .ap-btn-play {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--ap-gold);
+      box-shadow:
+        0 4px 16px rgba(201,164,110,.45),
+        0 1px 4px rgba(0,0,0,.2);
+      flex-shrink: 0;
+      margin: -16px 0;
+      color: #fff;
+      transition: background .15s, transform .15s, box-shadow .15s;
+    }
+    .ap-btn-play:hover {
+      background: #d9b47e;
+      box-shadow: 0 6px 20px rgba(201,164,110,.55), 0 2px 6px rgba(0,0,0,.2);
+      opacity: 1;
+    }
+    .ap-btn-play:active {
+      background: var(--ap-gold-dark);
+      transform: scale(.96);
+    }
+    .ap-icon-play  { display: block; }
+    .ap-icon-pause { display: none; }
+    .ap-playing .ap-icon-play  { display: none; }
+    .ap-playing .ap-icon-pause { display: block; }
+    .ap-loop-badge { position: relative; }
+    .ap-loop-count {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -54%);
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--ap-muted);
+      pointer-events: none;
+      line-height: 1;
+    }
+    .ap-btn.ap-active { color: var(--ap-gold); }
+    .ap-btn.ap-active .ap-loop-count { color: var(--ap-gold); }
+    .ap-vol-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 520px;
+      justify-content: flex-end;
+    }
+    .ap-vol-icon {
+      color: #a5a296;
+      flex-shrink: 0;
+    }
+    .ap-vol-slider {
+      width: 90px;
+      height: 3px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #e0ddd6;
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .ap-vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      background: var(--ap-gold);
+      cursor: pointer;
+      margin-top: -4px;
+    }
+    .ap-vol-slider::-webkit-slider-runnable-track {
+      height: 3px;
+      border-radius: 10px;
+      background: linear-gradient(
+        to right,
+        var(--ap-gold) 0%,
+        var(--ap-gold) var(--ap-vol-pct, 80%),
+        #e0ddd6 var(--ap-vol-pct, 80%),
+        #e0ddd6 100%
+      );
+    }
+    .ap-audio { display: none; }
+    @media (max-width: 540px) {
+      .ap-pill { max-width: 100%; padding: 8px 14px 8px 12px; }
+      .ap-btn-play { width: 62px; height: 62px; }
+      .ap-progress-wrap, .ap-meta, .ap-vol-wrap { max-width: 100%; }
+    }
+
+    /* ── SECTION BASE ── */
+    section { padding: 5rem 1.5rem; }
+    .container { max-width: 1080px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    h2 em { font-style: italic; color: var(--gold); }
+    .lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.75;
+    }
+
+    /* ── WHAT IS ── */
+    .what-is { background: var(--bg-alt); }
+    .what-is .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .what-is-text p { color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
+    .what-is-text p:last-child { margin-bottom: 0; }
+    .structure-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+    }
+    .structure-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 1.25rem;
+      color: var(--text);
+    }
+    .structure-list { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+    .structure-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .structure-list li .icon {
+      width: 30px; height: 30px;
+      background: var(--gold-light);
+      border: 1px solid rgba(181,135,58,0.2);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    .structure-list li .icon svg {
+      width: 15px; height: 15px;
+      stroke: var(--gold);
+    }
+    .structure-list li strong { color: var(--text); font-weight: 500; }
+
+    /* ── CHAPTERS ── */
+    .chapters { background: var(--bg); }
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .chapter-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .chapter-card-header {
+      background: var(--gold-light);
+      border-bottom: 1px solid rgba(181,135,58,0.2);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .chapter-num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .chapter-card-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .chapter-card-body { padding: 1.5rem; }
+    .chapter-card-body p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 1.25rem;
+    }
+    .chapter-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .chapter-bullets li {
+      font-size: 0.875rem;
+      color: var(--muted);
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+    .chapter-bullets li::before {
+      content: '→';
+      color: var(--gold);
+      flex-shrink: 0;
+      margin-top: 0.05em;
+    }
+    .reflection-box {
+      background: var(--gold-light);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 6px 6px 0;
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      font-style: italic;
+    }
+    .reflection-box strong {
+      font-style: normal;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ── COMING SOON ── */
+    .coming-soon { background: var(--bg-tan); }
+    .coming-soon .container { text-align: center; }
+    .coming-soon .lead { margin: 0 auto 3rem; }
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .pillar-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2rem 1.25rem 1.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.08);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .pillar-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 28px 75px rgba(0,0,0,0.13);
+      border-color: rgba(255,255,255,0.16);
+    }
+    .pillar-card::after {
+      content: 'Coming Soon';
+      position: absolute;
+      top: 12px;
+      right: -34px;
+      background: var(--gold);
+      color: #fff;
+      font-size: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 1.6rem;
+      transform: rotate(45deg);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+    }
+    .pillar-icon {
+      width: 44px; height: 44px;
+      margin: 0 auto 0.85rem;
+      background: var(--gold-light);
+      border: 1px solid rgba(181,135,58,0.2);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pillar-icon svg {
+      width: 20px; height: 20px;
+      stroke: var(--gold);
+    }
+    .pillar-card h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    .pillar-card p {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .coming-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── SIGNUP ── */
+    .signup {
+      background: #1a1a1a;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .signup::before {
+      content: '\201C';
+      position: absolute;
+      top: -1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-display);
+      font-size: 20rem;
+      color: rgba(255,255,255,0.03);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .signup .container { max-width: 640px; text-align: center; position: relative; }
+    .signup h2 { color: #fff; margin-bottom: 0.75rem; }
+    .signup .lead { color: rgba(255,255,255,0.65); margin: 0 auto 0.5rem; }
+    .signup-sub {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 2.5rem;
+    }
+    .signup-perks {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .signup-perk {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.6);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .signup-perk::before {
+      content: '✓';
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .signup-form {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 2rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .form-row input, .signup-form input[type="email"] {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-row input::placeholder, .signup-form input::placeholder { color: rgba(255,255,255,0.35); }
+    .form-row input:focus, .signup-form input:focus { border-color: var(--gold); }
+    .signup-form .btn-gold { width: 100%; margin-top: 0.75rem; padding: 0.85rem; font-size: 1rem; border-radius: 5px; }
+    .signup-form .btn-gold:hover { background: var(--gold-hover); }
+    .form-disclaimer {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.35);
+      margin-top: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* ── AUTHOR ── */
+    .author {
+      background: var(--bg-alt);
+      padding-bottom: 0;
+    }
+    .author .container {
+      display: flex;
+      gap: 3rem;
+      align-items: flex-start;
+      max-width: 1000px;
+      padding: 0rem 0 0rem;
+    }
+    .author-avatar {
+      width: 240px;
+      border-radius: 20px;
+      overflow: hidden;
+      flex-shrink: 0;
+      align-self: flex-end;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+    .author-avatar img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .author-text h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+    .author-text {
+      padding: 1rem 0 2rem;
+    }
+    .author-title {
+      font-size: 0.8rem;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.85rem;
+    }
+    .author-text p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 0.75rem;
+    }
+    .author-links { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .author-links a {
+      font-size: 0.85rem;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(181,135,58,0.3);
+      transition: border-color 0.2s;
+    }
+    .author-links a:hover { border-color: var(--gold); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 3rem 1.5rem 2rem;
+    }
+    .footer-container {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 2rem;
+    }
+    .footer-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .footer-section.logo-section {
+      grid-column: 1;
+    }
+    .footer-section h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .footer-logo {
+      width: 60px;
+      height: auto;
+      margin-bottom: 0.5rem;
+    }
+    .footer-description {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-width: 200px;
+    }
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .footer-links li {
+      margin: 0;
+    }
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-divider {
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+    }
+    .sub-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+    .sub-footer-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .sub-footer-domain {
+      margin-right: 0.25rem;
+    }
+    .gold-j {
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .social-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .social-icon:hover {
+      color: var(--gold);
+    }
+    .social-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: currentColor;
+    }
+    @media (max-width: 900px) {
+      .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+      .footer-section.logo-section {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (max-width: 640px) {
+      footer {
+        padding: 2rem 1rem 1.5rem;
+      }
+      .footer-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .sub-footer {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-section.logo-section {
+        grid-column: 1;
+      }
+    }
+    .footer-copy { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .what-is .container { grid-template-columns: 1fr; gap: 2rem; }
+      .chapters-grid { grid-template-columns: 1fr; }
+      .author .container { flex-direction: column; text-align: center; }
+      .author-links { justify-content: center; }
+      .form-row { grid-template-columns: 1fr; }
+      .signup-perks { gap: 1rem; }
+      .hero-player-controls {
+        gap: 1rem;
+        padding: 0.85rem 1.25rem;
+      }
+      .hero-control-btn {
+        width: 36px;
+        height: 36px;
+      }
+      .hero-control-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .hero-play-btn {
+        width: 56px;
+        height: 56px;
+      }
+      .hero-info-btn {
+        width: 36px;
+        height: 36px;
+      }
+      .hero-info-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .modal-header {
+      margin-bottom: 2rem;
+    }
+    .modal-header h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .modal-header h2 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .modal-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .modal-close:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .modal-form .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .modal-form label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.05em;
+    }
+    .modal-form .helper-text {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-top: -0.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .modal-form input,
+    .modal-form textarea,
+    .modal-form select {
+      padding: 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      background: var(--background);
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    .modal-form input:focus,
+    .modal-form textarea:focus,
+    .modal-form select:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 164, 110, 0.1);
+    }
+    .modal-form textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .modal-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .modal-agreement {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1rem;
+      background: var(--surface-alt);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+    .modal-agreement input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+    .modal-form .btn {
+      padding: 0.95rem;
+      border-radius: 10px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-form .btn-gold {
+      background: var(--gold);
+      color: #fff;
+    }
+    .modal-form .btn-gold:hover {
+      background: var(--gold-hover);
+    }
+    .hidden-field {
+      display: none;
+    }
+    .hidden-field.show {
+      display: flex;
+    }
+    .audio-modal-card {
+      background: linear-gradient(180deg, rgba(30,24,19,0.95), rgba(10,8,6,0.98));
+      border-radius: 32px;
+      padding: 2rem;
+      max-width: 520px;
+      width: 100%;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+    }
+    .audio-modal-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 40%);
+      pointer-events: none;
+    }
+    .audio-card-top {
+      display: none;
+    }
+    .audio-card-top .icon-button {
+      display: none;
+    }
+    .audio-cover {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto 2rem;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.45));
+      aspect-ratio: 1;
+    }
+    .audio-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 16px;
+    }
+    .audio-details {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .audio-meta {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 1rem;
+    }
+    .audio-meta span { display: inline-flex; align-items: center; gap: 0.35rem; }
+    .audio-title {
+      font-size: 1.85rem;
+      margin: 0.25rem 0 0.35rem;
+      letter-spacing: -0.02em;
+    }
+    .audio-subtitle {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .audio-progress {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.8);
+      position: relative;
+      z-index: 1;
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, rgba(255,212,139,1), rgba(255,184,92,1));
+      transition: width 0.1s linear;
+    }
+    .eq-visualizer {
+      display: flex;
+      gap: 0.35rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .eq-bar {
+      width: 4px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      animation: pulse 1s ease-in-out infinite alternate;
+    }
+    .eq-bar:nth-child(2) { animation-delay: 0.05s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.1s; }
+    .eq-bar:nth-child(4) { animation-delay: 0.15s; }
+    .eq-bar:nth-child(5) { animation-delay: 0.2s; }
+    .eq-bar:nth-child(6) { animation-delay: 0.25s; }
+    .audio-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+      background: transparent;
+      border: none;
+      padding: 1rem 0;
+      position: relative;
+      z-index: 1;
+    }
+    .audio-control-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.2s, transform 0.2s;
+      padding: 0.5rem;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+    }
+    .audio-control-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: #fff;
+    }
+    .audio-control-btn:hover {
+      color: var(--gold);
+      transform: scale(1.1);
+    }
+    .audio-control-btn:hover svg {
+      stroke: var(--gold);
+    }
+    .audio-play-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--gold);
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .audio-play-btn:hover {
+      background: var(--gold-hover);
+      transform: scale(1.08);
+    }
+    @keyframes pulse {
+      from { height: 12px; opacity: 0.65; }
+      to { height: 36px; opacity: 1; }
+    }
+  </style>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Lcb3bAsAAAAAHUSz6uACjVAu9pOftduxnJ6g-C4"></script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img id="nav-logo" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" alt="Michael J. Gauthier" data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+        <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
+      </a>
+      <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="Open menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/mission">Mission</a></li>
+        <li><button id="listen-nav" class="nav-link-plain" type="button">Listen</button></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/resources">Resources</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+        <li><a href="#join" class="btn btn-dark">Join the Journey</a></li>
+        <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode"><svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-eyebrow">You Were Created For More</div>
+    <h1>The Stewardship<br><em>Blueprint</em></h1>
+    <p>The Stewardship Blueprint is a framework for living with intention—aligning your faith, your finances, your family, and your future into a life that actually matters.</p>
+    <div class="hero-ctas">
+      <a href="#join" class="btn btn-dark btn-lg">Join the Journey</a>
+      <a href="#overview" class="btn btn-outline btn-lg">See the Blueprint</a>
+    </div>
+    <div class="ap-wrap" id="mjg-player-hero">
+      <div class="ap-meta">
+        <p class="ap-meta-eyebrow">The Stewardship Blueprint</p>
+      </div>
+      <div class="ap-progress-wrap">
+        <span class="ap-time left" id="ap-cur-hero">0:00</span>
+        <input class="ap-track" id="ap-seek-hero" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek" style="--ap-pct:0%" />
+        <span class="ap-time right" id="ap-dur-hero">0:00</span>
+      </div>
+      <div class="ap-pill" id="ap-pill-hero">
+        <button class="ap-btn" id="ap-lib-hero" aria-label="Library" title="Library">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+            <rect x="9" y="13" width="20" height="16" rx="4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            <rect x="12" y="10" width="14" height="4" rx="2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            <rect x="14.5" y="7.5" width="9" height="3" rx="1.5" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M21.5 18.5v-3.5l-5 1v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16.5" cy="23" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+            <circle cx="21.5" cy="22" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </button>
+        <button class="ap-btn" id="ap-rew-hero" aria-label="Rewind 10 seconds" title="−10s">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+            <path d="M11.5 15.5A9.5 9.5 0 1 1 9 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M8 16l1.5-3.5L13 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-family="Geist,system-ui" font-size="8" font-weight="600">10</text>
+          </svg>
+        </button>
+        <button class="ap-btn ap-btn-play" id="ap-play-hero" aria-label="Play">
+          <svg class="ap-icon-play" width="30" height="30" viewBox="0 0 30 30" fill="none">
+            <path d="M11 8.5l12 6.5-12 6.5V8.5z" fill="white"/>
+          </svg>
+          <svg class="ap-icon-pause" width="30" height="30" viewBox="0 0 30 30" fill="none">
+            <rect x="9" y="8" width="4" height="14" rx="2" fill="white"/>
+            <rect x="17" y="8" width="4" height="14" rx="2" fill="white"/>
+          </svg>
+        </button>
+        <button class="ap-btn" id="ap-fwd-hero" aria-label="Forward 10 seconds" title="+10s">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+            <path d="M26.5 15.5A9.5 9.5 0 1 0 29 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M30 16l-1.5-3.5L25 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-family="Geist,system-ui" font-size="8" font-weight="600">10</text>
+          </svg>
+        </button>
+        <button class="ap-btn ap-loop-badge" id="ap-loop-hero" aria-label="Loop" title="Loop">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+            <path d="M9 21a10 10 0 1 0 1-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M9 11.5L9 17.5H15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="ap-loop-count">1</span>
+        </button>
+      </div>
+      <div class="ap-vol-wrap">
+        <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/>
+        </svg>
+        <input class="ap-vol-slider" id="ap-vol-hero" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" style="--ap-vol-pct:80%" />
+        <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/>
+          <path d="M11 4.5c1.5 1 2 2 2 3.5s-.5 2.5-2 3.5"/>
+          <path d="M13 2c2 1.5 3 3 3 6s-1 4.5-3 6"/>
+        </svg>
+      </div>
+      <audio class="ap-audio" id="mjg-audio-hero" preload="metadata">
+        <source src="https://michaeljgauthier.com/wp-content/uploads/2026/04/The-Stewardship-Blueprint-1.3.m4a" type="audio/mp4" />
+      </audio>
+    </div>
+    <p class="hero-meta">
+      By Michael J. Gauthier
+      <span></span>
+      Life Design · Stewardship · Faith
+    </p>
+  </section>
+
+  <!-- WHAT IS THE BLUEPRINT -->
+  <section class="what-is" id="overview">
+    <div class="container">
+      <div class="what-is-text">
+        <p class="section-label">The Blueprint</p>
+        <h2>What Is the Stewardship <em>Blueprint</em>?</h2>
+        <p>Most people build their lives by accident — chasing urgency, accumulating success, and one day asking why it doesn't feel like enough. The Stewardship Blueprint is a guide to doing the opposite.</p>
+        <p>Structured like a building, the Blueprint starts with bedrock — a foundation of faith and identity — and works outward through the pillars of a well-designed life: family, fitness, fun, and finances. Each layer is reinforced by guardrails, habits, and energy, culminating in a legacy worth leaving.</p>
+        <p>I'm writing it chapter by chapter, and you're invited to join me from the very beginning.</p>
+        <a href="#join" class="btn btn-dark" style="margin-top:1.5rem">Get Early Access</a>
+      </div>
+      <div class="structure-card">
+        <h3>The Blueprint Structure</h3>
+        <ul class="structure-list">
+          <li>
+            <span class="icon"><!-- anchor: faith & grounding -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="22"/><path d="M5 15H2a10 10 0 0 0 20 0h-3"/></svg>
+            </span>
+            <div><strong>Bedrock</strong> — Faith &amp; Identity</div>
+          </li>
+          <li>
+            <span class="icon"><!-- layers: stacked foundation -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            </span>
+            <div><strong>Foundation</strong> — Purpose &amp; Priorities</div>
+          </li>
+          <li>
+            <span class="icon"><!-- columns: structural pillars -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="20" x2="22" y2="20"/><line x1="2" y1="4" x2="22" y2="4"/><line x1="6" y1="4" x2="6" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/></svg>
+            </span>
+            <div><strong>Pillars</strong> — Family · Fitness · Fun · Finances</div>
+          </li>
+          <li>
+            <span class="icon"><!-- shield: protection & guardrails -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <div><strong>Guardrails</strong> — Boundaries &amp; Protection</div>
+          </li>
+          <li>
+            <span class="icon"><!-- zap: energy & habits -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </span>
+            <div><strong>Energy &amp; Habits</strong> — Rhythms That Sustain</div>
+          </li>
+          <li>
+            <span class="icon"><!-- leaf: legacy & growth -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 19.34a1 1 0 0 0 1.46 1.28C7.11 19 9 17 11 16c0 3 2 5 5 5 4 0 7-4 7-8 0-5-3-8-6-5z"/><path d="M3 19l4-4"/></svg>
+            </span>
+            <div><strong>Legacy</strong> — What You Leave Behind</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTHOR -->
+  <section class="author">
+    <div class="container">
+      <div class="author-avatar">
+        <img src="https://michaeljgauthier.com/wp-content/uploads/2026/04/mike-gauthier-profile-photo.png" alt="Michael J. Gauthier" />
+      </div>
+      <div class="author-text">
+        <h3>Michael J. Gauthier</h3>
+        <p class="author-title">Author · Financial Planner · Life Designer</p>
+        <p>In 2013, I stepped away from a secure career on Wall Street to pursue something more aligned with my values. That leap taught me that success without purpose is hollow — and that a meaningful life doesn't happen by accident.</p>
+        <p>I'm now writing The Stewardship Blueprint to share what I've learned about designing a life that integrates faith, family, finances, and legacy into something whole.</p>
+        <div class="author-links">
+          <a href="https://blueprint.michaeljgauthier.com/about">Read My Story</a>
+          <a href="https://blueprint.michaeljgauthier.com/mission">Our Mission</a>
+          <a href="https://blueprint.michaeljgauthier.com/contact">Get in Touch</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS 1 & 2 -->
+  <section class="chapters" id="chapters">
+    <div class="container">
+      <p class="section-label">The Wake Up Call</p>
+      <h2>Where We Begin: <em>Parts I &amp; II</em></h2>
+      <p class="lead">Before you can build anything meaningful, you need to wake up to why it matters. These first two chapters are that wake-up call.</p>
+      <div class="chapters-grid">
+
+        <div class="chapter-card">
+          <div class="chapter-card-header">
+            <div class="chapter-num">01</div>
+            <h3>Created for More</h3>
+          </div>
+          <div class="chapter-card-body">
+            <p>Life is often lived by default, not design. Most of us race through our days without pausing to ask whether the life we're building is the one we actually want. Chapter 1 begins with an honest look at how easily we drift.</p>
+            <ul class="chapter-bullets">
+              <li>Success does not equal purpose</li>
+              <li>Living by default vs. living by design</li>
+              <li>The cost of an unexamined life</li>
+              <li>Reflection as the starting point for change</li>
+            </ul>
+            <div class="reflection-box">
+              <strong>Reflection Prompt</strong>
+              When was the last time you slowed down to think about your life?
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-card">
+          <div class="chapter-card-header">
+            <div class="chapter-num">02</div>
+            <h3>Why Most People Build the Wrong Life</h3>
+          </div>
+          <div class="chapter-card-body">
+            <p>Even when we're paying attention, we often start with the wrong blueprint. Chapter 2 explores the trap of chasing urgent over important — and how misaligned priorities quietly shape a life we didn't intend to build.</p>
+            <ul class="chapter-bullets">
+              <li>Most people chase urgency instead of importance</li>
+              <li>Faith is often compartmentalized, not integrated</li>
+              <li>Life must be intentionally designed</li>
+              <li>Small misalignments compound over years</li>
+            </ul>
+            <div class="reflection-box">
+              <strong>Reflection Prompt</strong>
+              What areas of your life feel out of alignment right now?
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- COMING SOON -->
+  <section class="coming-soon">
+    <div class="container">
+      <p class="section-label">Looking Ahead</p>
+      <h2>The Blueprint <em>Continues</em></h2>
+      <p class="lead">Upcoming chapters will walk through every pillar of a well-designed life. Join the journey now and receive practical guides in guiding you to live your best life.</p>
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon"><!-- users: family -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h4>Family</h4>
+          <p>Designing your most important relationships</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon"><!-- activity: fitness -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h4>Fitness</h4>
+          <p>Stewarding your body and energy</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon"><!-- sun: fun & renewal -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </div>
+          <h4>Fun</h4>
+          <p>Rest, renewal, and intentional joy</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon"><!-- trending-up: finances -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <h4>Finances</h4>
+          <p>A financial blueprint built on purpose</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon"><!-- leaf: legacy & growth -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 19.34a1 1 0 0 0 1.46 1.28C7.11 19 9 17 11 16c0 3 2 5 5 5 4 0 7-4 7-8 0-5-3-8-6-5z"/><path d="M3 19l4-4"/></svg>
+          </div>
+          <h4>Legacy</h4>
+          <p>Designing what you leave behind</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGN UP -->
+  <section class="signup" id="join">
+    <div class="container">
+      <h2>Join the <em>Journey</em></h2>
+      <p class="lead">Join the conversation — share your thoughts and reflections from your own journey.</p>
+      <p class="signup-sub">You're one of the early supporters — your input will shape the book.</p>
+      <div class="signup-perks">
+        <span class="signup-perk">Early chapter drafts</span>
+        <span class="signup-perk">Reflection worksheets</span>
+        <span class="signup-perk">Live Q&amp;A invites</span>
+        <span class="signup-perk">Blueprint actions</span>
+      </div>
+      <div class="signup-form">
+        <form id="signupForm" action="#" method="POST" onsubmit="handleFluentForm(event)">
+          <input type="hidden" name="form_type" value="newsletter" />
+          <input type="hidden" name="recaptcha_token" id="signupRecaptchaToken" value="" />
+          <input type="hidden" name="source" value="Website Sign Up" />
+          <input type="hidden" name="join_the_movement" value="yes" />
+          <div class="form-row">
+            <input type="text" name="first_name" placeholder="First name" required />
+            <input type="text" name="last_name" placeholder="Last name" />
+          </div>
+          <input type="email" name="email" placeholder="Email address" required style="margin-bottom:0;" />
+          <button type="submit" class="btn btn-gold">Join the Journey →</button>
+          <p class="form-disclaimer">Your information will only be used to send you updates about The Stewardship Blueprint. No spam, ever. Unsubscribe at any time.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <!-- Logo & Description -->
+      <div class="footer-section logo-section">
+        <img id="footer-logo" class="footer-logo" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" alt="Michael J. Gauthier" data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+        <p class="footer-description">Welcome to my personal mission: Encouraging others to use their God given resources for God given purposes</p>
+      </div>
+
+      <!-- Explore Column -->
+      <div class="footer-section">
+        <h3>Explore</h3>
+        <ul class="footer-links">
+          <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+          <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+          <li><a href="https://blueprint.michaeljgauthier.com/resources">Resources</a></li>
+          <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Account Column -->
+      <div class="footer-section">
+        <h3>Account</h3>
+        <ul class="footer-links">
+          <li><a href="https://michaeljgauthier.com/login/">Login</a></li>
+          <li><a href="https://michaeljgauthier.com/register/">Register</a></li>
+          <li><a href="tel:+14804667070">Call Us</a></li>
+          <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Column -->
+      <div class="footer-section">
+        <h3>Contact</h3>
+        <ul class="footer-links">
+          <li><a href="tel:+14804667070">(480) 466-7070</a></li>
+          <li><a href="https://www.google.com/maps/dir//2330+W+Ray+Rd+Ste+%233,+Chandler,+AZ+85224/@33.3208879,-111.964255,45043m/data=!3m1!1e3!4m8!4m7!1m0!1m5!1m1!1s0x872b07386c66f17d:0x86e4537f11354256!2m2!1d-111.8818538!2d33.3209151" target="_blank">2330 W Ray Rd Ste #3,<br>Chandler, AZ 85224</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sub-footer -->
+    <div class="footer-divider">
+      <div class="sub-footer">
+        <div class="sub-footer-text">
+          <span id="dynamic-year" class="sub-footer-domain"></span>
+          <span class="sub-footer-domain"> © Michael<span class="gold-j">J.</span>Gauthier.com</span>
+          <span class="sub-footer-rights"> - All rights reserved.</span>
+        </div>
+        <div class="social-icons">
+          <a href="https://www.facebook.com/StrategicIncomeGroup" class="social-icon" aria-label="Facebook" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"></path></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/michaeljgauthier/" class="social-icon" aria-label="LinkedIn" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"></path><circle cx="4" cy="4" r="2"></circle></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('dynamic-year').textContent = new Date().getFullYear();
+    const FLUENT_CRM_ENDPOINT = 'https://michaeljgauthier.com/?fluentcrm=1&route=contact&hash=59309c3d-3d3c-4995-8600-5619e6f1f2bd';
+    const RECIPIENT_EMAIL = 'mike@strategicincomegroup.com';
+    const RECAPTCHA_SITE_KEY = '6Lcb3bAsAAAAAHUSz6uACjVAu9pOftduxnJ6g-C4';
+
+    function executeRecaptcha(action) {
+      return new Promise((resolve) => {
+        if (!window.grecaptcha) return resolve('');
+        grecaptcha.ready(() => {
+          grecaptcha.execute(RECAPTCHA_SITE_KEY, { action }).then(resolve).catch(() => resolve(''));
+        });
+      });
+    }
+
+    const logoElement = document.getElementById('nav-logo');
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const mobileToggle = document.getElementById('mobile-menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+
+    function updateLogo(theme) {
+      if (!logoElement) return;
+      const lightLogo = logoElement.dataset.logoLight;
+      const darkLogo = logoElement.dataset.logoDark;
+      logoElement.src = theme === 'dark' ? darkLogo : lightLogo;
+      
+      // Also update footer logo
+      const footerLogo = document.getElementById('footer-logo');
+      if (footerLogo) {
+        footerLogo.src = theme === 'dark' ? darkLogo : lightLogo;
+      }
+    }
+
+    function updateThemeIcon(theme) {
+      if (!themeIcon) return;
+      if (theme === 'dark') {
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      } else {
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      }
+    }
+
+    function setTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('theme', theme);
+      updateLogo(theme);
+      updateThemeIcon(theme);
+    }
+
+    function getInitialTheme() {
+      return localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    }
+
+    themeToggle?.addEventListener('click', () => {
+      const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      setTheme(nextTheme);
+    });
+
+    const HAMBURGER_SVG = '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
+    const CLOSE_SVG = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+    function openMobileMenu() { if (!navLinks) return; navLinks.classList.add('open'); if (mobileToggle) { mobileToggle.querySelector('svg').innerHTML = CLOSE_SVG; mobileToggle.setAttribute('aria-label', 'Close menu'); } }
+    function closeMobileMenu() { if (!navLinks) return; navLinks.classList.remove('open'); if (mobileToggle) { mobileToggle.querySelector('svg').innerHTML = HAMBURGER_SVG; mobileToggle.setAttribute('aria-label', 'Open menu'); } }
+    mobileToggle?.addEventListener('click', () => { navLinks?.classList.contains('open') ? closeMobileMenu() : openMobileMenu(); });
+    navLinks?.addEventListener('click', (event) => { if (event.target.closest('a, button')) closeMobileMenu(); });
+    document.addEventListener('click', (e) => { if (navLinks?.classList.contains('open') && !e.target.closest('nav')) closeMobileMenu(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && navLinks?.classList.contains('open')) closeMobileMenu(); });
+
+    setTheme(getInitialTheme());
+
+    async function handleFluentForm(event) {
+      event.preventDefault();
+      const form = event.target;
+      const token = await executeRecaptcha('fluent_form');
+      const formData = new FormData(form);
+      formData.set('recaptcha_token', token);
+      const fullName = `${formData.get('first_name') || ''} ${formData.get('last_name') || ''}`.trim();
+      if (fullName) {
+        formData.set('full_name', fullName);
+      }
+      formData.append('recipients', RECIPIENT_EMAIL);
+      formData.append('submitted_at', new Date().toISOString());
+
+      try {
+        const response = await fetch(FLUENT_CRM_ENDPOINT, {
+          method: 'POST',
+          body: formData,
+        });
+
+        console.log('Form submission response:', response.status, response.statusText);
+        console.log('Response headers:', Object.fromEntries(response.headers));
+        const responseText = await response.text();
+        console.log('Response body:', responseText);
+
+        showNotification(
+          'Thank You',
+          "We've received your message and appreciate you taking the time to join this journey. We'll be in touch soon.",
+          form
+        );
+      } catch (error) {
+        console.error('Fluent CRM submission error:', error);
+        showNotification(
+          'Thank You',
+          "We've received your message and appreciate you taking the time to join this journey. We'll be in touch soon.",
+          form
+        );
+      }
+    }
+
+    function showNotification(title, description, form) {
+      let container = document.getElementById('notification-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        container.className = 'notification-container';
+        document.body.appendChild(container);
+      }
+
+      const notification = document.createElement('div');
+      notification.className = 'notification success';
+      notification.innerHTML = `
+        <div class="notification-icon">✓</div>
+        <div class="notification-content">
+          <div class="notification-title">${title}</div>
+          <div class="notification-description">${description}</div>
+        </div>
+        <button class="notification-close" aria-label="Close notification">×</button>
+      `;
+
+      container.appendChild(notification);
+
+      const closeButton = notification.querySelector('.notification-close');
+      const removeNotification = () => {
+        notification.classList.add('removing');
+        setTimeout(() => notification.remove(), 300);
+      };
+
+      closeButton.addEventListener('click', removeNotification);
+      setTimeout(removeNotification, 5000);
+
+      if (form) {
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.style.opacity = '0.6';
+        }
+        form.querySelectorAll('input, textarea').forEach(el => el.disabled = true);
+      }
+    }
+
+    // ── MODAL: JOIN THE JOURNEY ──
+    function openJourneyModal() {
+      document.getElementById('journeyModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeJourneyModal() {
+      document.getElementById('journeyModal').classList.remove('open');
+      document.getElementById('journeyForm').reset();
+      const churchField = document.getElementById('churchField');
+      const churchInput = document.getElementById('churchInput');
+      churchField.classList.remove('show');
+      churchField.hidden = true;
+      churchInput.required = false;
+      churchInput.name = '';
+      churchInput.value = '';
+      document.body.style.overflow = 'auto';
+    }
+
+    function toggleConditionalField() {
+      const select = document.getElementById('hearAbout');
+      const churchField = document.getElementById('churchField');
+      const churchInput = document.getElementById('churchInput');
+
+      if (select.value === 'Church') {
+        churchField.hidden = false;
+        churchField.classList.add('show');
+        churchInput.required = true;
+        churchInput.name = 'church_name';
+      } else {
+        churchField.hidden = true;
+        churchField.classList.remove('show');
+        churchInput.required = false;
+        churchInput.name = '';
+        churchInput.value = '';
+      }
+    }
+
+    async function handleJourneySubmit(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const token = await executeRecaptcha('journey_signup');
+      const formData = new FormData(form);
+      formData.set('recaptcha_token', token);
+      const data = Object.fromEntries(formData);
+      
+      // Add additional fields for Fluent CRM
+      data.form_type = 'journey_signup';
+      data.source = 'Join The Journey Modal';
+      
+      fetch(FLUENT_CRM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(data)
+      }).then(async res => {
+        showNotification('success', 'Welcome! Check your email for next steps.', form);
+        closeJourneyModal();
+      }).catch(err => {
+        console.error('Error:', err);
+        showNotification('error', 'Something went wrong. Please try again.', form);
+      });
+    }
+
+    // Open modal on button click
+    document.querySelectorAll('a[href="#join"]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        openJourneyModal();
+      });
+    });
+
+    document.getElementById('listen-nav')?.addEventListener('click', () => {
+      openAudioModal();
+    });
+
+    function openAudioModal() {
+      document.getElementById('audioModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAudioModal() {
+      document.getElementById('audioModal').classList.remove('open');
+      document.body.style.overflow = 'auto';
+      const modalAudio = document.getElementById('mjg-audio-modal');
+      if (modalAudio) {
+        modalAudio.pause();
+      }
+      document.getElementById('ap-pill-modal')?.classList.remove('ap-playing');
+    }
+
+    function initMJGPlayer(suffix) {
+      const audio = document.getElementById(`mjg-audio-${suffix}`);
+      const pill = document.getElementById(`ap-pill-${suffix}`);
+      const btnPlay = document.getElementById(`ap-play-${suffix}`);
+      const btnRew = document.getElementById(`ap-rew-${suffix}`);
+      const btnFwd = document.getElementById(`ap-fwd-${suffix}`);
+      const btnLoop = document.getElementById(`ap-loop-${suffix}`);
+      const btnLib = document.getElementById(`ap-lib-${suffix}`);
+      const seekBar = document.getElementById(`ap-seek-${suffix}`);
+      const volBar = document.getElementById(`ap-vol-${suffix}`);
+      const curEl = document.getElementById(`ap-cur-${suffix}`);
+      const durEl = document.getElementById(`ap-dur-${suffix}`);
+
+      if (!audio || !pill || !btnPlay || !btnRew || !btnFwd || !seekBar || !volBar || !curEl || !durEl) return;
+
+      let loopMode = false;
+      let isDragging = false;
+
+      function fmt(seconds) {
+        if (!seconds || isNaN(seconds)) return '0:00';
+        const m = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return m + ':' + String(sec).padStart(2, '0');
+      }
+
+      function updateFill(el, pct, varName) {
+        el.style.setProperty(varName, pct + '%');
+      }
+
+      btnPlay.addEventListener('click', () => {
+        if (audio.paused) {
+          audio.play().then(() => {
+            pill.classList.add('ap-playing');
+          }).catch(() => {
+            pill.classList.remove('ap-playing');
+          });
+        } else {
+          audio.pause();
+          pill.classList.remove('ap-playing');
+        }
+      });
+
+      btnRew.addEventListener('click', () => {
+        audio.currentTime = Math.max(0, audio.currentTime - 10);
+      });
+
+      btnFwd.addEventListener('click', () => {
+        audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10);
+      });
+
+      btnLoop.addEventListener('click', () => {
+        loopMode = !loopMode;
+        audio.loop = loopMode;
+        btnLoop.classList.toggle('ap-active', loopMode);
+      });
+
+      btnLib.addEventListener('click', () => {
+        return;
+      });
+
+      audio.addEventListener('timeupdate', () => {
+        if (isDragging) return;
+        const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+        seekBar.value = pct;
+        updateFill(seekBar, pct, '--ap-pct');
+        curEl.textContent = fmt(audio.currentTime);
+      });
+
+      audio.addEventListener('loadedmetadata', () => {
+        durEl.textContent = fmt(audio.duration);
+      });
+
+      audio.addEventListener('ended', () => {
+        pill.classList.remove('ap-playing');
+        seekBar.value = 0;
+        updateFill(seekBar, 0, '--ap-pct');
+        curEl.textContent = '0:00';
+      });
+
+      seekBar.addEventListener('input', () => {
+        isDragging = true;
+        const pct = parseFloat(seekBar.value);
+        updateFill(seekBar, pct, '--ap-pct');
+        if (audio.duration) {
+          curEl.textContent = fmt((pct / 100) * audio.duration);
+        }
+      });
+
+      seekBar.addEventListener('change', () => {
+        if (audio.duration) {
+          audio.currentTime = (parseFloat(seekBar.value) / 100) * audio.duration;
+        }
+        isDragging = false;
+      });
+
+      audio.volume = parseFloat(volBar.value);
+      volBar.addEventListener('input', () => {
+        const pct = parseFloat(volBar.value) * 100;
+        audio.volume = parseFloat(volBar.value);
+        updateFill(volBar, pct, '--ap-vol-pct');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMJGPlayer('hero');
+      initMJGPlayer('modal');
+      document.getElementById('audioModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'audioModal') closeAudioModal();
+      });
+      document.getElementById('journeyModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'journeyModal') closeJourneyModal();
+      });
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('audioModal')?.classList.contains('open')) {
+          closeAudioModal();
+        }
+        if (document.getElementById('journeyModal')?.classList.contains('open')) {
+          closeJourneyModal();
+        }
+      }
+    });
+  </script>
+
+  <!-- MODAL: Join The Journey -->
+  <div class="modal-overlay" id="journeyModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeJourneyModal()">✕</button>
+      <div class="modal-header">
+        <h2>Join <em>The Journey</em></h2>
+      </div>
+      <form class="modal-form" id="journeyForm" onsubmit="handleJourneySubmit(event)">
+        <input type="hidden" name="recaptcha_token" id="journeyRecaptchaToken" value="" />
+        <div class="modal-form-row">
+          <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input type="text" id="firstName" name="first_name" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name *</label>
+            <input type="text" id="lastName" name="last_name" required>
+          </div>
+        </div>
+        
+        <div class="modal-form-row">
+          <div class="form-group">
+            <label for="phone">Phone Number *</label>
+            <input type="tel" id="phone" name="phone" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="questions">Questions & Comments</label>
+          <textarea id="questions" name="questions" placeholder="Share any thoughts or questions..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="hearAbout">How did you hear about us? *</label>
+          <select id="hearAbout" name="hear_about" required onchange="toggleConditionalField()">
+            <option value="">Select an option...</option>
+            <option value="Google">Google</option>
+            <option value="AI">AI</option>
+            <option value="YouTube">YouTube</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Church">Church</option>
+            <option value="Friend">Friend</option>
+            <option value="Family">Family</option>
+            <option value="Strategic Income Group">Strategic Income Group</option>
+            <option value="Other">Other</option>
+          </select>
+          <p class="helper-text">Select the option that best describes how you found us. If you choose Church, an additional field will appear.</p>
+        </div>
+
+        <div class="form-group hidden-field" id="churchField" hidden>
+          <label for="churchInput">Church Name</label>
+          <input type="text" id="churchInput" name="church_name" placeholder="Enter your church name...">
+        </div>
+
+        <div class="modal-agreement">
+          <input type="checkbox" id="agreeCheckbox" name="agree" required>
+          <label for="agreeCheckbox" style="margin: 0; font-size: inherit;">
+            I agree to The Stewardship Blueprint's <a href="#" style="color: var(--gold); text-decoration: none;">Privacy Policy</a> and <a href="#" style="color: var(--gold); text-decoration: none;">Terms of Service</a>. I understand I'll receive updates and resources related to stewardship and biblical principles of financial integrity.
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-gold">Join The Journey</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="audioModal">
+    <div class="audio-modal-card">
+      <button class="modal-close" onclick="closeAudioModal()">✕</button>
+      <div class="ap-wrap" id="mjg-player-modal">
+        <div class="ap-meta">
+          <p class="ap-meta-eyebrow">The Stewardship Blueprint</p>
+          <p class="ap-meta-title">Audiobook Preview</p>
+          <p class="ap-meta-sub">Michael J. Gauthier · 2 hours</p>
+        </div>
+        <div class="ap-progress-wrap">
+          <span class="ap-time left" id="ap-cur-modal">0:00</span>
+          <input class="ap-track" id="ap-seek-modal" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek" style="--ap-pct:0%" />
+          <span class="ap-time right" id="ap-dur-modal">0:00</span>
+        </div>
+        <div class="ap-pill" id="ap-pill-modal">
+          <button class="ap-btn" id="ap-lib-modal" aria-label="Library" title="Library">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+              <rect x="9" y="13" width="20" height="16" rx="4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+              <rect x="12" y="10" width="14" height="4" rx="2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+              <rect x="14.5" y="7.5" width="9" height="3" rx="1.5" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+              <path d="M21.5 18.5v-3.5l-5 1v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="16.5" cy="23" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+              <circle cx="21.5" cy="22" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+          </button>
+          <button class="ap-btn" id="ap-rew-modal" aria-label="Rewind 10 seconds" title="−10s">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+              <path d="M11.5 15.5A9.5 9.5 0 1 1 9 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M8 16l1.5-3.5L13 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-family="Geist,system-ui" font-size="8" font-weight="600">10</text>
+            </svg>
+          </button>
+          <button class="ap-btn ap-btn-play" id="ap-play-modal" aria-label="Play">
+            <svg class="ap-icon-play" width="30" height="30" viewBox="0 0 30 30" fill="none">
+              <path d="M11 8.5l12 6.5-12 6.5V8.5z" fill="white"/>
+            </svg>
+            <svg class="ap-icon-pause" width="30" height="30" viewBox="0 0 30 30" fill="none">
+              <rect x="9" y="8" width="4" height="14" rx="2" fill="white"/>
+              <rect x="17" y="8" width="4" height="14" rx="2" fill="white"/>
+            </svg>
+          </button>
+          <button class="ap-btn" id="ap-fwd-modal" aria-label="Forward 10 seconds" title="+10s">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+              <path d="M26.5 15.5A9.5 9.5 0 1 0 29 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M30 16l-1.5-3.5L25 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-family="Geist,system-ui" font-size="8" font-weight="600">10</text>
+            </svg>
+          </button>
+          <button class="ap-btn ap-loop-badge" id="ap-loop-modal" aria-label="Loop" title="Loop">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+              <path d="M9 21a10 10 0 1 0 1-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M9 11.5L9 17.5H15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="ap-loop-count">1</span>
+          </button>
+        </div>
+        <div class="ap-vol-wrap">
+          <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/>
+          </svg>
+          <input class="ap-vol-slider" id="ap-vol-modal" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" style="--ap-vol-pct:80%" />
+          <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/>
+            <path d="M11 4.5c1.5 1 2 2 2 3.5s-.5 2.5-2 3.5"/>
+            <path d="M13 2c2 1.5 3 3 3 6s-1 4.5-3 6"/>
+          </svg>
+        </div>
+        <audio class="ap-audio" id="mjg-audio-modal" preload="metadata">
+          <source src="https://michaeljgauthier.com/wp-content/uploads/2026/04/The-Stewardship-Blueprint-1.3.m4a" type="audio/mp4" />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

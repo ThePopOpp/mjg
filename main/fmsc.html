@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feed My Starving Children Food Packing Event | Strategic Income Group</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================================
+   SIG × FMSC Event Page
+   Brand: Navy dominant, warm gold accents, Cormorant Garamond for accents,
+   Geist for body/display. Built for Bricks Builder paste-in.
+   ========================================================================= */
+
+:root {
+  --navy:         #1a2554;
+  --navy-2:       #213069;
+  --navy-deep:    #0f1838;
+  --gold:         #b8935a;
+  --gold-2:       #d4b683;
+  --cream:        #faf7f2;
+  --off-white:    #f5f3ee;
+  --ink:          #0f1628;
+  --ink-2:        #334155;
+  --muted:        #64748b;
+  --border:       #e6e4dd;
+  --border-soft:  #efede6;
+  --success:      #15803d;
+  --danger:       #b91c1c;
+
+  --radius-sm:    6px;
+  --radius:       10px;
+  --radius-lg:    18px;
+
+  --shadow-sm:    0 1px 2px rgba(15, 24, 56, 0.06);
+  --shadow:       0 10px 30px -12px rgba(15, 24, 56, 0.18);
+  --shadow-lg:    0 30px 60px -20px rgba(15, 24, 56, 0.25);
+
+  --font-display: "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:    "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-accent:  "Cormorant Garamond", "Times New Roman", serif;
+
+  --container:    1200px;
+}
+
+/* -- Reset / base --------------------------------------------------------- */
+* { box-sizing: border-box; }
+.fmsc-page {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
+.fmsc-page img { max-width: 100%; display: block; }
+.fmsc-page a { color: var(--navy); text-decoration: none; }
+.fmsc-page button { font-family: inherit; cursor: pointer; }
+.fmsc-container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+
+/* ---- DEFENSIVE BUTTON RESET ----------------------------------------------
+   WordPress/Bricks theme stylesheets frequently override <button> background
+   and color (making our primary/submit buttons appear invisible). These
+   rules use higher specificity + !important to survive theme cascade. */
+.fmsc-page .fmsc-btn,
+.fmsc-page button.fmsc-btn,
+.fmsc-modal .fmsc-btn,
+.fmsc-modal button.fmsc-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  font-family: inherit;
+  border: 1.5px solid transparent !important;
+  cursor: pointer;
+  line-height: 1.2;
+  text-decoration: none;
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-transform: none;
+  min-height: 48px;
+}
+.fmsc-page .fmsc-btn--primary,
+.fmsc-page button.fmsc-btn--primary,
+.fmsc-modal .fmsc-btn--primary,
+.fmsc-modal button.fmsc-btn--primary {
+  background: var(--navy) !important;
+  background-color: var(--navy) !important;
+  color: #fff !important;
+  border-color: var(--navy) !important;
+}
+.fmsc-page .fmsc-btn--primary:hover,
+.fmsc-modal .fmsc-btn--primary:hover {
+  background: var(--navy-deep) !important;
+  background-color: var(--navy-deep) !important;
+  border-color: var(--navy-deep) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+.fmsc-page .fmsc-btn--secondary,
+.fmsc-page button.fmsc-btn--secondary,
+.fmsc-modal .fmsc-btn--secondary,
+.fmsc-modal button.fmsc-btn--secondary {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: var(--navy) !important;
+  border-color: var(--border) !important;
+}
+.fmsc-page .fmsc-btn--secondary:hover,
+.fmsc-modal .fmsc-btn--secondary:hover {
+  border-color: var(--navy) !important;
+}
+.fmsc-page .fmsc-btn--submit,
+.fmsc-page button.fmsc-btn--submit,
+.fmsc-modal .fmsc-btn--submit,
+.fmsc-modal button.fmsc-btn--submit {
+  padding: 18px 28px !important;
+  font-size: 16px !important;
+  background: linear-gradient(135deg, var(--navy), var(--navy-2)) !important;
+  background-color: var(--navy) !important;
+  color: #fff !important;
+  border-color: var(--navy) !important;
+}
+.fmsc-page .fmsc-btn--submit:hover,
+.fmsc-modal .fmsc-btn--submit:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+.fmsc-page .fmsc-btn--submit:disabled,
+.fmsc-modal .fmsc-btn--submit:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed;
+  transform: none;
+}
+.fmsc-page .fmsc-btn--xl,
+.fmsc-modal .fmsc-btn--xl {
+  padding: 18px 32px !important;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.fmsc-page h1, .fmsc-page h2, .fmsc-page h3, .fmsc-page h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  color: var(--navy);
+}
+.fmsc-eyebrow {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--gold-2);
+  margin-bottom: 18px;
+  display: inline-block;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.fmsc-hero {
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 90px 0 0;
+  overflow: hidden;
+}
+.fmsc-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1000px 400px at 80% 20%, rgba(212, 182, 131, 0.12), transparent 60%),
+    radial-gradient(800px 500px at 10% 80%, rgba(33, 48, 105, 0.8), transparent 60%);
+  pointer-events: none;
+}
+.fmsc-hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.fmsc-hero__share-eyebrow {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--gold-2);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+  display: block;
+}
+.fmsc-hero h1 {
+  color: #fff;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.03;
+  margin-bottom: 28px;
+}
+.fmsc-hero h1 .accent {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--gold-2);
+  letter-spacing: -0.01em;
+}
+.fmsc-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 36px;
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.14);
+}
+.fmsc-hero__meta-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.fmsc-hero__meta-item svg { flex-shrink: 0; margin-top: 2px; color: var(--gold-2); }
+.fmsc-hero__meta-label {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+  opacity: 0.85;
+  display: block;
+  margin-bottom: 2px;
+}
+.fmsc-hero__meta-value {
+  font-size: 15px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.fmsc-hero__image {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  aspect-ratio: 4 / 5;
+  margin-bottom: -80px;
+  transform: translateY(20px);
+}
+.fmsc-hero__image img { width: 100%; height: 100%; object-fit: cover; }
+.fmsc-hero__image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(15, 24, 56, 0.35));
+}
+
+.fmsc-hero__share {
+  display: flex;
+  gap: 10px;
+  margin-top: 36px;
+}
+.fmsc-hero__share-label {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 16px;
+  color: rgba(255,255,255,0.7);
+  align-self: center;
+  margin-right: 8px;
+}
+.fmsc-share-btn {
+  width: 38px; height: 38px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+.fmsc-share-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+
+/* =========================================================================
+   PARTNERSHIP / INTRO
+   ========================================================================= */
+.fmsc-intro {
+  background: var(--cream);
+  padding: 160px 0 100px;
+  position: relative;
+}
+.fmsc-intro__partners {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 56px;
+}
+.fmsc-intro__partner-logo {
+  height: 70px;
+  display: flex;
+  align-items: center;
+}
+.fmsc-intro__partner-logo img { max-height: 100%; width: auto; }
+.fmsc-intro__partner-x {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 28px;
+  color: var(--gold);
+}
+.fmsc-intro__content {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+.fmsc-intro__type {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: var(--navy);
+  color: var(--gold-2);
+  padding: 8px 18px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+.fmsc-intro h2 {
+  font-size: clamp(28px, 3vw, 40px);
+  margin-bottom: 22px;
+}
+.fmsc-intro h2 em {
+  font-family: var(--font-accent);
+  font-weight: 500;
+  color: var(--gold);
+  font-style: italic;
+}
+.fmsc-intro p {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* =========================================================================
+   KEY INFO CARD  (Date / Time / Location / Spots)
+   ========================================================================= */
+.fmsc-keycard-wrap {
+  max-width: 1000px;
+  margin: 56px auto 0;
+  padding: 0 24px;
+}
+.fmsc-keycard {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px 40px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  position: relative;
+}
+.fmsc-keycard::before {
+  content: "";
+  position: absolute;
+  top: -1px; left: 40px; right: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--navy));
+  border-radius: 2px;
+}
+.fmsc-keycard__item { padding-left: 20px; border-left: 1px solid var(--border-soft); }
+.fmsc-keycard__item:first-child { border-left: none; padding-left: 0; }
+.fmsc-keycard__icon {
+  width: 40px; height: 40px;
+  background: var(--off-white);
+  border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--navy);
+  margin-bottom: 14px;
+}
+.fmsc-keycard__label {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+  display: block;
+  font-weight: 500;
+}
+.fmsc-keycard__value {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1.35;
+}
+.fmsc-keycard__sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* =========================================================================
+   SPOTS REMAINING — Standalone section below the info grid
+   ========================================================================= */
+.fmsc-spots {
+  max-width: 1000px;
+  margin: 24px auto 0;
+  padding: 0 24px;
+}
+.fmsc-spots__card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 40px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 32px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.fmsc-spots__card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 40px; right: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--navy), var(--gold));
+  border-radius: 2px;
+}
+.fmsc-spots__icon {
+  width: 56px; height: 56px;
+  background: var(--navy);
+  color: var(--gold-2);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.fmsc-spots__main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fmsc-spots__label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+.fmsc-spots__headline {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.fmsc-spots__num {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--navy);
+  letter-spacing: -0.03em;
+}
+.fmsc-spots__num.low { color: var(--danger); }
+.fmsc-spots__num-label {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--navy);
+}
+.fmsc-spots__sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.fmsc-spots__progress {
+  width: 100%;
+  margin-top: 10px;
+}
+.fmsc-spots__bar {
+  height: 8px;
+  background: var(--border-soft);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.fmsc-spots__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-2));
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.fmsc-spots__cta {
+  flex-shrink: 0;
+}
+.fmsc-spots__cta .fmsc-btn {
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   VIDEO
+   ========================================================================= */
+.fmsc-video {
+  padding: 100px 0 80px;
+  background: var(--cream);
+}
+.fmsc-video__inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.fmsc-video__header { text-align: center; margin-bottom: 40px; }
+.fmsc-video__header h2 {
+  font-size: clamp(26px, 2.6vw, 34px);
+  margin-bottom: 10px;
+}
+.fmsc-video__header p {
+  color: var(--muted);
+  font-size: 16px;
+  margin: 0;
+}
+.fmsc-video__frame {
+  position: relative;
+  padding-top: 56.25%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: #000;
+}
+.fmsc-video__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* =========================================================================
+   RSVP SECTION
+   ========================================================================= */
+.fmsc-rsvp {
+  padding: 90px 0 100px;
+  background: linear-gradient(180deg, var(--cream) 0%, #fff 100%);
+  position: relative;
+}
+.fmsc-rsvp__header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+.fmsc-rsvp__header .fmsc-eyebrow { margin-bottom: 14px; }
+.fmsc-rsvp__header h2 {
+  font-size: clamp(28px, 3vw, 40px);
+  margin-bottom: 14px;
+}
+.fmsc-rsvp__header p { color: var(--muted); font-size: 16px; margin: 0; }
+
+.fmsc-rsvp__deadline {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-top: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.fmsc-rsvp__deadline strong { color: var(--navy); }
+.fmsc-rsvp__deadline svg { color: var(--gold); }
+
+/* Form card */
+.fmsc-form-card {
+  max-width: 860px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+/* Progress */
+.fmsc-progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--navy);
+  color: #fff;
+}
+.fmsc-progress__step {
+  padding: 22px 18px;
+  text-align: center;
+  position: relative;
+  opacity: 0.55;
+  transition: opacity 0.3s ease;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.fmsc-progress__step[data-active="true"],
+.fmsc-progress__step[data-complete="true"] { opacity: 1; }
+.fmsc-progress__step[data-active="true"]::after {
+  content: ""; position: absolute; bottom: 0; left: 20%; right: 20%;
+  height: 3px; background: var(--gold);
+}
+.fmsc-progress__num {
+  display: inline-block;
+  width: 24px; height: 24px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  line-height: 24px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 8px;
+}
+.fmsc-progress__step[data-complete="true"] .fmsc-progress__num { background: var(--gold); color: var(--navy); }
+
+/* Form body */
+.fmsc-form-body { padding: 40px 48px 48px; }
+.fmsc-form-step { display: none; animation: fmscFade 0.35s ease; }
+.fmsc-form-step.active { display: block; }
+@keyframes fmscFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fmsc-form-step h3 {
+  font-size: 24px;
+  margin-bottom: 6px;
+  color: var(--navy);
+}
+.fmsc-form-step__sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 28px;
+}
+.fmsc-form-divider {
+  height: 1px;
+  background: var(--border-soft);
+  margin: 32px 0;
+}
+.fmsc-form-divider--thick { height: 2px; background: var(--border); }
+
+/* Field grid */
+.fmsc-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 22px;
+}
+.fmsc-field { display: flex; flex-direction: column; gap: 8px; }
+.fmsc-field--full { grid-column: 1 / -1; }
+.fmsc-field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: 0.01em;
+}
+.fmsc-field label .req { color: var(--danger); margin-left: 2px; }
+.fmsc-field input[type="text"],
+.fmsc-field input[type="email"],
+.fmsc-field input[type="tel"],
+.fmsc-field input[type="number"],
+.fmsc-field select {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.fmsc-field input:focus,
+.fmsc-field select:focus {
+  outline: none;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(26, 37, 84, 0.1);
+}
+.fmsc-field input.error,
+.fmsc-field select.error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
+}
+.fmsc-field__error {
+  color: var(--danger);
+  font-size: 12px;
+  display: none;
+}
+.fmsc-field.has-error .fmsc-field__error { display: block; }
+.fmsc-field__hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Yes/No button group */
+.fmsc-toggle-group {
+  margin-top: 8px;
+}
+.fmsc-toggle-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 12px;
+  font-family: var(--font-display);
+}
+.fmsc-toggle-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.fmsc-toggle-btn {
+  padding: 14px 20px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+.fmsc-toggle-btn:hover { border-color: var(--navy); color: var(--navy); }
+.fmsc-toggle-btn[aria-pressed="true"] {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+.fmsc-toggle-btn[aria-pressed="true"][data-value="no"] {
+  background: var(--ink-2);
+  border-color: var(--ink-2);
+}
+
+/* Conditional reveal */
+.fmsc-conditional { display: none; margin-top: 20px; }
+.fmsc-conditional.show { display: block; animation: fmscFade 0.3s ease; }
+
+/* Tshirt subsection */
+.fmsc-subsection {
+  background: var(--off-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  margin-top: 20px;
+}
+.fmsc-subsection h4 {
+  font-size: 17px;
+  margin-bottom: 16px;
+  color: var(--navy);
+}
+
+/* Guest cards (repeater) */
+.fmsc-guest-list { display: flex; flex-direction: column; gap: 18px; }
+.fmsc-guest-card {
+  background: var(--off-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  position: relative;
+}
+.fmsc-guest-card__header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.fmsc-guest-card__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--navy);
+}
+.fmsc-guest-card__remove {
+  font-size: 13px;
+  color: var(--danger);
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  transition: all 0.18s;
+}
+.fmsc-guest-card__remove:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+.fmsc-guest-card__notice {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+  margin: 12px 0 0;
+}
+
+.fmsc-add-guest-btn {
+  margin-top: 18px;
+  padding: 14px;
+  width: 100%;
+  border: 1.5px dashed var(--border);
+  background: transparent;
+  color: var(--navy);
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  transition: all 0.18s;
+  font-family: inherit;
+}
+.fmsc-add-guest-btn:hover { border-color: var(--navy); background: var(--off-white); }
+
+/* Footer nav / actions */
+.fmsc-form-actions {
+  display: flex; justify-content: space-between;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border-soft);
+  gap: 12px;
+}
+
+/* Summary */
+.fmsc-summary { display: flex; flex-direction: column; gap: 28px; }
+.fmsc-summary__block {
+  padding: 24px 26px;
+  background: var(--off-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+}
+.fmsc-summary__block h4 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: var(--navy);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.fmsc-summary__edit {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-body);
+  background: none; border: none; cursor: pointer;
+}
+.fmsc-summary__edit:hover { color: var(--navy); }
+.fmsc-summary__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+}
+.fmsc-summary__item span {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+.fmsc-summary__item strong {
+  font-weight: 500;
+  color: var(--ink);
+  font-size: 15px;
+}
+.fmsc-summary__guest {
+  margin-top: 18px; padding-top: 18px;
+  border-top: 1px dashed var(--border);
+}
+.fmsc-summary__guest:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.fmsc-summary__guest-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+/* Success state */
+.fmsc-success { display: none; text-align: center; padding: 20px 0; }
+.fmsc-success.show { display: block; }
+.fmsc-success__icon {
+  width: 72px; height: 72px;
+  background: var(--success);
+  border-radius: 50%;
+  color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.fmsc-success h3 { font-size: 28px; margin-bottom: 12px; }
+.fmsc-success p { color: var(--muted); max-width: 420px; margin: 0 auto; }
+
+/* =========================================================================
+   CAPACITY REACHED STATE
+   ========================================================================= */
+.fmsc-capacity {
+  display: none;
+  max-width: 720px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 56px 48px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.fmsc-page.fmsc-event-full .fmsc-form-card,
+.fmsc-page.fmsc-event-full #fmsc-form-slot-inline { display: none; }
+.fmsc-page.fmsc-event-full .fmsc-capacity { display: block; }
+.fmsc-page.fmsc-event-full .fmsc-spots__num { color: var(--danger); }
+.fmsc-page.fmsc-event-full .fmsc-spots__cta { display: none; }
+
+.fmsc-capacity__badge {
+  display: inline-block;
+  background: rgba(185, 28, 28, 0.1);
+  color: var(--danger);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+.fmsc-capacity h3 {
+  font-size: 28px;
+  margin-bottom: 14px;
+}
+.fmsc-capacity > p {
+  color: var(--ink-2);
+  max-width: 480px;
+  margin: 0 auto 30px;
+  font-size: 16px;
+  line-height: 1.65;
+}
+.fmsc-capacity__contact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 28px;
+}
+.fmsc-capacity__contact a {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  transition: all 0.2s;
+}
+.fmsc-capacity__contact a:hover {
+  border-color: var(--navy);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.fmsc-capacity__contact small {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.fmsc-capacity__contact strong {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--navy);
+  font-weight: 600;
+}
+
+/* =========================================================================
+   CTA / DONATE
+   ========================================================================= */
+.fmsc-cta {
+  background: var(--navy);
+  color: #fff;
+  padding: 110px 0;
+  position: relative;
+  overflow: hidden;
+}
+.fmsc-cta::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(600px 400px at 85% 50%, rgba(212, 182, 131, 0.1), transparent 60%);
+}
+.fmsc-cta__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.fmsc-cta__eyebrow {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--gold-2);
+  font-size: 20px;
+  margin-bottom: 16px;
+  display: block;
+}
+.fmsc-cta h2 {
+  font-size: clamp(32px, 3.8vw, 52px);
+  color: #fff;
+  margin-bottom: 24px;
+  line-height: 1.05;
+}
+.fmsc-cta h2 em {
+  font-family: var(--font-accent);
+  font-weight: 500;
+  color: var(--gold-2);
+  font-style: italic;
+}
+.fmsc-cta__content > p {
+  font-size: 17px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.85);
+  margin: 0 0 28px;
+}
+.fmsc-cta__tiers {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 36px;
+  display: grid;
+  gap: 12px;
+}
+.fmsc-cta__tiers li {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 20px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 15px;
+}
+.fmsc-cta__tiers li:last-child { border-bottom: 1px solid rgba(255,255,255,0.1); }
+.fmsc-cta__tiers .amount {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold-2);
+  letter-spacing: -0.02em;
+}
+.fmsc-cta__tiers .desc { color: rgba(255,255,255,0.85); }
+.fmsc-cta__btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--gold);
+  color: var(--navy);
+  padding: 18px 32px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  font-family: var(--font-display);
+}
+.fmsc-cta__btn:hover { background: var(--gold-2); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.fmsc-cta__image {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+/* =========================================================================
+   FLOATING RSVP BUTTON (always in view)
+   ========================================================================= */
+.fmsc-float-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--navy);
+  color: #fff;
+  padding: 16px 26px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  box-shadow: 0 12px 40px -10px rgba(15, 24, 56, 0.5), 0 0 0 1px rgba(255,255,255,0.1);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  animation: fmscFloatIn 0.5s 0.8s ease backwards;
+}
+.fmsc-float-btn:hover {
+  background: var(--navy-deep);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 50px -10px rgba(15, 24, 56, 0.6), 0 0 0 1px var(--gold);
+}
+.fmsc-float-btn::before {
+  content: "";
+  width: 8px; height: 8px;
+  background: var(--gold-2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(212, 182, 131, 0.7);
+  animation: fmscPulse 2s infinite;
+}
+@keyframes fmscFloatIn {
+  from { opacity: 0; transform: translateY(60px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fmscPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(212, 182, 131, 0.7); }
+  70%  { box-shadow: 0 0 0 10px rgba(212, 182, 131, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(212, 182, 131, 0); }
+}
+
+/* Hide float button when modal open or event full */
+body.fmsc-modal-open .fmsc-float-btn,
+body.fmsc-event-full .fmsc-float-btn,
+.fmsc-page.fmsc-event-full .fmsc-float-btn { display: none; }
+
+/* =========================================================================
+   MODAL
+   ========================================================================= */
+.fmsc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.fmsc-modal.open { display: flex; animation: fmscModalFade 0.25s ease; }
+@keyframes fmscModalFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.fmsc-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 24, 56, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.fmsc-modal__container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  max-height: calc(100vh - 48px);
+  background: #fff;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  animation: fmscModalIn 0.3s ease;
+}
+@keyframes fmscModalIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.fmsc-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--navy);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+}
+.fmsc-modal__close:hover {
+  background: var(--navy);
+  color: #fff;
+  transform: rotate(90deg);
+  border-color: var(--navy);
+}
+.fmsc-modal__body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+}
+/* Inside modal, drop the form card's own shadow/border since the modal handles it */
+.fmsc-modal .fmsc-form-card {
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  max-width: none;
+}
+
+/* Lock body scroll */
+body.fmsc-modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 960px) {
+  .fmsc-hero { padding-top: 60px; }
+  .fmsc-hero__inner { grid-template-columns: 1fr; gap: 40px; }
+  .fmsc-hero__image { aspect-ratio: 16/11; margin-bottom: -60px; }
+  .fmsc-intro { padding: 120px 0 80px; }
+  .fmsc-keycard { grid-template-columns: 1fr 1fr; gap: 24px; padding: 28px; }
+  .fmsc-keycard__item:nth-child(3) { grid-column: 1 / -1; border-left: none; padding-left: 0; padding-top: 20px; border-top: 1px solid var(--border-soft); }
+  .fmsc-spots__card { grid-template-columns: auto 1fr; padding: 28px; gap: 20px; }
+  .fmsc-spots__cta { grid-column: 1 / -1; }
+  .fmsc-spots__cta .fmsc-btn { width: 100%; }
+  .fmsc-cta__inner { grid-template-columns: 1fr; gap: 40px; }
+  .fmsc-cta__image { order: -1; }
+}
+@media (max-width: 640px) {
+  .fmsc-container { padding: 0 18px; }
+  .fmsc-form-body { padding: 28px 22px 32px; }
+  .fmsc-field-grid { grid-template-columns: 1fr; }
+  .fmsc-summary__grid { grid-template-columns: 1fr; }
+  .fmsc-keycard { grid-template-columns: 1fr; padding: 24px; }
+  .fmsc-keycard__item { border-left: none !important; padding-left: 0 !important; padding-bottom: 20px; border-bottom: 1px solid var(--border-soft); }
+  .fmsc-keycard__item:last-child { border-bottom: none; padding-bottom: 0; }
+  .fmsc-spots { padding: 0 18px; }
+  .fmsc-spots__card { grid-template-columns: 1fr; padding: 24px; text-align: left; gap: 16px; }
+  .fmsc-spots__card::before { left: 24px; right: 24px; }
+  .fmsc-spots__num { font-size: 40px; }
+  .fmsc-spots__icon { width: 48px; height: 48px; }
+  .fmsc-progress__step { font-size: 11px; padding: 18px 8px; }
+  .fmsc-progress__step span.label-text { display: none; }
+  .fmsc-capacity__contact { grid-template-columns: 1fr; }
+  .fmsc-cta { padding: 80px 0; }
+  .fmsc-cta__tiers li { grid-template-columns: 90px 1fr; }
+  .fmsc-form-actions { flex-direction: column-reverse; }
+  .fmsc-form-actions .fmsc-btn { width: 100% !important; }
+
+  /* Floating button → full-width sticky bar on mobile with safe-area inset */
+  .fmsc-float-btn {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    justify-content: center;
+    padding: 18px 24px;
+    border-radius: 14px;
+    font-size: 16px;
+  }
+
+  /* Add breathing room at bottom of page so float button doesn't cover CTA content */
+  .fmsc-cta { padding-bottom: 120px; }
+
+  /* Modal → full-screen bottom-sheet feel on mobile */
+  .fmsc-modal { padding: 0; align-items: stretch; }
+  .fmsc-modal__container {
+    max-width: 100%;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 0;
+    animation: fmscModalInMobile 0.3s ease;
+  }
+  @keyframes fmscModalInMobile {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fmsc-modal__close {
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+  }
+  /* Pad the last actionable element so modal bottom doesn't get masked on iOS */
+  .fmsc-modal__body { padding-bottom: env(safe-area-inset-bottom); }
+}
+</style>
+</head>
+
+<body>
+<!--
+  ==========================================================================
+  JETENGINE FIELD MAPPING REFERENCE
+  ==========================================================================
+  Below is a map of every JetEngine CPT field used on this page. Fields not
+  listed are not used for this specific event (SIG × FMSC at FMSC Tempe HQ).
+
+  USED (this event):
+    • event-date                       → Hero · Keycard · Summary event name
+    • event_start_time                 → Hero · Keycard
+    • event_end_time                   → Hero · Keycard
+    • event_time_notification          → Keycard subtitle (optional)
+    • rsvp_deadline                    → RSVP deadline pill
+    • event-topic                      → Intro type pill
+    • event-short-description          → Intro paragraph
+    • featured_event_photo             → Hero image
+    • notification_headline            → Capacity-reached heading
+    • notification_message             → Capacity-reached body
+    • organization_name                → Partner alt text
+    • organization_logo                → Partner logo in intro
+    • video_url                        → Embedded YouTube iframe
+    • new_event_site_name              → Keycard · Hero location
+    • new_event_site_address           → Keycard subtitle
+    • new_event_site_capacity          → Spots widget data-total-spots
+    • spots_remaining                  → Spots widget data-spots-filled
+    • donation_title                   → CTA heading
+    • donation_description             → CTA paragraph
+    • donation_image                   → CTA image
+    • donation_button_url              → CTA button href
+    • donation_button_text             → CTA button label
+
+  NOT USED (this event):
+    • sig_chandler_office.*            (Chandler-based events)
+    • sig_peoria_office.*              (Peoria-based events)
+    • virtual_event_info.*             (Virtual/hybrid events)
+    • speaker_info.* / add_event_speaker  (Speaker-led events)
+    • i-frame / i-frame_text_field / i-frame_embed_field  (Alt video embed)
+    • video_placeholder                (Alt video poster image)
+    • chandler_booking_button_url
+    • peoria_booking_button_url
+    • new_event_site_booking_button_url
+    • booking_button_label
+    • event_site_url
+
+  Dynamic fields are marked inline throughout the HTML with
+    <!-\- JetEngine: field_name (type) -\->
+  comments so you know where to drop Bricks dynamic tags.
+  ==========================================================================
+-->
+<div class="fmsc-page">
+
+<!-- =====================================================================
+     HERO
+     ===================================================================== -->
+<section class="fmsc-hero">
+  <div class="fmsc-container fmsc-hero__inner">
+    <div>
+      <span class="fmsc-hero__share-eyebrow">Sharing Is Caring</span>
+      <h1>Feed My Starving Children <span class="accent">Food Packing</span> Event</h1>
+
+      <div class="fmsc-hero__meta">
+        <!-- JetEngine: event-date (date) · event_time_notification (text) -->
+        <div class="fmsc-hero__meta-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <div>
+            <span class="fmsc-hero__meta-label">Date</span>
+            <span class="fmsc-hero__meta-value">Wednesday, June 3, 2026</span>
+          </div>
+        </div>
+        <!-- JetEngine: event_start_time (text) · event_end_time (text) -->
+        <div class="fmsc-hero__meta-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <div>
+            <span class="fmsc-hero__meta-label">Time</span>
+            <span class="fmsc-hero__meta-value">2:15 p.m. – 4:00 p.m.</span>
+          </div>
+        </div>
+        <!-- JetEngine: new_event_site_name (text) -->
+        <div class="fmsc-hero__meta-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          <div>
+            <span class="fmsc-hero__meta-label">Location</span>
+            <span class="fmsc-hero__meta-value">Tempe, AZ HQ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fmsc-hero__share">
+        <span class="fmsc-hero__share-label">Share:</span>
+        <a href="#" class="fmsc-share-btn" aria-label="Facebook"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H8v-3h2.4V9.8c0-2.4 1.4-3.7 3.6-3.7 1 0 2.1.2 2.1.2v2.3h-1.2c-1.2 0-1.5.7-1.5 1.5V12h2.6l-.4 3h-2.2v7A10 10 0 0 0 22 12z"/></svg></a>
+        <a href="#" class="fmsc-share-btn" aria-label="X"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M18.9 2h3.3l-7.2 8.2L24 22h-6.6l-5.2-6.8L6.3 22H3l7.7-8.8L2 2h6.8l4.7 6.2L18.9 2zm-1.2 18h1.9L7.4 4H5.4l12.3 16z"/></svg></a>
+        <a href="#" class="fmsc-share-btn" aria-label="LinkedIn"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8.3 18.3H5.7V9.7h2.6v8.6zM7 8.6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm11.3 9.7h-2.6v-4.2c0-1 0-2.3-1.4-2.3s-1.6 1.1-1.6 2.2v4.3h-2.6V9.7h2.5v1.2c.4-.7 1.2-1.4 2.5-1.4 2.7 0 3.2 1.8 3.2 4.1v4.7z"/></svg></a>
+        <a href="#" class="fmsc-share-btn" aria-label="Email"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+      </div>
+    </div>
+
+    <!-- JetEngine: featured_event_photo (media) -->
+    <div class="fmsc-hero__image">
+      <img src="https://strategicincomegroup.com/wp-content/uploads/FacebookCoverPhoto3.jpg" alt="Volunteers packing meals at Feed My Starving Children">
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     INTRO / PARTNERSHIP
+     ===================================================================== -->
+<section class="fmsc-intro">
+  <div class="fmsc-container">
+    <div class="fmsc-intro__partners">
+      <!-- SIG logo is hardcoded (site owner). Partner org uses JetEngine fields below. -->
+      <div class="fmsc-intro__partner-logo">
+        <img src="https://strategicincomegroup.com/wp-content/uploads/Asset-1-1.svg" alt="Strategic Income Group">
+      </div>
+      <div class="fmsc-intro__partner-x">×</div>
+      <!-- JetEngine: organization_logo (media) · organization_name (text, alt) -->
+      <div class="fmsc-intro__partner-logo">
+        <img src="https://strategicincomegroup.com/wp-content/uploads/FMSC-Blue-Square-1.jpg" alt="Feed My Starving Children">
+      </div>
+    </div>
+
+    <div class="fmsc-intro__content">
+      <!-- JetEngine: event-topic (select) -->
+      <span class="fmsc-intro__type">Food Packing Event</span>
+      <h2>A service event where <em>community meets action</em>.</h2>
+      <!-- JetEngine: event-short-description (textarea) -->
+      <p>Strategic Income Group is proud to partner with Feed My Starving Children for an impactful service event where we'll come together to pack meals for children and families in need across the globe. This is a unique opportunity to give back, build community, and make a tangible difference in the fight against global hunger. Read on for more important details and to RSVP.</p>
+    </div>
+  </div>
+
+  <!-- Key Info Card -->
+  <div class="fmsc-keycard-wrap">
+    <div class="fmsc-keycard">
+      <!-- JetEngine: event-date (date) · rsvp_deadline (datetime-local) -->
+      <div class="fmsc-keycard__item">
+        <div class="fmsc-keycard__icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <span class="fmsc-keycard__label">Date</span>
+        <div class="fmsc-keycard__value">Wed, June 3, 2026</div>
+        <div class="fmsc-keycard__sub">RSVP by May 20, 4:30 p.m.</div>
+      </div>
+
+      <!-- JetEngine: event_start_time · event_end_time · event_time_notification -->
+      <div class="fmsc-keycard__item">
+        <div class="fmsc-keycard__icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <span class="fmsc-keycard__label">Time</span>
+        <div class="fmsc-keycard__value">2:15 – 4:00 p.m.</div>
+        <div class="fmsc-keycard__sub">Arrive 10 min early</div>
+      </div>
+
+      <!-- JetEngine: new_event_site_name (text) · new_event_site_address (text) -->
+      <div class="fmsc-keycard__item">
+        <div class="fmsc-keycard__icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </div>
+        <span class="fmsc-keycard__label">Location</span>
+        <div class="fmsc-keycard__value">FMSC Tempe, AZ HQ</div>
+        <div class="fmsc-keycard__sub">1100 W Grove Pkwy, Ste 101</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       SPOTS REMAINING — standalone section
+       JetEngine: new_event_site_capacity (number, total) · spots_remaining (number)
+       In Bricks, replace data-total-spots and data-spots-filled with dynamic
+       tags on #fmsc-spots-widget:
+         data-total-spots="{jet_engine_field field=\"new_event_site_capacity\"}"
+         data-spots-filled="{calculated: capacity - spots_remaining}"
+       The JS computes remaining, draws the progress bar, colors the number
+       red at ≤5 left, and toggles .fmsc-event-full when 0.
+       ===================================================================== -->
+  <div class="fmsc-spots">
+    <div class="fmsc-spots__card"
+         id="fmsc-spots-widget"
+         data-total-spots="25"
+         data-spots-filled="0">
+      <div class="fmsc-spots__icon">
+        <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="fmsc-spots__main">
+        <span class="fmsc-spots__label">Spots Remaining</span>
+        <div class="fmsc-spots__headline">
+          <span class="fmsc-spots__num" id="fmsc-spots-num">25</span>
+          <span class="fmsc-spots__num-label">of 25 total — space is limited</span>
+        </div>
+        <div class="fmsc-spots__progress">
+          <div class="fmsc-spots__bar"><div class="fmsc-spots__bar-fill" id="fmsc-spots-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="fmsc-spots__cta">
+        <button type="button" class="fmsc-btn fmsc-btn--primary" data-open-modal>RSVP Today →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     VIDEO
+     ===================================================================== -->
+<section class="fmsc-video">
+  <div class="fmsc-container fmsc-video__inner">
+    <div class="fmsc-video__header">
+      <h2>Follow the journey of a MannaPack<sup>®</sup> meal.</h2>
+      <p>See exactly what we'll be doing together — from packing line to child in need.</p>
+    </div>
+    <div class="fmsc-video__frame">
+      <!-- JetEngine: video_url (text) — extract YouTube ID and plug into /embed/ path.
+           Alternative: use i-frame_embed_field (html) to paste full iframe markup. -->
+      <iframe src="https://www.youtube.com/embed/gZkSNTkT1PU"
+              title="Follow Our Food: The Journey of a MannaPack Meal"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     RSVP
+     ===================================================================== -->
+<section class="fmsc-rsvp" id="rsvp">
+  <div class="fmsc-container">
+    <div class="fmsc-rsvp__header">
+      <span class="fmsc-eyebrow">Reserve Your Spot</span>
+      <h2>RSVP for the Food Packing Event</h2>
+      <p>Space is strictly limited to 25 attendees. Secure your spot below.</p>
+      <div class="fmsc-rsvp__deadline">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <!-- JetEngine: rsvp_deadline (datetime-local) -->
+        <span>RSVP Deadline: <strong>Wednesday, May 20, 4:30 p.m.</strong></span>
+      </div>
+    </div>
+
+    <!-- Capacity Reached State — shown when spots_remaining hits 0.
+         JetEngine: notification_headline (text) · notification_message (textarea) -->
+    <div class="fmsc-capacity">
+      <span class="fmsc-capacity__badge">Event at Capacity</span>
+      <h3>We're fully booked — but we'd still love to hear from you.</h3>
+      <p>This event has reached its 25-spot capacity. Please contact us directly to be added to a waitlist or to ask about future events.</p>
+      <div class="fmsc-capacity__contact">
+        <a href="tel:+14804667070">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <small>Call</small>
+          <strong>(480) 466-7070</strong>
+        </a>
+        <a href="mailto:julie@strategicincomegroup.com">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <small>Email</small>
+          <strong>julie@strategicincomegroup.com</strong>
+        </a>
+      </div>
+    </div>
+
+    <!-- ==============================================================
+         RSVP FORM (lives inline here by default; teleports into modal
+         when floating RSVP button is clicked, returns on close)
+         ============================================================== -->
+    <div id="fmsc-form-slot-inline" class="fmsc-form-slot">
+      <!-- Form Card -->
+      <form class="fmsc-form-card" id="fmsc-rsvp-form" novalidate>
+      <div class="fmsc-progress" role="tablist">
+        <div class="fmsc-progress__step" data-step="1" data-active="true">
+          <span class="fmsc-progress__num">1</span><span class="label-text">Attendee</span>
+        </div>
+        <div class="fmsc-progress__step" data-step="2">
+          <span class="fmsc-progress__num">2</span><span class="label-text">Guests</span>
+        </div>
+        <div class="fmsc-progress__step" data-step="3">
+          <span class="fmsc-progress__num">3</span><span class="label-text">Summary</span>
+        </div>
+      </div>
+
+      <div class="fmsc-form-body">
+
+        <!-- STEP 1 -->
+        <div class="fmsc-form-step active" data-step="1">
+          <h3>Attendee Information</h3>
+          <p class="fmsc-form-step__sub">Tell us about yourself — this is the primary RSVP contact.</p>
+
+          <div class="fmsc-field-grid">
+            <div class="fmsc-field">
+              <label for="attendee_first">First Name <span class="req">*</span></label>
+              <input type="text" id="attendee_first" name="attendee_first_name" required>
+              <span class="fmsc-field__error">Please enter your first name.</span>
+            </div>
+            <div class="fmsc-field">
+              <label for="attendee_last">Last Name <span class="req">*</span></label>
+              <input type="text" id="attendee_last" name="attendee_last_name" required>
+              <span class="fmsc-field__error">Please enter your last name.</span>
+            </div>
+            <div class="fmsc-field">
+              <label for="attendee_email">Email <span class="req">*</span></label>
+              <input type="email" id="attendee_email" name="attendee_email" required>
+              <span class="fmsc-field__error">Please enter a valid email.</span>
+            </div>
+            <div class="fmsc-field">
+              <label for="attendee_phone">Phone <span class="req">*</span></label>
+              <input type="tel" id="attendee_phone" name="attendee_phone" placeholder="(480) 555-1234" required>
+              <span class="fmsc-field__error">Please enter a valid phone number.</span>
+            </div>
+          </div>
+
+          <div class="fmsc-form-divider"></div>
+
+          <div class="fmsc-toggle-group">
+            <span class="fmsc-toggle-label">Do you need a free SIG event t-shirt?</span>
+            <div class="fmsc-toggle-buttons" data-toggle="attendee_tshirt">
+              <button type="button" class="fmsc-toggle-btn" data-value="yes" aria-pressed="false">Yes</button>
+              <button type="button" class="fmsc-toggle-btn" data-value="no" aria-pressed="false">No</button>
+            </div>
+            <input type="hidden" name="attendee_tshirt" id="attendee_tshirt">
+
+            <div class="fmsc-conditional" data-reveal-for="attendee_tshirt" data-reveal-when="yes">
+              <div class="fmsc-subsection">
+                <h4>Your T-Shirt Details</h4>
+                <div class="fmsc-field-grid">
+                  <div class="fmsc-field">
+                    <label for="attendee_tshirt_name">T-Shirt Recipient Name</label>
+                    <input type="text" id="attendee_tshirt_name" name="attendee_tshirt_name" data-auto-fill="attendee_full">
+                  </div>
+                  <div class="fmsc-field">
+                    <label for="attendee_tshirt_size">Size <span class="req">*</span></label>
+                    <select id="attendee_tshirt_size" name="attendee_tshirt_size">
+                      <option value="">Select size…</option>
+                      <option>XS</option><option>Small</option><option>Medium</option>
+                      <option>Large</option><option>XL</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fmsc-form-actions">
+            <span></span>
+            <button type="button" class="fmsc-btn fmsc-btn--primary" data-action="next">Next: Guests →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="fmsc-form-step" data-step="2">
+          <h3>Guest Information</h3>
+          <p class="fmsc-form-step__sub">Bringing anyone with you? Add their details here.</p>
+
+          <div class="fmsc-toggle-group">
+            <span class="fmsc-toggle-label">Are you bringing a guest with you?</span>
+            <div class="fmsc-toggle-buttons" data-toggle="has_guests">
+              <button type="button" class="fmsc-toggle-btn" data-value="yes" aria-pressed="false">Yes</button>
+              <button type="button" class="fmsc-toggle-btn" data-value="no" aria-pressed="false">No</button>
+            </div>
+            <input type="hidden" name="has_guests" id="has_guests">
+          </div>
+
+          <div class="fmsc-conditional" data-reveal-for="has_guests" data-reveal-when="yes">
+            <div class="fmsc-form-divider"></div>
+
+            <div class="fmsc-field fmsc-field--full">
+              <label for="guest_count">How many guests are you bringing?</label>
+              <select id="guest_count" name="guest_count">
+                <option value="1">1 Guest</option>
+                <option value="2">2 Guests</option>
+                <option value="3">3 Guests</option>
+                <option value="4">4 Guests</option>
+                <option value="5">5 Guests</option>
+              </select>
+              <span class="fmsc-field__hint">Note: your guest count + you cannot exceed total remaining spots.</span>
+            </div>
+
+            <div class="fmsc-guest-list" id="fmsc-guest-list"><!-- guest cards injected here --></div>
+
+            <button type="button" class="fmsc-add-guest-btn" id="fmsc-add-guest">+ Add Another Guest</button>
+          </div>
+
+          <div class="fmsc-form-actions">
+            <button type="button" class="fmsc-btn fmsc-btn--secondary" data-action="prev">← Previous</button>
+            <button type="button" class="fmsc-btn fmsc-btn--primary" data-action="next">Next: Review →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="fmsc-form-step" data-step="3">
+          <h3>Review Your RSVP</h3>
+          <p class="fmsc-form-step__sub">Please confirm everything looks right before submitting.</p>
+
+          <div class="fmsc-summary" id="fmsc-summary">
+            <!-- Injected by JS -->
+          </div>
+
+          <input type="hidden" name="event_name" value="FMSC Food Packing Event 06/03/2026">
+
+          <div class="fmsc-form-actions">
+            <button type="button" class="fmsc-btn fmsc-btn--secondary" data-action="prev">← Previous</button>
+            <button type="submit" class="fmsc-btn fmsc-btn--submit">Complete Registration</button>
+          </div>
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="fmsc-success" id="fmsc-success">
+          <div class="fmsc-success__icon">
+            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <h3>Your spot is reserved.</h3>
+          <p>Thank you for RSVPing! A confirmation email is on its way with event details and what to expect on June 3.</p>
+          <button type="button" class="fmsc-btn fmsc-btn--primary" data-close-modal style="margin-top:24px;">Done</button>
+        </div>
+
+      </div>
+    </form>
+    </div><!-- /#fmsc-form-slot-inline -->
+  </div>
+</section>
+
+<!-- =====================================================================
+     MODAL (empty shell — form teleports in/out via JS)
+     ===================================================================== -->
+<div class="fmsc-modal" id="fmsc-modal" role="dialog" aria-modal="true" aria-labelledby="fmsc-modal-heading" aria-hidden="true">
+  <div class="fmsc-modal__backdrop" data-close-modal></div>
+  <div class="fmsc-modal__container">
+    <button type="button" class="fmsc-modal__close" data-close-modal aria-label="Close RSVP form">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="fmsc-modal__body" id="fmsc-form-slot-modal">
+      <h2 id="fmsc-modal-heading" style="position:absolute;left:-9999px;">RSVP for FMSC Food Packing Event</h2>
+      <!-- Form gets teleported into here when modal opens -->
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     CTA / DONATE
+     ===================================================================== -->
+<section class="fmsc-cta">
+  <div class="fmsc-container fmsc-cta__inner">
+    <div class="fmsc-cta__content">
+      <span class="fmsc-cta__eyebrow">Can't attend? You can still help.</span>
+      <!-- JetEngine: donation_title (text) -->
+      <h2>Donate to FMSC. Your gift <em>changes lives</em>.</h2>
+      <!-- JetEngine: donation_description (wysiwyg) -->
+      <p>We know hunger is fixable — one meal at a time. And when each meal costs just 29 cents, each of us can make a big impact. How many meals will you provide?</p>
+
+      <ul class="fmsc-cta__tiers">
+        <li><span class="amount">$106</span><span class="desc">Feeds a child for a year</span></li>
+        <li><span class="amount">$424</span><span class="desc">Feeds a family for a year</span></li>
+        <li><span class="amount">$2,255</span><span class="desc">Feeds a classroom of 21 for a year</span></li>
+        <li><span class="amount">$12,000</span><span class="desc">Feeds a village for a year</span></li>
+      </ul>
+
+      <!-- JetEngine: donation_button_url (text) · donation_button_text (text) -->
+      <a class="fmsc-cta__btn" target="_blank" rel="noopener"
+         href="https://give.fmsc.org/campaign/651668/donate?c_src=vrs_email&c_src2=Reservation_Created_Confirm_To_Leader&utm_campaign=Reservation_Created_Confirm_To_Leader&utm_medium=vrs_email&utm_source=email">
+        Donate to FMSC Today
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <!-- JetEngine: donation_image (media) -->
+    <div class="fmsc-cta__image">
+      <img src="https://strategicincomegroup.com/wp-content/uploads/FMSC-106-Feeds-a-child-for-one-year-Rounded-1.png" alt="$106 feeds a child for one year">
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     FLOATING RSVP BUTTON (always in view)
+     ===================================================================== -->
+<button type="button" class="fmsc-float-btn" data-open-modal aria-label="Open RSVP form">
+  <span>RSVP Today</span>
+  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+</button>
+
+</div><!-- /.fmsc-page -->
+
+<script>
+/* =========================================================================
+   FMSC RSVP FORM LOGIC
+   - Multi-step navigation
+   - Yes/No toggles w/ conditional reveal
+   - Dynamic guest repeater
+   - T-shirt name auto-fill from first + last
+   - Summary generation on step 3
+   - JetEngine hook: #fmsc-spots-widget[data-spots-filled]
+     When server-rendered value hits total, body.fmsc-event-full toggles form off.
+   ========================================================================= */
+(function () {
+  const form = document.getElementById('fmsc-rsvp-form');
+  if (!form) return;
+
+  // ----- SPOTS COUNTER (JetEngine injection point) -----------------------
+  // Replace data-spots-filled with JetEngine dynamic value in Bricks, e.g.:
+  //   data-spots-filled="{jet_engine_field field=\"spots_filled\"}"
+  const spotsWidget = document.getElementById('fmsc-spots-widget');
+  const spotsNumEl  = document.getElementById('fmsc-spots-num');
+  const spotsFill   = document.getElementById('fmsc-spots-fill');
+
+  const TOTAL_SPOTS = parseInt(spotsWidget.dataset.totalSpots, 10) || 25;
+  const FILLED      = parseInt(spotsWidget.dataset.spotsFilled, 10) || 0;
+  const REMAINING   = Math.max(0, TOTAL_SPOTS - FILLED);
+
+  spotsNumEl.textContent = REMAINING;
+  const pctFilled = (FILLED / TOTAL_SPOTS) * 100;
+  spotsFill.style.width = pctFilled + '%';
+  if (REMAINING <= 5 && REMAINING > 0) spotsNumEl.classList.add('low');
+  if (REMAINING <= 0) {
+    document.querySelector('.fmsc-page')?.classList.add('fmsc-event-full');
+    document.body.classList.add('fmsc-event-full'); // belt + suspenders
+  }
+
+  // Cap guest_count select based on remaining spots (attendee is 1 seat)
+  const guestCountSelect = document.getElementById('guest_count');
+  if (guestCountSelect) {
+    const maxGuests = Math.max(0, REMAINING - 1);
+    [...guestCountSelect.options].forEach(opt => {
+      if (parseInt(opt.value, 10) > maxGuests) opt.disabled = true;
+    });
+  }
+
+  // ----- MULTI-STEP NAVIGATION ------------------------------------------
+  let currentStep = 1;
+  const steps = form.querySelectorAll('.fmsc-form-step');
+  const progressSteps = form.querySelectorAll('.fmsc-progress__step');
+
+  function goToStep(n) {
+    steps.forEach(s => s.classList.toggle('active', +s.dataset.step === n));
+    progressSteps.forEach(p => {
+      const step = +p.dataset.step;
+      p.dataset.active = (step === n) ? 'true' : 'false';
+      p.dataset.complete = (step < n) ? 'true' : 'false';
+    });
+    currentStep = n;
+    if (n === 3) buildSummary();
+    // Scroll appropriately depending on whether form is in modal or inline.
+    // If form is currently a descendant of the modal, scroll the modal body;
+    // otherwise scroll the page to the form.
+    const modalBody = document.getElementById('fmsc-form-slot-modal');
+    if (modalBody && modalBody.contains(form)) {
+      modalBody.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  form.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    if (action === 'next') {
+      if (validateStep(currentStep)) goToStep(currentStep + 1);
+    } else if (action === 'prev') {
+      goToStep(currentStep - 1);
+    }
+  });
+
+  // ----- YES/NO TOGGLES --------------------------------------------------
+  form.addEventListener('click', (e) => {
+    const btn = e.target.closest('.fmsc-toggle-btn');
+    if (!btn) return;
+    const group = btn.closest('.fmsc-toggle-buttons');
+    const name = group.dataset.toggle;
+    const value = btn.dataset.value;
+
+    group.querySelectorAll('.fmsc-toggle-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+
+    const hidden = form.querySelector(`#${name}`);
+    if (hidden) hidden.value = value;
+
+    // reveal conditional blocks tied to this toggle
+    form.querySelectorAll(`[data-reveal-for="${name}"]`).forEach(panel => {
+      panel.classList.toggle('show', panel.dataset.revealWhen === value);
+    });
+
+    // sync guest cards if toggle affects count
+    if (name === 'has_guests') syncGuestCards();
+  });
+
+  // ----- T-SHIRT NAME AUTO-FILL -----------------------------------------
+  function updateAttendeeFullName() {
+    const first = form.querySelector('#attendee_first').value.trim();
+    const last  = form.querySelector('#attendee_last').value.trim();
+    const full  = `${first} ${last}`.trim();
+    const tshirtNameField = form.querySelector('#attendee_tshirt_name');
+    if (tshirtNameField && !tshirtNameField.dataset.userEdited) {
+      tshirtNameField.value = full;
+    }
+  }
+  form.querySelector('#attendee_first').addEventListener('input', updateAttendeeFullName);
+  form.querySelector('#attendee_last').addEventListener('input', updateAttendeeFullName);
+  form.querySelector('#attendee_tshirt_name').addEventListener('input', (e) => {
+    e.target.dataset.userEdited = 'true';
+  });
+
+  // ----- PHONE MASK ------------------------------------------------------
+  const phoneInput = form.querySelector('#attendee_phone');
+  phoneInput.addEventListener('input', (e) => {
+    let d = e.target.value.replace(/\D/g, '').slice(0, 10);
+    if (d.length > 6)      e.target.value = `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+    else if (d.length > 3) e.target.value = `(${d.slice(0,3)}) ${d.slice(3)}`;
+    else if (d.length > 0) e.target.value = `(${d}`;
+    else                   e.target.value = '';
+  });
+
+  // ----- GUEST REPEATER --------------------------------------------------
+  const guestList = document.getElementById('fmsc-guest-list');
+  const addGuestBtn = document.getElementById('fmsc-add-guest');
+
+  function guestCardHTML(idx) {
+    return `
+      <div class="fmsc-guest-card" data-guest-index="${idx}">
+        <div class="fmsc-guest-card__header">
+          <span class="fmsc-guest-card__title">Guest ${idx + 1}</span>
+          <button type="button" class="fmsc-guest-card__remove" data-remove-guest="${idx}">Remove Guest</button>
+        </div>
+        <div class="fmsc-field-grid">
+          <div class="fmsc-field">
+            <label>First Name <span class="req">*</span></label>
+            <input type="text" name="guest_first_${idx}" data-guest-first="${idx}" required>
+          </div>
+          <div class="fmsc-field">
+            <label>Last Name <span class="req">*</span></label>
+            <input type="text" name="guest_last_${idx}" data-guest-last="${idx}" required>
+          </div>
+          <div class="fmsc-field">
+            <label>Age <span class="req">*</span></label>
+            <input type="number" name="guest_age_${idx}" min="0" max="120" required>
+          </div>
+          <div class="fmsc-field">
+            <label>&nbsp;</label>
+            <p class="fmsc-guest-card__notice">Guests under 5 must be accompanied by an adult.</p>
+          </div>
+        </div>
+
+        <div class="fmsc-form-divider"></div>
+
+        <div class="fmsc-toggle-group">
+          <span class="fmsc-toggle-label">Does your guest need a t-shirt?</span>
+          <div class="fmsc-toggle-buttons" data-toggle="guest_tshirt_${idx}">
+            <button type="button" class="fmsc-toggle-btn" data-value="yes" aria-pressed="false">Yes</button>
+            <button type="button" class="fmsc-toggle-btn" data-value="no" aria-pressed="false">No</button>
+          </div>
+          <input type="hidden" name="guest_tshirt_${idx}" id="guest_tshirt_${idx}">
+
+          <div class="fmsc-conditional" data-reveal-for="guest_tshirt_${idx}" data-reveal-when="yes">
+            <div class="fmsc-subsection">
+              <h4>Guest T-Shirt Details</h4>
+              <div class="fmsc-field-grid">
+                <div class="fmsc-field">
+                  <label>Recipient Name</label>
+                  <input type="text" name="guest_tshirt_name_${idx}" data-guest-tshirt-name="${idx}">
+                </div>
+                <div class="fmsc-field">
+                  <label>Size <span class="req">*</span></label>
+                  <select name="guest_tshirt_size_${idx}">
+                    <option value="">Select size…</option>
+                    <option>XS</option><option>Small</option><option>Medium</option>
+                    <option>Large</option><option>XL</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function syncGuestCards() {
+    const hasGuests = form.querySelector('#has_guests').value === 'yes';
+    if (!hasGuests) { guestList.innerHTML = ''; return; }
+    const count = parseInt(guestCountSelect.value, 10) || 1;
+    const existing = guestList.querySelectorAll('.fmsc-guest-card').length;
+    if (existing < count) {
+      for (let i = existing; i < count; i++) {
+        guestList.insertAdjacentHTML('beforeend', guestCardHTML(i));
+      }
+    } else if (existing > count) {
+      const cards = guestList.querySelectorAll('.fmsc-guest-card');
+      for (let i = count; i < existing; i++) cards[i].remove();
+    }
+    reindexGuestCards();
+    wireGuestNameAutoFill();
+  }
+
+  function reindexGuestCards() {
+    guestList.querySelectorAll('.fmsc-guest-card').forEach((card, i) => {
+      card.dataset.guestIndex = i;
+      card.querySelector('.fmsc-guest-card__title').textContent = `Guest ${i + 1}`;
+    });
+  }
+
+  function wireGuestNameAutoFill() {
+    guestList.querySelectorAll('.fmsc-guest-card').forEach(card => {
+      const idx = card.dataset.guestIndex;
+      const first = card.querySelector(`[data-guest-first="${idx}"]`);
+      const last  = card.querySelector(`[data-guest-last="${idx}"]`);
+      const nameField = card.querySelector(`[data-guest-tshirt-name="${idx}"]`);
+      if (!first || !last || !nameField) return;
+      const sync = () => {
+        if (!nameField.dataset.userEdited) {
+          nameField.value = `${first.value.trim()} ${last.value.trim()}`.trim();
+        }
+      };
+      first.addEventListener('input', sync);
+      last.addEventListener('input', sync);
+      nameField.addEventListener('input', () => { nameField.dataset.userEdited = 'true'; });
+    });
+  }
+
+  guestCountSelect.addEventListener('change', syncGuestCards);
+
+  addGuestBtn.addEventListener('click', () => {
+    const currentCount = parseInt(guestCountSelect.value, 10);
+    const maxAllowed = Math.max(0, REMAINING - 1);
+    if (currentCount < 5 && currentCount < maxAllowed) {
+      guestCountSelect.value = currentCount + 1;
+      syncGuestCards();
+    }
+  });
+
+  guestList.addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('[data-remove-guest]');
+    if (!removeBtn) return;
+    removeBtn.closest('.fmsc-guest-card').remove();
+    const newCount = guestList.querySelectorAll('.fmsc-guest-card').length;
+    guestCountSelect.value = newCount > 0 ? newCount : 1;
+    if (newCount === 0) {
+      // user removed all guests; flip back to "No"
+      const noBtn = form.querySelector('.fmsc-toggle-buttons[data-toggle="has_guests"] [data-value="no"]');
+      if (noBtn) noBtn.click();
+    } else {
+      reindexGuestCards();
+    }
+  });
+
+  // ----- VALIDATION ------------------------------------------------------
+  function validateStep(step) {
+    let valid = true;
+    const stepEl = form.querySelector(`.fmsc-form-step[data-step="${step}"]`);
+
+    // required fields visible in this step
+    stepEl.querySelectorAll('input[required], select[required]').forEach(input => {
+      // skip inputs inside hidden conditional panels
+      const conditional = input.closest('.fmsc-conditional');
+      if (conditional && !conditional.classList.contains('show')) return;
+
+      const field = input.closest('.fmsc-field');
+      const ok = input.checkValidity() && input.value.trim() !== '';
+      if (!ok) {
+        valid = false;
+        input.classList.add('error');
+        field && field.classList.add('has-error');
+      } else {
+        input.classList.remove('error');
+        field && field.classList.remove('has-error');
+      }
+    });
+
+    // Step 1: if t-shirt = yes, size is required
+    if (step === 1 && form.querySelector('#attendee_tshirt').value === 'yes') {
+      const size = form.querySelector('#attendee_tshirt_size');
+      if (!size.value) { valid = false; size.classList.add('error'); }
+      else size.classList.remove('error');
+    }
+
+    // Step 2: if has_guests = yes, each guest must have required fields + size if tshirt yes
+    if (step === 2 && form.querySelector('#has_guests').value === 'yes') {
+      guestList.querySelectorAll('.fmsc-guest-card').forEach(card => {
+        card.querySelectorAll('input[required], select[required]').forEach(input => {
+          const field = input.closest('.fmsc-field');
+          if (!input.value.trim()) {
+            valid = false;
+            input.classList.add('error');
+            field && field.classList.add('has-error');
+          } else {
+            input.classList.remove('error');
+            field && field.classList.remove('has-error');
+          }
+        });
+        const idx = card.dataset.guestIndex;
+        const tshirtValue = form.querySelector(`#guest_tshirt_${idx}`);
+        if (tshirtValue && tshirtValue.value === 'yes') {
+          const size = card.querySelector(`[name="guest_tshirt_size_${idx}"]`);
+          if (size && !size.value) { valid = false; size.classList.add('error'); }
+          else if (size) size.classList.remove('error');
+        }
+      });
+    }
+
+    return valid;
+  }
+
+  // ----- SUMMARY ---------------------------------------------------------
+  function esc(s) { return String(s || '').replace(/[<>&"]/g, c => ({ '<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;' }[c])); }
+
+  function buildSummary() {
+    const container = document.getElementById('fmsc-summary');
+    const fd = new FormData(form);
+
+    const tshirtWanted = form.querySelector('#attendee_tshirt').value === 'yes';
+    const hasGuests    = form.querySelector('#has_guests').value === 'yes';
+    const guestCards   = guestList.querySelectorAll('.fmsc-guest-card');
+
+    let html = '';
+
+    // Attendee block
+    html += `
+      <div class="fmsc-summary__block">
+        <h4>
+          Attendee Information
+          <button type="button" class="fmsc-summary__edit" data-edit-step="1">Edit</button>
+        </h4>
+        <div class="fmsc-summary__grid">
+          <div class="fmsc-summary__item"><span>First Name</span><strong>${esc(fd.get('attendee_first_name'))}</strong></div>
+          <div class="fmsc-summary__item"><span>Last Name</span><strong>${esc(fd.get('attendee_last_name'))}</strong></div>
+          <div class="fmsc-summary__item"><span>Email</span><strong>${esc(fd.get('attendee_email'))}</strong></div>
+          <div class="fmsc-summary__item"><span>Phone</span><strong>${esc(fd.get('attendee_phone'))}</strong></div>
+          <div class="fmsc-summary__item"><span>Event</span><strong>FMSC Food Packing Event 06/03/2026</strong></div>
+          <div class="fmsc-summary__item"><span>T-Shirt Needed</span><strong>${tshirtWanted ? 'Yes' : 'No'}</strong></div>
+          ${tshirtWanted ? `
+            <div class="fmsc-summary__item"><span>T-Shirt Recipient</span><strong>${esc(fd.get('attendee_tshirt_name'))}</strong></div>
+            <div class="fmsc-summary__item"><span>T-Shirt Size</span><strong>${esc(fd.get('attendee_tshirt_size'))}</strong></div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+
+    // Guest block
+    html += `
+      <div class="fmsc-summary__block">
+        <h4>
+          Guest Information
+          <button type="button" class="fmsc-summary__edit" data-edit-step="2">Edit</button>
+        </h4>
+        <div class="fmsc-summary__grid">
+          <div class="fmsc-summary__item"><span>Bringing Guests?</span><strong>${hasGuests ? 'Yes' : 'No'}</strong></div>
+          ${hasGuests ? `<div class="fmsc-summary__item"><span>Number of Guests</span><strong>${guestCards.length}</strong></div>` : ''}
+          ${hasGuests ? `<div class="fmsc-summary__item"><span>Attendee + Guests</span><strong>${1 + guestCards.length}</strong></div>` : ''}
+        </div>
+    `;
+
+    if (hasGuests && guestCards.length) {
+      guestCards.forEach((card, i) => {
+        const idx = card.dataset.guestIndex;
+        const tshirt = form.querySelector(`#guest_tshirt_${idx}`).value === 'yes';
+        html += `
+          <div class="fmsc-summary__guest">
+            <div class="fmsc-summary__guest-title">Guest ${i + 1}</div>
+            <div class="fmsc-summary__grid">
+              <div class="fmsc-summary__item"><span>First Name</span><strong>${esc(fd.get(`guest_first_${idx}`))}</strong></div>
+              <div class="fmsc-summary__item"><span>Last Name</span><strong>${esc(fd.get(`guest_last_${idx}`))}</strong></div>
+              <div class="fmsc-summary__item"><span>Age</span><strong>${esc(fd.get(`guest_age_${idx}`))}</strong></div>
+              <div class="fmsc-summary__item"><span>T-Shirt Needed</span><strong>${tshirt ? 'Yes' : 'No'}</strong></div>
+              ${tshirt ? `
+                <div class="fmsc-summary__item"><span>T-Shirt Recipient</span><strong>${esc(fd.get(`guest_tshirt_name_${idx}`))}</strong></div>
+                <div class="fmsc-summary__item"><span>T-Shirt Size</span><strong>${esc(fd.get(`guest_tshirt_size_${idx}`))}</strong></div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
+
+    // Edit buttons
+    container.querySelectorAll('[data-edit-step]').forEach(btn => {
+      btn.addEventListener('click', () => goToStep(parseInt(btn.dataset.editStep, 10)));
+    });
+  }
+
+  // ----- SUBMIT ----------------------------------------------------------
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validateStep(3)) return;
+
+    const submitBtn = form.querySelector('.fmsc-btn--submit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    // TODO: Wire this to Fluent CRM Pro endpoint / custom REST endpoint
+    // Example payload:
+    const payload = Object.fromEntries(new FormData(form));
+    payload.guests = [];
+    guestList.querySelectorAll('.fmsc-guest-card').forEach(card => {
+      const idx = card.dataset.guestIndex;
+      payload.guests.push({
+        first: form.elements[`guest_first_${idx}`]?.value,
+        last:  form.elements[`guest_last_${idx}`]?.value,
+        age:   form.elements[`guest_age_${idx}`]?.value,
+        tshirt: form.querySelector(`#guest_tshirt_${idx}`).value,
+        tshirt_name: form.elements[`guest_tshirt_name_${idx}`]?.value,
+        tshirt_size: form.elements[`guest_tshirt_size_${idx}`]?.value
+      });
+    });
+
+    // Replace this block with your Fluent CRM Pro / JetEngine REST call.
+    console.log('FMSC RSVP payload →', payload);
+    await new Promise(r => setTimeout(r, 800));
+
+    // Show success
+    form.querySelector('.fmsc-form-step[data-step="3"]').classList.remove('active');
+    document.getElementById('fmsc-success').classList.add('show');
+    form.querySelector('.fmsc-progress').style.display = 'none';
+    submitBtn.remove();
+  });
+
+  // ----- MODAL OPEN / CLOSE (with form teleportation) --------------------
+  // The form lives inline by default. When modal opens, we move the form
+  // element into the modal body. When modal closes, we move it back. This
+  // preserves form values, event listeners, and state across locations.
+  const modal            = document.getElementById('fmsc-modal');
+  const inlineSlot       = document.getElementById('fmsc-form-slot-inline');
+  const modalSlot        = document.getElementById('fmsc-form-slot-modal');
+  let lastFocusedEl      = null;
+
+  function openModal() {
+    if (document.querySelector('.fmsc-page.fmsc-event-full, body.fmsc-event-full')) return;
+    lastFocusedEl = document.activeElement;
+
+    // Teleport form → modal
+    modalSlot.appendChild(form);
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('fmsc-modal-open');
+
+    setTimeout(() => {
+      const firstInput = modal.querySelector('input:not([type="hidden"]), select, button:not(.fmsc-modal__close)');
+      if (firstInput) firstInput.focus();
+    }, 320);
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('fmsc-modal-open');
+
+    // Teleport form → back inline
+    inlineSlot.appendChild(form);
+
+    if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') lastFocusedEl.focus();
+  }
+
+  // Open triggers (floating button + any inline triggers)
+  document.querySelectorAll('[data-open-modal]').forEach(btn => {
+    btn.addEventListener('click', openModal);
+  });
+
+  // Close triggers — use event delegation on document since the Done button
+  // inside success state is part of the teleported form and needs to work
+  // in either location.
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-close-modal]')) closeModal();
+  });
+
+  // ESC to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+
+})();
+</script>
+
+</body>
+</html>

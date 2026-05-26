@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Michael J. Gauthier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --font-display: 'DM Serif Display', serif;
+      --font-body: 'Roboto', sans-serif;
+      --background: #0f0f0f;
+      --surface: #161616;
+      --surface-alt: #1f1f1f;
+      --text: #f7f5f2;
+      --text-muted: #bfb6a7;
+      --gold: #C9A46E;
+      --gold-light: #9E6F2E;
+      --border: rgba(255,255,255,0.08);
+      --nav-background: #0f0f0f;
+      --nav-link-color: rgba(255,255,255,0.7);
+      --nav-text: #f7f5f2;
+      --btn-bg-light: #f7f5f2;
+      --btn-text-light: #0f0f0f;
+      --bg-dark: #0f0f0f;
+      --bg-dark-alt: #161616;
+      --bg-light: #F7F5F2;
+      --text-light: #f7f5f2;
+      --text-dark: #111111;
+      --border-light: rgba(255,255,255,0.08);
+      --border-dark: rgba(17,17,17,0.1);
+      --control-bg: rgba(255,255,255,0.08);
+      --control-border: rgba(255,255,255,0.18);
+      --control-hover: rgba(255,255,255,0.12);
+      --control-text: #f7f5f2;
+    }
+
+    [data-theme='light'] {
+      --background: #F7F5F2;
+      --surface: #ffffff;
+      --surface-alt: #f3efe7;
+      --text: #111111;
+      --text-muted: #6b6860;
+      --border: rgba(17,17,17,0.08);
+      --nav-background: #ffffff;
+      --nav-link-color: #111111;
+      --nav-text: #111111;
+      --btn-bg-light: #111111;
+      --btn-text-light: #ffffff;
+      --bg-dark: #111111;
+      --bg-dark-alt: #f5f4f0;
+      --bg-light: #ffffff;
+      --text-light: #ffffff;
+      --text-dark: #111111;
+      --border-light: rgba(17,17,17,0.08);
+      --border-dark: rgba(255,255,255,0.1);
+      --control-bg: rgba(17,17,17,0.06);
+      --control-border: rgba(17,17,17,0.16);
+      --control-hover: rgba(17,17,17,0.1);
+      --control-text: #111111;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      width: 100%;
+      background: var(--nav-background);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1160px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 60px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    .nav-logo img { height: 34px; display: block; }
+    .nav-logo-text {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--nav-text);
+      letter-spacing: -0.02em;
+    }
+    .nav-logo-text .gold {
+      color: var(--gold);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      color: var(--nav-text);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover,
+    .nav-links .active { color: var(--text); }
+    .nav-link-plain {
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: var(--nav-text);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .nav-link-plain:hover { color: var(--text); }
+    .nav-links .btn-dark {
+      background: var(--btn-bg-light);
+      color: var(--btn-text-light);
+      border-radius: 999px;
+      padding: 0.75rem 1.15rem;
+      font-size: 0.875rem;
+      border: 1px solid transparent;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-links .btn-dark:hover { opacity: 0.95; }
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      background: var(--control-bg);
+      border: 1px solid var(--control-border);
+      color: var(--control-text);
+      border-radius: 14px;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, border-color 0.2s;
+    }
+    .mobile-menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      background: var(--control-bg);
+      border: 1px solid var(--control-border);
+      color: var(--control-text);
+      border-radius: 14px;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, border-color 0.2s;
+    }
+    .theme-toggle:hover,
+    .mobile-menu-toggle:hover { background: var(--control-hover); transform: translateY(-1px); }
+    /* ── NOTIFICATION ── */
+    .notification-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
+    }
+    .notification {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      max-width: 420px;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+    [data-theme="dark"] .notification {
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .notification.success {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(201,164,110,0.05) 100%);
+    }
+    .notification-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(201,164,110,0.12);
+      color: var(--gold);
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .notification-content {
+      flex: 1;
+    }
+    .notification-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .notification-description {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .notification-close {
+      flex-shrink: 0;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .notification-close:hover {
+      color: var(--text);
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+    .notification.removing {
+      animation: slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @media (max-width: 640px) {
+      .notification-container {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+      }
+      .notification {
+        max-width: none;
+      }
+    }
+
+    .page-hero {
+      background: var(--surface);
+      color: var(--text);
+      padding: 4rem 2rem 3rem;
+    }
+    .page-hero .page-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2rem;
+      align-items: center;
+    }
+    .hero-flag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem 1rem;
+      border-radius: 999px;
+      background: rgba(201,164,110,0.12);
+      color: var(--gold-dark);
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+      font-weight: 700;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 4vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.25rem;
+    }
+    .hero-title em { font-style: italic; color: var(--gold-dark); }
+    .hero-copy {
+      max-width: 560px;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 2.25rem;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0.95rem 1.5rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s, color 0.2s;
+      border: 1px solid transparent;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-dark { background: var(--bg-dark); color: var(--text-light); }
+    .btn-dark:hover { background: #1d1d1d; }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-gold {
+      background: var(--gold);
+      color: var(--btn-text-light);
+      border-color: var(--gold);
+    }
+    .btn-gold:hover { background: var(--gold-light); border-color: var(--gold-light); }
+
+    .contact-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 2rem;
+      box-shadow: 0 25px 70px rgba(17,17,17,0.08);
+    }
+    .contact-panel h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 1rem 1.1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: var(--font-body);
+    }
+    input:focus,
+    textarea:focus { outline: none; border-color: var(--gold-dark); box-shadow: 0 0 0 4px rgba(201,164,110,0.12); }
+    textarea { min-height: 170px; resize: vertical; }
+    .field-row input:last-child { margin-top: 0; }
+    .form-group { margin-bottom: 1rem; }
+    .checkbox-row {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      margin: 1rem 0 1.25rem;
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      margin-top: 0.15rem;
+    }
+    .checkbox-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .recaptcha {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem;
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .recaptcha strong { display: block; margin-bottom: 0.4rem; }
+    .contact-panel button { width: 100%; }
+    .form-note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      max-width: 36rem;
+    }
+
+    .section-dark {
+      background: var(--surface-alt);
+      padding: 4rem 2rem 5rem;
+    }
+    .section-dark .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      gap: 2.5rem;
+    }
+    .section-header small {
+      display: block;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 4vw, 4.4rem);
+      line-height: 1.02;
+      margin-bottom: 1rem;
+    }
+    .section-header em { font-style: italic; color: var(--gold-dark); }
+    .section-header p { max-width: 700px; color: var(--text-muted); font-size: 1rem; }
+    .benefits-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      padding: 2rem;
+      display: grid;
+      gap: 1.5rem;
+    }
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .benefit {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .benefit-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(201,164,110,0.14);
+      color: var(--gold-dark);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .benefit h4 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .benefit p {
+      margin: 0.35rem 0 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .disclaimer {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      background: rgba(201,164,110,0.05);
+    }
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 3rem 1.5rem 2rem;
+    }
+    .footer-container {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 2rem;
+    }
+    .footer-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .footer-section.logo-section {
+      grid-column: 1;
+    }
+    .footer-section h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .footer-logo {
+      width: 60px;
+      height: auto;
+      margin-bottom: 0.5rem;
+    }
+    .footer-description {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-width: 200px;
+    }
+    footer a { color: var(--text-muted); }
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .footer-links li {
+      margin: 0;
+    }
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-divider {
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+    }
+    .sub-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+    .sub-footer-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .sub-footer-domain {
+      margin-right: 0.25rem;
+    }
+    .gold-j {
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .social-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .social-icon:hover {
+      color: var(--gold);
+    }
+    .social-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: currentColor;
+    }
+    @media (max-width: 900px) {
+      .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+      .footer-section.logo-section {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (max-width: 640px) {
+      footer {
+        padding: 2rem 1rem 1.5rem;
+      }
+      .footer-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .sub-footer {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-section.logo-section {
+        grid-column: 1;
+      }
+    }
+    @media (max-width: 980px) {
+      .page-hero .page-inner,
+      .section-dark .container { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      nav { padding: 1rem; }
+      .page-hero { padding: 2.5rem 1rem 2rem; }
+      .section-dark { padding: 2.5rem 1rem 3rem; }
+      .mobile-menu-toggle { display: inline-flex; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px; left: 0; right: 0;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem 1.75rem;
+        background: var(--nav-background);
+        border-bottom: 1px solid var(--border);
+        z-index: 99;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links li { width: 100%; }
+      .nav-links a, .nav-link-plain, .btn-dark { width: 100%; }
+      .btn-dark { text-align: center; }
+      .hero-title { font-size: 2.8rem; }
+      .contact-panel { padding: 1.5rem; }
+      .benefits-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .modal-header {
+      margin-bottom: 2rem;
+    }
+    .modal-header h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .modal-header h2 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .modal-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .modal-close:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .modal-form .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .modal-form label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.05em;
+    }
+    .modal-form input,
+    .modal-form textarea,
+    .modal-form select {
+      padding: 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      background: var(--background);
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    .modal-form input:focus,
+    .modal-form textarea:focus,
+    .modal-form select:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 164, 110, 0.1);
+    }
+    .modal-form textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .modal-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .modal-agreement {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1rem;
+      background: var(--surface-alt);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+    .modal-agreement input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+    .modal-form .btn {
+      padding: 0.95rem;
+      border-radius: 10px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-form .btn-gold {
+      background: var(--gold);
+      color: #fff;
+    }
+    .modal-form .btn-gold:hover {
+      background: var(--gold-hover);
+    }
+    .hidden-field {
+      display: none;
+    }
+    .hidden-field.show {
+      display: flex;
+    }
+  /* Audio modal + player */
+  :root { --ap-bg: #191815; --ap-gold: #c9a46e; --ap-gold-dark: #a8833f; --ap-muted: #a5a296; --ap-radius: 60px; --ap-font: 'Geist', system-ui, sans-serif; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .audio-modal-card { background: linear-gradient(180deg, rgba(30,24,19,0.97), rgba(10,8,6,0.99)); border-radius: 32px; padding: 2rem; max-width: 520px; width: 92%; position: relative; }
+  .modal-close-audio { position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .modal-close-audio:hover { background: rgba(255,255,255,0.14); color: #fff; }
+  .ap-wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 16px; font-family: var(--ap-font); -webkit-font-smoothing: antialiased; }
+  .ap-meta { text-align: center; } .ap-meta-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ap-gold); margin-bottom: 6px; }
+  .ap-meta-title { font-size: 18px; font-weight: 500; color: #f1eee3; line-height: 1.3; margin-bottom: 4px; } .ap-meta-sub { font-size: 13px; color: var(--ap-muted); font-weight: 300; }
+  .ap-progress-wrap { width: 100%; max-width: 520px; display: flex; align-items: center; gap: 10px; }
+  .ap-time { font-size: 11px; font-weight: 500; color: var(--ap-muted); min-width: 34px; } .ap-time.right { text-align: right; }
+  .ap-track { flex: 1; height: 3px; background: #e0ddd6; border-radius: 10px; cursor: pointer; -webkit-appearance: none; appearance: none; }
+  .ap-track::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--ap-gold); cursor: pointer; margin-top: -5px; }
+  .ap-track::-webkit-slider-runnable-track { height: 3px; border-radius: 10px; background: linear-gradient(to right, var(--ap-gold) 0%, var(--ap-gold) var(--ap-pct, 0%), #e0ddd6 var(--ap-pct, 0%), #e0ddd6 100%); }
+  .ap-pill { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 520px; background: var(--ap-bg); border-radius: var(--ap-radius); padding: 10px 20px 10px 18px; box-shadow: 0 8px 32px rgba(0,0,0,.22); position: relative; }
+  .ap-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%; transition: transform .15s, opacity .15s; color: var(--ap-muted); flex-shrink: 0; }
+  .ap-btn:hover { opacity: .75; transform: scale(1.06); }
+  .ap-btn-play { width: 72px; height: 72px; border-radius: 50%; background: var(--ap-gold); flex-shrink: 0; margin: -16px 0; color: #fff; transition: background .15s; }
+  .ap-btn-play:hover { background: #d9b47e; opacity: 1; }
+  .ap-icon-play { display: block; } .ap-icon-pause { display: none; }
+  .ap-playing .ap-icon-play { display: none; } .ap-playing .ap-icon-pause { display: block; }
+  .ap-loop-badge { position: relative; } .ap-loop-count { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-54%); font-size: 9px; font-weight: 700; color: var(--ap-muted); pointer-events: none; }
+  .ap-btn.ap-active { color: var(--ap-gold); }
+  .ap-vol-wrap { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 520px; justify-content: flex-end; }
+  .ap-vol-icon { color: #a5a296; flex-shrink: 0; }
+  .ap-vol-slider { width: 90px; height: 3px; -webkit-appearance: none; appearance: none; background: #e0ddd6; border-radius: 10px; outline: none; cursor: pointer; }
+  .ap-vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--ap-gold); cursor: pointer; margin-top: -4px; }
+  .ap-vol-slider::-webkit-slider-runnable-track { height: 3px; border-radius: 10px; background: linear-gradient(to right, var(--ap-gold) 0%, var(--ap-gold) var(--ap-vol-pct, 80%), #e0ddd6 var(--ap-vol-pct, 80%), #e0ddd6 100%); }
+  .ap-audio { display: none; }
+  /* nav-link-plain for Listen button */
+  .nav-link-plain { background: none; border: none; padding: 0; font-family: var(--font-body); font-size: 0.875rem; color: var(--nav-text); cursor: pointer; transition: color 0.2s; }
+  .nav-link-plain:hover { color: var(--text); }
+  </style>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Lcb3bAsAAAAAHUSz6uACjVAu9pOftduxnJ6g-C4"></script>
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="https://blueprint.michaeljgauthier.com/" class="nav-logo">
+        <img id="nav-logo" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" alt="Michael J. Gauthier" data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+        <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
+      </a>
+      <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="Open menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/mission">Mission</a></li>
+        <li><button id="listen-nav" class="nav-link-plain" type="button">Listen</button></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/resources">Resources</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/#join" class="btn btn-dark">Join the Journey</a></li>
+        <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode"><svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <section class="page-hero">
+      <div class="page-inner">
+        <div class="hero-intro">
+          <div class="hero-flag">Get in Touch</div>
+          <h1 class="hero-title">Let’s Start a <em>Conversation</em></h1>
+          <p class="hero-copy">Whether you have a question about The Stewardship Blueprint, want to share your story, or are curious about working together — I’d love to hear from you. Every message is read personally.</p>
+          <div class="hero-actions">
+            <a href="https://blueprint.michaeljgauthier.com/#join" class="btn btn-dark">Join the Movement →</a>
+            <a href="https://blueprint.michaeljgauthier.com/resources" class="btn btn-outline">Browse Resources</a>
+          </div>
+        </div>
+        <aside class="contact-panel" id="contact-form">
+          <h2>Contact Michael</h2>
+          <form id="contactForm" onsubmit="handleFluentForm(event)">
+            <input type="hidden" name="form_type" value="contact" />
+            <input type="hidden" name="source" value="Website Contact" />
+            <input type="hidden" name="recaptcha_token" id="contactRecaptchaToken" value="" />
+            <input type="hidden" name="join_the_movement" value="no" />
+            <div class="field-row">
+              <div class="form-group">
+                <label for="first_name">First Name *</label>
+                <input id="first_name" name="first_name" type="text" required />
+              </div>
+              <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input id="last_name" name="last_name" type="text" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input id="email" name="email" type="email" required />
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone</label>
+                <input id="phone" name="phone" type="tel" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="notes">Questions or Comments *</label>
+              <textarea id="notes" name="notes" required></textarea>
+            </div>
+            <div class="checkbox-row">
+              <input id="consent" type="checkbox" required />
+              <label class="checkbox-label" for="consent">I consent to michaelgauthier.com storing my submitted information so they can respond to my inquiry *</label>
+            </div>
+            <div class="recaptcha">
+              <strong>reCAPTCHA</strong>
+              <span>This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply.</span>
+            </div>
+            <button type="submit" class="btn btn-gold">Contact Us</button>
+            <p class="form-note">Your information will only be used to respond to your inquiry. No spam, ever.</p>
+          </form>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section-dark">
+      <div class="container">
+        <div class="section-header">
+          <small>Send a Message</small>
+          <h2>How Can I <em>Help You?</em></h2>
+          <p>Fill out the form below and I’ll get back to you personally. No automated replies — just a real conversation.</p>
+        </div>
+        <div class="benefits-card">
+          <div class="benefits-grid">
+            <div class="benefit">
+              <div class="benefit-icon">✓</div>
+              <div>
+                <h4>Personal reply from Michael</h4>
+                <p>Every message receives a thoughtful, one-on-one response.</p>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">✓</div>
+              <div>
+                <h4>Responds within 1–2 business days</h4>
+                <p>Timely follow-up for every inquiry.</p>
+              </div>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">✓</div>
+              <div>
+                <h4>Your information stays private</h4>
+                <p>Message data is used only to respond to your request.</p>
+              </div>
+            </div>
+          </div>
+          <div class="disclaimer">Your information is used only to respond to your message. It will never be sold or shared with third parties. You can request removal at any time.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+      <!-- Logo & Description -->
+      <div class="footer-section logo-section">
+        <img id="footer-logo" class="footer-logo" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" alt="Michael J. Gauthier" data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+        <p class="footer-description">Welcome to my personal mission: Encouraging others to use their God given resources for God given purposes</p>
+      </div>
+
+      <!-- Explore Column -->
+      <div class="footer-section">
+        <h3>Explore</h3>
+        <ul class="footer-links">
+          <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+          <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+          <li><a href="https://blueprint.michaeljgauthier.com/resources">Resources</a></li>
+          <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Account Column -->
+      <div class="footer-section">
+        <h3>Account</h3>
+        <ul class="footer-links">
+          <li><a href="https://michaeljgauthier.com/login/">Login</a></li>
+          <li><a href="https://michaeljgauthier.com/register/">Register</a></li>
+          <li><a href="tel:+14804667070">Call Us</a></li>
+          <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Column -->
+      <div class="footer-section">
+        <h3>Contact</h3>
+        <ul class="footer-links">
+          <li><a href="tel:+14804667070">(480) 466-7070</a></li>
+          <li><a href="https://www.google.com/maps/dir//2330+W+Ray+Rd+Ste+%233,+Chandler,+AZ+85224/@33.3208879,-111.964255,45043m/data=!3m1!1e3!4m8!4m7!1m0!1m5!1m1!1s0x872b07386c66f17d:0x86e4537f11354256!2m2!1d-111.8818538!2d33.3209151" target="_blank">2330 W Ray Rd Ste #3,<br>Chandler, AZ 85224</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sub-footer -->
+    <div class="footer-divider">
+      <div class="sub-footer">
+        <div class="sub-footer-text">
+          <span id="dynamic-year" class="sub-footer-domain"></span>
+          <span class="sub-footer-domain"> © Michael<span class="gold-j">J.</span>Gauthier.com</span>
+          <span class="sub-footer-rights"> - All rights reserved.</span>
+        </div>
+        <div class="social-icons">
+          <a href="https://www.facebook.com/StrategicIncomeGroup" class="social-icon" aria-label="Facebook" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"></path></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/michaeljgauthier/" class="social-icon" aria-label="LinkedIn" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"></path><circle cx="4" cy="4" r="2"></circle></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Audio Modal -->
+  <div class="modal-overlay" id="audioModal">
+    <div class="audio-modal-card">
+      <button class="modal-close-audio" id="audio-modal-close">&#x2715;</button>
+      <div class="ap-wrap">
+        <div class="ap-meta"><p class="ap-meta-eyebrow">The Stewardship Blueprint</p><p class="ap-meta-title">Audiobook Preview</p><p class="ap-meta-sub">Michael J. Gauthier &middot; 2 hours</p></div>
+        <div class="ap-progress-wrap"><span class="ap-time left" id="ap-cur-modal">0:00</span><input class="ap-track" id="ap-seek-modal" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek" style="--ap-pct:0%" /><span class="ap-time right" id="ap-dur-modal">0:00</span></div>
+        <div class="ap-pill" id="ap-pill-modal">
+          <button class="ap-btn" id="ap-lib-modal" aria-label="Library"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="9" y="13" width="20" height="16" rx="4" stroke="currentColor" stroke-width="1.4"/><rect x="12" y="10" width="14" height="4" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M21.5 18.5v-3.5l-5 1v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="16.5" cy="23" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="21.5" cy="22" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg></button>
+          <button class="ap-btn" id="ap-rew-modal" aria-label="Rewind 10s"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M11.5 15.5A9.5 9.5 0 1 1 9 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 16l1.5-3.5L13 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-size="8" font-weight="600">10</text></svg></button>
+          <button class="ap-btn ap-btn-play" id="ap-play-modal" aria-label="Play"><svg class="ap-icon-play" width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M11 8.5l12 6.5-12 6.5V8.5z" fill="white"/></svg><svg class="ap-icon-pause" width="30" height="30" viewBox="0 0 30 30" fill="none"><rect x="9" y="8" width="4" height="14" rx="2" fill="white"/><rect x="17" y="8" width="4" height="14" rx="2" fill="white"/></svg></button>
+          <button class="ap-btn" id="ap-fwd-modal" aria-label="Forward 10s"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M26.5 15.5A9.5 9.5 0 1 0 29 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M30 16l-1.5-3.5L25 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="19" y="23.5" text-anchor="middle" fill="currentColor" font-size="8" font-weight="600">10</text></svg></button>
+          <button class="ap-btn ap-loop-badge" id="ap-loop-modal" aria-label="Loop"><svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M9 21a10 10 0 1 0 1-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M9 11.5L9 17.5H15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="ap-loop-count">1</span></button>
+        </div>
+        <div class="ap-vol-wrap">
+          <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/></svg>
+          <input class="ap-vol-slider" id="ap-vol-modal" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" style="--ap-vol-pct:80%" />
+          <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/><path d="M11 4.5c1.5 1 2 2 2 3.5s-.5 2.5-2 3.5"/><path d="M13 2c2 1.5 3 3 3 6s-1 4.5-3 6"/></svg>
+        </div>
+        <audio class="ap-audio" id="mjg-audio-modal" preload="metadata"><source src="https://michaeljgauthier.com/wp-content/uploads/2026/04/The-Stewardship-Blueprint-Chapters-1-and-2-Summary.wav" type="audio/wav" /></audio>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('dynamic-year').textContent = new Date().getFullYear();
+    const FLUENT_CRM_ENDPOINT = 'https://michaeljgauthier.com/?fluentcrm=1&route=contact&hash=59309c3d-3d3c-4995-8600-5619e6f1f2bd';
+    const RECIPIENT_EMAIL = 'mike@strategicincomegroup.com';
+    const RECAPTCHA_SITE_KEY = '6Lcb3bAsAAAAAHUSz6uACjVAu9pOftduxnJ6g-C4';
+
+    function executeRecaptcha(action) {
+      return new Promise((resolve) => {
+        if (!window.grecaptcha) return resolve('');
+        grecaptcha.ready(() => {
+          grecaptcha.execute(RECAPTCHA_SITE_KEY, { action }).then(resolve).catch(() => resolve(''));
+        });
+      });
+    }
+
+    const logoElement = document.getElementById('nav-logo');
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const mobileToggle = document.getElementById('mobile-menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+
+    function updateLogo(theme) {
+      if (!logoElement) return;
+      const lightLogo = logoElement.dataset.logoLight;
+      const darkLogo = logoElement.dataset.logoDark;
+      logoElement.src = theme === 'dark' ? darkLogo : lightLogo;
+      
+      // Also update footer logo
+      const footerLogo = document.getElementById('footer-logo');
+      if (footerLogo) {
+        footerLogo.src = theme === 'dark' ? darkLogo : lightLogo;
+      }
+    }
+
+    function updateThemeIcon(theme) {
+      if (!themeIcon) return;
+      if (theme === 'dark') {
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      } else {
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      }
+    }
+
+    function setTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('theme', theme);
+      updateLogo(theme);
+      updateThemeIcon(theme);
+    }
+
+    function getInitialTheme() {
+      return localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    }
+
+    themeToggle?.addEventListener('click', () => {
+      const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      setTheme(nextTheme);
+    });
+
+    const HAMBURGER_SVG = '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
+    const CLOSE_SVG = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+    function openMobileMenu() { if (!navLinks) return; navLinks.classList.add('open'); if (mobileToggle) { mobileToggle.querySelector('svg').innerHTML = CLOSE_SVG; mobileToggle.setAttribute('aria-label', 'Close menu'); } }
+    function closeMobileMenu() { if (!navLinks) return; navLinks.classList.remove('open'); if (mobileToggle) { mobileToggle.querySelector('svg').innerHTML = HAMBURGER_SVG; mobileToggle.setAttribute('aria-label', 'Open menu'); } }
+    mobileToggle?.addEventListener('click', () => { navLinks?.classList.contains('open') ? closeMobileMenu() : openMobileMenu(); });
+    navLinks?.addEventListener('click', (event) => { if (event.target.closest('a, button')) closeMobileMenu(); });
+    document.addEventListener('click', (e) => { if (navLinks?.classList.contains('open') && !e.target.closest('nav')) closeMobileMenu(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && navLinks?.classList.contains('open')) closeMobileMenu(); });
+
+    setTheme(getInitialTheme());
+
+    async function handleFluentForm(event) {
+      event.preventDefault();
+      const form = event.target;
+      const token = await executeRecaptcha('fluent_form');
+      const formData = new FormData(form);
+      formData.set('recaptcha_token', token);
+      const fullName = `${formData.get('first_name') || ''} ${formData.get('last_name') || ''}`.trim();
+      if (fullName) {
+        formData.set('full_name', fullName);
+      }
+      formData.append('recipients', RECIPIENT_EMAIL);
+      formData.append('submitted_at', new Date().toISOString());
+
+      try {
+        const response = await fetch(FLUENT_CRM_ENDPOINT, {
+          method: 'POST',
+          body: formData,
+        });
+
+        console.log('Form submission response:', response.status, response.statusText);
+        console.log('Response headers:', Object.fromEntries(response.headers));
+        const responseText = await response.text();
+        console.log('Response body:', responseText);
+
+        showNotification(
+          'Message Received',
+          'Thank you for reaching out. Your message means a lot, and I appreciate you taking the time to connect. I look forward to our conversation.',
+          form
+        );
+      } catch (error) {
+        console.error('Fluent CRM submission error:', error);
+        showNotification(
+          'Message Received',
+          'Thank you for reaching out. Your message means a lot, and I appreciate you taking the time to connect. I look forward to our conversation.',
+          form
+        );
+      }
+    }
+
+    // ── MODAL: JOIN THE JOURNEY ──
+    function openJourneyModal() {
+      document.getElementById('journeyModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeJourneyModal() {
+      document.getElementById('journeyModal').classList.remove('open');
+      document.getElementById('journeyForm').reset();
+      document.getElementById('conditionalField').classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+
+    function toggleConditionalField() {
+      const select = document.getElementById('hearAbout');
+      const field = document.getElementById('conditionalField');
+      const label = document.getElementById('conditionalLabel');
+      const input = document.getElementById('conditionalInput');
+      
+      if (select.value === 'Church') {
+        field.classList.add('show');
+        label.textContent = 'Church Name';
+        input.placeholder = 'Enter your church name...';
+        input.name = 'church_name';
+        input.required = true;
+      } else if (select.value === 'Other') {
+        field.classList.add('show');
+        label.textContent = 'Please Specify';
+        input.placeholder = 'Please tell us how you heard about us...';
+        input.name = 'other_source';
+        input.required = true;
+      } else {
+        field.classList.remove('show');
+        input.required = false;
+        input.value = '';
+      }
+    }
+
+    function handleJourneySubmit(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+      
+      // Add additional fields for Fluent CRM
+      data.form_type = 'journey_signup';
+      data.source = 'Join The Journey Modal';
+      
+      fetch(FLUENT_CRM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(data)
+      }).then(async res => {
+        showNotification('success', 'Welcome! Check your email for next steps.', form);
+        closeJourneyModal();
+      }).catch(err => {
+        console.error('Error:', err);
+        showNotification('error', 'Something went wrong. Please try again.', form);
+      });
+    }
+
+    // Open modal on button click
+    document.querySelectorAll('a[href="#join"]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        openJourneyModal();
+      });
+    });
+
+    // Close modal on overlay click (but not modal content click)
+    document.getElementById('journeyModal').addEventListener('click', (e) => {
+      if (e.target.id === 'journeyModal') {
+        closeJourneyModal();
+      }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('journeyModal').classList.contains('open')) {
+        closeJourneyModal();
+      }
+    });
+
+    function showNotification(title, description, form) {
+      let container = document.getElementById('notification-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        container.className = 'notification-container';
+        document.body.appendChild(container);
+      }
+
+      const notification = document.createElement('div');
+      notification.className = 'notification success';
+      notification.innerHTML = `
+        <div class="notification-icon">✓</div>
+        <div class="notification-content">
+          <div class="notification-title">${title}</div>
+          <div class="notification-description">${description}</div>
+        </div>
+        <button class="notification-close" aria-label="Close notification">×</button>
+      `;
+
+      container.appendChild(notification);
+
+      const closeButton = notification.querySelector('.notification-close');
+      const removeNotification = () => {
+        notification.classList.add('removing');
+        setTimeout(() => notification.remove(), 300);
+      };
+
+      closeButton.addEventListener('click', removeNotification);
+      setTimeout(removeNotification, 5000);
+
+      if (form) {
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.style.opacity = '0.6';
+        }
+        form.querySelectorAll('input, textarea').forEach(el => el.disabled = true);
+      }
+    }
+
+    // Audio modal
+    function openAudioModal() { document.getElementById('audioModal').classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeAudioModal() { document.getElementById('audioModal').classList.remove('open'); document.body.style.overflow = ''; var a = document.getElementById('mjg-audio-modal'); if (a) a.pause(); var p = document.getElementById('ap-pill-modal'); if (p) p.classList.remove('ap-playing'); }
+    document.getElementById('listen-nav')?.addEventListener('click', openAudioModal);
+    document.getElementById('audio-modal-close')?.addEventListener('click', closeAudioModal);
+    document.getElementById('audioModal')?.addEventListener('click', function(e) { if (e.target.id === 'audioModal') closeAudioModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('audioModal')?.classList.contains('open')) closeAudioModal(); });
+    document.addEventListener('DOMContentLoaded', function() {
+      var audio = document.getElementById('mjg-audio-modal'), pill = document.getElementById('ap-pill-modal'), btnPlay = document.getElementById('ap-play-modal'), btnRew = document.getElementById('ap-rew-modal'), btnFwd = document.getElementById('ap-fwd-modal'), btnLoop = document.getElementById('ap-loop-modal'), seekBar = document.getElementById('ap-seek-modal'), volBar = document.getElementById('ap-vol-modal'), curEl = document.getElementById('ap-cur-modal'), durEl = document.getElementById('ap-dur-modal');
+      if (!audio || !pill || !btnPlay) return;
+      var loopMode = false, isDragging = false;
+      function fmt(s) { if (!s || isNaN(s)) return '0:00'; return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0'); }
+      btnPlay.addEventListener('click', function() { if (audio.paused) { audio.play().then(function(){ pill.classList.add('ap-playing'); }).catch(function(){}); } else { audio.pause(); pill.classList.remove('ap-playing'); } });
+      btnRew.addEventListener('click', function() { audio.currentTime = Math.max(0, audio.currentTime - 10); });
+      btnFwd.addEventListener('click', function() { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); });
+      btnLoop.addEventListener('click', function() { loopMode = !loopMode; audio.loop = loopMode; btnLoop.classList.toggle('ap-active', loopMode); });
+      audio.addEventListener('timeupdate', function() { if (isDragging) return; var pct = audio.duration ? (audio.currentTime/audio.duration)*100 : 0; seekBar.value = pct; seekBar.style.setProperty('--ap-pct', pct+'%'); curEl.textContent = fmt(audio.currentTime); });
+      audio.addEventListener('loadedmetadata', function() { durEl.textContent = fmt(audio.duration); });
+      audio.addEventListener('ended', function() { pill.classList.remove('ap-playing'); seekBar.value = 0; seekBar.style.setProperty('--ap-pct','0%'); curEl.textContent = '0:00'; });
+      seekBar.addEventListener('input', function() { isDragging = true; var pct = parseFloat(seekBar.value); seekBar.style.setProperty('--ap-pct', pct+'%'); if (audio.duration) curEl.textContent = fmt((pct/100)*audio.duration); });
+      seekBar.addEventListener('change', function() { if (audio.duration) audio.currentTime = (parseFloat(seekBar.value)/100)*audio.duration; isDragging = false; });
+      audio.volume = parseFloat(volBar.value);
+      volBar.addEventListener('input', function() { audio.volume = parseFloat(volBar.value); volBar.style.setProperty('--ap-vol-pct', parseFloat(volBar.value)*100+'%'); });
+    });
+  </script>
+
+  <!-- MODAL: Join The Journey -->
+  <div class="modal-overlay" id="journeyModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeJourneyModal()">✕</button>
+      <div class="modal-header">
+        <h2>Join <em>The Journey</em></h2>
+      </div>
+      <form class="modal-form" id="journeyForm" onsubmit="handleJourneySubmit(event)">
+        <div class="modal-form-row">
+          <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input type="text" id="firstName" name="first_name" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name *</label>
+            <input type="text" id="lastName" name="last_name" required>
+          </div>
+        </div>
+        
+        <div class="modal-form-row">
+          <div class="form-group">
+            <label for="phone">Phone Number *</label>
+            <input type="tel" id="phone" name="phone" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="questions">Questions & Comments</label>
+          <textarea id="questions" name="questions" placeholder="Share any thoughts or questions..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="hearAbout">How did you hear about us? *</label>
+          <select id="hearAbout" name="hear_about" required onchange="toggleConditionalField()">
+            <option value="">Select an option...</option>
+            <option value="Google">Google</option>
+            <option value="AI">AI</option>
+            <option value="YouTube">YouTube</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Church">Church</option>
+            <option value="Friend">Friend</option>
+            <option value="Family">Family</option>
+            <option value="Strategic Income Group">Strategic Income Group</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group hidden-field" id="conditionalField">
+          <label for="conditionalInput" id="conditionalLabel">Church Name</label>
+          <input type="text" id="conditionalInput" name="church_name" placeholder="Please specify...">
+        </div>
+
+        <div class="modal-agreement">
+          <input type="checkbox" id="agreeCheckbox" name="agree" required>
+          <label for="agreeCheckbox" style="margin: 0; font-size: inherit;">
+            I agree to The Stewardship Blueprint's <a href="#" style="color: var(--gold); text-decoration: none;">Privacy Policy</a> and <a href="#" style="color: var(--gold); text-decoration: none;">Terms of Service</a>. I understand I'll receive updates and resources related to stewardship and biblical principles of financial integrity.
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-gold">Join The Journey</button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

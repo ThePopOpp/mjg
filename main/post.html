@@ -1,0 +1,779 @@
+<!--
+  ============================================================
+  MJG360 &middot; SINGLE POST PAGE
+  Paste into Bricks Builder > Code block on /post/ (or /article/)
+  URL format: post.html?slug=the-post-slug
+  Pulls live post data from michaeljgauthier.com WP REST API
+  ============================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Geist:wght@300;400;500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ── Tokens ──────────────────────────────────────────────── */
+:root {
+  --bg:           #F7F5F2;
+  --bg-white:     #ffffff;
+  --bg-dark:      #0f0f0f;
+  --bg-dark-2:    #161616;
+  --border:       #e4e1d9;
+  --text:         #111110;
+  --text-muted:   #6b6a64;
+  --text-faint:   #9b9a94;
+  --gold:         #9E6F2E;
+  --gold-dark:    #C9A46E;
+  --gold-light:   #fdf4e8;
+  --gold-mid:     #edd9a8;
+  --radius:       10px;
+  --radius-lg:    16px;
+  --font-d:       'Cormorant Garamond', Georgia, serif;
+  --font-b:       'Geist', system-ui, sans-serif;
+  --max:          720px;
+  --max-wide:     1100px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+img { display: block; max-width: 100%; }
+a   { color: inherit; text-decoration: none; }
+
+.post-page {
+  font-family: var(--font-b);
+  -webkit-font-smoothing: antialiased;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* ── Dark mode ───────────────────────────────────────────── */
+[data-theme="dark"] .post-page  { background: #0f0f0f; color: #f7f5f2; }
+
+[data-theme="dark"] .sp-hero    { background: #111; }
+[data-theme="dark"] .sp-meta-bar { border-color: rgba(255,255,255,.08); }
+[data-theme="dark"] .sp-tag     { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); }
+[data-theme="dark"] .sp-cat-badge { background: rgba(201,164,110,.12); color: var(--gold-dark); }
+[data-theme="dark"] .sp-author-card { background: #161616; border-color: rgba(255,255,255,.08); }
+[data-theme="dark"] .sp-author-name { color: #f7f5f2; }
+[data-theme="dark"] .sp-divider { border-color: rgba(255,255,255,.08); }
+[data-theme="dark"] .sp-related-card { background: #161616; border-color: rgba(255,255,255,.08); }
+[data-theme="dark"] .sp-related-card:hover { border-color: var(--gold-dark); }
+[data-theme="dark"] .sp-related-title { color: #f7f5f2; }
+[data-theme="dark"] .sp-share-btn { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); color: rgba(255,255,255,.6); }
+[data-theme="dark"] .sp-share-btn:hover { background: rgba(255,255,255,.1); }
+[data-theme="dark"] .sp-back-link { color: rgba(255,255,255,.5); }
+[data-theme="dark"] .sp-back-link:hover { color: #fff; }
+[data-theme="dark"] .post-content { color: #d8d3ca; }
+[data-theme="dark"] .post-content h1, [data-theme="dark"] .post-content h2, [data-theme="dark"] .post-content h3,
+[data-theme="dark"] .post-content h4 { color: #f7f5f2; }
+[data-theme="dark"] .post-content blockquote { background: rgba(255,255,255,.04); border-left-color: var(--gold-dark); }
+[data-theme="dark"] .post-content a { color: var(--gold-dark); }
+[data-theme="dark"] .post-content hr { border-color: rgba(255,255,255,.1); }
+[data-theme="dark"] .post-content code { background: rgba(255,255,255,.08); }
+[data-theme="dark"] .post-content pre { background: #1a1a1a; }
+[data-theme="dark"] .sp-loading-wrap { color: rgba(255,255,255,.4); }
+[data-theme="dark"] .skeleton { background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%); background-size: 200% 100%; }
+
+/* ── NAV ─────────────────────────────────────────────────── */
+nav {
+  --nv-bg:       #ffffff;
+  --nv-text:     #111110;
+  --nv-border:   rgba(17,17,17,0.1);
+  --nv-btn-bg:   #111110;
+  --nv-btn-text: #ffffff;
+  --nv-ctrl-bg:  rgba(17,17,17,0.06);
+  --nv-ctrl-bdr: rgba(17,17,17,0.16);
+  --nv-ctrl-hov: rgba(17,17,17,0.1);
+}
+[data-theme="dark"] nav {
+  --nv-bg:       #0f0f0f;
+  --nv-text:     #f7f5f2;
+  --nv-border:   rgba(255,255,255,0.08);
+  --nv-btn-bg:   #f7f5f2;
+  --nv-btn-text: #111110;
+  --nv-ctrl-bg:  rgba(255,255,255,0.08);
+  --nv-ctrl-bdr: rgba(255,255,255,0.18);
+  --nv-ctrl-hov: rgba(255,255,255,0.12);
+}
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+  background: var(--nv-bg);
+  border-bottom: 1px solid var(--nv-border);
+}
+.nav-inner {
+  max-width: 1160px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+.nav-logo img { height: 36px; width: auto; display: block; }
+.nav-logo-text {
+  font-family: 'DM Serif Display', 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--nv-text);
+  letter-spacing: -0.02em;
+}
+.nav-logo-text .gold { color: #C9A46E; }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.875rem !important;
+  color: var(--nv-text) !important;
+  text-decoration: none !important;
+  transition: opacity 0.2s;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+.nav-links a:hover { opacity: 0.7; }
+.nav-link-plain {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  color: var(--nv-text);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.nav-link-plain:hover { opacity: 0.7; }
+.nav-links .nav-btn-cta {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 500;
+  color: var(--nv-btn-text) !important;
+  background: var(--nv-btn-bg) !important;
+  border: 1px solid var(--nv-btn-bg) !important;
+  border-radius: 6px;
+  padding: 0.55rem 1.25rem !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.nav-links .nav-btn-cta:hover { opacity: 0.9; }
+.nav-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px; height: 42px;
+  background: var(--nv-ctrl-bg);
+  border: 1px solid var(--nv-ctrl-bdr);
+  color: var(--nv-text);
+  border-radius: 14px;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.nav-theme-toggle:hover { background: var(--nv-ctrl-hov); transform: translateY(-1px); }
+.nav-mobile-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px; height: 42px;
+  background: var(--nv-ctrl-bg);
+  border: 1px solid var(--nv-ctrl-bdr);
+  color: var(--nv-text);
+  border-radius: 14px;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.nav-links.open { display: flex; }
+@media (max-width: 768px) {
+  .nav-mobile-toggle { display: inline-flex; }
+  .nav-links {
+    position: absolute;
+    top: 60px; left: 0; right: 0;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem 1.75rem;
+    background: var(--nv-bg);
+    border-bottom: 1px solid var(--nv-border);
+    display: none;
+  }
+  .nav-links li { width: 100%; }
+  .nav-links a, .nav-link-plain, .nav-btn-cta { width: 100%; }
+  .nav-btn-cta { text-align: center; justify-content: center; }
+}
+
+/* ── HERO IMAGE ──────────────────────────────────────────── */
+.sp-hero {
+  width: 100%;
+  height: clamp(240px, 38vw, 520px);
+  overflow: hidden;
+  background: #ede9e1;
+}
+.sp-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 24%;
+}
+.sp-hero-placeholder {
+  width: 100%; height: 320px;
+  display: flex; align-items: center; justify-content: center;
+  background: #ede9e1;
+}
+[data-theme="dark"] .sp-hero-placeholder { background: #1a1a1a; }
+.sp-hero-placeholder svg { opacity: .2; }
+@media (max-width: 768px) {
+  .sp-hero { height: clamp(220px, 55vw, 360px); }
+  .sp-hero img { object-position: center 20%; }
+}
+
+/* ── ARTICLE WRAP ────────────────────────────────────────── */
+.sp-article-wrap {
+  max-width: var(--max); margin: 0 auto;
+  padding: 48px 28px 80px;
+}
+
+/* ── BACK LINK ───────────────────────────────────────────── */
+.sp-back-link {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 13px; color: var(--text-muted);
+  text-decoration: none; margin-bottom: 32px;
+  transition: color .15s;
+}
+.sp-back-link:hover { color: var(--gold); }
+[data-theme="dark"] .sp-back-link:hover { color: var(--gold-dark); }
+
+/* ── POST HEADER ─────────────────────────────────────────── */
+.sp-cats { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+.sp-cat-badge {
+  font-size: 10px; font-weight: 600; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--gold);
+  background: var(--gold-light); border-radius: 100px; padding: 4px 11px;
+}
+.sp-post-title {
+  font-family: var(--font-d); font-size: clamp(32px, 5vw, 52px);
+  font-weight: 400; letter-spacing: -.03em; line-height: 1.12;
+  color: var(--text); margin-bottom: 20px;
+}
+[data-theme="dark"] .sp-post-title { color: #f7f5f2; }
+.sp-meta-bar {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding-bottom: 24px; border-bottom: 1px solid var(--border);
+  margin-bottom: 40px; font-size: 13px; color: var(--text-faint);
+}
+.sp-meta-bar .sp-author-name { color: var(--text-muted); font-weight: 500; }
+.sp-meta-sep { opacity: .35; }
+
+/* ── POST CONTENT ────────────────────────────────────────── */
+.post-content {
+  font-family: var(--font-b); font-size: 16.5px;
+  line-height: 1.82; color: var(--text); font-weight: 300;
+}
+.post-content p  { margin-bottom: 1.5em; }
+.post-content h1, .post-content h2, .post-content h3, .post-content h4 {
+  font-family: var(--font-d); font-weight: 500;
+  letter-spacing: -.02em; line-height: 1.2;
+  margin: 2em 0 .6em; color: var(--text);
+}
+.post-content h1 { font-size: 2.2em; }
+.post-content h2 { font-size: 1.7em; }
+.post-content h3 { font-size: 1.35em; }
+.post-content h4 { font-size: 1.1em; font-family: var(--font-b); font-weight: 600; }
+.post-content a  { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+.post-content a:hover { color: #7d5820; }
+[data-theme="dark"] .post-content a:hover { color: #d4a96a; }
+.post-content ul, .post-content ol { padding-left: 1.6em; margin-bottom: 1.5em; }
+.post-content li { margin-bottom: .5em; }
+.post-content blockquote {
+  border-left: 3px solid var(--gold); background: var(--gold-light);
+  padding: 18px 24px; border-radius: 0 8px 8px 0;
+  margin: 2em 0; font-style: italic; font-family: var(--font-d);
+  font-size: 1.12em; color: var(--text-muted);
+}
+.post-content img { border-radius: var(--radius); margin: 1.8em auto; }
+.post-content hr { border: none; border-top: 1px solid var(--border); margin: 2.5em 0; }
+.post-content code {
+  font-size: .88em; background: rgba(0,0,0,.06);
+  padding: 2px 6px; border-radius: 4px; font-family: monospace;
+}
+.post-content pre {
+  background: #f3f1ed; border-radius: 8px; padding: 20px;
+  overflow-x: auto; margin: 1.8em 0;
+}
+.post-content pre code { background: none; padding: 0; font-size: .85em; }
+.post-content figure { margin: 2em 0; }
+.post-content figcaption { font-size: 12px; color: var(--text-faint); text-align: center; margin-top: 8px; }
+
+/* ── TAGS ────────────────────────────────────────────────── */
+.sp-tags-wrap { margin-top: 40px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sp-tags-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); }
+.sp-tag {
+  font-size: 11.5px; padding: 4px 11px; border-radius: 100px;
+  background: #f0ede6; color: var(--text-muted); cursor: default;
+}
+
+/* ── SHARE ───────────────────────────────────────────────── */
+.sp-share-wrap {
+  margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+[data-theme="dark"] .sp-share-wrap { border-top-color: rgba(255,255,255,.08); }
+.sp-share-label { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-right: 4px; }
+.sp-share-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; font-weight: 500;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-muted); cursor: pointer; transition: all .15s;
+  font-family: var(--font-b);
+}
+.sp-share-btn:hover { background: var(--gold-light); border-color: var(--gold-mid); color: var(--gold); }
+.sp-share-btn svg { flex-shrink: 0; }
+
+/* ── AUTHOR CARD ─────────────────────────────────────────── */
+.sp-author-card {
+  display: flex; align-items: flex-start; gap: 20px;
+  background: var(--bg-white); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 28px; margin-top: 48px;
+}
+.sp-author-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0; background: var(--gold-light);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: 24px; color: var(--gold);
+  overflow: hidden;
+}
+.sp-author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sp-author-info { flex: 1; }
+.sp-author-by { font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 4px; }
+.sp-author-name { font-family: var(--font-d); font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+.sp-author-bio { font-size: 13.5px; color: var(--text-muted); line-height: 1.7; font-weight: 300; }
+
+/* ── DIVIDER ─────────────────────────────────────────────── */
+.sp-divider { border: none; border-top: 1px solid var(--border); margin: 64px 0 52px; }
+
+/* ── RELATED POSTS ───────────────────────────────────────── */
+.sp-related-section { max-width: var(--max-wide); margin: 0 auto; padding: 0 28px 80px; }
+.sp-related-header { margin-bottom: 28px; }
+.sp-related-eyebrow { font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; }
+.sp-related-title { font-family: var(--font-d); font-size: clamp(24px, 3vw, 36px); font-weight: 400; letter-spacing: -.025em; }
+[data-theme="dark"] .sp-related-title { color: #f7f5f2; }
+.sp-related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+@media (max-width: 900px) { .sp-related-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .sp-related-grid { grid-template-columns: 1fr; } }
+.sp-related-card {
+  background: var(--bg-white); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  transition: transform .18s, border-color .18s, box-shadow .18s; cursor: pointer;
+}
+.sp-related-card:hover { transform: translateY(-2px); border-color: var(--gold-mid); box-shadow: 0 8px 28px rgba(0,0,0,.07); }
+.sp-related-img { aspect-ratio: 16/9; overflow: hidden; background: #f0ede6; }
+.sp-related-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+.sp-related-card:hover .sp-related-img img { transform: scale(1.04); }
+.sp-related-body { padding: 16px 18px 18px; }
+.sp-related-cat { font-size: 9.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+[data-theme="dark"] .sp-related-cat { color: var(--gold-dark); }
+.sp-related-title-card { font-family: var(--font-d); font-size: 17px; font-weight: 500; line-height: 1.3; margin-bottom: 6px; }
+.sp-related-title-card a { color: var(--text); transition: color .15s; }
+.sp-related-title-card a:hover { color: var(--gold); }
+[data-theme="dark"] .sp-related-title-card a { color: #f7f5f2; }
+[data-theme="dark"] .sp-related-title-card a:hover { color: var(--gold-dark); }
+.sp-related-date { font-size: 11px; color: var(--text-faint); }
+
+/* ── LOADING / ERROR ─────────────────────────────────────── */
+.sp-loading-wrap { max-width: var(--max); margin: 0 auto; padding: 80px 28px; text-align: center; color: var(--text-muted); font-size: 15px; }
+.sp-error-wrap { max-width: var(--max); margin: 0 auto; padding: 80px 28px; text-align: center; }
+.sp-error-title { font-family: var(--font-d); font-size: 36px; font-weight: 400; margin-bottom: 12px; }
+.sp-error-sub { font-size: 14px; color: var(--text-muted); }
+@keyframes shimmer { 0%{ background-position:200% 0 } 100%{ background-position:-200% 0 } }
+.skeleton { border-radius: 8px; background: linear-gradient(90deg,#ede9e1 25%,#f5f2ed 50%,#ede9e1 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+.skel-hero  { width:100%; height:380px; border-radius:0; }
+.skel-title { height:52px; width:75%; margin-bottom:16px; }
+.skel-meta  { height:18px; width:50%; margin-bottom:40px; }
+.skel-body  { height:18px; width:100%; margin-bottom:12px; }
+.skel-body.short { width:65%; }
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+footer {
+  background: var(--bg); border-top: 1px solid var(--border);
+  padding: 3rem 1.5rem 2rem; font-family: 'Roboto', sans-serif;
+}
+[data-theme="dark"] footer { background: #0f0f0f; border-top-color: rgba(255,255,255,0.08); }
+.footer-container { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 2rem; }
+.footer-section { display: flex; flex-direction: column; gap: 1rem; }
+.footer-section.logo-section { grid-column: 1; }
+.footer-section h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 600; color: var(--text); }
+[data-theme="dark"] .footer-section h3 { color: #f7f5f2; }
+.footer-logo { width: 60px; height: auto; margin-bottom: 0.5rem; }
+.footer-description { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; max-width: 200px; }
+footer a { color: var(--text-muted); text-decoration: none; }
+.footer-links { display: flex; flex-direction: column; gap: 0.75rem; list-style: none; }
+.footer-links a { font-size: 0.85rem; transition: color 0.2s; }
+.footer-links a:hover { color: var(--gold); }
+[data-theme="dark"] .footer-links a { color: rgba(255,255,255,0.5); }
+[data-theme="dark"] .footer-links a:hover { color: var(--gold-dark); }
+.footer-divider { border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 1.5rem; }
+[data-theme="dark"] .footer-divider { border-top-color: rgba(255,255,255,0.08); }
+.sub-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; max-width: 1160px; margin: 0 auto; }
+.sub-footer-text { font-size: 0.8rem; color: var(--text-muted); }
+[data-theme="dark"] .sub-footer-text { color: rgba(255,255,255,0.5); }
+.gold-j { color: var(--gold); font-weight: 600; }
+[data-theme="dark"] .gold-j { color: var(--gold-dark); }
+.social-icons { display: flex; gap: 1rem; align-items: center; }
+.social-icon { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--text-muted); transition: color 0.2s; }
+.social-icon:hover { color: var(--gold); }
+[data-theme="dark"] .social-icon:hover { color: var(--gold-dark); }
+.social-icon svg { width: 100%; height: 100%; fill: currentColor; stroke: currentColor; }
+@media (max-width: 900px) { .footer-container { grid-template-columns: 1fr 1fr; gap: 2rem; } .footer-section.logo-section { grid-column: 1 / -1; } }
+@media (max-width: 640px) { footer { padding: 2rem 1rem 1.5rem; } .footer-container { grid-template-columns: 1fr; gap: 1.5rem; } .sub-footer { flex-direction: column; text-align: center; } }
+</style>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="https://blueprint.michaeljgauthier.com/" class="nav-logo">
+      <img id="nav-logo-img"
+        src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        data-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        data-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg"
+        alt="Michael J. Gauthier" />
+      <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
+    </a>
+    <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open menu" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/mission">Mission</a></li>
+      <li><button id="listen-btn" class="nav-link-plain" type="button">Listen</button></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+      <li><a href="https://blueprint.michaeljgauthier.com/#join" class="nav-btn-cta">Join the Journey</a></li>
+      <li><button id="nav-theme-toggle" class="nav-theme-toggle" type="button" aria-label="Toggle dark mode"><svg id="nav-theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg></button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="post-page" id="spMain">
+  <!-- Populated by JS -->
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-container">
+    <div class="footer-section logo-section">
+      <img id="sp-footer-logo" class="footer-logo"
+        src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        alt="Michael J. Gauthier"
+        data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+      <p class="footer-description">Welcome to my personal mission: Encouraging others to use their God given resources for God given purposes</p>
+    </div>
+    <div class="footer-section">
+      <h3>Explore</h3>
+      <ul class="footer-links">
+        <li><a href="https://blueprint.michaeljgauthier.com/">Home</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/about">About</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="https://blueprint.michaeljgauthier.com/contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Account</h3>
+      <ul class="footer-links">
+        <li><a href="https://michaeljgauthier.com/login/">Login</a></li>
+        <li><a href="https://michaeljgauthier.com/register/">Register</a></li>
+        <li><a href="tel:+14804667070">Call Us</a></li>
+        <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Contact</h3>
+      <ul class="footer-links">
+        <li><a href="tel:+14804667070">(480) 466-7070</a></li>
+        <li><a href="https://www.google.com/maps/dir//2330+W+Ray+Rd+Ste+%233,+Chandler,+AZ+85224/" target="_blank">2330 W Ray Rd Ste #3,<br>Chandler, AZ 85224</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-divider">
+    <div class="sub-footer">
+      <div class="sub-footer-text">
+        <span id="sp-year"></span>
+        <span> &copy; Michael<span class="gold-j">J.</span>Gauthier.com</span>
+        <span> &mdash; All rights reserved.</span>
+      </div>
+      <div class="social-icons">
+        <a href="https://www.facebook.com/StrategicIncomeGroup" class="social-icon" aria-label="Facebook" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/michaeljgauthier/" class="social-icon" aria-label="LinkedIn" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Nav + Theme — isolated script, matches about-us.html ── */
+(function() {
+  var logoImg    = document.getElementById('nav-logo-img');
+  var themeBtn   = document.getElementById('nav-theme-toggle');
+  var themeIcon  = document.getElementById('nav-theme-icon');
+  var mobileBtn  = document.getElementById('nav-mobile-toggle');
+  var navLinks   = document.getElementById('nav-links');
+  var footerLogo = document.getElementById('sp-footer-logo');
+  var SUN  = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+  var MOON = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    if (themeIcon) themeIcon.innerHTML = t === 'dark' ? MOON : SUN;
+    if (logoImg) logoImg.src = t === 'dark' ? logoImg.dataset.dark : logoImg.dataset.light;
+    if (footerLogo) footerLogo.src = t === 'dark' ? footerLogo.getAttribute('data-logo-dark') : footerLogo.getAttribute('data-logo-light');
+  }
+
+  var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  setTheme(saved);
+
+  if (themeBtn) themeBtn.addEventListener('click', function() {
+    setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  var HAMBURGER_SVG = '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
+  var CLOSE_SVG = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+  function openMobileMenu()  { if (!navLinks) return; navLinks.classList.add('open');    if (mobileBtn) { mobileBtn.querySelector('svg').innerHTML = CLOSE_SVG;     mobileBtn.setAttribute('aria-label', 'Close menu'); } }
+  function closeMobileMenu() { if (!navLinks) return; navLinks.classList.remove('open'); if (mobileBtn) { mobileBtn.querySelector('svg').innerHTML = HAMBURGER_SVG; mobileBtn.setAttribute('aria-label', 'Open menu');  } }
+  if (mobileBtn) mobileBtn.addEventListener('click', function() { navLinks && navLinks.classList.contains('open') ? closeMobileMenu() : openMobileMenu(); });
+  if (navLinks)  navLinks.addEventListener('click',  function(e) { if (e.target.closest('a')) closeMobileMenu(); });
+  document.addEventListener('click',   function(e) { if (navLinks && navLinks.classList.contains('open') && !e.target.closest('nav')) closeMobileMenu(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && navLinks && navLinks.classList.contains('open')) closeMobileMenu(); });
+
+  var listenBtn = document.getElementById('listen-btn');
+  if (listenBtn) listenBtn.addEventListener('click', function() { window.location.href = 'https://blueprint.michaeljgauthier.com/#listen'; });
+}());
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  const API       = 'https://michaeljgauthier.com/wp-json/wp/v2';
+  const ARCHIVE   = 'resources.html';
+  const main      = document.getElementById('spMain');
+
+  /* ── Helpers ────────────────────────────────────────────── */
+  function getSlug() {
+    return new URLSearchParams(window.location.search).get('slug') || '';
+  }
+
+  function formatDate(str) {
+    return new Date(str).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  function readingTime(html) {
+    const words = html.replace(/<[^>]+>/g, '').trim().split(/\s+/).length;
+    return Math.max(1, Math.ceil(words / 200)) + ' min read';
+  }
+
+  function stripHtml(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    return d.textContent || '';
+  }
+
+  /* ── Skeleton loader ────────────────────────────────────── */
+  function showSkeleton() {
+    main.innerHTML = `
+      <div class="skeleton skel-hero"></div>
+      <div class="sp-article-wrap">
+        <div class="skeleton skel-title" style="margin-bottom:12px;"></div>
+        <div class="skeleton skel-title" style="width:55%;height:40px;"></div>
+        <div class="skeleton skel-meta" style="margin-top:20px;"></div>
+        ${Array(8).fill('').map((_, i) =>
+          `<div class="skeleton skel-body${i % 4 === 3 ? ' short' : ''}" style="margin-bottom:12px;"></div>`
+        ).join('')}
+      </div>`;
+  }
+
+  /* ── Error state ────────────────────────────────────────── */
+  function showError(msg) {
+    main.innerHTML = `
+      <div class="sp-error-wrap">
+        <p class="sp-error-title">Post not found</p>
+        <p class="sp-error-sub">${msg}</p>
+        <a href="${ARCHIVE}" style="display:inline-flex;align-items:center;gap:7px;margin-top:28px;font-size:13.5px;color:var(--gold);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to Resources
+        </a>
+      </div>`;
+  }
+
+  /* ── Share buttons ──────────────────────────────────────── */
+  function shareHtml(url, title) {
+    const enc  = encodeURIComponent(url);
+    const encT = encodeURIComponent(title);
+    return `
+      <div class="sp-share-wrap">
+        <span class="sp-share-label">Share</span>
+        <button class="sp-share-btn" onclick="navigator.clipboard.writeText('${url}').then(()=>this.textContent='Copied!')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Copy Link
+        </button>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${enc}" target="_blank" class="sp-share-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg>
+          Facebook
+        </a>
+        <a href="https://twitter.com/intent/tweet?url=${enc}&text=${encT}" target="_blank" class="sp-share-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          X (Twitter)
+        </a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=${enc}&title=${encT}" target="_blank" class="sp-share-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+      </div>`;
+  }
+
+  /* ── Render related post card ───────────────────────────── */
+  function relatedCard(p) {
+    const img  = p._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+    const cats = (p._embedded?.['wp:term']?.[0] || []).filter(c => c.name !== 'Uncategorized');
+    const href = 'post.html?slug=' + encodeURIComponent(p.slug);
+    return `<div class="sp-related-card" onclick="location.href='${href}'">
+      <div class="sp-related-img">
+        ${img ? `<img src="${img}" alt="" loading="lazy" />` : ''}
+      </div>
+      <div class="sp-related-body">
+        ${cats[0] ? `<p class="sp-related-cat">${cats[0].name}</p>` : ''}
+        <h3 class="sp-related-title-card"><a href="${href}">${p.title.rendered}</a></h3>
+        <p class="sp-related-date">${formatDate(p.date)}</p>
+      </div>
+    </div>`;
+  }
+
+  /* ── Render full post ───────────────────────────────────── */
+  function renderPost(post, related) {
+    const imgUrl  = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
+    const author  = post._embedded?.author?.[0] || {};
+    const cats    = (post._embedded?.['wp:term']?.[0] || []).filter(c => c.name !== 'Uncategorized');
+    const tags    = post._embedded?.['wp:term']?.[1] || [];
+    const title   = post.title.rendered;
+    const date    = formatDate(post.date);
+    const rt      = readingTime(post.content.rendered);
+    const postUrl = window.location.href;
+
+    const catHtml = cats.map(c => `<span class="sp-cat-badge">${c.name}</span>`).join('');
+    const tagHtml = tags.map(t => `<span class="sp-tag">${t.name}</span>`).join('');
+    const authorAvatar = author.avatar_urls?.['96'] || '';
+    const authorInitial = (author.name || 'M').charAt(0);
+
+    document.title = stripHtml(title) + ' — Michael J. Gauthier';
+
+    main.innerHTML = `
+      ${imgUrl
+        ? `<div class="sp-hero"><img src="${imgUrl}" alt="${stripHtml(title)}" /></div>`
+        : `<div class="sp-hero"><div class="sp-hero-placeholder"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div></div>`
+      }
+
+      <div class="sp-article-wrap">
+        <a href="${ARCHIVE}" class="sp-back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to Resources
+        </a>
+
+        ${catHtml ? `<div class="sp-cats">${catHtml}</div>` : ''}
+
+        <h1 class="sp-post-title">${title}</h1>
+
+        <div class="sp-meta-bar">
+          <span class="sp-author-name">By ${author.name || 'Mike Gauthier'}</span>
+          <span class="sp-meta-sep">&middot;</span>
+          <span>${date}</span>
+          <span class="sp-meta-sep">&middot;</span>
+          <span>${rt}</span>
+        </div>
+
+        <div class="post-content">${post.content.rendered}</div>
+
+        ${tagHtml ? `<div class="sp-tags-wrap"><span class="sp-tags-label">Tags</span>${tagHtml}</div>` : ''}
+
+        ${shareHtml(postUrl, stripHtml(title))}
+
+        <div class="sp-author-card">
+          <div class="sp-author-avatar">
+            ${authorAvatar
+              ? `<img src="${authorAvatar}" alt="${author.name || ''}" />`
+              : authorInitial
+            }
+          </div>
+          <div class="sp-author-info">
+            <p class="sp-author-by">Written by</p>
+            <p class="sp-author-name">${author.name || 'Mike Gauthier'}</p>
+            <p class="sp-author-bio">${author.description || 'Michael J. Gauthier is a Certified Financial Planner&reg; and author of The Stewardship Blueprint &mdash; a practical, faith-rooted framework for designing a life of meaning, generosity, and lasting impact.'}</p>
+          </div>
+        </div>
+      </div>
+
+      ${related.length > 0 ? `
+        <div class="sp-related-section">
+          <hr class="sp-divider" />
+          <div class="sp-related-header">
+            <p class="sp-related-eyebrow">Keep Reading</p>
+            <h2 class="sp-related-title">More from the <em style="font-style:italic;color:var(--gold)">Blog</em></h2>
+          </div>
+          <div class="sp-related-grid">
+            ${related.map(relatedCard).join('')}
+          </div>
+        </div>` : ''}
+    `;
+  }
+
+  /* ── Init ───────────────────────────────────────────────── */
+  async function init() {
+    const slug = getSlug();
+    if (!slug) { showError('No post slug provided.'); return; }
+
+    showSkeleton();
+
+    try {
+      const [posts, relatedRaw] = await Promise.all([
+        fetch(`${API}/posts?slug=${encodeURIComponent(slug)}&_embed=true`).then(r => r.json()),
+        fetch(`${API}/posts?_embed=true&per_page=3&orderby=date&order=desc`).then(r => r.json()),
+      ]);
+
+      if (!posts || posts.length === 0) { showError('The post you\'re looking for could not be found.'); return; }
+
+      const post    = posts[0];
+      const related = relatedRaw.filter(p => p.id !== post.id).slice(0, 3);
+
+      renderPost(post, related);
+    } catch (err) {
+      showError('There was a problem loading this post. Please try again.');
+    }
+  }
+
+  document.getElementById('sp-year').textContent = new Date().getFullYear();
+  init();
+}());
+</script>
