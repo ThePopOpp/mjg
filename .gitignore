@@ -3,3 +3,10 @@ main/.claude/
 .env
 .env.*
 !.env.example
+node_modules/
+.next/
+out/
+dist/
+npm-debug.log*
+next-dev*.log
+tsconfig.tsbuildinfo

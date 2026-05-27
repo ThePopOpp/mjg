@@ -1,0 +1,213 @@
+export const WAVE_SOURCE_VALUES = [
+  "wave_0",
+  "wave_1",
+  "wave_2",
+  "wave_3",
+  "pastor_elder",
+  "inner_circle",
+  "direct_text",
+  "direct_email",
+  "referral",
+  "manual_admin",
+] as const;
+
+export type WaveSource = (typeof WAVE_SOURCE_VALUES)[number];
+
+export const PARTICIPANT_TYPES = {
+  GENERAL: "general_participant",
+  PASTOR_ELDER: "pastor_elder_church_leader",
+} as const;
+
+export const CHECK_IN_SECTIONS = [
+  {
+    key: "purpose",
+    title: "Purpose & Direction",
+    lowestTag: "Lowest: Purpose",
+    questions: [
+      "I have a clear sense of what matters most in this season.",
+      "My calendar reflects the life I say I want to build.",
+      "I know what I need to say yes to and what I need to say no to.",
+      "I am making progress toward the people and causes God has placed on my heart.",
+      "I can name one faithful next step I need to take.",
+    ],
+  },
+  {
+    key: "family",
+    title: "Family & Relationships",
+    lowestTag: "Lowest: Family",
+    questions: [
+      "The people closest to me are getting my best attention.",
+      "I am creating space for meaningful conversations.",
+      "I am present when I am with my family or closest relationships.",
+      "I am addressing relational drift instead of avoiding it.",
+      "My relationships reflect the priorities I say matter most.",
+    ],
+  },
+  {
+    key: "fitness",
+    title: "Fitness & Energy",
+    lowestTag: "Lowest: Fitness/Energy",
+    questions: [
+      "I have the energy I need for the life I am called to live.",
+      "I am caring for my body with reasonable consistency.",
+      "My sleep, movement, and health rhythms support my purpose.",
+      "I notice when stress or exhaustion begins to shape my choices.",
+      "I am building capacity instead of only pushing through.",
+    ],
+  },
+  {
+    key: "fun",
+    title: "Fun, Joy & Meaningful Experiences",
+    lowestTag: "Lowest: Fun/Joy",
+    questions: [
+      "I make room for joy, rest, and meaningful experiences.",
+      "My life includes moments that refresh my soul.",
+      "I am not postponing all joy to a someday season.",
+      "I can identify activities that help me feel more alive and grateful.",
+      "I am stewarding experiences, not only responsibilities.",
+    ],
+  },
+  {
+    key: "finances",
+    title: "Finances & Stewardship",
+    lowestTag: "Lowest: Finances",
+    questions: [
+      "My money decisions reflect my values and priorities.",
+      "I have clarity about where my resources are going.",
+      "I am using my treasure for people and causes that matter.",
+      "Financial pressure is not quietly controlling my life.",
+      "I am growing in generosity, wisdom, and intentional stewardship.",
+    ],
+  },
+] as const;
+
+export type CheckInSectionKey = (typeof CHECK_IN_SECTIONS)[number]["key"];
+
+export const REFLECTION_PROMPTS = [
+  "In this season, I sense I need to pay attention to:",
+  "This week, one small action I will take is:",
+  "One person I may need to talk with is:",
+  "One rhythm, habit, or calendar adjustment that could help is:",
+] as const;
+
+export const DEFAULT_TAGS = [
+  "Created for More Pilot",
+  "Wave 0",
+  "Wave 1",
+  "Wave 2",
+  "Wave 3",
+  "Pastor/Elder Review",
+  "Church Leader",
+  "Check-In Started",
+  "Check-In Completed",
+  "7-Day Journey Started",
+  "7-Day Journey Completed",
+  "Survey Sent",
+  "Survey Completed",
+  "Inner Circle Invited",
+  "Inner Circle Accepted",
+  "Story Permission Granted",
+  "Interview Candidate",
+  "Church Pilot Interest",
+  "Small Group Interest",
+  "Bible Plan Interest",
+  "Workbook Interest",
+  "Speaking Interest",
+  "Referral / Shared With Others",
+  "Lowest: Purpose",
+  "Lowest: Family",
+  "Lowest: Fitness/Energy",
+  "Lowest: Fun/Joy",
+  "Lowest: Finances",
+] as const;
+
+export const SCORE_RANGE_LABELS = {
+  aligned: "Aligned and Intentional",
+  stretched: "Aware but Stretched",
+  drifting: "Drifting in Key Areas",
+  rebuild: "Time to Pause and Rebuild",
+} as const;
+
+export const GENERAL_SURVEY_FIELDS = [
+  { name: "name", label: "Name", type: "text", required: true },
+  { name: "email", label: "Email", type: "email", required: true },
+  { name: "checkInScore", label: "What was your total Created for More Check-In score?", type: "number" },
+  {
+    name: "lowestArea",
+    label: "Which area was your lowest score?",
+    type: "select",
+    options: [
+      "Purpose & Direction",
+      "Family & Relationships",
+      "Fitness & Energy",
+      "Fun, Joy & Meaningful Experiences",
+      "Finances & Stewardship",
+      "I am not sure / I do not remember",
+    ],
+  },
+  {
+    name: "resonantDay",
+    label: "Which day of the 7-day journey resonated most with you?",
+    type: "select",
+    options: [
+      "Day 1 — What Kind of Life Are You Actually Building?",
+      "Day 2 — Faith at the Center",
+      "Day 3 — Purpose, Scoreboards, and Drift",
+      "Day 4 — Family and Relationships",
+      "Day 5 — Fitness, Energy, and Capacity",
+      "Day 6 — Fun, Joy, Money, and Meaningful Resources",
+      "Day 7 — One Faithful Next Step",
+    ],
+  },
+  { name: "whyResonated", label: "Why did that day resonate most?", type: "textarea" },
+  { name: "stayedWithYou", label: "What phrase, question, or idea stayed with you the most?", type: "textarea" },
+  { name: "sawDrift", label: "Did the 7-day journey help you see any area of drift or misalignment in your life?", type: "select", options: ["Yes, clearly", "Somewhat", "Not really", "I am still processing"] },
+  { name: "clearerArea", label: "If yes, what area did it help you see more clearly?", type: "textarea" },
+  { name: "tookAction", label: "Did you take any action during the 7 days?", type: "select", options: ["Yes", "Not yet, but I plan to", "No"] },
+  { name: "actionTaken", label: "If yes, what action did you take?", type: "textarea" },
+  { name: "conversation", label: "Did you have a conversation you may not have had otherwise?", type: "select", options: ["Yes", "Not yet, but I plan to", "No"] },
+  { name: "newRhythm", label: "Did you identify or begin one new rhythm, habit, or calendar adjustment?", type: "select", options: ["Yes", "Not yet, but I plan to", "No"] },
+  { name: "tone", label: "How would you describe the tone of the journey?", type: "select", options: ["Encouraging", "Convicting", "Both encouraging and convicting", "Too soft", "Too intense", "Unclear"] },
+  { name: "faithContent", label: "How did the faith content feel to you?", type: "select", options: ["About right", "Too light", "Too heavy", "Clear and helpful", "Unclear", "Not applicable to me"] },
+  { name: "mostHelpful", label: "What felt most helpful?", type: "textarea" },
+  { name: "missing", label: "What felt missing, unclear, repetitive, or less helpful?", type: "textarea" },
+  { name: "practicalEnough", label: "Did the journey feel practical enough to help someone take action?", type: "select", options: ["Yes", "Somewhat", "Not yet", "Unsure"] },
+  { name: "moreUseful", label: "What would make this more useful or transformational?", type: "textarea" },
+  { name: "whoNeedsThis", label: "Who do you think most needs this message right now?", type: "textarea" },
+  { name: "recommend", label: "Would you recommend this to someone else?", type: "select", options: ["Yes", "Maybe", "Not yet"] },
+  { name: "shareWith", label: "Who would you be most likely to share this with?", type: "select", options: ["Friend", "Spouse", "Family member", "Coworker", "Small group", "Church leader", "Client/customer", "Other"] },
+  { name: "futureResource", label: "What future resource would be most helpful?", type: "checkbox", options: ["Bible plan", "Small-group study", "Workbook", "Video series", "Live workshop", "Church class", "Online community", "Book companion guide", "Family/couples guide", "Men’s group version", "Financial stewardship guide"] },
+  { name: "innerCircle", label: "Would you be open to joining a smaller Inner Circle to continue helping shape the book and future resources?", type: "select", options: ["Yes", "Maybe", "No"] },
+  { name: "followUp", label: "May Mike follow up with you about your feedback?", type: "select", options: ["Yes", "No"] },
+  { name: "storyInterview", label: "May Mike contact you about a possible quote, story, or interview?", type: "select", options: ["Yes", "Maybe", "No"] },
+  { name: "anonymousUse", label: "May your feedback be used anonymously to improve the book and future resources?", type: "select", options: ["Yes", "No"] },
+  { name: "finalNeed", label: "Final question: What do you think people most need from this message right now?", type: "textarea" },
+] as const;
+
+export const PASTOR_ELDER_SURVEY_FIELDS = [
+  { name: "name", label: "Name", type: "text", required: true },
+  { name: "email", label: "Email", type: "email", required: true },
+  { name: "churchOrganization", label: "Church / organization", type: "text" },
+  { name: "role", label: "Role", type: "select", options: ["Senior pastor", "Executive pastor", "Teaching pastor", "Associate pastor", "Elder", "Ministry leader", "Small-group leader", "Other"] },
+  { name: "biblicallyGrounded", label: "Did the 7-day journey feel biblically grounded?", type: "select", options: ["Yes", "Mostly", "Somewhat", "Not yet", "Unsure"] },
+  { name: "theologyClarity", label: "Where, if anywhere, does the biblical or theological foundation need more clarity?", type: "textarea" },
+  { name: "pastorallyHelpful", label: "Did the tone feel pastorally helpful?", type: "select", options: ["Yes", "Mostly", "Somewhat", "Not yet", "Unsure"] },
+  { name: "convictingNotCondemning", label: "Did the content feel convicting without being condemning?", type: "select", options: ["Yes", "Mostly", "Somewhat", "Not yet", "Unsure"] },
+  { name: "mostHelpful", label: "What part felt most pastorally helpful?", type: "textarea" },
+  { name: "beCarefulWith", label: "What part would you want me to be careful with?", type: "textarea" },
+  { name: "churchUse", label: "Could you see this serving people in a church setting?", type: "select", options: ["Yes", "Possibly", "Not yet", "Unsure"] },
+  { name: "churchSetting", label: "Which church setting seems most natural?", type: "checkbox", options: ["Men’s group", "Couples group", "Small group", "Adult class", "Stewardship class", "Leadership cohort", "Marriage/family ministry", "Financial stewardship ministry", "Sermon series support", "Church-wide campaign", "Young adults", "Parents", "Business leaders", "Other"] },
+  { name: "audience", label: "What audience in your church or ministry do you think most needs this?", type: "textarea" },
+  { name: "concerns", label: "What concerns would you have before recommending this to a church group?", type: "textarea" },
+  { name: "leaderNeeds", label: "What would need to be added for a small-group leader to use this well?", type: "textarea" },
+  { name: "studyLength", label: "Would this work better as a 4-week, 6-week, or 7-week small-group study?", type: "select", options: ["4-week", "6-week", "7-week", "Unsure", "Other"] },
+  { name: "topicsExpanded", label: "What topics should be expanded for church use?", type: "checkbox", options: ["Faith at the center", "Family and relationships", "Health and energy", "Joy, Sabbath, and meaningful experiences", "Financial stewardship", "Guardrails", "Habits", "Generosity and legacy", "Raising the next generation", "Purpose and calling", "Other"] },
+  { name: "businessOrChurchFit", label: "Did anything feel too business-oriented, too financial, or not church-friendly enough?", type: "textarea" },
+  { name: "spiritualWeight", label: "Did anything feel too light spiritually or too heavy spiritually?", type: "textarea" },
+  { name: "scriptureTheme", label: "What Scripture, theological theme, or discipleship emphasis would you suggest strengthening?", type: "textarea" },
+  { name: "followUpConversation", label: "Would you be open to a follow-up conversation with Michael?", type: "select", options: ["Yes", "Maybe", "No"] },
+  { name: "futureReview", label: "Would you be open to reviewing future versions of a small-group study, Bible plan, or church resource?", type: "select", options: ["Yes", "Maybe", "No"] },
+  { name: "anonymousUse", label: "May Michael use your feedback anonymously to improve the book and future resources?", type: "select", options: ["Yes", "No"] },
+  { name: "storyInterview", label: "May Michael contact you about a possible quote, endorsement, story, or interview in the future?", type: "select", options: ["Yes", "Maybe", "No"] },
+  { name: "finalNeed", label: "Final question: What do you think people most need from this message right now?", type: "textarea" },
+] as const;

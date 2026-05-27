@@ -1,0 +1,223 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 27% 98%;
+    --foreground: 160 16% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 160 16% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 16% 8%;
+    --primary: 151 44% 24%;
+    --primary-foreground: 48 45% 96%;
+    --secondary: 42 32% 93%;
+    --secondary-foreground: 160 16% 14%;
+    --muted: 42 26% 94%;
+    --muted-foreground: 160 7% 42%;
+    --accent: 43 51% 84%;
+    --accent-foreground: 160 26% 14%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 42 20% 84%;
+    --input: 42 20% 84%;
+    --ring: 151 44% 28%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 162 26% 7%;
+    --foreground: 42 32% 93%;
+    --card: 160 24% 10%;
+    --card-foreground: 42 32% 93%;
+    --popover: 160 24% 10%;
+    --popover-foreground: 42 32% 93%;
+    --primary: 43 62% 72%;
+    --primary-foreground: 160 32% 8%;
+    --secondary: 160 17% 15%;
+    --secondary-foreground: 42 28% 91%;
+    --muted: 160 15% 16%;
+    --muted-foreground: 42 12% 68%;
+    --accent: 151 30% 21%;
+    --accent-foreground: 43 55% 82%;
+    --destructive: 0 67% 43%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 160 16% 20%;
+    --input: 160 16% 20%;
+    --ring: 43 62% 72%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 14px;
+  }
+}
+
+@layer components {
+  .pilot-page {
+    --background: 45 33% 98%;
+    --foreground: 200 35% 7%;
+    --card: 45 33% 99%;
+    --card-foreground: 200 35% 7%;
+    --popover: 45 33% 99%;
+    --popover-foreground: 200 35% 7%;
+    --primary: 200 35% 7%;
+    --primary-foreground: 45 33% 98%;
+    --secondary: 41 28% 94%;
+    --secondary-foreground: 200 35% 9%;
+    --muted: 42 24% 93%;
+    --muted-foreground: 203 9% 42%;
+    --accent: 38 43% 61%;
+    --accent-foreground: 200 35% 7%;
+    --border: 39 26% 84%;
+    --input: 39 26% 84%;
+    --ring: 38 43% 54%;
+    --brand-navy: #1a2e3b;
+    --brand-gold: #b88a4a;
+    --brand-gold-2: #c9a96e;
+    --brand-cream: #fbfaf7;
+    --brand-beige: #ebe6db;
+    --brand-ink: #0c1419;
+    background:
+      linear-gradient(rgba(26, 46, 59, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26, 46, 59, 0.035) 1px, transparent 1px),
+      hsl(var(--background));
+    background-size: 48px 48px;
+    color: hsl(var(--foreground));
+    font-family: "Geist", Arial, sans-serif;
+  }
+
+  .dark .pilot-page {
+    --background: 200 43% 7%;
+    --foreground: 42 28% 92%;
+    --card: 200 34% 9%;
+    --card-foreground: 42 28% 92%;
+    --popover: 200 34% 9%;
+    --popover-foreground: 42 28% 92%;
+    --primary: 42 28% 96%;
+    --primary-foreground: 200 35% 7%;
+    --secondary: 195 22% 13%;
+    --secondary-foreground: 42 28% 92%;
+    --muted: 195 21% 13%;
+    --muted-foreground: 42 10% 68%;
+    --accent: 38 43% 61%;
+    --accent-foreground: 200 35% 7%;
+    --border: 195 18% 18%;
+    --input: 195 18% 18%;
+    --ring: 38 43% 61%;
+    background:
+      linear-gradient(rgba(251, 250, 247, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(251, 250, 247, 0.035) 1px, transparent 1px),
+      hsl(var(--background));
+  }
+
+  .pilot-topbar {
+    border-bottom: 1px solid hsl(var(--border) / 0.65);
+    background: hsl(var(--background) / 0.88);
+    backdrop-filter: blur(18px);
+  }
+
+  .dark .pilot-topbar {
+    background: hsl(var(--background) / 0.92);
+  }
+
+  .pilot-logo {
+    font-family: "Geist", Arial, sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -0.07em;
+    line-height: 0.8;
+  }
+
+  .pilot-signature {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+
+  .pilot-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid hsl(var(--accent) / 0.35);
+    border-radius: 999px;
+    background: hsl(var(--card) / 0.72);
+    padding: 0.48rem 0.9rem;
+    color: hsl(var(--accent));
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .pilot-heading {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
+  }
+
+  .pilot-heading em {
+    color: hsl(var(--accent));
+    font-style: italic;
+  }
+
+  .pilot-hero-copy {
+    color: hsl(var(--muted-foreground));
+    font-size: 1.08rem;
+    line-height: 1.8;
+  }
+
+  .pilot-video {
+    border: 1px solid hsl(var(--border) / 0.75);
+    background:
+      radial-gradient(circle at 50% 35%, hsl(var(--accent) / 0.14), transparent 42%),
+      hsl(var(--card) / 0.74);
+    box-shadow: 0 24px 80px rgba(12, 20, 25, 0.08);
+  }
+
+  .pilot-page .rounded-lg {
+    border-radius: 0.5rem;
+  }
+
+  .pilot-page .shadow-sm {
+    box-shadow: 0 18px 50px rgba(12, 20, 25, 0.05);
+  }
+
+  .pilot-theme-toggle {
+    display: inline-flex;
+    height: 2.75rem;
+    width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--secondary) / 0.7);
+    color: hsl(var(--foreground));
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .pilot-theme-toggle:hover {
+    background: hsl(var(--secondary));
+    transform: translateY(-1px);
+  }
+
+  .pilot-page nav .bg-primary {
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+    border: 1px solid hsl(var(--foreground));
+  }
+
+  .dark .pilot-page nav .bg-primary {
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
+}
