@@ -54,6 +54,7 @@ export async function upsertParticipant(input: ContactInput) {
   if (error) throw error;
 
   await applyParticipantTags(data.id, tagsForParticipant(input));
+  await linkParticipantToMatchingUser(data.id, normalizedEmail, input.phone);
   return data;
 }
 
@@ -127,6 +128,20 @@ export async function saveCheckIn(input: {
     message: `${input.contact.firstName} ${input.contact.lastName} completed the Created for More Check-In.`,
     participantId: participant.id,
     metadata: { totalScore: input.result.totalScore, lowestArea: input.result.lowestAreaLabel },
+  });
+
+  await recordFormSubmission({
+    formType: "created_for_more_check_in",
+    email: input.contact.email,
+    phone: input.contact.phone,
+    participantId: participant.id,
+    source: input.contact.waveSource,
+    payload: {
+      contact: input.contact,
+      scores: input.scores,
+      result: input.result,
+      reflections: input.reflections,
+    },
   });
 
   return { participantId: participant.id, checkInResultId: checkIn.id };
@@ -208,6 +223,16 @@ export async function saveSurvey(input: {
     participantId: participant.id,
   });
 
+  await recordFormSubmission({
+    formType: input.surveyType === "pastor_elder" ? "pastor_elder_survey" : "general_survey",
+    email: input.email,
+    participantId: participant.id,
+    payload: {
+      surveyType: input.surveyType,
+      answers: input.answers,
+    },
+  });
+
   return { participantId: participant.id, surveyResponseId: response.id };
 }
 
@@ -265,7 +290,89 @@ export async function saveInnerCircle(input: {
     participantId: participant.id,
   });
 
+  await recordFormSubmission({
+    formType: "inner_circle",
+    email: input.email,
+    phone: input.phone,
+    participantId: participant.id,
+    source: "inner_circle",
+    payload: input,
+  });
+
   return { participantId: participant.id };
+}
+
+async function recordFormSubmission(input: {
+  formType: string;
+  email?: string;
+  phone?: string;
+  participantId?: string;
+  source?: string;
+  payload: Record<string, unknown>;
+}) {
+  const supabase = createSupabaseAdminClient();
+  const normalizedEmail = input.email?.trim().toLowerCase() || null;
+  const user = await findProfileByContact(normalizedEmail ?? undefined, input.phone);
+
+  await supabase.from("form_submissions").insert({
+    form_type: input.formType,
+    email: normalizedEmail,
+    phone: input.phone || null,
+    user_id: user?.id ?? null,
+    participant_id: input.participantId ?? null,
+    source: input.source ?? null,
+    status: "received",
+    payload: input.payload,
+  });
+
+  if (user?.id && input.participantId) {
+    await supabase.from("participant_user_links").upsert(
+      {
+        participant_id: input.participantId,
+        user_id: user.id,
+        link_type: "form_submission_match",
+      },
+      { onConflict: "participant_id,user_id" },
+    );
+  }
+}
+
+async function linkParticipantToMatchingUser(participantId: string, email?: string, phone?: string) {
+  const supabase = createSupabaseAdminClient();
+  const user = await findProfileByContact(email, phone);
+
+  if (!user?.id) return;
+
+  await supabase.from("participant_user_links").upsert(
+    {
+      participant_id: participantId,
+      user_id: user.id,
+      link_type: email ? "email_match" : "phone_match",
+    },
+    { onConflict: "participant_id,user_id" },
+  );
+
+  await supabase
+    .from("profiles")
+    .update({ related_participant_id: participantId, updated_at: new Date().toISOString() })
+    .eq("id", user.id)
+    .is("related_participant_id", null);
+}
+
+async function findProfileByContact(email?: string, phone?: string) {
+  const supabase = createSupabaseAdminClient();
+
+  if (email) {
+    const { data } = await supabase.from("profiles").select("id,email,phone").eq("email", email.trim().toLowerCase()).maybeSingle();
+    if (data) return data;
+  }
+
+  if (phone) {
+    const { data } = await supabase.from("profiles").select("id,email,phone").eq("phone", phone.trim()).maybeSingle();
+    if (data) return data;
+  }
+
+  return null;
 }
 
 async function applyParticipantTags(participantId: string, tagNames: string[]) {

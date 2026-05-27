@@ -8,6 +8,12 @@ The pilot schema is defined in:
 ## Core Tables
 
 - `profiles`
+- `user_invitations`
+- `user_activity_logs`
+- `user_preferences`
+- `form_submissions`
+- `participant_user_links`
+- `role_assignment_history`
 - `participants`
 - `waves`
 - `tags`
@@ -20,6 +26,38 @@ The pilot schema is defined in:
 - `notifications`
 - `activity_logs`
 - `inner_circle_responses`
+
+## User Management Storage
+
+All important user-management data is stored in Supabase. The active schema extends `profiles` with:
+
+- `auth_user_id`
+- first, last, and full name
+- email and phone
+- role and status
+- avatar URL
+- invited-by user
+- related participant/contact record
+- notes
+- last login date
+- role/status change metadata
+
+Additional user-management tables store:
+
+- invitations by email, SMS, or manual invite
+- role assignment history
+- user-specific view/search/filter/column preferences
+- user activity logs
+- form submission records
+- participant-to-user links
+- user-management notifications
+
+Privileged user-management writes must happen server-side through:
+
+- `POST /api/user-management/invitations`
+- `POST /api/user-management/users`
+
+These route handlers require an active `super_admin` or `admin` Supabase profile and use the service role key only on the server.
 
 ## Consent Fields
 

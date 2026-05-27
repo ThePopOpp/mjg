@@ -7,7 +7,7 @@ export type DashboardProfile = {
   firstName: string;
   lastName: string;
   role: AppRole;
-  status: "active" | "invited" | "inactive";
+  status: "active" | "invited" | "pending" | "suspended" | "archived" | "inactive";
 };
 
 export async function getCurrentProfile(): Promise<DashboardProfile | null> {
