@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Join The Movement - Michael J. Gauthier</title>
+  <meta name="description" content="Join The Movement and take the next step on your stewardship journey with Michael J. Gauthier." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f0f0d;
+      --bg-soft: #171512;
+      --text: #f8f5ef;
+      --muted: rgba(248, 245, 239, 0.72);
+      --line: rgba(255, 255, 255, 0.1);
+      --card: #fffdf8;
+      --card-text: #151412;
+      --card-muted: #9b948b;
+      --field-line: #ddd8cf;
+      --gold: #d0aa6f;
+      --gold-dark: #a87d42;
+      --danger: #c94f4f;
+      --success: #2f8f62;
+      --nav-bg: rgba(15, 15, 13, 0.82);
+      --nav-text: #f8f5ef;
+      --nav-btn-bg: #fffdf8;
+      --nav-btn-text: #0f0f0d;
+      --control-bg: rgba(255, 255, 255, 0.06);
+      --control-border: rgba(255, 255, 255, 0.2);
+    }
+
+    html[data-theme="light"] {
+      --bg: #f8f5ef;
+      --bg-soft: #fffdf8;
+      --text: #151412;
+      --muted: #5f5a53;
+      --line: rgba(21, 20, 18, 0.12);
+      --card: #ffffff;
+      --card-text: #151412;
+      --card-muted: #81786f;
+      --field-line: #ddd8cf;
+      --nav-bg: rgba(248, 245, 239, 0.9);
+      --nav-text: #111110;
+      --nav-btn-bg: #111110;
+      --nav-btn-text: #fffdf8;
+      --control-bg: rgba(17, 17, 16, 0.04);
+      --control-border: rgba(17, 17, 16, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 64% 52%, rgba(208, 170, 111, 0.18), transparent 26rem),
+        linear-gradient(rgba(208, 170, 111, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(208, 170, 111, 0.035) 1px, transparent 1px),
+        var(--bg);
+      background-size: auto, 44px 44px, 44px 44px, auto;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .site-shell {
+      width: min(100% - 48px, 1160px);
+      min-height: 100vh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      color: var(--nav-text);
+    }
+
+    .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .nav-logo img {
+      height: 42px;
+      width: auto;
+      display: block;
+    }
+
+    .nav-logo-text {
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: 17px;
+      font-style: italic;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      font-size: 16px;
+      font-weight: 700;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links li { display: flex; align-items: center; }
+
+    .nav-links a { color: var(--nav-text); }
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      height: 52px;
+      padding: 0 27px;
+      border-radius: 4px;
+      background: var(--nav-btn-bg);
+      color: var(--nav-btn-text) !important;
+      font-size: 16px;
+    }
+
+    .theme-toggle {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--control-border);
+      border-radius: 14px;
+      background: var(--control-bg);
+      color: var(--nav-text);
+      cursor: pointer;
+    }
+
+    .hero {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 418px;
+      gap: clamp(52px, 8vw, 92px);
+      align-items: center;
+      padding: 72px 0 86px;
+    }
+
+    .copy { max-width: 560px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 29px;
+      padding: 0 14px;
+      border: 2px solid var(--gold);
+      border-radius: 999px;
+      background: rgba(208, 170, 111, 0.13);
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    h1 {
+      margin: 28px 0 28px;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(4rem, 7vw, 5.3rem);
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.045em;
+    }
+
+    h1 em {
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    .copy p {
+      width: min(100%, 500px);
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.72;
+    }
+
+    .secondary-cta {
+      width: 206px;
+      height: 45px;
+      margin-top: 28px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .signup-card {
+      width: 100%;
+      min-height: 572px;
+      padding: 32px 30px 34px;
+      border-radius: 20px;
+      background: var(--card);
+      color: var(--card-text);
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.28);
+    }
+
+    .field {
+      position: relative;
+      margin-bottom: 22px;
+    }
+
+    .field input {
+      width: 100%;
+      height: 58px;
+      border: 0;
+      border-bottom: 1px solid var(--field-line);
+      border-radius: 0;
+      background: transparent;
+      color: var(--card-text);
+      outline: none;
+      padding: 0 14px;
+      font-size: 14px;
+    }
+
+    .field input::placeholder { color: var(--card-muted); }
+
+    .custom-select {
+      position: relative;
+      width: 100%;
+      color: var(--card-text);
+    }
+
+    .custom-select-trigger {
+      width: 100%;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border: 0;
+      border-bottom: 1px solid var(--field-line);
+      border-radius: 0;
+      background: transparent;
+      color: var(--card-text);
+      padding: 0 14px;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .custom-select-trigger::after {
+      content: "";
+      flex: 0 0 auto;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #d8d2c8;
+      transition: transform 0.18s ease;
+    }
+
+    .custom-select.open .custom-select-trigger::after { transform: rotate(180deg); }
+
+    .custom-select-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 8px);
+      z-index: 20;
+      display: none;
+      padding: 8px;
+      border: 1px solid var(--field-line);
+      border-radius: 14px;
+      background: var(--card);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .custom-select.open .custom-select-menu { display: grid; gap: 4px; }
+
+    .custom-select-option {
+      width: 100%;
+      min-height: 38px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--card-text);
+      padding: 0 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .custom-select-option:hover,
+    .custom-select-option[aria-selected="true"] {
+      background: rgba(208, 170, 111, 0.18);
+      color: #111110;
+    }
+
+    .consent {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 12px;
+      align-items: start;
+      margin: 38px 0 58px;
+      color: #4c473f;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .consent input {
+      width: 17px;
+      height: 17px;
+      margin: 1px 0 0;
+      accent-color: var(--gold);
+    }
+
+    .submit {
+      width: 100%;
+      height: 50px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--gold);
+      color: #070706;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .submit:hover { background: #dbb77d; transform: translateY(-1px); }
+    .submit:disabled { cursor: wait; opacity: 0.68; transform: none; }
+
+    .status {
+      min-height: 22px;
+      margin-top: 18px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--card-muted);
+    }
+
+    .status.success { color: var(--success); }
+    .status.error { color: var(--danger); }
+
+    @media (max-width: 860px) {
+      .site-shell { width: min(100% - 32px, 640px); }
+      .nav { height: auto; padding: 16px 0; }
+      .nav-links { gap: 14px; font-size: 12px; }
+      .nav-links li:not(:has(.nav-cta)):not(:last-child) { display: none; }
+      .nav-logo img { height: 34px; }
+      .nav-logo-text { display: none; }
+      .nav-cta { height: 42px; padding: 0 16px; font-size: 13px; }
+      .theme-toggle { width: 42px; height: 42px; }
+      .hero { grid-template-columns: 1fr; padding: 48px 0 64px; }
+      .signup-card { max-width: 420px; }
+      h1 { font-size: clamp(3.2rem, 14vw, 4.5rem); }
+    }
+  </style>
+  <script>
+    (function () {
+      var stored = localStorage.getItem("mjg-join-theme");
+      var preferred = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", stored || preferred);
+    }());
+  </script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="nav">
+      <a class="nav-logo" href="index.html" aria-label="Michael J. Gauthier home">
+        <img id="nav-logo-img" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" alt="Michael J. Gauthier" data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+        <span class="nav-logo-text">Michael J. Gauthier</span>
+      </a>
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about-us.html">About</a></li>
+          <li><a href="our-mission">Mission</a></li>
+          <li><a href="index.html#listen">Listen</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a class="nav-cta" href="join-the-movement.html">Join the Movement</a></li>
+          <li><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light and dark mode">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+            </svg>
+          </button></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <section class="copy" aria-labelledby="page-title">
+        <div class="eyebrow">Now Writing · Chapters 1 &amp; 2 Available</div>
+        <h1 id="page-title">Join <em>The</em> Movement</h1>
+        <p>Are you ready to use your God-given resources for God-given purposes? We can make a difference together. By clicking the button below, you can join this movement to live a life of generosity, impact investing, and community transformation. When you join, you will receive additional resources, support, and guidance from my team to help you take the next steps on your stewardship journey.</p>
+        <button class="secondary-cta" type="button" onclick="document.getElementById('join-form').scrollIntoView({behavior:'smooth', block:'center'});">Contact Us</button>
+      </section>
+
+      <section class="signup-card" aria-label="Join The Movement signup form">
+        <form id="join-form">
+          <div class="field">
+            <input id="first-name" name="first_name" type="text" placeholder="First Name" autocomplete="given-name" required />
+          </div>
+          <div class="field">
+            <input id="last-name" name="last_name" type="text" placeholder="Last Name" autocomplete="family-name" required />
+          </div>
+          <div class="field">
+            <input id="phone" name="phone" type="tel" placeholder="(480) 466-7070" autocomplete="tel" required />
+          </div>
+          <div class="field">
+            <input id="email" name="email" type="email" placeholder="mike@strategicincomegroup.com" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <input id="interest" name="interest" type="hidden" value="Join the movement" />
+            <div class="custom-select" data-custom-select>
+              <button class="custom-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">Join the movement</button>
+              <div class="custom-select-menu" role="listbox" aria-label="Movement interest">
+                <button class="custom-select-option" type="button" role="option" aria-selected="true" data-value="Join the movement">Join the movement</button>
+                <button class="custom-select-option" type="button" role="option" aria-selected="false" data-value="Stewardship resources">Stewardship resources</button>
+                <button class="custom-select-option" type="button" role="option" aria-selected="false" data-value="Impact investing">Impact investing</button>
+                <button class="custom-select-option" type="button" role="option" aria-selected="false" data-value="Community transformation">Community transformation</button>
+              </div>
+            </div>
+          </div>
+          <label class="consent" for="consent">
+            <input id="consent" name="consent" type="checkbox" required />
+            <span>I agree to receive emails and text messages from michaeljgauthier.com</span>
+          </label>
+          <button class="submit" id="submit-button" type="submit">Get Started</button>
+          <div class="status" id="form-status" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { supabase } from "./js/supabase-client.js";
+
+    const form = document.getElementById("join-form");
+    const submitButton = document.getElementById("submit-button");
+    const statusEl = document.getElementById("form-status");
+    const themeToggle = document.getElementById("theme-toggle");
+    const navLogo = document.getElementById("nav-logo-img");
+    const customSelect = document.querySelector("[data-custom-select]");
+    const customSelectTrigger = customSelect.querySelector(".custom-select-trigger");
+    const customSelectOptions = customSelect.querySelectorAll(".custom-select-option");
+    const interestInput = document.getElementById("interest");
+
+    function syncHeaderLogo() {
+      const theme = document.documentElement.getAttribute("data-theme") || "dark";
+      navLogo.src = theme === "dark" ? navLogo.dataset.logoDark : navLogo.dataset.logoLight;
+    }
+
+    syncHeaderLogo();
+
+    customSelectTrigger.addEventListener("click", () => {
+      const isOpen = customSelect.classList.toggle("open");
+      customSelectTrigger.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    customSelectOptions.forEach((option) => {
+      option.addEventListener("click", () => {
+        interestInput.value = option.dataset.value;
+        customSelectTrigger.textContent = option.dataset.value;
+        customSelectOptions.forEach((item) => item.setAttribute("aria-selected", "false"));
+        option.setAttribute("aria-selected", "true");
+        customSelect.classList.remove("open");
+        customSelectTrigger.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!customSelect.contains(event.target)) {
+        customSelect.classList.remove("open");
+        customSelectTrigger.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        customSelect.classList.remove("open");
+        customSelectTrigger.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    function setStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function generateTemporaryPassword() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+      const bytes = new Uint32Array(18);
+      crypto.getRandomValues(bytes);
+      return Array.from(bytes, value => chars[value % chars.length]).join("");
+    }
+
+    async function insertIfAvailable(table, payload) {
+      try {
+        const { error } = await supabase.from(table).insert(payload);
+        if (error) console.warn(table + " insert skipped:", error.message);
+      } catch (error) {
+        console.warn(table + " insert skipped:", error.message);
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setStatus("", "");
+      submitButton.disabled = true;
+      submitButton.textContent = "Creating Account...";
+
+      const formData = new FormData(form);
+      const firstName = String(formData.get("first_name") || "").trim();
+      const lastName = String(formData.get("last_name") || "").trim();
+      const email = String(formData.get("email") || "").trim().toLowerCase();
+      const phone = String(formData.get("phone") || "").trim();
+      const interest = String(formData.get("interest") || "Join the movement");
+      const temporaryPassword = generateTemporaryPassword();
+      const fullName = [firstName, lastName].filter(Boolean).join(" ");
+
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password: temporaryPassword,
+          options: {
+            emailRedirectTo: new URL("dashboard/home.html", window.location.href).toString(),
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              full_name: fullName,
+              phone,
+              source: "join_the_movement",
+              interest,
+              role: "user",
+              status: "invited",
+              temporary_password: temporaryPassword
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        const userId = data.user?.id || null;
+        if (userId) {
+          await insertIfAvailable("profiles", {
+            id: userId,
+            email,
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName,
+            phone,
+            role: "user",
+            status: "invited",
+            source: "join_the_movement"
+          });
+        }
+
+        await insertIfAvailable("form_submissions", {
+          form_type: "join_the_movement",
+          user_id: userId,
+          email,
+          phone,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName,
+            interest,
+            consent: true,
+            source: "Join The Movement page"
+          }
+        });
+
+        setStatus("You're in. Check your email for next steps and login details.", "success");
+        form.reset();
+      } catch (error) {
+        setStatus(error.message || "Something went wrong. Please try again.", "error");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Get Started";
+      }
+    });
+
+    themeToggle.addEventListener("click", () => {
+      const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("mjg-join-theme", next);
+      syncHeaderLogo();
+    });
+  </script>
+</body>
+</html>

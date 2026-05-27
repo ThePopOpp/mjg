@@ -1,0 +1,2353 @@
+<style>
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700&display=swap");
+
+/* =========================================================
+   MJG CREATED FOR MORE CHECK-IN
+   Complete Bricks Builder CSS
+========================================================= */
+
+:root {
+  --mjg-nav-background: #ffffff;
+  --mjg-nav-text: #111110;
+  --mjg-nav-border: #e8e6e0;
+  --mjg-nav-btn-bg: #111110;
+  --mjg-nav-btn-text: #ffffff;
+  --mjg-control-bg: rgba(17,17,17,0.06);
+  --mjg-control-border: rgba(17,17,17,0.16);
+  --mjg-control-hover: rgba(17,17,17,0.1);
+}
+
+html[data-theme="dark"] {
+  --mjg-nav-background: #0f0f0f;
+  --mjg-nav-text: #f7f5f2;
+  --mjg-nav-border: rgba(255,255,255,0.08);
+  --mjg-nav-btn-bg: #f7f5f2;
+  --mjg-nav-btn-text: #0f0f0f;
+  --mjg-control-bg: rgba(255,255,255,0.08);
+  --mjg-control-border: rgba(255,255,255,0.18);
+  --mjg-control-hover: rgba(255,255,255,0.12);
+}
+
+.mjg-site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background: var(--mjg-nav-background);
+  border-bottom: 1px solid var(--mjg-nav-border);
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.mjg-nav-inner {
+  max-width: 1160px;
+  width: 100%;
+  min-height: 60px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mjg-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--mjg-nav-text);
+  text-decoration: none;
+}
+
+.mjg-nav-logo img {
+  height: 36px;
+  width: auto;
+  display: block;
+}
+
+.mjg-nav-logo-text {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--mjg-nav-text);
+  letter-spacing: -0.02em;
+}
+
+.mjg-nav-logo-text .gold { color: #C9A46E; }
+
+.mjg-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mjg-nav-links a,
+.mjg-nav-link-plain {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 0.875rem;
+  color: var(--mjg-nav-text);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.mjg-nav-link-plain {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.mjg-nav-links a:hover,
+.mjg-nav-link-plain:hover { color: #C9A46E; }
+
+.mjg-btn {
+  display: inline-block;
+  padding: 0.55rem 1.25rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.mjg-btn-dark {
+  background: var(--mjg-nav-btn-bg);
+  color: var(--mjg-nav-btn-text) !important;
+}
+
+.mjg-theme-toggle,
+.mjg-mobile-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: var(--mjg-control-bg);
+  border: 1px solid var(--mjg-control-border);
+  color: var(--mjg-nav-text);
+  border-radius: 14px;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+.mjg-theme-toggle:hover,
+.mjg-mobile-menu-toggle:hover {
+  background: var(--mjg-control-hover);
+  transform: translateY(-1px);
+}
+
+.mjg-mobile-menu-toggle { display: none; }
+
+.mjg-checkin {
+  --mjg-navy: #172f3d;
+  --mjg-navy-dark: #122936;
+  --mjg-gold: #b8965c;
+  --mjg-gold-soft: #efe6d6;
+  --mjg-cream: #f8f6f0;
+  --mjg-paper: #fffdf8;
+  --mjg-border: #ded8c9;
+  --mjg-text: #26333a;
+  --mjg-muted: #697276;
+  --mjg-white: #ffffff;
+  --mjg-heading: var(--mjg-navy);
+  --mjg-page-shadow: 0 20px 60px rgba(18, 41, 54, 0.06);
+  --mjg-panel: #ffffff;
+  --mjg-input-bg: #ffffff;
+  --mjg-input-text: var(--mjg-text);
+  --mjg-radio-bg: #fffdf8;
+  --mjg-radio-text: var(--mjg-navy);
+
+  background: var(--mjg-cream);
+  color: var(--mjg-text);
+  font-family: Inter, Arial, sans-serif;
+  line-height: 1.55;
+  width: 100%;
+  padding: 48px 16px;
+}
+
+html[data-theme="dark"] .mjg-checkin {
+  --mjg-cream: #0f0f0f;
+  --mjg-paper: #161616;
+  --mjg-border: rgba(255,255,255,0.1);
+  --mjg-text: #f7f5f2;
+  --mjg-muted: #bfb6a7;
+  --mjg-gold-soft: rgba(184,150,92,0.16);
+  --mjg-heading: #f7f5f2;
+  --mjg-page-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+  --mjg-panel: #1d1d1d;
+  --mjg-input-bg: #101010;
+  --mjg-input-text: #f7f5f2;
+  --mjg-radio-bg: #101010;
+  --mjg-radio-text: #f7f5f2;
+}
+
+.mjg-checkin *,
+.mjg-checkin *::before,
+.mjg-checkin *::after {
+  box-sizing: border-box;
+}
+
+.mjg-checkin form,
+.mjg-checkin input,
+.mjg-checkin textarea,
+.mjg-checkin select,
+.mjg-checkin button {
+  font-family: inherit;
+}
+
+.mjg-page {
+  width: min(100%, 980px);
+  margin: 0 auto 48px;
+  padding: clamp(32px, 5vw, 72px);
+  background: var(--mjg-paper);
+  border: 1px solid var(--mjg-border);
+  box-shadow: var(--mjg-page-shadow);
+  overflow: visible;
+}
+
+.mjg-cover,
+.mjg-end {
+  min-height: 760px;
+  background: var(--mjg-navy-dark);
+  color: var(--mjg-white);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mjg-page:not(.mjg-cover):not(.mjg-end)::before {
+  content: "Created for More • The Stewardship Blueprint";
+  display: block;
+  padding-bottom: 16px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--mjg-border);
+  color: var(--mjg-muted);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.mjg-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.26em;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.mjg-cover-content {
+  max-width: 720px;
+}
+
+.mjg-eyebrow {
+  color: var(--mjg-gold);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.mjg-checkin h1,
+.mjg-checkin h2,
+.mjg-checkin h3 {
+  font-family: "DM Serif Display", Georgia, serif;
+  color: var(--mjg-heading);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  margin: 0 0 18px;
+}
+
+.mjg-cover h1,
+.mjg-end h2 {
+  color: var(--mjg-white);
+}
+
+.mjg-checkin h1 {
+  font-size: clamp(4rem, 9vw, 7.5rem);
+}
+
+.mjg-checkin h2 {
+  font-size: clamp(2.7rem, 5vw, 5.1rem);
+}
+
+.mjg-checkin h3 {
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.mjg-checkin em {
+  color: var(--mjg-gold);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.mjg-lead {
+  max-width: 560px;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.mjg-page p {
+  font-size: 1rem;
+  color: var(--mjg-text);
+}
+
+.mjg-cover p,
+.mjg-end p {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.mjg-checkin blockquote {
+  margin: 28px 0;
+  padding: 18px 24px;
+  border-left: 4px solid var(--mjg-gold);
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: var(--mjg-text);
+  background: rgba(184, 150, 92, 0.06);
+}
+
+.mjg-cover blockquote,
+.mjg-end blockquote {
+  color: rgba(255, 255, 255, 0.82);
+  background: transparent;
+  border-color: var(--mjg-gold);
+}
+
+.mjg-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 48px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.mjg-footer-dark {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.mjg-logo {
+  font-size: clamp(2.5rem, 5vw, 4.4rem);
+  font-weight: 900;
+  letter-spacing: -0.08em;
+  color: var(--mjg-white);
+}
+
+.mjg-list {
+  display: grid;
+  gap: 18px;
+  margin: 32px 0;
+}
+
+.mjg-list-item {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  gap: 18px;
+  padding: 20px 0;
+  border-bottom: 1px dashed var(--mjg-border);
+}
+
+.mjg-list-item span {
+  color: var(--mjg-gold);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.mjg-list-item h3 {
+  margin-bottom: 6px;
+  font-size: 1.35rem;
+}
+
+.mjg-list-item p {
+  margin: 0;
+}
+
+.mjg-score-table {
+  border: 1px solid var(--mjg-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--mjg-white);
+  margin: 28px 0;
+}
+
+.mjg-score-head,
+.mjg-score-row {
+  display: grid;
+  grid-template-columns: 90px 220px 1fr;
+  align-items: center;
+}
+
+.mjg-score-head {
+  background: var(--mjg-navy);
+  color: var(--mjg-white);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 800;
+}
+
+.mjg-score-head span,
+.mjg-score-row span,
+.mjg-score-row strong,
+.mjg-score-row p {
+  padding: 14px 18px;
+  margin: 0;
+}
+
+.mjg-score-row {
+  border-bottom: 1px solid var(--mjg-border);
+}
+
+.mjg-score-row:last-child {
+  border-bottom: none;
+}
+
+.mjg-score-row span {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--mjg-heading);
+}
+
+.mjg-section-heading {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 22px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.mjg-section-number {
+  width: 86px;
+  height: 86px;
+  border-radius: 18px;
+  background: var(--mjg-navy);
+  color: var(--mjg-white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+}
+
+.mjg-section-number strong {
+  font-size: 2rem;
+  letter-spacing: 0;
+}
+
+.mjg-section-heading p {
+  margin: -8px 0 0;
+  color: var(--mjg-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mjg-core-question {
+  padding: 20px 24px;
+  border: 1px solid var(--mjg-border);
+  border-left: 4px solid var(--mjg-gold);
+  background: var(--mjg-white);
+  margin-bottom: 28px;
+}
+
+.mjg-core-question span {
+  display: block;
+  color: var(--mjg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.mjg-core-question strong {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 1.15rem;
+}
+
+.mjg-checkin .mjg-form {
+  display: block;
+  width: 100%;
+}
+
+.mjg-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.mjg-contact-grid label {
+  display: grid;
+  gap: 8px;
+  color: var(--mjg-heading);
+  font-weight: 800;
+}
+
+.mjg-checkin .mjg-rating-table {
+  display: grid;
+  gap: 14px;
+  border: none;
+  background: transparent;
+  overflow: visible;
+  margin: 28px 0;
+}
+
+.mjg-checkin .mjg-rating-head {
+  display: none;
+}
+
+.mjg-checkin .mjg-rating-row {
+  display: grid;
+  grid-template-columns: 1fr repeat(5, 52px);
+  gap: 14px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid var(--mjg-border);
+  border-radius: 14px;
+  background: var(--mjg-panel);
+  box-shadow: 0 10px 30px rgba(18, 41, 54, 0.04);
+}
+
+.mjg-checkin .mjg-rating-row p {
+  padding: 0;
+  margin: 0;
+  color: var(--mjg-text);
+  font-size: 1rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.mjg-checkin .mjg-rating-row label {
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mjg-checkin .mjg-rating-row input[type="radio"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  border: 1px solid var(--mjg-border) !important;
+  border-radius: 10px !important;
+  background: var(--mjg-radio-bg) !important;
+  cursor: pointer;
+  position: relative;
+  box-shadow: none !important;
+  transition: all 0.2s ease;
+}
+
+.mjg-checkin .mjg-rating-row label:nth-of-type(1) input::before {
+  content: "1";
+}
+
+.mjg-checkin .mjg-rating-row label:nth-of-type(2) input::before {
+  content: "2";
+}
+
+.mjg-checkin .mjg-rating-row label:nth-of-type(3) input::before {
+  content: "3";
+}
+
+.mjg-checkin .mjg-rating-row label:nth-of-type(4) input::before {
+  content: "4";
+}
+
+.mjg-checkin .mjg-rating-row label:nth-of-type(5) input::before {
+  content: "5";
+}
+
+.mjg-checkin .mjg-rating-row input[type="radio"]::before {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mjg-radio-text);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.mjg-checkin .mjg-rating-row input[type="radio"]:checked {
+  background: var(--mjg-navy) !important;
+  border-color: var(--mjg-navy) !important;
+}
+
+.mjg-checkin .mjg-rating-row input[type="radio"]:checked::before {
+  color: #ffffff;
+}
+
+.mjg-checkin .mjg-rating-row input[type="radio"]:hover {
+  border-color: var(--mjg-gold) !important;
+  background: var(--mjg-gold-soft) !important;
+}
+
+.mjg-checkin .mjg-rating-row input[type="radio"]:checked:hover {
+  background: var(--mjg-navy) !important;
+}
+
+.mjg-checkin .mjg-section-score {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.mjg-checkin .mjg-section-score label {
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mjg-heading);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.mjg-checkin .mjg-section-score input,
+.mjg-checkin .mjg-total-card input {
+  width: 90px !important;
+  height: 44px !important;
+  padding: 8px 12px !important;
+  border: 1px solid var(--mjg-border) !important;
+  border-radius: 8px !important;
+  background: var(--mjg-input-bg) !important;
+  color: var(--mjg-input-text) !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  text-align: center;
+  box-shadow: none !important;
+}
+
+.mjg-checkin select,
+.mjg-checkin textarea,
+.mjg-checkin input[type="text"],
+.mjg-checkin input[type="email"],
+.mjg-checkin input[type="tel"],
+.mjg-checkin input[type="number"] {
+  width: 100%;
+  border: 1px solid var(--mjg-border) !important;
+  border-radius: 10px !important;
+  background: var(--mjg-input-bg) !important;
+  color: var(--mjg-input-text) !important;
+  font-family: inherit !important;
+  font-size: 1rem !important;
+  line-height: 1.4 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.mjg-checkin select {
+  height: 48px;
+  padding: 0 14px !important;
+}
+
+.mjg-checkin textarea {
+  min-height: 110px !important;
+  padding: 14px 16px !important;
+  resize: vertical;
+}
+
+.mjg-checkin select:focus,
+.mjg-checkin textarea:focus,
+.mjg-checkin input[type="text"]:focus,
+.mjg-checkin input[type="email"]:focus,
+.mjg-checkin input[type="tel"]:focus,
+.mjg-checkin input[type="number"]:focus {
+  border-color: var(--mjg-gold) !important;
+  box-shadow: 0 0 0 3px rgba(184, 150, 92, 0.14) !important;
+}
+
+.mjg-checkin input[readonly] {
+  cursor: default;
+  background: var(--mjg-cream) !important;
+}
+
+.mjg-checkin .mjg-total-card {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--mjg-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--mjg-panel);
+  margin: 28px 0;
+}
+
+.mjg-checkin .mjg-total-card label {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--mjg-border);
+  color: var(--mjg-text);
+  font-weight: 700;
+}
+
+.mjg-checkin .mjg-total-card label:last-child {
+  border-bottom: none;
+}
+
+.mjg-checkin .mjg-total-card .mjg-total-score {
+  background: var(--mjg-navy);
+  color: #ffffff;
+}
+
+.mjg-checkin .mjg-total-card .mjg-total-score input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+}
+
+.mjg-results-panel {
+  margin: 32px 0;
+  padding: 28px;
+  border: 1px solid var(--mjg-border);
+  border-radius: 18px;
+  background: var(--mjg-panel);
+  box-shadow: 0 16px 44px rgba(18, 41, 54, 0.06);
+}
+
+.mjg-results-panel h3 {
+  margin-bottom: 12px;
+  color: var(--mjg-heading);
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+}
+
+.mjg-results-panel p {
+  max-width: 760px;
+  margin-bottom: 24px;
+}
+
+.mjg-results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.mjg-results-grid div {
+  padding: 18px;
+  border: 1px solid var(--mjg-border);
+  border-radius: 14px;
+  background: var(--mjg-paper);
+}
+
+.mjg-results-grid span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--mjg-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.mjg-results-grid strong {
+  display: block;
+  color: var(--mjg-heading);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.mjg-tier-card {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 24px;
+  padding: 24px;
+  margin: 18px 0;
+  border: 1px solid var(--mjg-border);
+  border-radius: 12px;
+  background: var(--mjg-panel);
+}
+
+.mjg-tier-card > strong {
+  color: var(--mjg-heading);
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.mjg-tier-card h3 {
+  margin-bottom: 6px;
+}
+
+.mjg-tier-card p {
+  margin: 0 0 8px;
+}
+
+.mjg-tier-card em {
+  display: block;
+  padding-left: 14px;
+  border-left: 3px solid var(--mjg-gold);
+  color: var(--mjg-text);
+  font-family: Georgia, serif;
+}
+
+.mjg-action-block {
+  display: grid;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.mjg-checkin .mjg-action-block label {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px 16px;
+  align-items: start;
+  padding: 18px;
+  border: 1px solid var(--mjg-border);
+  border-radius: 14px;
+  background: var(--mjg-panel);
+  color: var(--mjg-heading);
+  font-weight: 800;
+}
+
+.mjg-checkin .mjg-action-block label > span {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--mjg-navy);
+  color: var(--mjg-white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.mjg-checkin .mjg-action-block select,
+.mjg-checkin .mjg-action-block textarea {
+  grid-column: 2;
+}
+
+.mjg-reflection-list {
+  display: grid;
+  gap: 22px;
+  margin-top: 32px;
+}
+
+.mjg-checkin .mjg-reflection-list label {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 10px 16px;
+  padding: 18px;
+  border: 1px solid var(--mjg-border);
+  border-radius: 14px;
+  background: var(--mjg-panel);
+  color: var(--mjg-heading);
+  font-weight: 800;
+}
+
+.mjg-checkin .mjg-reflection-list span {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--mjg-navy);
+  color: var(--mjg-white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.mjg-checkin .mjg-reflection-list textarea {
+  grid-column: 2;
+  min-height: 88px !important;
+}
+
+.mjg-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 32px;
+  padding: 16px 28px;
+  border: none;
+  border-radius: 999px;
+  background: var(--mjg-navy);
+  color: var(--mjg-white);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.mjg-submit:hover {
+  background: var(--mjg-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(18, 41, 54, 0.18);
+}
+
+.mjg-submit:disabled {
+  opacity: 0.68;
+  cursor: wait;
+  transform: none;
+}
+
+.mjg-submit-status {
+  min-height: 24px;
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: var(--mjg-muted);
+}
+
+.mjg-submit-status.success { color: #2f8f62; }
+.mjg-submit-status.error { color: #b84848; }
+
+.mjg-link-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.mjg-link-grid a {
+  display: block;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.68);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 10px;
+  transition: all 0.25s ease;
+}
+
+.mjg-link-grid a strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--mjg-white);
+  font-size: 0.95rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.mjg-link-grid a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--mjg-gold);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .mjg-mobile-menu-toggle { display: inline-flex; }
+
+  .mjg-nav-links {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem 1.75rem;
+    background: var(--mjg-nav-background);
+    border-bottom: 1px solid var(--mjg-nav-border);
+    display: none;
+  }
+
+  .mjg-nav-links.open { display: flex; }
+  .mjg-nav-links li { width: 100%; }
+  .mjg-nav-links a,
+  .mjg-nav-links .mjg-theme-toggle,
+  .mjg-nav-links .mjg-btn-dark {
+    width: 100%;
+  }
+
+  .mjg-nav-links .mjg-theme-toggle { justify-content: center; }
+  .mjg-nav-links .mjg-btn-dark { text-align: center; }
+
+  .mjg-checkin {
+    padding: 28px 12px;
+  }
+
+  .mjg-page {
+    padding: 28px 20px;
+    margin-bottom: 28px;
+  }
+
+  .mjg-topline,
+  .mjg-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mjg-checkin h1 {
+    font-size: clamp(3.2rem, 14vw, 5rem);
+  }
+
+  .mjg-checkin h2 {
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+  }
+
+  .mjg-score-head,
+  .mjg-score-row {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .mjg-score-head span:nth-child(3),
+  .mjg-score-row p {
+    grid-column: 1 / -1;
+  }
+
+  .mjg-section-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .mjg-contact-grid,
+  .mjg-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mjg-checkin .mjg-rating-row {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .mjg-checkin .mjg-rating-row p {
+    grid-column: 1 / -1;
+  }
+
+  .mjg-checkin .mjg-rating-row label {
+    width: 100%;
+  }
+
+  .mjg-checkin .mjg-rating-row input[type="radio"] {
+    width: 100% !important;
+    min-width: 42px !important;
+  }
+
+  .mjg-checkin .mjg-section-score {
+    justify-content: flex-start;
+  }
+
+  .mjg-checkin .mjg-action-block label,
+  .mjg-checkin .mjg-reflection-list label {
+    grid-template-columns: 1fr;
+  }
+
+  .mjg-checkin .mjg-action-block label > span,
+  .mjg-checkin .mjg-reflection-list span {
+    margin-bottom: 6px;
+  }
+
+  .mjg-checkin .mjg-action-block select,
+  .mjg-checkin .mjg-action-block textarea,
+  .mjg-checkin .mjg-reflection-list textarea {
+    grid-column: 1;
+  }
+
+  .mjg-checkin .mjg-total-card label {
+    grid-template-columns: 1fr;
+  }
+
+  .mjg-tier-card {
+    grid-template-columns: 1fr;
+  }
+
+  .mjg-link-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<script>
+(function () {
+  var theme = localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.dataset.theme = theme;
+}());
+</script>
+
+<nav class="mjg-site-nav">
+  <div class="mjg-nav-inner">
+    <a href="index.html" class="mjg-nav-logo">
+      <img id="mjg-nav-logo" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" alt="Michael J. Gauthier" data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+      <span class="mjg-nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
+    </a>
+    <button id="mjg-mobile-menu-toggle" class="mjg-mobile-menu-toggle" type="button" aria-label="Open menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <ul class="mjg-nav-links" id="mjg-nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about-us.html">About</a></li>
+      <li><a href="our-mission">Mission</a></li>
+      <li><a href="index.html#listen">Listen</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="join-the-movement.html" class="mjg-btn mjg-btn-dark">Join the Movement</a></li>
+      <li><button id="mjg-theme-toggle" class="mjg-theme-toggle" type="button" aria-label="Toggle light/dark mode"><svg id="mjg-theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg></button></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="mjg-checkin">
+  <div class="mjg-page mjg-cover">
+    <div class="mjg-topline">
+      <span>The Stewardship Blueprint</span>
+      <span>Created for More • Companion Guide</span>
+    </div>
+
+    <div class="mjg-cover-content">
+      <p class="mjg-eyebrow">A 14-Page Reflection Guide</p>
+      <h1>Created<br>for <em>More</em><br>Check-In</h1>
+      <p class="mjg-lead">
+        See where you’re aligned, where you’re drifting, and what needs your attention next.
+      </p>
+
+      <blockquote>
+        “You were not created merely to keep up. You were created to steward a life that matters.”
+      </blockquote>
+    </div>
+
+    <div class="mjg-footer mjg-footer-dark">
+      <div>
+        <strong>Michael J. Gauthier</strong><br>
+        Author • Financial Planner • Life Designer
+      </div>
+      <div class="mjg-logo">MJG</div>
+    </div>
+  </div>
+
+  <div class="mjg-page">
+    <p class="mjg-eyebrow">Welcome</p>
+    <h2>Welcome from <em>Michael</em></h2>
+
+    <p>
+      Most people do not drift because they do not care. They drift because life gets full.
+      Responsibilities grow. Calendars fill. Work expands. Family needs attention. Financial
+      pressure builds. Health gets pushed aside. Joy becomes something we hope to get back to someday.
+    </p>
+
+    <p>
+      And somewhere along the way, many people stop asking one of the most important questions they could ever ask:
+    </p>
+
+    <blockquote>
+      What kind of life am I actually building?
+    </blockquote>
+
+    <p>
+      The Created for More Check-In is not designed to make you feel guilty or overwhelmed.
+      It is not a test you pass or fail. It is a simple reflection tool to help you pause,
+      look honestly at the direction of your life, and identify one area that may need your attention next.
+    </p>
+
+    <p>
+      You do not need to fix everything today. You simply need to begin noticing.
+      <strong>Because awareness is where stewardship begins.</strong>
+    </p>
+  </div>
+
+  <div class="mjg-page">
+    <p class="mjg-eyebrow">The Case for Reflection</p>
+    <h2>Why this <em>check-in</em> matters</h2>
+
+    <div class="mjg-list">
+      <div class="mjg-list-item">
+        <span>01</span>
+        <div>
+          <h3>Busyness can disguise drift.</h3>
+          <p>Most people are not doing nothing. They are doing everything. The danger is not usually laziness — it’s motion without direction.</p>
+        </div>
+      </div>
+
+      <div class="mjg-list-item">
+        <span>02</span>
+        <div>
+          <h3>Success does not always equal alignment.</h3>
+          <p>A person can be successful and still be misaligned. Productive and still exhausted. Responsible and still reactive.</p>
+        </div>
+      </div>
+
+      <div class="mjg-list-item">
+        <span>03</span>
+        <div>
+          <h3>Reflection is where transformation begins.</h3>
+          <p>Before you can redesign your life, you have to see your life clearly. You cannot steward what you refuse to examine.</p>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      This check-in will help you evaluate five key areas of your life — Purpose, Family,
+      Fitness, Fun, and Finances — which connect to the larger Stewardship Blueprint framework.
+    </p>
+  </div>
+
+  <div class="mjg-page">
+    <p class="mjg-eyebrow">Instructions</p>
+    <h2>How to use the <em>check-in</em></h2>
+
+    <p>
+      Set aside 10 to 15 quiet minutes. You can complete this quickly, but do not rush through it.
+      The value is not in the score alone. The value is in the honesty.
+    </p>
+
+    <div class="mjg-score-table">
+      <div class="mjg-score-head">
+        <span>Score</span>
+        <span>Meaning</span>
+        <span>Description</span>
+      </div>
+
+      <div class="mjg-score-row">
+        <span>1</span>
+        <strong>Strongly Disagree</strong>
+        <p>This is rarely true in my life right now.</p>
+      </div>
+
+      <div class="mjg-score-row">
+        <span>2</span>
+        <strong>Disagree</strong>
+        <p>This is occasionally true, but not consistently.</p>
+      </div>
+
+      <div class="mjg-score-row">
+        <span>3</span>
+        <strong>Neutral / Unsure</strong>
+        <p>This is somewhat true, but I have room to grow.</p>
+      </div>
+
+      <div class="mjg-score-row">
+        <span>4</span>
+        <strong>Agree</strong>
+        <p>This is mostly true in my life.</p>
+      </div>
+
+      <div class="mjg-score-row">
+        <span>5</span>
+        <strong>Strongly Agree</strong>
+        <p>This is consistently true and intentionally protected.</p>
+      </div>
+    </div>
+
+    <blockquote>
+      Answer based on what is actually true, not what you wish were true.
+    </blockquote>
+  </div>
+
+  <form class="mjg-form" id="created-for-more-form">
+    <input type="hidden" name="action" value="mjg_checkin_submit">
+
+    <div class="mjg-page mjg-contact-page">
+      <p class="mjg-eyebrow">Start Here</p>
+      <h2>Your <em>information</em></h2>
+
+      <p>
+        Enter your information below so we can send you a confirmation and next-step guidance based on your Created for More Check-In.
+      </p>
+
+      <div class="mjg-contact-grid">
+        <label>
+          First Name
+          <input type="text" name="participant_first_name" required>
+        </label>
+
+        <label>
+          Last Name
+          <input type="text" name="participant_last_name" required>
+        </label>
+
+        <label>
+          Phone Number
+          <input type="tel" name="participant_phone">
+        </label>
+
+        <label>
+          Email Address
+          <input type="email" name="participant_email" required>
+        </label>
+      </div>
+    </div>
+
+    <div class="mjg-page mjg-section-page">
+      <div class="mjg-section-heading">
+        <span class="mjg-section-number">Section<br><strong>01</strong></span>
+        <div>
+          <h2>Purpose &amp; <em>Direction</em></h2>
+          <p>Five Statements • 25 Points</p>
+        </div>
+      </div>
+
+      <div class="mjg-core-question">
+        <span>Core Question</span>
+        <strong>Am I living with clarity about what kind of life I am building?</strong>
+      </div>
+
+      <div class="mjg-rating-table">
+        <div class="mjg-rating-row">
+          <p>I regularly slow down to reflect on the direction of my life.</p>
+          <label><input type="radio" name="purpose_1" value="1"></label>
+          <label><input type="radio" name="purpose_1" value="2"></label>
+          <label><input type="radio" name="purpose_1" value="3"></label>
+          <label><input type="radio" name="purpose_1" value="4"></label>
+          <label><input type="radio" name="purpose_1" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I have clarity about what matters most in this season.</p>
+          <label><input type="radio" name="purpose_2" value="1"></label>
+          <label><input type="radio" name="purpose_2" value="2"></label>
+          <label><input type="radio" name="purpose_2" value="3"></label>
+          <label><input type="radio" name="purpose_2" value="4"></label>
+          <label><input type="radio" name="purpose_2" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>My calendar reflects my stated priorities.</p>
+          <label><input type="radio" name="purpose_3" value="1"></label>
+          <label><input type="radio" name="purpose_3" value="2"></label>
+          <label><input type="radio" name="purpose_3" value="3"></label>
+          <label><input type="radio" name="purpose_3" value="4"></label>
+          <label><input type="radio" name="purpose_3" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I am building my life around purpose, not just pressure or expectation.</p>
+          <label><input type="radio" name="purpose_4" value="1"></label>
+          <label><input type="radio" name="purpose_4" value="2"></label>
+          <label><input type="radio" name="purpose_4" value="3"></label>
+          <label><input type="radio" name="purpose_4" value="4"></label>
+          <label><input type="radio" name="purpose_4" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I can identify where I may be drifting and what needs my attention.</p>
+          <label><input type="radio" name="purpose_5" value="1"></label>
+          <label><input type="radio" name="purpose_5" value="2"></label>
+          <label><input type="radio" name="purpose_5" value="3"></label>
+          <label><input type="radio" name="purpose_5" value="4"></label>
+          <label><input type="radio" name="purpose_5" value="5"></label>
+        </div>
+      </div>
+
+      <div class="mjg-section-score">
+        <label>Section Score <input type="number" name="purpose_score" id="purpose_score" min="0" max="25" readonly> / 25</label>
+      </div>
+    </div>
+
+    <div class="mjg-page mjg-section-page">
+      <div class="mjg-section-heading">
+        <span class="mjg-section-number">Section<br><strong>02</strong></span>
+        <div>
+          <h2>Family &amp; <em>Relationships</em></h2>
+          <p>Five Statements • 25 Points</p>
+        </div>
+      </div>
+
+      <div class="mjg-core-question">
+        <span>Core Question</span>
+        <strong>Are the people who matter most receiving my best?</strong>
+      </div>
+
+      <div class="mjg-rating-table">
+        <div class="mjg-rating-row">
+          <p>I am intentionally investing in my closest relationships.</p>
+          <label><input type="radio" name="family_1" value="1"></label>
+          <label><input type="radio" name="family_1" value="2"></label>
+          <label><input type="radio" name="family_1" value="3"></label>
+          <label><input type="radio" name="family_1" value="4"></label>
+          <label><input type="radio" name="family_1" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>The people I love are receiving my presence, not just my provision.</p>
+          <label><input type="radio" name="family_2" value="1"></label>
+          <label><input type="radio" name="family_2" value="2"></label>
+          <label><input type="radio" name="family_2" value="3"></label>
+          <label><input type="radio" name="family_2" value="4"></label>
+          <label><input type="radio" name="family_2" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I have healthy rhythms for connection with family, friends, or community.</p>
+          <label><input type="radio" name="family_3" value="1"></label>
+          <label><input type="radio" name="family_3" value="2"></label>
+          <label><input type="radio" name="family_3" value="3"></label>
+          <label><input type="radio" name="family_3" value="4"></label>
+          <label><input type="radio" name="family_3" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I am leading, serving, or encouraging the people entrusted to me.</p>
+          <label><input type="radio" name="family_4" value="1"></label>
+          <label><input type="radio" name="family_4" value="2"></label>
+          <label><input type="radio" name="family_4" value="3"></label>
+          <label><input type="radio" name="family_4" value="4"></label>
+          <label><input type="radio" name="family_4" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I am not allowing busyness to consistently crowd out relationships.</p>
+          <label><input type="radio" name="family_5" value="1"></label>
+          <label><input type="radio" name="family_5" value="2"></label>
+          <label><input type="radio" name="family_5" value="3"></label>
+          <label><input type="radio" name="family_5" value="4"></label>
+          <label><input type="radio" name="family_5" value="5"></label>
+        </div>
+      </div>
+
+      <div class="mjg-section-score">
+        <label>Section Score <input type="number" name="family_score" id="family_score" min="0" max="25" readonly> / 25</label>
+      </div>
+    </div>
+
+    <div class="mjg-page mjg-section-page">
+      <div class="mjg-section-heading">
+        <span class="mjg-section-number">Section<br><strong>03</strong></span>
+        <div>
+          <h2>Fitness &amp; <em>Energy</em></h2>
+          <p>Five Statements • 25 Points</p>
+        </div>
+      </div>
+
+      <div class="mjg-core-question">
+        <span>Core Question</span>
+        <strong>Am I stewarding my body and energy well enough to live with purpose?</strong>
+      </div>
+
+      <div class="mjg-rating-table">
+        <div class="mjg-rating-row">
+          <p>I am caring for my physical health with intention.</p>
+          <label><input type="radio" name="fitness_1" value="1"></label>
+          <label><input type="radio" name="fitness_1" value="2"></label>
+          <label><input type="radio" name="fitness_1" value="3"></label>
+          <label><input type="radio" name="fitness_1" value="4"></label>
+          <label><input type="radio" name="fitness_1" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I have enough energy to be present for what matters most.</p>
+          <label><input type="radio" name="fitness_2" value="1"></label>
+          <label><input type="radio" name="fitness_2" value="2"></label>
+          <label><input type="radio" name="fitness_2" value="3"></label>
+          <label><input type="radio" name="fitness_2" value="4"></label>
+          <label><input type="radio" name="fitness_2" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>My sleep, movement, nutrition, and recovery support the life I want to build.</p>
+          <label><input type="radio" name="fitness_3" value="1"></label>
+          <label><input type="radio" name="fitness_3" value="2"></label>
+          <label><input type="radio" name="fitness_3" value="3"></label>
+          <label><input type="radio" name="fitness_3" value="4"></label>
+          <label><input type="radio" name="fitness_3" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I recognize when I am depleted and need renewal.</p>
+          <label><input type="radio" name="fitness_4" value="1"></label>
+          <label><input type="radio" name="fitness_4" value="2"></label>
+          <label><input type="radio" name="fitness_4" value="3"></label>
+          <label><input type="radio" name="fitness_4" value="4"></label>
+          <label><input type="radio" name="fitness_4" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I see my health as capacity for calling, service, and stewardship.</p>
+          <label><input type="radio" name="fitness_5" value="1"></label>
+          <label><input type="radio" name="fitness_5" value="2"></label>
+          <label><input type="radio" name="fitness_5" value="3"></label>
+          <label><input type="radio" name="fitness_5" value="4"></label>
+          <label><input type="radio" name="fitness_5" value="5"></label>
+        </div>
+      </div>
+
+      <div class="mjg-section-score">
+        <label>Section Score <input type="number" name="fitness_score" id="fitness_score" min="0" max="25" readonly> / 25</label>
+      </div>
+    </div>
+
+    <div class="mjg-page mjg-section-page">
+      <div class="mjg-section-heading">
+        <span class="mjg-section-number">Section<br><strong>04</strong></span>
+        <div>
+          <h2>Fun, Joy &amp; <em>Meaningful Experiences</em></h2>
+          <p>Five Statements • 25 Points</p>
+        </div>
+      </div>
+
+      <div class="mjg-core-question">
+        <span>Core Question</span>
+        <strong>Am I making room for joy, adventure, rest, and meaningful experiences?</strong>
+      </div>
+
+      <div class="mjg-rating-table">
+        <div class="mjg-rating-row">
+          <p>I make time for activities and experiences that bring joy and renewal.</p>
+          <label><input type="radio" name="fun_1" value="1"></label>
+          <label><input type="radio" name="fun_1" value="2"></label>
+          <label><input type="radio" name="fun_1" value="3"></label>
+          <label><input type="radio" name="fun_1" value="4"></label>
+          <label><input type="radio" name="fun_1" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I schedule meaningful moments instead of hoping they happen accidentally.</p>
+          <label><input type="radio" name="fun_2" value="1"></label>
+          <label><input type="radio" name="fun_2" value="2"></label>
+          <label><input type="radio" name="fun_2" value="3"></label>
+          <label><input type="radio" name="fun_2" value="4"></label>
+          <label><input type="radio" name="fun_2" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I am creating memories with the people I love.</p>
+          <label><input type="radio" name="fun_3" value="1"></label>
+          <label><input type="radio" name="fun_3" value="2"></label>
+          <label><input type="radio" name="fun_3" value="3"></label>
+          <label><input type="radio" name="fun_3" value="4"></label>
+          <label><input type="radio" name="fun_3" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I allow space for rest, celebration, adventure, or play.</p>
+          <label><input type="radio" name="fun_4" value="1"></label>
+          <label><input type="radio" name="fun_4" value="2"></label>
+          <label><input type="radio" name="fun_4" value="3"></label>
+          <label><input type="radio" name="fun_4" value="4"></label>
+          <label><input type="radio" name="fun_4" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>My life includes more than responsibility, productivity, and obligation.</p>
+          <label><input type="radio" name="fun_5" value="1"></label>
+          <label><input type="radio" name="fun_5" value="2"></label>
+          <label><input type="radio" name="fun_5" value="3"></label>
+          <label><input type="radio" name="fun_5" value="4"></label>
+          <label><input type="radio" name="fun_5" value="5"></label>
+        </div>
+      </div>
+
+      <div class="mjg-section-score">
+        <label>Section Score <input type="number" name="fun_score" id="fun_score" min="0" max="25" readonly> / 25</label>
+      </div>
+    </div>
+
+    <div class="mjg-page mjg-section-page">
+      <div class="mjg-section-heading">
+        <span class="mjg-section-number">Section<br><strong>05</strong></span>
+        <div>
+          <h2>Finances &amp; <em>Stewardship</em></h2>
+          <p>Five Statements • 25 Points</p>
+        </div>
+      </div>
+
+      <div class="mjg-core-question">
+        <span>Core Question</span>
+        <strong>Is money serving my purpose, or shaping my identity?</strong>
+      </div>
+
+      <div class="mjg-rating-table">
+        <div class="mjg-rating-row">
+          <p>I see money as a tool, not the ultimate goal.</p>
+          <label><input type="radio" name="finance_1" value="1"></label>
+          <label><input type="radio" name="finance_1" value="2"></label>
+          <label><input type="radio" name="finance_1" value="3"></label>
+          <label><input type="radio" name="finance_1" value="4"></label>
+          <label><input type="radio" name="finance_1" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>My spending reflects my values and priorities.</p>
+          <label><input type="radio" name="finance_2" value="1"></label>
+          <label><input type="radio" name="finance_2" value="2"></label>
+          <label><input type="radio" name="finance_2" value="3"></label>
+          <label><input type="radio" name="finance_2" value="4"></label>
+          <label><input type="radio" name="finance_2" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I have clarity about what financial stewardship looks like in this season.</p>
+          <label><input type="radio" name="finance_3" value="1"></label>
+          <label><input type="radio" name="finance_3" value="2"></label>
+          <label><input type="radio" name="finance_3" value="3"></label>
+          <label><input type="radio" name="finance_3" value="4"></label>
+          <label><input type="radio" name="finance_3" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I am using resources for provision, generosity, freedom, and impact.</p>
+          <label><input type="radio" name="finance_4" value="1"></label>
+          <label><input type="radio" name="finance_4" value="2"></label>
+          <label><input type="radio" name="finance_4" value="3"></label>
+          <label><input type="radio" name="finance_4" value="4"></label>
+          <label><input type="radio" name="finance_4" value="5"></label>
+        </div>
+
+        <div class="mjg-rating-row">
+          <p>I am not allowing fear, comparison, status, or accumulation to define success.</p>
+          <label><input type="radio" name="finance_5" value="1"></label>
+          <label><input type="radio" name="finance_5" value="2"></label>
+          <label><input type="radio" name="finance_5" value="3"></label>
+          <label><input type="radio" name="finance_5" value="4"></label>
+          <label><input type="radio" name="finance_5" value="5"></label>
+        </div>
+      </div>
+
+      <div class="mjg-section-score">
+        <label>Section Score <input type="number" name="finance_score" id="finance_score" min="0" max="25" readonly> / 25</label>
+      </div>
+    </div>
+
+    <div class="mjg-page">
+      <p class="mjg-eyebrow">Tally</p>
+      <h2>Score your <em>check-in</em></h2>
+
+      <p>
+        Add each section score and calculate your total out of 125. This is not a pass/fail test.
+        It is a reflection tool designed to help you notice where alignment is strong and where drift may be showing up.
+      </p>
+
+      <div class="mjg-total-card">
+        <label>
+          Purpose &amp; Direction
+          <input type="number" name="tally_purpose" id="tally_purpose" min="0" max="25" readonly>
+          / 25
+        </label>
+
+        <label>
+          Family &amp; Relationships
+          <input type="number" name="tally_family" id="tally_family" min="0" max="25" readonly>
+          / 25
+        </label>
+
+        <label>
+          Fitness &amp; Energy
+          <input type="number" name="tally_fitness" id="tally_fitness" min="0" max="25" readonly>
+          / 25
+        </label>
+
+        <label>
+          Fun &amp; Meaningful Experiences
+          <input type="number" name="tally_fun" id="tally_fun" min="0" max="25" readonly>
+          / 25
+        </label>
+
+        <label>
+          Finances &amp; Stewardship
+          <input type="number" name="tally_finance" id="tally_finance" min="0" max="25" readonly>
+          / 25
+        </label>
+
+        <label class="mjg-total-score">
+          Total Score
+          <input type="number" name="total_score" id="total_score" min="0" max="125" readonly>
+          / 125
+        </label>
+      </div>
+
+      <div class="mjg-results-panel" id="mjg_results_panel">
+        <p class="mjg-eyebrow">Your Result</p>
+
+        <h3 id="mjg_result_title">Complete the check-in to see your result.</h3>
+
+        <p id="mjg_result_summary">
+          Your result will appear here after you answer the scored questions.
+        </p>
+
+        <div class="mjg-results-grid">
+          <div>
+            <span>Strongest Area</span>
+            <strong id="mjg_strongest_area">—</strong>
+          </div>
+
+          <div>
+            <span>Growth Area</span>
+            <strong id="mjg_growth_area">—</strong>
+          </div>
+
+          <div>
+            <span>Recommended Next Step</span>
+            <strong id="mjg_next_step">—</strong>
+          </div>
+        </div>
+
+        <input type="hidden" name="result_title" id="result_title">
+        <input type="hidden" name="result_summary" id="result_summary">
+        <input type="hidden" name="strongest_area" id="strongest_area">
+        <input type="hidden" name="growth_area" id="growth_area">
+        <input type="hidden" name="recommended_next_step" id="recommended_next_step">
+      </div>
+
+      <blockquote>
+        The point is not to judge your life. The point is to see it clearly enough to steward it wisely.
+      </blockquote>
+    </div>
+
+    <div class="mjg-page">
+      <p class="mjg-eyebrow">Score Tiers</p>
+      <h2>What your score may be <em>telling you</em></h2>
+
+      <div class="mjg-tier-card">
+        <strong>100–125</strong>
+        <div>
+          <h3>Aligned and Intentional</h3>
+          <p>You appear to be living with a meaningful level of clarity and intentionality.</p>
+          <em>“What rhythm, relationship, habit, or priority do I need to protect?”</em>
+        </div>
+      </div>
+
+      <div class="mjg-tier-card">
+        <strong>75–99</strong>
+        <div>
+          <h3>Aware but Stretched</h3>
+          <p>You likely have meaningful alignment in some areas, but you may also feel stretched, reactive, or inconsistent.</p>
+          <em>“Where am I giving too much attention to urgency and not enough to importance?”</em>
+        </div>
+      </div>
+
+      <div class="mjg-tier-card">
+        <strong>50–74</strong>
+        <div>
+          <h3>Drifting in Key Areas</h3>
+          <p>Your score may indicate that parts of your life are being shaped more by default than by design.</p>
+          <em>“What area of my life is asking for my attention right now?”</em>
+        </div>
+      </div>
+
+      <div class="mjg-tier-card">
+        <strong>&lt; 50</strong>
+        <div>
+          <h3>Time to Pause and Rebuild</h3>
+          <p>This may be a season where you need deeper reflection, support, and realignment.</p>
+          <em>“What is one honest step I can take this week?”</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="mjg-page">
+      <p class="mjg-eyebrow">Action</p>
+      <h2>Identify your <em>next step</em></h2>
+
+      <p>
+        Insight becomes powerful when it turns into action. Do not try to redesign your entire life in one day.
+        Begin with one faithful next step.
+      </p>
+
+      <div class="mjg-action-block">
+        <label>
+          <span>1</span>
+          Circle your lowest section
+          <select name="lowest_section" id="lowest_section">
+            <option value="">Select one</option>
+            <option>Purpose</option>
+            <option>Family</option>
+            <option>Fitness</option>
+            <option>Fun</option>
+            <option>Finances</option>
+          </select>
+        </label>
+
+        <label>
+          <span>2</span>
+          Complete this sentence
+          <textarea name="attention_area" placeholder="In this season, I sense I need to pay attention to..."></textarea>
+        </label>
+
+        <label>
+          <span>3</span>
+          Choose one small action
+          <textarea name="small_action" placeholder="This week, I will..."></textarea>
+        </label>
+
+        <label>
+          <span>4</span>
+          Choose one conversation
+          <textarea name="conversation" placeholder="One person I may need to talk with about this is..."></textarea>
+        </label>
+
+        <label>
+          <span>5</span>
+          Choose one rhythm
+          <textarea name="rhythm" placeholder="One rhythm, habit, or calendar adjustment that could help is..."></textarea>
+        </label>
+      </div>
+    </div>
+
+    <div class="mjg-page">
+      <p class="mjg-eyebrow">Going Deeper</p>
+      <h2>Reflection <em>questions</em></h2>
+
+      <div class="mjg-reflection-list">
+        <label><span>01</span> What kind of life am I actually building right now? <textarea name="reflection_1"></textarea></label>
+        <label><span>02</span> Where am I confusing busyness with faithfulness? <textarea name="reflection_2"></textarea></label>
+        <label><span>03</span> What does my calendar reveal about my true priorities? <textarea name="reflection_3"></textarea></label>
+        <label><span>04</span> What does my spending reveal about what I value, fear, or desire? <textarea name="reflection_4"></textarea></label>
+        <label><span>05</span> Who is receiving the best version of me, and who is receiving what is left over? <textarea name="reflection_5"></textarea></label>
+        <label><span>06</span> Where am I living by default rather than by design? <textarea name="reflection_6"></textarea></label>
+        <label><span>07</span> What area of my life feels most misaligned right now? <textarea name="reflection_7"></textarea></label>
+        <label><span>08</span> What would change if I saw my life not merely as something I own, but as something entrusted to me? <textarea name="reflection_8"></textarea></label>
+        <label><span>09</span> What is one area where I need to stop drifting and begin stewarding? <textarea name="reflection_9"></textarea></label>
+        <label><span>10</span> What is one step I can take this week? <textarea name="reflection_10"></textarea></label>
+      </div>
+
+      <button class="mjg-submit" id="created-for-more-submit" type="submit">Submit Check-In</button>
+      <div class="mjg-submit-status" id="created-for-more-status" role="status" aria-live="polite"></div>
+    </div>
+  </form>
+
+  <div class="mjg-page mjg-end">
+    <div class="mjg-topline">
+      <span>The Stewardship Blueprint</span>
+      <span>Created for More</span>
+    </div>
+
+    <div class="mjg-cover-content">
+      <p class="mjg-eyebrow">Join the Journey</p>
+      <h2>Walk with me as I<br><em>write the book.</em></h2>
+
+      <p>
+        The Created for More Check-In is only a beginning. I am currently writing
+        The Stewardship Blueprint, a book and movement designed to help people
+        design their life, steward their resources, and build a legacy that matters.
+      </p>
+
+      <div class="mjg-link-grid">
+        <a href="https://michaeljgauthier.com" target="_blank">Website<br><strong>MichaelJGauthier.com</strong></a>
+        <a href="#" target="_blank">LinkedIn<br><strong>Michael J. Gauthier</strong></a>
+        <a href="#" target="_blank">PDF Book<br><strong>Early Access — Free</strong></a>
+        <a href="#" target="_blank">Speaking<br><strong>Contact for Inquiries</strong></a>
+      </div>
+    </div>
+
+    <div class="mjg-footer mjg-footer-dark">
+      <blockquote>
+        “You were not created merely to keep up. You were created to steward a life that matters.”
+      </blockquote>
+      <div class="mjg-logo">MJG</div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  const logoElement = document.getElementById("mjg-nav-logo");
+  const themeToggle = document.getElementById("mjg-theme-toggle");
+  const themeIcon = document.getElementById("mjg-theme-icon");
+  const mobileToggle = document.getElementById("mjg-mobile-menu-toggle");
+  const navLinks = document.getElementById("mjg-nav-links");
+
+  const HAMBURGER_SVG = '<line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
+  const CLOSE_SVG = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+
+  function updateLogo(theme) {
+    if (!logoElement) return;
+    const lightLogo = logoElement.dataset.logoLight;
+    const darkLogo = logoElement.dataset.logoDark;
+    logoElement.src = theme === "dark" ? darkLogo : lightLogo;
+  }
+
+  function updateThemeIcon(theme) {
+    if (!themeIcon) return;
+    if (theme === "dark") {
+      themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+    } else {
+      themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+    }
+  }
+
+  function setTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+    updateLogo(theme);
+    updateThemeIcon(theme);
+  }
+
+  function closeMobileMenu() {
+    navLinks?.classList.remove("open");
+    const icon = mobileToggle?.querySelector("svg");
+    if (icon) icon.innerHTML = HAMBURGER_SVG;
+    mobileToggle?.setAttribute("aria-label", "Open menu");
+  }
+
+  function openMobileMenu() {
+    navLinks?.classList.add("open");
+    const icon = mobileToggle?.querySelector("svg");
+    if (icon) icon.innerHTML = CLOSE_SVG;
+    mobileToggle?.setAttribute("aria-label", "Close menu");
+  }
+
+  themeToggle?.addEventListener("click", () => {
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+  });
+
+  mobileToggle?.addEventListener("click", () => {
+    navLinks?.classList.contains("open") ? closeMobileMenu() : openMobileMenu();
+  });
+
+  navLinks?.addEventListener("click", (event) => {
+    if (event.target.closest("a, button")) closeMobileMenu();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (navLinks?.classList.contains("open") && !event.target.closest(".mjg-site-nav")) closeMobileMenu();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && navLinks?.classList.contains("open")) closeMobileMenu();
+  });
+
+  setTheme(document.documentElement.dataset.theme || "light");
+}());
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const sections = {
+    purpose: {
+      label: "Purpose & Direction",
+      shortLabel: "Purpose",
+      scoreId: "purpose_score",
+      tallyId: "tally_purpose",
+      names: ["purpose_1", "purpose_2", "purpose_3", "purpose_4", "purpose_5"],
+      nextStep: "Create space to reflect on what kind of life you are intentionally building."
+    },
+    family: {
+      label: "Family & Relationships",
+      shortLabel: "Family",
+      scoreId: "family_score",
+      tallyId: "tally_family",
+      names: ["family_1", "family_2", "family_3", "family_4", "family_5"],
+      nextStep: "Choose one relationship that needs your presence, encouragement, or intentional time this week."
+    },
+    fitness: {
+      label: "Fitness & Energy",
+      shortLabel: "Fitness",
+      scoreId: "fitness_score",
+      tallyId: "tally_fitness",
+      names: ["fitness_1", "fitness_2", "fitness_3", "fitness_4", "fitness_5"],
+      nextStep: "Protect one simple health rhythm this week: sleep, movement, nutrition, or recovery."
+    },
+    fun: {
+      label: "Fun & Meaningful Experiences",
+      shortLabel: "Fun",
+      scoreId: "fun_score",
+      tallyId: "tally_fun",
+      names: ["fun_1", "fun_2", "fun_3", "fun_4", "fun_5"],
+      nextStep: "Schedule one meaningful moment for joy, rest, adventure, or celebration."
+    },
+    finance: {
+      label: "Finances & Stewardship",
+      shortLabel: "Finances",
+      scoreId: "finance_score",
+      tallyId: "tally_finance",
+      names: ["finance_1", "finance_2", "finance_3", "finance_4", "finance_5"],
+      nextStep: "Review one financial decision through the lens of purpose, generosity, freedom, and impact."
+    }
+  };
+
+  function getRadioValue(name) {
+    const checked = document.querySelector(`input[name="${name}"]:checked`);
+    return checked ? parseInt(checked.value, 10) : 0;
+  }
+
+  function setValue(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+  }
+
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  }
+
+  function getResultTier(total, answeredCount) {
+    if (answeredCount < 25) {
+      return {
+        title: "Complete the check-in to see your full result.",
+        summary: "Your score is updating as you answer each question. Complete all 25 scored statements to receive your full reflection result."
+      };
+    }
+
+    if (total >= 100) {
+      return {
+        title: "Aligned and Intentional",
+        summary: "You appear to be living with a meaningful level of clarity and intentionality. The next step is not complacency — it is protection. What is healthy should be guarded, strengthened, and sustained."
+      };
+    }
+
+    if (total >= 75) {
+      return {
+        title: "Aware but Stretched",
+        summary: "You likely have meaningful alignment in some areas, but you may also feel stretched, reactive, or inconsistent. This is a common place for responsible people. You are not off track, but busyness may be beginning to create drift."
+      };
+    }
+
+    if (total >= 50) {
+      return {
+        title: "Drifting in Key Areas",
+        summary: "Your score may indicate that parts of your life are being shaped more by default than by design. This is not a reason for shame. It is a reason to pause, pay attention, and begin making intentional adjustments."
+      };
+    }
+
+    return {
+      title: "Time to Pause and Rebuild",
+      summary: "This may be a season where you need deeper reflection, support, and realignment. Do not try to fix everything at once. Start with one area, one conversation, and one faithful step."
+    };
+  }
+
+  function calculateScores() {
+    let total = 0;
+    let sectionScores = [];
+    const answeredCount = document.querySelectorAll('.mjg-rating-row input[type="radio"]:checked').length;
+
+    Object.keys(sections).forEach(function (key) {
+      const section = sections[key];
+
+      const score = section.names.reduce(function (sum, name) {
+        return sum + getRadioValue(name);
+      }, 0);
+
+      total += score;
+
+      setValue(section.scoreId, score);
+      setValue(section.tallyId, score);
+
+      sectionScores.push({
+        key: key,
+        label: section.label,
+        shortLabel: section.shortLabel,
+        score: score,
+        nextStep: section.nextStep
+      });
+    });
+
+    setValue("total_score", total);
+
+    const result = getResultTier(total, answeredCount);
+
+    let completedSections = sectionScores.filter(item => item.score > 0);
+    let strongest = completedSections.length
+      ? completedSections.reduce((max, item) => item.score > max.score ? item : max, completedSections[0])
+      : { label: "—" };
+
+    let growth = completedSections.length
+      ? completedSections.reduce((min, item) => item.score < min.score ? item : min, completedSections[0])
+      : { label: "—", shortLabel: "", nextStep: "—" };
+
+    setText("mjg_result_title", result.title);
+    setText("mjg_result_summary", result.summary);
+    setText("mjg_strongest_area", strongest.label || "—");
+    setText("mjg_growth_area", growth.label || "—");
+    setText("mjg_next_step", growth.nextStep || "—");
+
+    setValue("result_title", result.title);
+    setValue("result_summary", result.summary);
+    setValue("strongest_area", strongest.label || "");
+    setValue("growth_area", growth.label || "");
+    setValue("recommended_next_step", growth.nextStep || "");
+
+    const lowestSelect = document.getElementById("lowest_section");
+    if (lowestSelect && growth.shortLabel && !lowestSelect.dataset.userSelected) {
+      lowestSelect.value = growth.shortLabel;
+    }
+  }
+
+  document.querySelectorAll('.mjg-rating-row input[type="radio"]').forEach(function (radio) {
+    radio.addEventListener("change", calculateScores);
+  });
+
+  const lowestSelect = document.getElementById("lowest_section");
+  if (lowestSelect) {
+    lowestSelect.addEventListener("change", function () {
+      lowestSelect.dataset.userSelected = "true";
+    });
+  }
+
+  calculateScores();
+});
+</script>
+
+<script type="module">
+import { supabase, getCurrentUser } from "./js/supabase-client.js";
+
+const form = document.getElementById("created-for-more-form");
+const submitButton = document.getElementById("created-for-more-submit");
+const statusEl = document.getElementById("created-for-more-status");
+
+const sectionKeys = ["purpose", "family", "fitness", "fun", "finance"];
+const sectionLabels = {
+  purpose: "Purpose & Direction",
+  family: "Family & Relationships",
+  fitness: "Fitness & Energy",
+  fun: "Fun & Meaningful Experiences",
+  finance: "Finances & Stewardship"
+};
+
+function setSubmitStatus(message, type) {
+  if (!statusEl) return;
+  statusEl.textContent = message;
+  statusEl.className = "mjg-submit-status" + (type ? " " + type : "");
+}
+
+function generateTemporaryPassword() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+  const bytes = new Uint32Array(18);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, value => chars[value % chars.length]).join("");
+}
+
+function getValue(formData, name) {
+  return String(formData.get(name) || "").trim();
+}
+
+function getNumber(formData, name) {
+  const value = parseInt(String(formData.get(name) || "0"), 10);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function collectRatings(formData) {
+  const ratings = {};
+  sectionKeys.forEach(section => {
+    ratings[section] = {};
+    for (let index = 1; index <= 5; index += 1) {
+      ratings[section][`${section}_${index}`] = getNumber(formData, `${section}_${index}`);
+    }
+  });
+  return ratings;
+}
+
+function collectSectionScores(formData) {
+  return {
+    purpose: getNumber(formData, "purpose_score"),
+    family: getNumber(formData, "family_score"),
+    fitness: getNumber(formData, "fitness_score"),
+    fun: getNumber(formData, "fun_score"),
+    finance: getNumber(formData, "finance_score")
+  };
+}
+
+function collectReflections(formData) {
+  const reflections = {};
+  for (let index = 1; index <= 10; index += 1) {
+    reflections[`reflection_${index}`] = getValue(formData, `reflection_${index}`);
+  }
+  return reflections;
+}
+
+function getAnsweredCount(formData) {
+  return sectionKeys.reduce((total, section) => {
+    for (let index = 1; index <= 5; index += 1) {
+      if (getNumber(formData, `${section}_${index}`) > 0) total += 1;
+    }
+    return total;
+  }, 0);
+}
+
+function getScoreBand(totalScore, answeredCount) {
+  if (answeredCount < 25) return "incomplete";
+  if (totalScore >= 100) return "aligned_and_intentional";
+  if (totalScore >= 75) return "aware_but_stretched";
+  if (totalScore >= 50) return "drifting_in_key_areas";
+  return "time_to_pause_and_rebuild";
+}
+
+function buildDashboardPayload(formData, userId, temporaryPassword) {
+  const firstName = getValue(formData, "participant_first_name");
+  const lastName = getValue(formData, "participant_last_name");
+  const email = getValue(formData, "participant_email").toLowerCase();
+  const phone = getValue(formData, "participant_phone");
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  const sectionScores = collectSectionScores(formData);
+  const totalScore = getNumber(formData, "total_score");
+  const answeredCount = getAnsweredCount(formData);
+
+  return {
+    userId,
+    temporaryPassword,
+    contact: {
+      first_name: firstName,
+      last_name: lastName,
+      full_name: fullName,
+      email,
+      phone
+    },
+    scores: {
+      sections: sectionScores,
+      labels: sectionLabels,
+      total: totalScore,
+      answered_count: answeredCount,
+      score_band: getScoreBand(totalScore, answeredCount),
+      strongest_area: getValue(formData, "strongest_area"),
+      growth_area: getValue(formData, "growth_area"),
+      recommended_next_step: getValue(formData, "recommended_next_step"),
+      result_title: getValue(formData, "result_title"),
+      result_summary: getValue(formData, "result_summary")
+    },
+    ratings: collectRatings(formData),
+    action_plan: {
+      lowest_section: getValue(formData, "lowest_section"),
+      attention_area: getValue(formData, "attention_area"),
+      small_action: getValue(formData, "small_action"),
+      conversation: getValue(formData, "conversation"),
+      rhythm: getValue(formData, "rhythm")
+    },
+    reflections: collectReflections(formData),
+    meta: {
+      form_type: "created_for_more_checkin",
+      source: "Created for More Check-In page",
+      submitted_at: new Date().toISOString(),
+      mapped_user_id: userId,
+      login_email_sent_by: "supabase_auth_or_configured_autoresponder"
+    }
+  };
+}
+
+async function insertIfAvailable(table, payload) {
+  try {
+    const { error } = await supabase.from(table).insert(payload);
+    if (error) {
+      console.warn(table + " insert skipped:", error.message);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.warn(table + " insert skipped:", error.message);
+    return false;
+  }
+}
+
+async function insertFormSubmission(payload) {
+  const richPayload = {
+    form_type: "created_for_more_checkin",
+    user_id: payload.userId,
+    email: payload.contact.email,
+    phone: payload.contact.phone,
+    data: payload
+  };
+
+  if (await insertIfAvailable("form_submissions", richPayload)) return true;
+
+  return insertIfAvailable("form_submissions", {
+    form_type: "created_for_more_checkin",
+    user_id: payload.userId,
+    data: payload
+  });
+}
+
+async function getOrCreateUser(contact) {
+  try {
+    const currentUser = await getCurrentUser();
+    if (currentUser) {
+      return { userId: currentUser.id, temporaryPassword: "", createdAccount: false };
+    }
+  } catch (_) {
+    // No active session; continue with sign-up.
+  }
+
+  const temporaryPassword = generateTemporaryPassword();
+  const { data, error } = await supabase.auth.signUp({
+    email: contact.email,
+    password: temporaryPassword,
+    options: {
+      emailRedirectTo: new URL("dashboard/home.html", window.location.href).toString(),
+      data: {
+        first_name: contact.first_name,
+        last_name: contact.last_name,
+        full_name: contact.full_name,
+        phone: contact.phone,
+        source: "created_for_more_checkin",
+        role: "user",
+        status: "invited",
+        temporary_password: temporaryPassword
+      }
+    }
+  });
+
+  if (error) {
+    console.warn("Supabase sign-up skipped:", error.message);
+    return { userId: null, temporaryPassword, createdAccount: false };
+  }
+
+  return { userId: data.user?.id || null, temporaryPassword, createdAccount: true };
+}
+
+async function saveCheckIn(payload) {
+  if (payload.userId) {
+    await insertIfAvailable("profiles", {
+      id: payload.userId,
+      email: payload.contact.email,
+      first_name: payload.contact.first_name,
+      last_name: payload.contact.last_name,
+      full_name: payload.contact.full_name,
+      phone: payload.contact.phone,
+      role: "user",
+      status: "invited",
+      source: "created_for_more_checkin"
+    });
+  }
+
+  const savedSubmission = await insertFormSubmission(payload);
+  if (!savedSubmission) {
+    throw new Error("We could not save your check-in to the dashboard. Please try again.");
+  }
+
+  await insertIfAvailable("user_requests", {
+    user_id: payload.userId,
+    type: "created_for_more_checkin",
+    priority: payload.scores.score_band === "time_to_pause_and_rebuild" ? "high" : "normal",
+    status: "new",
+    title: `Created for More Check-In - ${payload.contact.full_name || payload.contact.email}`,
+    data: payload
+  });
+}
+
+if (form) {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+    const answeredCount = getAnsweredCount(formData);
+    if (answeredCount < 25) {
+      setSubmitStatus("Please answer all 25 scored statements before submitting your check-in.", "error");
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+    setSubmitStatus("Saving your check-in and preparing your login details...", "");
+
+    try {
+      const contact = {
+        first_name: getValue(formData, "participant_first_name"),
+        last_name: getValue(formData, "participant_last_name"),
+        full_name: [getValue(formData, "participant_first_name"), getValue(formData, "participant_last_name")].filter(Boolean).join(" "),
+        email: getValue(formData, "participant_email").toLowerCase(),
+        phone: getValue(formData, "participant_phone")
+      };
+
+      const user = await getOrCreateUser(contact);
+      const payload = buildDashboardPayload(formData, user.userId, user.temporaryPassword);
+      await saveCheckIn(payload);
+
+      setSubmitStatus("Your check-in was submitted. Check your email for completion details and login next steps.", "success");
+    } catch (error) {
+      console.error("Created for More submission error:", error);
+      setSubmitStatus(error.message || "Something went wrong. Please try again.", "error");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit Check-In";
+    }
+  });
+}
+</script>
