@@ -20,7 +20,7 @@ export async function getUserManagementData() {
       supabase.from("user_preferences").select("*").order("updated_at", { ascending: false }).limit(100),
       supabase
         .from("participant_user_links")
-        .select("*, participants(id,first_name,last_name,email), profiles(id,full_name,email)")
+        .select("*, participants(id,first_name,last_name,email), user:profiles!participant_user_links_user_id_fkey(id,full_name,email)")
         .order("created_at", { ascending: false })
         .limit(100),
       supabase.from("form_submissions").select("*").order("created_at", { ascending: false }).limit(100),
