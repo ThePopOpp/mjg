@@ -8,9 +8,15 @@ export type MediaAssetInput = {
   sourceType?: "upload" | "external_url" | "recording" | "embed";
   fileUrl?: string;
   embedUrl?: string;
+  storageBucket?: string;
+  storagePath?: string;
+  mimeType?: string;
+  fileSize?: number;
+  durationSeconds?: number;
   description?: string;
   status?: "draft" | "published" | "hidden" | "archived" | "deleted";
   visibility?: "private" | "public" | "assigned";
+  metadata?: Record<string, unknown>;
   actorUserId?: string;
 };
 
@@ -40,9 +46,15 @@ export async function saveMediaAsset(input: MediaAssetInput) {
     source_type: input.sourceType || "external_url",
     file_url: input.fileUrl?.trim() || null,
     embed_url: input.embedUrl?.trim() || null,
+    storage_bucket: input.storageBucket?.trim() || null,
+    storage_path: input.storagePath?.trim() || null,
+    mime_type: input.mimeType?.trim() || null,
+    file_size: input.fileSize ?? null,
+    duration_seconds: input.durationSeconds ?? null,
     description: input.description?.trim() || null,
     status: input.status || "draft",
     visibility: input.visibility || "private",
+    metadata: input.metadata || {},
     updated_by: input.actorUserId ?? null,
     updated_at: new Date().toISOString(),
   };

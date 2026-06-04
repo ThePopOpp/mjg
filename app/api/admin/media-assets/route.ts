@@ -14,9 +14,15 @@ export async function POST(request: Request) {
       sourceType: body.sourceType,
       fileUrl: body.fileUrl,
       embedUrl: body.embedUrl,
+      storageBucket: body.storageBucket,
+      storagePath: body.storagePath,
+      mimeType: body.mimeType,
+      fileSize: body.fileSize,
+      durationSeconds: body.durationSeconds,
       description: body.description,
       status: body.status,
       visibility: body.visibility,
+      metadata: body.metadata,
       actorUserId: actor.id,
     });
 
