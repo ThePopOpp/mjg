@@ -9,11 +9,12 @@ const tabs = [
   { href: "/dashboard/emails/automations", label: "Email Automations" },
   { href: "/dashboard/emails/journey", label: "Journey" },
   { href: "/dashboard/emails/inbox", label: "Inbox" },
+  { href: "/dashboard/emails/form-submissions", label: "Form Submissions" },
   { href: "/dashboard/emails/history", label: "History" },
   { href: "/dashboard/emails/wizard", label: "Wizard" },
 ];
 
-export function EmailTabs({ active }: { active: "overview" | "send" | "templates" | "editor" | "automations" | "journey" | "inbox" | "history" | "wizard" }) {
+export function EmailTabs({ active }: { active: "overview" | "send" | "templates" | "editor" | "automations" | "journey" | "inbox" | "form-submissions" | "history" | "wizard" }) {
   const activeHref =
     active === "overview"
       ? "/dashboard/emails"
@@ -29,9 +30,11 @@ export function EmailTabs({ active }: { active: "overview" | "send" | "templates
             ? "/dashboard/emails/journey"
             : active === "inbox"
               ? "/dashboard/emails/inbox"
-              : active === "history"
-                ? "/dashboard/emails/history"
-                : "/dashboard/emails/wizard";
+              : active === "form-submissions"
+                ? "/dashboard/emails/form-submissions"
+                : active === "history"
+                  ? "/dashboard/emails/history"
+                  : "/dashboard/emails/wizard";
 
   return (
     <div className="flex flex-wrap gap-2 rounded-md border bg-card p-1">

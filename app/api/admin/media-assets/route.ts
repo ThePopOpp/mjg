@@ -1,0 +1,28 @@
+import { NextResponse } from "next/server";
+import { saveMediaAsset } from "@/lib/content/media";
+import { requireAdminManager } from "@/lib/user-management/auth";
+
+export async function POST(request: Request) {
+  try {
+    const actor = await requireAdminManager();
+    const body = await request.json();
+    const asset = await saveMediaAsset({
+      id: body.id,
+      title: body.title,
+      slug: body.slug,
+      assetType: body.assetType,
+      sourceType: body.sourceType,
+      fileUrl: body.fileUrl,
+      embedUrl: body.embedUrl,
+      description: body.description,
+      status: body.status,
+      visibility: body.visibility,
+      actorUserId: actor.id,
+    });
+
+    return NextResponse.json({ ok: true, asset });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Media asset save failed.";
+    return NextResponse.json({ error: message }, { status: message.includes("permission") ? 403 : 500 });
+  }
+}

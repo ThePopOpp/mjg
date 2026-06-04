@@ -16,6 +16,19 @@ export async function POST(request: NextRequest) {
     const firstName = stringValue(payload.first_name || payload.firstName);
     const lastName = stringValue(payload.last_name || payload.lastName);
     const phone = stringValue(payload.phone);
+    const formType = stringValue(payload.form_type) || "join_the_journey";
+
+    if (formType !== "journey_signup" && formType !== "join_the_journey") {
+      const submission = await savePublicFormSubmission({
+        formType,
+        email,
+        firstName,
+        lastName,
+        phone,
+        payload,
+      });
+      return NextResponse.json({ ok: true, submissionId: submission?.id ?? null });
+    }
 
     if (!email || !firstName || !lastName) {
       return NextResponse.json({ ok: false, error: "First name, last name, and email are required." }, { status: 400 });
@@ -96,6 +109,93 @@ export async function POST(request: NextRequest) {
     const message = error instanceof Error ? error.message : "Join The Journey signup failed.";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
+}
+
+async function savePublicFormSubmission(input: {
+  formType: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  payload: Record<string, unknown>;
+}) {
+  const supabase = createSupabaseAdminClient();
+  const subject = stringValue(input.payload.subject) || labelize(input.formType);
+  const message = stringValue(input.payload.notes || input.payload.message || input.payload.questions);
+  const fullName = stringValue(input.payload.full_name) || `${input.firstName} ${input.lastName}`.trim();
+
+  const { data, error } = await supabase
+    .from("form_submissions")
+    .insert({
+      form_type: input.formType,
+      email: input.email || null,
+      phone: input.phone || null,
+      subject,
+      message,
+      source: stringValue(input.payload.source) || "Public website",
+      status: "received",
+      payload: input.payload,
+    })
+    .select("*")
+    .single();
+  if (error) throw error;
+
+  await supabase.from("notifications").insert({
+    type: "form_submission_received",
+    title: `${labelize(input.formType)} submitted`,
+    message: `${fullName || input.email || "A website visitor"} submitted ${labelize(input.formType)}.`,
+    destination: "dashboard",
+    status: "queued",
+    metadata: { formType: input.formType, submissionId: data.id, email: input.email },
+  });
+
+  await notifySuperAdminsOfSubmission({
+    formType: input.formType,
+    name: fullName,
+    email: input.email,
+    phone: input.phone,
+    subject,
+    message,
+  });
+
+  return data;
+}
+
+async function notifySuperAdminsOfSubmission(input: {
+  formType: string;
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+}) {
+  const supabase = createSupabaseAdminClient();
+  const { data: admins } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("role", "super_admin")
+    .eq("status", "active")
+    .not("email", "is", null);
+
+  const recipients = Array.from(new Set((admins ?? []).map((admin) => admin.email).filter(Boolean)));
+  if (!recipients.length) return;
+
+  await sendSmtpEmail({
+    to: recipients,
+    subject: `New ${labelize(input.formType)} submission`,
+    html: `
+      <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111;">
+        <h2>New ${escapeHtml(labelize(input.formType))} submission</h2>
+        <p><strong>Name:</strong> ${escapeHtml(input.name || "-")}</p>
+        <p><strong>Email:</strong> ${escapeHtml(input.email || "-")}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(input.phone || "-")}</p>
+        <p><strong>Subject:</strong> ${escapeHtml(input.subject || "-")}</p>
+        <p><strong>Message:</strong></p>
+        <p>${escapeHtml(input.message || "-").replace(/\n/g, "<br>")}</p>
+      </div>
+    `,
+    text: `New ${labelize(input.formType)} submission\nName: ${input.name}\nEmail: ${input.email}\nPhone: ${input.phone ?? ""}\nSubject: ${input.subject}\nMessage:\n${input.message}`,
+  });
 }
 
 async function parseRequestPayload(request: NextRequest) {
@@ -240,6 +340,10 @@ function generateTemporaryPassword() {
 
 function stringValue(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function labelize(value: string) {
+  return value.replace(/[_-]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function escapeHtml(value: string) {
