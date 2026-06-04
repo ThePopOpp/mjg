@@ -82,7 +82,8 @@ function transformStaticHtml(html: string) {
     .replace(
       /var FLUENT_CRM_URL = 'https:\/\/michaeljgauthier\.com\/\?fluentcrm=1&route=contact&hash=[^']+';/g,
       "var FLUENT_CRM_URL = '/api/public/join-journey';",
-    );
+    )
+    .replace("const POST_PAGE = 'post.html';", "const POST_PAGE = '/post';");
 
   for (const [fileName, route] of Object.entries(STATIC_ROUTES)) {
     const absolute = `${siteUrl}${route === "/" ? "/" : route}`;

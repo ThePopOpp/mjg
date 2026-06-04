@@ -1,19 +1,11 @@
-import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { EmailHistoryTable, type EmailHistoryRow } from "@/components/emails/email-history-table";
 import { EmailTabs } from "@/components/emails/email-tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentProfile } from "@/lib/auth/server";
 import { getEmailMessageHistoryData } from "@/lib/email/inbox";
 import { getEmailTemplateData, renderTemplate } from "@/lib/email/templates";
-import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 
 export default async function EmailHistoryPage() {
-  const profile = await getCurrentProfile();
-  if (!can(profile?.role, PERMISSIONS.MANAGE_USERS)) {
-    redirect("/access-restricted");
-  }
-
   const [templateData, inboxData] = await Promise.all([getEmailTemplateData(), getEmailMessageHistoryData()]);
 
   const history: EmailHistoryRow[] = [

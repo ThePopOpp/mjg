@@ -1,20 +1,12 @@
-import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserProfileEditor } from "@/components/user-management/user-profile-editor";
-import { getCurrentProfile } from "@/lib/auth/server";
-import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { ROLE_LABELS, isAppRole } from "@/lib/rbac/roles";
 import { getUserManagementProfile } from "@/lib/user-management/repository";
 
 export default async function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const currentProfile = await getCurrentProfile();
-  if (!can(currentProfile?.role, PERMISSIONS.MANAGE_USERS)) {
-    redirect("/access-restricted");
-  }
-
   const { id } = await params;
   const data = await getUserManagementProfile(id);
 

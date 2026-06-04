@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useRef, useState } from "react";
-import { Copy, ImageIcon, Mic, Pause, Play, RotateCcw, Save, Square, Upload, Video, X } from "lucide-react";
+import { Copy, FileAudio, ImageIcon, LinkIcon, Mic, Pause, Play, RotateCcw, Save, Square, Upload, Video, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,9 @@ const displayTargets = [
   { key: "selected_users", label: "Selected users later" },
 ];
 
+const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, "0"));
+const minutes = ["00", "15", "30", "45"];
+
 export function MediaStudioDashboard({ assets }: { assets: any[] }) {
   const router = useRouter();
   const [active, setActive] = useState<AssetType>("audio");
@@ -51,6 +54,7 @@ export function MediaStudioDashboard({ assets }: { assets: any[] }) {
 
     const response = await fetch("/api/admin/media-assets", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         title,
@@ -177,22 +181,29 @@ function AudioStudio({ assets }: { assets: any[] }) {
   const [recording, setRecording] = useState(false);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [audioPreviewUrl, setAudioPreviewUrl] = useState("");
+  const [audioUrl, setAudioUrl] = useState("");
   const [uploadedAudio, setUploadedAudio] = useState<UploadedFile | null>(null);
   const [uploadedThumbnail, setUploadedThumbnail] = useState<UploadedFile | null>(null);
+  const [audioFileName, setAudioFileName] = useState("");
+  const [thumbnailFileName, setThumbnailFileName] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [status, setStatus] = useState("draft");
   const [visibility, setVisibility] = useState("private");
-  const [publishAt, setPublishAt] = useState("");
+  const [publishDate, setPublishDate] = useState("");
+  const [publishHour, setPublishHour] = useState("08");
+  const [publishMinute, setPublishMinute] = useState("00");
+  const [publishPeriod, setPublishPeriod] = useState("AM");
   const [targets, setTargets] = useState<string[]>(["frontend_resources"]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [playerAsset, setPlayerAsset] = useState<any | null>(null);
 
-  const currentAudioUrl = uploadedAudio?.url || audioPreviewUrl;
+  const currentAudioUrl = uploadedAudio?.url || audioUrl || audioPreviewUrl;
   const currentThumbnail = uploadedThumbnail?.url || thumbnailUrl;
+  const publishAt = buildPublishAt(publishDate, publishHour, publishMinute, publishPeriod);
 
   async function startRecording() {
     setError(null);
@@ -229,12 +240,15 @@ function AudioStudio({ assets }: { assets: any[] }) {
     setAudioPreviewUrl("");
     setRecordedBlob(null);
     setUploadedAudio(null);
+    setAudioFileName("");
   }
 
   async function handleAudioUpload(file: File) {
     setError(null);
     const upload = await uploadFile(file, "audio");
     setUploadedAudio(upload);
+    setAudioFileName(file.name);
+    setAudioUrl("");
     setRecordedBlob(null);
     setAudioPreviewUrl(upload.url);
   }
@@ -243,10 +257,10 @@ function AudioStudio({ assets }: { assets: any[] }) {
     setError(null);
     const upload = await uploadFile(file, "thumbnail");
     setUploadedThumbnail(upload);
+    setThumbnailFileName(file.name);
   }
 
-  async function saveAudioAsset(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function saveAudioAsset(nextStatus = status) {
     setSaving(true);
     setMessage(null);
     setError(null);
@@ -259,24 +273,26 @@ function AudioStudio({ assets }: { assets: any[] }) {
         setUploadedAudio(audio);
       }
 
-      if (!audio?.url) {
-        throw new Error("Record or upload an audio file first.");
+      const resolvedAudioUrl = audio?.url || audioUrl.trim();
+      if (!resolvedAudioUrl) {
+        throw new Error("Record, upload, or add an audio file URL first.");
       }
 
       const response = await fetch("/api/admin/media-assets", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
           assetType: "audio",
-          sourceType: recordedBlob ? "recording" : "upload",
-          fileUrl: audio.url,
-          storageBucket: audio.bucket,
-          storagePath: audio.path,
-          mimeType: audio.mimeType,
-          fileSize: audio.fileSize,
+          sourceType: recordedBlob ? "recording" : audio ? "upload" : "external_url",
+          fileUrl: resolvedAudioUrl,
+          storageBucket: audio?.bucket,
+          storagePath: audio?.path,
+          mimeType: audio?.mimeType,
+          fileSize: audio?.fileSize,
           description,
-          status,
+          status: nextStatus,
           visibility,
           metadata: {
             thumbnail_url: currentThumbnail || null,
@@ -291,14 +307,19 @@ function AudioStudio({ assets }: { assets: any[] }) {
 
       setTitle("");
       setDescription("");
+      setAudioUrl("");
       setThumbnailUrl("");
-      setPublishAt("");
+      setPublishDate("");
+      setPublishHour("08");
+      setPublishMinute("00");
+      setPublishPeriod("AM");
       setStatus("draft");
       setVisibility("private");
       setTargets(["frontend_resources"]);
       setUploadedThumbnail(null);
+      setThumbnailFileName("");
       resetRecording();
-      setMessage("Audio track saved.");
+      setMessage(nextStatus === "draft" ? "Audio track saved as draft." : "Audio track saved.");
       router.refresh();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Audio save failed.");
@@ -319,7 +340,7 @@ function AudioStudio({ assets }: { assets: any[] }) {
           <CardDescription>Record or upload an audio track, add its card details, and choose where it should appear.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]" onSubmit={saveAudioAsset}>
+          <form className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]" onSubmit={(event) => { event.preventDefault(); saveAudioAsset(status); }}>
             <div className="space-y-5">
               <div className="rounded-md border bg-muted/30 p-4">
                 <div className="flex flex-wrap items-center gap-3">
@@ -338,6 +359,12 @@ function AudioStudio({ assets }: { assets: any[] }) {
                   </label>
                   {recording ? <Badge variant="secondary">Recording</Badge> : null}
                 </div>
+                {audioFileName ? (
+                  <p className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">
+                    <FileAudio className="h-4 w-4" />
+                    {audioFileName}
+                  </p>
+                ) : null}
                 {currentAudioUrl ? (
                   <audio ref={previewAudio} className="mt-4 w-full" controls src={currentAudioUrl}>
                     <track kind="captions" />
@@ -365,39 +392,90 @@ function AudioStudio({ assets }: { assets: any[] }) {
                     </SelectContent>
                   </Select>
                 </label>
-                <label className="space-y-2">
+                <label className="space-y-2 lg:col-span-2">
+                  <span className="text-sm font-medium">Audio file URL</span>
+                  <div className="relative">
+                    <LinkIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      className="pl-9"
+                      value={audioUrl}
+                      onChange={(event) => {
+                        setAudioUrl(event.target.value);
+                        setUploadedAudio(null);
+                        setAudioFileName("");
+                        setAudioPreviewUrl("");
+                      }}
+                      placeholder="https://..."
+                    />
+                  </div>
+                </label>
+                <label className="space-y-2 lg:col-span-2">
                   <span className="text-sm font-medium">Short description</span>
-                  <Input maxLength={50} value={description} onChange={(event) => setDescription(event.target.value)} placeholder="50 characters max" />
-                  <span className="text-xs text-muted-foreground">{description.length}/50</span>
+                  <textarea
+                    className="min-h-[96px] w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    value={description}
+                    onChange={(event) => setDescription(limitWords(event.target.value, 50))}
+                    placeholder="50 words max. The card preview will show up to three lines."
+                  />
+                  <span className="text-xs text-muted-foreground">{wordCount(description)}/50 words</span>
                 </label>
-                <label className="space-y-2">
+                <div className="space-y-2 lg:col-span-2">
                   <span className="text-sm font-medium">Publish schedule</span>
-                  <Input type="datetime-local" value={publishAt} onChange={(event) => setPublishAt(event.target.value)} />
-                </label>
-                <label className="space-y-2">
-                  <span className="text-sm font-medium">Visibility</span>
-                  <Select value={visibility} onValueChange={setVisibility}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="private">Private</SelectItem>
-                      <SelectItem value="public">Public</SelectItem>
-                      <SelectItem value="assigned">Assigned</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </label>
-                <label className="space-y-2">
+                  <div className="grid gap-3 sm:grid-cols-[1fr_110px_110px_110px]">
+                    <Input value={publishDate} onChange={(event) => setPublishDate(event.target.value)} placeholder="MM/DD/YYYY" />
+                    <Select value={publishHour} onValueChange={setPublishHour}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>{hours.map((hour) => <SelectItem key={hour} value={hour}>{hour}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Select value={publishMinute} onValueChange={setPublishMinute}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>{minutes.map((minute) => <SelectItem key={minute} value={minute}>{minute}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Select value={publishPeriod} onValueChange={setPublishPeriod}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AM">AM</SelectItem>
+                        <SelectItem value="PM">PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <label className="space-y-2 lg:col-span-2">
                   <span className="text-sm font-medium">Thumbnail URL</span>
                   <Input value={thumbnailUrl} onChange={(event) => setThumbnailUrl(event.target.value)} placeholder="https://..." />
                 </label>
                 <label className="space-y-2 lg:col-span-2">
                   <span className="text-sm font-medium">Upload thumbnail</span>
-                  <Input type="file" accept="image/*" onChange={(event) => event.target.files?.[0] && handleThumbnailUpload(event.target.files[0])} />
+                  <span className="flex min-h-24 cursor-pointer items-center justify-center rounded-md border border-dashed bg-muted/30 px-4 py-6 text-center transition-colors hover:bg-muted/50">
+                    <span className="flex flex-col items-center gap-2 text-sm">
+                      <ImageIcon className="h-6 w-6 text-primary" />
+                      <span className="font-medium">{thumbnailFileName || "Choose thumbnail image"}</span>
+                      <span className="text-xs text-muted-foreground">JPG, PNG, WebP, or GIF</span>
+                    </span>
+                    <input className="sr-only" type="file" accept="image/*" onChange={(event) => event.target.files?.[0] && handleThumbnailUpload(event.target.files[0])} />
+                  </span>
                 </label>
               </div>
 
               <div className="rounded-md border p-4">
-                <p className="text-sm font-medium">Display locations</p>
-                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+                  <label className="space-y-2">
+                    <span className="text-sm font-medium">Visibility</span>
+                    <Select value={visibility} onValueChange={setVisibility}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="private">Private</SelectItem>
+                        <SelectItem value="public">Public</SelectItem>
+                        <SelectItem value="assigned">Assigned</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </label>
+                  <div>
+                    <p className="text-sm font-medium">Display locations</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Choose where this audio card can appear after it is published.</p>
+                  </div>
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
                   {displayTargets.map((target) => (
                     <label key={target.key} className="flex items-center justify-between gap-3 rounded-md border bg-background p-3 text-sm">
                       <span>{target.label}</span>
@@ -409,10 +487,16 @@ function AudioStudio({ assets }: { assets: any[] }) {
 
               {message ? <p className="rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</p> : null}
               {error ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
-              <Button type="submit" disabled={saving || !title || !currentAudioUrl}>
-                <Save className="h-4 w-4" />
-                {saving ? "Saving..." : "Save audio track"}
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button type="button" variant="outline" disabled={saving || !title || !currentAudioUrl} onClick={() => saveAudioAsset("draft")}>
+                  <Save className="h-4 w-4" />
+                  Save as draft
+                </Button>
+                <Button type="submit" disabled={saving || !title || !currentAudioUrl}>
+                  <Save className="h-4 w-4" />
+                  {saving ? "Saving..." : "Save audio track"}
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -507,7 +591,12 @@ function AudioCard({ asset, onPlay }: { asset: any; onPlay: () => void }) {
         </div>
         <div>
           <h3 className="font-semibold">{asset.title}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">{asset.description || "No description."}</p>
+          <p
+            className="mt-1 text-sm text-muted-foreground"
+            style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+          >
+            {asset.description || "No description."}
+          </p>
         </div>
         {asset.metadata?.publish_at ? <p className="text-xs text-muted-foreground">Scheduled: {formatDate(asset.metadata.publish_at)}</p> : null}
         {targets.length ? <p className="text-xs text-muted-foreground">Displays: {targets.join(", ")}</p> : null}
@@ -596,6 +685,7 @@ async function uploadFile(file: File, intent: "audio" | "thumbnail"): Promise<Up
   formData.append("intent", intent);
   const response = await fetch("/api/admin/media-assets/upload", {
     method: "POST",
+    credentials: "same-origin",
     body: formData,
   });
   const data = await response.json();
@@ -607,4 +697,27 @@ function formatDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString();
+}
+
+function wordCount(value: string) {
+  return value.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function limitWords(value: string, maxWords: number) {
+  const words = value.trimStart().split(/\s+/).filter(Boolean);
+  if (words.length <= maxWords) return value;
+  return words.slice(0, maxWords).join(" ");
+}
+
+function buildPublishAt(date: string, hour: string, minute: string, period: string) {
+  if (!date.trim()) return "";
+  const match = date.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!match) return `${date.trim()} ${hour}:${minute} ${period}`;
+
+  const [, month, day, year] = match;
+  let hour24 = Number(hour);
+  if (period === "PM" && hour24 < 12) hour24 += 12;
+  if (period === "AM" && hour24 === 12) hour24 = 0;
+  const parsed = new Date(Number(year), Number(month) - 1, Number(day), hour24, Number(minute));
+  return Number.isNaN(parsed.getTime()) ? `${date.trim()} ${hour}:${minute} ${period}` : parsed.toISOString();
 }

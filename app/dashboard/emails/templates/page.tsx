@@ -1,17 +1,9 @@
-import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { EmailTemplateManager } from "@/components/email-templates/email-template-manager";
 import { EmailTabs } from "@/components/emails/email-tabs";
-import { getCurrentProfile } from "@/lib/auth/server";
 import { getEmailTemplateData } from "@/lib/email/templates";
-import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 
 export default async function EmailTemplatesHubPage() {
-  const profile = await getCurrentProfile();
-  if (!can(profile?.role, PERMISSIONS.MANAGE_USERS)) {
-    redirect("/access-restricted");
-  }
-
   const data = await getEmailTemplateData();
 
   return (

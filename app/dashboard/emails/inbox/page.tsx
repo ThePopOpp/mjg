@@ -1,19 +1,11 @@
-import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { SyncEmailButton } from "@/components/email-inbox/sync-email-button";
 import { EmailHistoryTable, type EmailHistoryRow } from "@/components/emails/email-history-table";
 import { EmailTabs } from "@/components/emails/email-tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentProfile } from "@/lib/auth/server";
 import { getEmailInboxData } from "@/lib/email/inbox";
-import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 
 export default async function EmailInboxHubPage() {
-  const profile = await getCurrentProfile();
-  if (!can(profile?.role, PERMISSIONS.MANAGE_USERS)) {
-    redirect("/access-restricted");
-  }
-
   const data = await getEmailInboxData();
   const rows: EmailHistoryRow[] = data.messages.map((message: any) => ({
     id: `received-${message.id}`,

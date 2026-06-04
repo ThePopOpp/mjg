@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { DeployEmailForm } from "@/components/email-templates/deploy-email-form";
 import { DynamicFieldCopyGrid } from "@/components/email-templates/dynamic-field-copy-grid";
@@ -7,14 +6,10 @@ import { ManualEmailComposer } from "@/components/emails/manual-email-composer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { DEFAULT_EMAIL_FIELDS, getEmailTemplateData } from "@/lib/email/templates";
-import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export default async function SendEmailPage() {
   const profile = await getCurrentProfile();
-  if (!can(profile?.role, PERMISSIONS.MANAGE_USERS)) {
-    redirect("/access-restricted");
-  }
 
   const data = await getEmailTemplateData();
   const supabase = createSupabaseAdminClient();

@@ -1,21 +1,13 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { InviteUserForm } from "@/components/user-management/invite-user-form";
-import { getCurrentProfile } from "@/lib/auth/server";
-import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { ROLE_LABELS, isAppRole } from "@/lib/rbac/roles";
 import { getUserManagementData } from "@/lib/user-management/repository";
 
 export default async function UserManagementPage() {
-  const profile = await getCurrentProfile();
-  if (!can(profile?.role, PERMISSIONS.MANAGE_USERS)) {
-    redirect("/access-restricted");
-  }
-
   const data = await getUserManagementData();
 
   return (

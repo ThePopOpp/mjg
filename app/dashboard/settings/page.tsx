@@ -1,16 +1,10 @@
-import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmailTestForm } from "@/components/settings/email-test-form";
 import { getCurrentProfile } from "@/lib/auth/server";
-import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 
 export default async function SettingsPage() {
   const profile = await getCurrentProfile();
-
-  if (!can(profile?.role, PERMISSIONS.MANAGE_SETTINGS)) {
-    redirect("/access-restricted");
-  }
 
   return (
     <div className="space-y-6">

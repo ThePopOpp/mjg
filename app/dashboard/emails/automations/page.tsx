@@ -1,18 +1,10 @@
-import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { TemplateMappingForm } from "@/components/email-templates/template-mapping-form";
 import { EmailTabs } from "@/components/emails/email-tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentProfile } from "@/lib/auth/server";
 import { getEmailTemplateData } from "@/lib/email/templates";
-import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 
 export default async function EmailAutomationsPage() {
-  const profile = await getCurrentProfile();
-  if (!can(profile?.role, PERMISSIONS.MANAGE_USERS)) {
-    redirect("/access-restricted");
-  }
-
   const data = await getEmailTemplateData();
 
   return (
