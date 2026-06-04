@@ -21,7 +21,7 @@ const sampleMergeData: Record<string, string> = {
   check_in_status: "completed",
   survey_status: "sent",
   inner_circle_status: "invited",
-  site_url: "https://blueprint.michaeljgauthier.com",
+  site_url: "https://my.michaeljgauthier.com",
 };
 
 const categories = [

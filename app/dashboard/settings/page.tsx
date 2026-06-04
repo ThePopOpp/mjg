@@ -37,15 +37,15 @@ export default async function SettingsPage() {
           <CardContent className="space-y-3 text-sm">
             <div>
               <p className="font-medium">Dashboard URL</p>
-              <p className="text-muted-foreground">https://blueprint.michaeljgauthier.com/dashboard</p>
+              <p className="text-muted-foreground">https://my.michaeljgauthier.com/dashboard</p>
             </div>
             <div>
               <p className="font-medium">Participant URL example</p>
-              <p className="text-muted-foreground">https://blueprint.michaeljgauthier.com/dashboard/participants</p>
+              <p className="text-muted-foreground">https://my.michaeljgauthier.com/dashboard/participants</p>
             </div>
             <div>
               <p className="font-medium">Production environment value</p>
-              <code className="mt-1 block rounded-md bg-muted p-2 text-xs">NEXT_PUBLIC_SITE_URL=https://blueprint.michaeljgauthier.com</code>
+              <code className="mt-1 block rounded-md bg-muted p-2 text-xs">NEXT_PUBLIC_SITE_URL=https://my.michaeljgauthier.com</code>
             </div>
           </CardContent>
         </Card>
