@@ -48,10 +48,10 @@ const templateIdsByAlias = new Map();
 
 for (const [fileName, eventKey, name, category] of imports) {
   const filePath = path.join(templateDir, fileName);
-  const rawHtml = fs.readFileSync(filePath, "utf8");
-  const htmlBody = normalizeMergeFields(rawHtml);
-  const subject = extractTitle(rawHtml) || name;
-  const preheader = extractPreheader(rawHtml);
+  const rawHtml = repairMojibake(fs.readFileSync(filePath, "utf8"));
+  const htmlBody = repairMojibake(normalizeMergeFields(rawHtml));
+  const subject = repairMojibake(extractTitle(rawHtml) || name);
+  const preheader = repairMojibake(extractPreheader(rawHtml) || "");
   const slug = `created-for-more-${fileName.replace(/\.html$/i, "")}`;
   const availableFields = Array.from(extractMergeFields(`${subject} ${preheader} ${htmlBody}`));
 
@@ -62,7 +62,7 @@ for (const [fileName, eventKey, name, category] of imports) {
         name,
         slug,
         subject,
-        preheader,
+        preheader: preheader || null,
         html_body: htmlBody,
         text_body: stripHtml(htmlBody),
         category,
@@ -145,7 +145,7 @@ function stripHtml(value) {
 }
 
 function decodeEntities(value) {
-  return value
+  return repairMojibake(value
     .replace(/&#x27;/g, "'")
     .replace(/&mdash;/g, "-")
     .replace(/&ndash;/g, "-")
@@ -155,5 +155,25 @@ function decodeEntities(value) {
     .replace(/&rdquo;/g, '"')
     .replace(/&middot;/g, "·")
     .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ");
+    .replace(/&nbsp;/g, " "));
+}
+
+function repairMojibake(value) {
+  if (!value) return value;
+  const replacements = [
+    [[0x00e2, 0x20ac, 0x201d], "-"],
+    [[0x00e2, 0x20ac, 0x201c], "-"],
+    [[0x00e2, 0x20ac, 0x0022], "-"],
+    [[0x00e2, 0x20ac, 0x2122], "'"],
+    [[0x00e2, 0x20ac, 0x02dc], "'"],
+    [[0x00e2, 0x20ac, 0x0153], '"'],
+    [[0x00e2, 0x20ac, 0x009d], '"'],
+    [[0x00c2, 0x00b7], "·"],
+    [[0x00c2], ""],
+  ];
+
+  return replacements.reduce(
+    (current, [codepoints, replacement]) => current.replaceAll(String.fromCodePoint(...codepoints), replacement),
+    value,
+  );
 }
