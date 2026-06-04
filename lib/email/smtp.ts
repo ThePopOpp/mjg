@@ -1,15 +1,24 @@
 import nodemailer from "nodemailer";
 
 export type SendEmailInput = {
-  to: string;
+  to: string | string[];
+  cc?: string | string[];
+  bcc?: string | string[];
   subject: string;
   html: string;
   text?: string;
   replyTo?: string;
+  attachments?: Array<{
+    filename: string;
+    content: Buffer;
+    contentType?: string;
+  }>;
 };
 
 export function hasSmtpConfig() {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASSWORD);
+  const user = process.env.SMTP_USER ?? process.env.MAIL_JW_USERNAME;
+  const pass = process.env.SMTP_PASSWORD ?? process.env.MAIL_JW_PASSWORD;
+  return Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && user && pass);
 }
 
 export async function sendSmtpEmail(input: SendEmailInput) {
@@ -21,25 +30,35 @@ export async function sendSmtpEmail(input: SendEmailInput) {
     };
   }
 
+  const port = Number(process.env.SMTP_PORT ?? 465);
+  const user = process.env.SMTP_USER ?? process.env.MAIL_JW_USERNAME;
+  const pass = process.env.SMTP_PASSWORD ?? process.env.MAIL_JW_PASSWORD;
+  const secure =
+    process.env.SMTP_SECURE !== "false" &&
+    (process.env.SMTP_SECURE === "true" || process.env.SMTP_ENCRYPTION === "ssl" || port === 465);
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT ?? 465),
-    secure: process.env.SMTP_SECURE !== "false",
+    port,
+    secure,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD,
+      user,
+      pass,
     },
   });
 
-  const from = process.env.NOTIFICATION_FROM_EMAIL || process.env.SMTP_USER;
+  const from = process.env.NOTIFICATION_FROM_EMAIL || user;
 
   const info = await transporter.sendMail({
     from,
     to: input.to,
+    cc: input.cc,
+    bcc: input.bcc,
     subject: input.subject,
     html: input.html,
     text: input.text,
     replyTo: input.replyTo || from,
+    attachments: input.attachments,
   });
 
   return {

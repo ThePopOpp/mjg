@@ -1,11 +1,21 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { InviteUserForm } from "@/components/user-management/invite-user-form";
+import { getCurrentProfile } from "@/lib/auth/server";
+import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { ROLE_LABELS, isAppRole } from "@/lib/rbac/roles";
 import { getUserManagementData } from "@/lib/user-management/repository";
 
 export default async function UserManagementPage() {
+  const profile = await getCurrentProfile();
+  if (!can(profile?.role, PERMISSIONS.MANAGE_USERS)) {
+    redirect("/access-restricted");
+  }
+
   const data = await getUserManagementData();
 
   return (
@@ -18,6 +28,15 @@ export default async function UserManagementPage() {
         <SummaryCard label="Form submissions" value={data.submissions.length} />
         <SummaryCard label="Participant links" value={data.links.length} />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Invite user</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <InviteUserForm />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -34,6 +53,7 @@ export default async function UserManagementPage() {
                 <TableHead>Status</TableHead>
                 <TableHead>Participant</TableHead>
                 <TableHead>Last login</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -46,9 +66,14 @@ export default async function UserManagementPage() {
                   <TableCell><StatusBadge status={profile.status} /></TableCell>
                   <TableCell>{profile.participants ? `${profile.participants.first_name} ${profile.participants.last_name}` : "-"}</TableCell>
                   <TableCell>{profile.last_login_at ? new Date(profile.last_login_at).toLocaleDateString() : "-"}</TableCell>
+                  <TableCell className="text-right">
+                    <Link className="text-sm font-medium text-primary hover:underline" href={`/dashboard/user-management/${profile.id}`}>
+                      Edit
+                    </Link>
+                  </TableCell>
                 </TableRow>
               ))}
-              {!data.profiles.length ? <TableRow><TableCell colSpan={7}>No Supabase profiles found yet.</TableCell></TableRow> : null}
+              {!data.profiles.length ? <TableRow><TableCell colSpan={8}>No Supabase profiles found yet.</TableCell></TableRow> : null}
             </TableBody>
           </Table>
         </CardContent>
@@ -68,6 +93,7 @@ export default async function UserManagementPage() {
                   <TableHead>Method</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Expires</TableHead>
+                  <TableHead>Invite link</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -78,9 +104,18 @@ export default async function UserManagementPage() {
                     <TableCell>{invite.invite_method}</TableCell>
                     <TableCell><StatusBadge status={invite.invite_status} /></TableCell>
                     <TableCell>{invite.expires_at ? new Date(invite.expires_at).toLocaleDateString() : "-"}</TableCell>
+                    <TableCell>
+                      {invite.metadata?.inviteUrl ? (
+                        <Link className="text-sm font-medium text-primary hover:underline" href={invite.metadata.inviteUrl}>
+                          Open
+                        </Link>
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
-                {!data.invitations.length ? <TableRow><TableCell colSpan={5}>No invitations yet.</TableCell></TableRow> : null}
+                {!data.invitations.length ? <TableRow><TableCell colSpan={6}>No invitations yet.</TableCell></TableRow> : null}
               </TableBody>
             </Table>
           </CardContent>

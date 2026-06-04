@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { ROLES, type AppRole, isAppRole } from "@/lib/rbac/roles";
+import { ROLES, canAccessDashboard, type AppRole, isAppRole } from "@/lib/rbac/roles";
 
 export type DashboardProfile = {
   id: string;
@@ -33,7 +33,7 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
   const { data: profile } = await supabase
     .from("profiles")
     .select("id,email,first_name,last_name,role,status")
-    .eq("id", user.id)
+    .or(`id.eq.${user.id},auth_user_id.eq.${user.id}`)
     .maybeSingle();
 
   const role = isAppRole(profile?.role) ? profile.role : ROLES.PARTICIPANT;
@@ -46,4 +46,8 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
     role,
     status: profile?.status ?? "active",
   };
+}
+
+export function isActiveDashboardProfile(profile: DashboardProfile | null) {
+  return Boolean(profile && profile.status === "active" && canAccessDashboard(profile.role));
 }

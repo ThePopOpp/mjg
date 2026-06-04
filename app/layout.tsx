@@ -13,7 +13,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var storedTheme = localStorage.getItem('theme');
+                var preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                var theme = storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : preferredTheme;
+                document.documentElement.dataset.theme = theme;
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+              } catch {}
+            `,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,10 +1,8 @@
 import crypto from "node:crypto";
-import { sendSmtpEmail } from "@/lib/email/smtp";
+import { sendTemplateForEvent } from "@/lib/email/templates";
 import { ROLES, type AppRole, isAppRole } from "@/lib/rbac/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-
-export const USER_STATUSES = ["active", "invited", "pending", "suspended", "archived", "inactive"] as const;
-export type UserStatus = (typeof USER_STATUSES)[number];
+import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants";
 
 export async function getUserManagementData() {
   try {
@@ -87,9 +85,9 @@ export async function createUserInvitation(input: {
       role: input.role,
       invited_by: input.invitedBy ?? null,
       invite_method: input.inviteMethod,
-      invite_status: input.inviteMethod === "manual" ? "pending" : "sent",
+      invite_status: "pending",
       invite_token: inviteToken,
-      sent_at: input.inviteMethod === "manual" ? null : new Date().toISOString(),
+      sent_at: null,
       expires_at: expiresAt.toISOString(),
     })
     .select("*")
@@ -99,12 +97,60 @@ export async function createUserInvitation(input: {
 
   if (input.email && input.inviteMethod === "email") {
     const inviteUrl = `${input.siteUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? ""}/accept-invite?token=${inviteToken}`;
-    await sendSmtpEmail({
-      to: input.email,
-      subject: "You have been invited to the MJG Dashboard",
-      html: `<p>You have been invited to the MJG Dashboard.</p><p><a href="${inviteUrl}">Accept your invitation</a></p>`,
-      text: `You have been invited to the MJG Dashboard. Accept your invitation: ${inviteUrl}`,
-    });
+    try {
+      const emailResult = await sendTemplateForEvent({
+        eventKey: "user_invitation",
+        actorUserId: input.invitedBy,
+        recipient: {
+          email: input.email,
+          phone: input.phone,
+          role: input.role,
+          status: "invited",
+          merge_data: { invite_url: inviteUrl },
+        },
+        fallback: {
+          subject: "You have been invited to the MJG Dashboard",
+          html: `<p>You have been invited to the MJG Dashboard.</p><p><a href="{{invite_url}}">Accept your invitation</a></p>`,
+          text: `You have been invited to the MJG Dashboard. Accept your invitation: {{invite_url}}`,
+        },
+      });
+
+      await supabase
+        .from("user_invitations")
+        .update({
+          invite_status: emailResult.skipped ? "pending" : "sent",
+          sent_at: emailResult.skipped ? null : new Date().toISOString(),
+          metadata: {
+            ...(invitation.metadata ?? {}),
+            inviteUrl,
+            emailSkipped: emailResult.skipped,
+            emailReason: emailResult.reason ?? null,
+            providerMessageId: emailResult.messageId ?? null,
+          },
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", invitation.id);
+    } catch (sendError) {
+      const message = sendError instanceof Error ? sendError.message : "SMTP send failed.";
+      await supabase
+        .from("user_invitations")
+        .update({
+          invite_status: "failed",
+          metadata: { ...(invitation.metadata ?? {}), inviteUrl, emailError: message },
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", invitation.id);
+      throw new Error(`Invitation was saved, but email failed: ${message}`);
+    }
+  } else {
+    const inviteUrl = `${input.siteUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? ""}/accept-invite?token=${inviteToken}`;
+    await supabase
+      .from("user_invitations")
+      .update({
+        metadata: { ...(invitation.metadata ?? {}), inviteUrl },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", invitation.id);
   }
 
   await logUserActivity({
@@ -126,6 +172,131 @@ export async function createUserInvitation(input: {
   });
 
   return invitation;
+}
+
+export async function acceptUserInvitation(input: {
+  token: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  phone?: string;
+}) {
+  if (!input.token) throw new Error("Invitation token is required.");
+  if (!input.password || input.password.length < 8) {
+    throw new Error("Password must be at least 8 characters.");
+  }
+
+  const supabase = createSupabaseAdminClient();
+  const { data: invitation, error: invitationError } = await supabase
+    .from("user_invitations")
+    .select("*")
+    .eq("invite_token", input.token)
+    .maybeSingle();
+
+  if (invitationError) throw invitationError;
+  if (!invitation) throw new Error("Invitation not found.");
+  if (invitation.invite_status === "accepted") throw new Error("Invitation has already been accepted.");
+  if (invitation.invite_status === "revoked") throw new Error("Invitation has been revoked.");
+  if (invitation.expires_at && new Date(invitation.expires_at).getTime() < Date.now()) {
+    await supabase
+      .from("user_invitations")
+      .update({ invite_status: "expired", updated_at: new Date().toISOString() })
+      .eq("id", invitation.id);
+    throw new Error("Invitation has expired.");
+  }
+  if (!invitation.email) throw new Error("Email invitations are required for account setup.");
+  if (!isAppRole(invitation.role)) throw new Error("Invitation role is invalid.");
+
+  const email = invitation.email.trim().toLowerCase();
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    password: input.password,
+    email_confirm: true,
+    phone: input.phone || invitation.phone || undefined,
+    user_metadata: {
+      first_name: input.firstName,
+      last_name: input.lastName,
+      invited_by: invitation.invited_by,
+    },
+  });
+
+  if (authError) throw authError;
+  if (!authData.user) throw new Error("Supabase Auth user could not be created.");
+
+  const profile = await upsertProfile({
+    authUserId: authData.user.id,
+    firstName: input.firstName,
+    lastName: input.lastName,
+    email,
+    phone: input.phone || invitation.phone || undefined,
+    role: invitation.role,
+    status: "active",
+    invitedBy: invitation.invited_by ?? undefined,
+    actorUserId: invitation.invited_by ?? undefined,
+  });
+
+  await supabase
+    .from("user_invitations")
+    .update({
+      invite_status: "accepted",
+      accepted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      metadata: { ...(invitation.metadata ?? {}), acceptedProfileId: profile.id },
+    })
+    .eq("id", invitation.id);
+
+  await logUserActivity({
+    userId: profile.id,
+    actorUserId: invitation.invited_by ?? undefined,
+    action: "invite_accepted",
+    entityType: "user_invitations",
+    entityId: invitation.id,
+    metadata: { email, role: invitation.role },
+  });
+
+  await supabase.from("notifications").insert({
+    type: "invite_accepted",
+    title: "Invitation accepted",
+    message: `${profile.full_name || email} accepted an MJG Dashboard invitation.`,
+    destination: "dashboard",
+    status: "queued",
+    user_id: profile.id,
+    actor_user_id: invitation.invited_by ?? null,
+    metadata: { invitationId: invitation.id },
+  });
+
+  return { email, profile };
+}
+
+export async function getUserManagementProfile(id: string) {
+  const supabase = createSupabaseAdminClient();
+  const [profile, activity, links, submissions] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("*, participants:related_participant_id(id,first_name,last_name,email,phone,wave,participant_type)")
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("user_activity_logs")
+      .select("*")
+      .or(`user_id.eq.${id},actor_user_id.eq.${id}`)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("participant_user_links")
+      .select("*, participants(id,first_name,last_name,email,phone,wave,participant_type)")
+      .eq("user_id", id)
+      .order("created_at", { ascending: false }),
+    supabase.from("form_submissions").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(50),
+  ]);
+
+  return {
+    profile: profile.data,
+    activity: activity.data ?? [],
+    links: links.data ?? [],
+    submissions: submissions.data ?? [],
+    error: profile.error?.message ?? activity.error?.message ?? links.error?.message ?? submissions.error?.message ?? null,
+  };
 }
 
 export async function upsertProfile(input: {

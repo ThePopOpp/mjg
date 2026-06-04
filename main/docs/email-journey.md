@@ -44,3 +44,33 @@ Hostinger SMTP/IMAP values are prepared through environment variables:
 The server-only SMTP helper lives in `lib/email/smtp.ts`. It does not send unless `SMTP_PASSWORD` is configured.
 
 The journey worker still needs to be added: it should read pending `email_journey_events`, send the matching template, update `status`, `sent_at`, and `provider_message_id`, and record any error in `error_message`.
+## Email Templates and Deployment
+
+Dashboard admins can create reusable email templates at:
+
+```txt
+/dashboard/email-templates
+```
+
+Templates support:
+
+- Subject lines with dynamic fields
+- HTML body content
+- Plain text fallback content
+- Categories and draft/active/archive status
+- Send logs in Supabase
+
+Dynamic fields use double braces:
+
+```txt
+{{first_name}}
+{{last_name}}
+{{full_name}}
+{{email}}
+{{wave}}
+{{check_in_status}}
+{{survey_status}}
+{{site_url}}
+```
+
+Start by sending a test email to yourself. Audience deployment sends immediately and should be used carefully during pilot testing.

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { isAppRole } from "@/lib/rbac/roles";
 import { requireUserManager } from "@/lib/user-management/auth";
-import { USER_STATUSES, upsertProfile } from "@/lib/user-management/repository";
+import { USER_STATUSES } from "@/lib/user-management/constants";
+import { upsertProfile } from "@/lib/user-management/repository";
 
 export async function POST(request: Request) {
   try {
