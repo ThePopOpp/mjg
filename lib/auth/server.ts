@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ROLES, canAccessDashboard, type AppRole, isAppRole } from "@/lib/rbac/roles";
 
 export type DashboardProfile = {
@@ -30,16 +31,30 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
 
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  const admin = createSupabaseAdminClient();
+  let { data: profile } = await admin
     .from("profiles")
-    .select("id,email,first_name,last_name,role,status")
+    .select("id,auth_user_id,email,first_name,last_name,role,status")
     .or(`id.eq.${user.id},auth_user_id.eq.${user.id}`)
     .maybeSingle();
+
+  if (!profile && user.email) {
+    const byEmail = await admin
+      .from("profiles")
+      .select("id,auth_user_id,email,first_name,last_name,role,status")
+      .eq("email", user.email.trim().toLowerCase())
+      .maybeSingle();
+    profile = byEmail.data;
+  }
+
+  if (profile && profile.auth_user_id !== user.id) {
+    await admin.from("profiles").update({ auth_user_id: user.id, updated_at: new Date().toISOString() }).eq("id", profile.id);
+  }
 
   const role = isAppRole(profile?.role) ? profile.role : ROLES.PARTICIPANT;
 
   return {
-    id: user.id,
+    id: profile?.id ?? user.id,
     email: profile?.email ?? user.email ?? "",
     firstName: profile?.first_name ?? "",
     lastName: profile?.last_name ?? "",

@@ -17,12 +17,7 @@ export async function requireUserManager() {
     throw new Error("Authentication required.");
   }
 
-  const admin = createSupabaseAdminClient();
-  const { data: profile, error } = await admin
-    .from("profiles")
-    .select("id,role,status,email")
-    .or(`auth_user_id.eq.${user.id},id.eq.${user.id}`)
-    .maybeSingle();
+  const { profile, error } = await getProfileForAuthUser(user);
 
   if (error) throw error;
   if (!profile || profile.status !== "active") {
@@ -50,12 +45,7 @@ export async function requireParticipantManager() {
     throw new Error("Authentication required.");
   }
 
-  const admin = createSupabaseAdminClient();
-  const { data: profile, error } = await admin
-    .from("profiles")
-    .select("id,role,status,email")
-    .or(`auth_user_id.eq.${user.id},id.eq.${user.id}`)
-    .maybeSingle();
+  const { profile, error } = await getProfileForAuthUser(user);
 
   if (error) throw error;
   if (!profile || profile.status !== "active") {
@@ -83,12 +73,7 @@ export async function requireContentManager() {
     throw new Error("Authentication required.");
   }
 
-  const admin = createSupabaseAdminClient();
-  const { data: profile, error } = await admin
-    .from("profiles")
-    .select("id,role,status,email")
-    .or(`auth_user_id.eq.${user.id},id.eq.${user.id}`)
-    .maybeSingle();
+  const { profile, error } = await getProfileForAuthUser(user);
 
   if (error) throw error;
   if (!profile || profile.status !== "active") {
@@ -116,12 +101,7 @@ export async function requireAdminManager() {
     throw new Error("Authentication required.");
   }
 
-  const admin = createSupabaseAdminClient();
-  const { data: profile, error } = await admin
-    .from("profiles")
-    .select("id,role,status,email")
-    .or(`auth_user_id.eq.${user.id},id.eq.${user.id}`)
-    .maybeSingle();
+  const { profile, error } = await getProfileForAuthUser(user);
 
   if (error) throw error;
   if (!profile || profile.status !== "active") {
@@ -132,4 +112,29 @@ export async function requireAdminManager() {
   }
 
   return profile;
+}
+
+async function getProfileForAuthUser(user: { id: string; email?: string | null }) {
+  const admin = createSupabaseAdminClient();
+  let { data: profile, error } = await admin
+    .from("profiles")
+    .select("id,auth_user_id,role,status,email")
+    .or(`auth_user_id.eq.${user.id},id.eq.${user.id}`)
+    .maybeSingle();
+
+  if (!profile && !error && user.email) {
+    const byEmail = await admin
+      .from("profiles")
+      .select("id,auth_user_id,role,status,email")
+      .eq("email", user.email.trim().toLowerCase())
+      .maybeSingle();
+    profile = byEmail.data;
+    error = byEmail.error;
+  }
+
+  if (profile && profile.auth_user_id !== user.id) {
+    await admin.from("profiles").update({ auth_user_id: user.id, updated_at: new Date().toISOString() }).eq("id", profile.id);
+  }
+
+  return { profile, error };
 }
