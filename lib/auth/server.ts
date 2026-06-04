@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ROLES, canAccessDashboard, normalizeAppRole, type AppRole } from "@/lib/rbac/roles";
 
+const OWNER_EMAILS = new Set(["jw@michaeljgauthier.com"]);
+
 export type DashboardProfile = {
   id: string;
   email: string;
@@ -51,7 +53,11 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
     await admin.from("profiles").update({ auth_user_id: user.id, updated_at: new Date().toISOString() }).eq("id", profile.id);
   }
 
-  const role = normalizeAppRole(profile?.role) ?? ROLES.PARTICIPANT;
+  const userEmail = (user.email ?? "").trim().toLowerCase();
+  const profileEmail = (profile?.email ?? userEmail).trim().toLowerCase();
+  const isOwner = OWNER_EMAILS.has(userEmail) || OWNER_EMAILS.has(profileEmail);
+  const role = isOwner ? ROLES.SUPER_ADMIN : normalizeAppRole(profile?.role) ?? ROLES.PARTICIPANT;
+  const status = isOwner ? "active" : profile?.status ?? "active";
 
   return {
     id: profile?.id ?? user.id,
@@ -59,7 +65,7 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
     firstName: profile?.first_name ?? "",
     lastName: profile?.last_name ?? "",
     role,
-    status: profile?.status ?? "active",
+    status,
   };
 }
 

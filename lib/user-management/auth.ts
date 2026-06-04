@@ -1,6 +1,8 @@
-import { ROLES } from "@/lib/rbac/roles";
+import { ROLES, normalizeAppRole } from "@/lib/rbac/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+
+const OWNER_EMAILS = new Set(["jw@michaeljgauthier.com"]);
 
 export async function requireUserManager() {
   const supabase = await createClient();
@@ -20,14 +22,15 @@ export async function requireUserManager() {
   const { profile, error } = await getProfileForAuthUser(user);
 
   if (error) throw error;
+  const role = normalizeResolvedRole(profile, user.email);
   if (!profile || profile.status !== "active") {
     throw new Error("Active admin profile required.");
   }
-  if (profile.role !== ROLES.SUPER_ADMIN && profile.role !== ROLES.ADMIN) {
+  if (role !== ROLES.SUPER_ADMIN && role !== ROLES.ADMIN) {
     throw new Error("User management permission required.");
   }
 
-  return profile;
+  return { ...profile, role };
 }
 
 export async function requireParticipantManager() {
@@ -48,14 +51,15 @@ export async function requireParticipantManager() {
   const { profile, error } = await getProfileForAuthUser(user);
 
   if (error) throw error;
+  const role = normalizeResolvedRole(profile, user.email);
   if (!profile || profile.status !== "active") {
     throw new Error("Active dashboard profile required.");
   }
-  if (![ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.TEAM_MEMBER].includes(profile.role)) {
+  if (!(role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN || role === ROLES.TEAM_MEMBER)) {
     throw new Error("Participant management permission required.");
   }
 
-  return profile;
+  return { ...profile, role };
 }
 
 export async function requireContentManager() {
@@ -76,14 +80,15 @@ export async function requireContentManager() {
   const { profile, error } = await getProfileForAuthUser(user);
 
   if (error) throw error;
+  const role = normalizeResolvedRole(profile, user.email);
   if (!profile || profile.status !== "active") {
     throw new Error("Active dashboard profile required.");
   }
-  if (![ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.CONTENT_REVIEWER].includes(profile.role)) {
+  if (!(role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN || role === ROLES.CONTENT_REVIEWER)) {
     throw new Error("Content management permission required.");
   }
 
-  return profile;
+  return { ...profile, role };
 }
 
 export async function requireAdminManager() {
@@ -104,14 +109,22 @@ export async function requireAdminManager() {
   const { profile, error } = await getProfileForAuthUser(user);
 
   if (error) throw error;
+  const role = normalizeResolvedRole(profile, user.email);
   if (!profile || profile.status !== "active") {
     throw new Error("Active admin profile required.");
   }
-  if (![ROLES.SUPER_ADMIN, ROLES.ADMIN].includes(profile.role)) {
+  if (!(role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN)) {
     throw new Error("Admin permission required.");
   }
 
-  return profile;
+  return { ...profile, role };
+}
+
+function normalizeResolvedRole(profile: { email?: string | null; role?: string | null } | null, authEmail?: string | null) {
+  const userEmail = (authEmail ?? "").trim().toLowerCase();
+  const profileEmail = (profile?.email ?? "").trim().toLowerCase();
+  if (OWNER_EMAILS.has(userEmail) || OWNER_EMAILS.has(profileEmail)) return ROLES.SUPER_ADMIN;
+  return normalizeAppRole(profile?.role) ?? ROLES.PARTICIPANT;
 }
 
 async function getProfileForAuthUser(user: { id: string; email?: string | null }) {
