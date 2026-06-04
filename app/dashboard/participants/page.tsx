@@ -1,5 +1,6 @@
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { ParticipantsTable } from "@/components/participants/participants-table";
+import { ParticipantsTabs } from "@/components/participants/participants-tabs";
 import { getPilotDashboardData } from "@/lib/dashboard/pilot-data";
 
 export default async function ParticipantsPage() {
@@ -11,6 +12,7 @@ export default async function ParticipantsPage() {
         title="Participants"
         description="Manage Created for More pilot contacts, Check-In progress, tags, notes, and consent records."
       />
+      <ParticipantsTabs active="participants" />
       <ParticipantsTable participants={data.participants as any[]} />
       {data.error ? <p className="text-sm text-destructive">{data.error}</p> : null}
     </div>

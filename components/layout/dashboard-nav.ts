@@ -10,7 +10,6 @@ import {
   MonitorPlay,
   MessageSquareText,
   Settings,
-  Tags,
   UsersRound,
   Waves,
 } from "lucide-react";
@@ -27,7 +26,6 @@ export const dashboardNavItems = [
   { href: "/dashboard/blog-posts", label: "Blog Posts", icon: FileText, permission: PERMISSIONS.REVIEW_CONTENT },
   { href: "/dashboard/emails", label: "Emails", icon: MailCheck },
   { href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
-  { href: "/dashboard/tags-segments", label: "Tags & Segments", icon: Tags },
   { href: "/dashboard/reports", label: "Reports", icon: FileBarChart },
   { href: "/dashboard/settings", label: "Settings", icon: Settings, permission: PERMISSIONS.MANAGE_SETTINGS },
   { href: "/dashboard/user-management", label: "User Management", icon: BarChart3, permission: PERMISSIONS.MANAGE_USERS },
