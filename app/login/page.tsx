@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import blackLogo from "@/docs/mjg-logos/mjg_black_white.png";
+import whiteLogo from "@/docs/mjg-logos/mjg_white.png";
 import { LoginForm } from "@/components/auth/login-form";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getCurrentProfile, isActiveDashboardProfile } from "@/lib/auth/server";
@@ -22,8 +24,13 @@ export default async function LoginPage() {
       </div>
       <section className="hidden border-r bg-card lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div>
-          <p className="text-5xl font-black tracking-normal">MJG</p>
-          <p className="mt-2 text-sm font-semibold uppercase text-muted-foreground">Stewardship Blueprint</p>
+          <span className="relative block h-16 w-44">
+            <img src={blackLogo.src} alt="MJG" className="h-full w-full object-contain object-left dark:hidden" />
+            <img src={whiteLogo.src} alt="MJG" className="hidden h-full w-full object-contain object-left dark:block" />
+          </span>
+          <p className="mt-2 font-serif text-sm font-semibold italic text-foreground">
+            Michael <span className="text-[#c9aa70]">J.</span> Gauthier
+          </p>
         </div>
         <div className="max-w-md">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">Created for More</p>

@@ -27,9 +27,16 @@ export const DASHBOARD_ROLES = [
 ] as const satisfies readonly AppRole[];
 
 export function isAppRole(role: string | null | undefined): role is AppRole {
-  return Object.values(ROLES).includes(role as AppRole);
+  return Boolean(normalizeAppRole(role));
+}
+
+export function normalizeAppRole(role: string | null | undefined): AppRole | null {
+  const normalized = role?.trim().toLowerCase();
+  const matchedRole = Object.values(ROLES).find((value) => value === normalized);
+  return matchedRole ?? null;
 }
 
 export function canAccessDashboard(role: string | null | undefined) {
-  return isAppRole(role) && (DASHBOARD_ROLES as readonly AppRole[]).includes(role);
+  const normalizedRole = normalizeAppRole(role);
+  return Boolean(normalizedRole && (DASHBOARD_ROLES as readonly AppRole[]).includes(normalizedRole));
 }

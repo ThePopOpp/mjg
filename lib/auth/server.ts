@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { ROLES, canAccessDashboard, type AppRole, isAppRole } from "@/lib/rbac/roles";
+import { ROLES, canAccessDashboard, normalizeAppRole, type AppRole } from "@/lib/rbac/roles";
 
 export type DashboardProfile = {
   id: string;
@@ -51,7 +51,7 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
     await admin.from("profiles").update({ auth_user_id: user.id, updated_at: new Date().toISOString() }).eq("id", profile.id);
   }
 
-  const role = isAppRole(profile?.role) ? profile.role : ROLES.PARTICIPANT;
+  const role = normalizeAppRole(profile?.role) ?? ROLES.PARTICIPANT;
 
   return {
     id: profile?.id ?? user.id,

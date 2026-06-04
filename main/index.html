@@ -1270,6 +1270,98 @@
       resize: vertical;
       min-height: 100px;
     }
+    .journey-native-select {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .journey-select {
+      position: relative;
+      width: 100%;
+    }
+    .journey-select__button {
+      width: 100%;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--background);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .journey-select__button svg {
+      width: 20px;
+      height: 20px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform 0.2s, color 0.2s;
+    }
+    .journey-select.open .journey-select__button,
+    .journey-select__button:focus-visible {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 164, 110, 0.14);
+    }
+    .journey-select.open .journey-select__button svg {
+      transform: rotate(180deg);
+      color: var(--gold);
+    }
+    .journey-select__menu {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      display: none;
+      max-height: 260px;
+      overflow: auto;
+      padding: 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--background);
+      color: var(--text);
+      box-shadow: 0 22px 55px rgba(0,0,0,0.18);
+    }
+    .journey-select.open .journey-select__menu {
+      display: block;
+    }
+    .journey-select__option {
+      width: 100%;
+      display: block;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text);
+      padding: 0.75rem 0.85rem;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .journey-select__option:hover,
+    .journey-select__option:focus-visible {
+      outline: none;
+      background: var(--surface-alt);
+      color: var(--text);
+    }
+    .journey-select__option.selected {
+      background: rgba(201, 164, 110, 0.16);
+      color: var(--gold);
+      font-weight: 700;
+    }
+    [data-theme="dark"] .journey-select__menu {
+      box-shadow: 0 22px 55px rgba(0,0,0,0.5);
+    }
     .modal-form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -2018,6 +2110,7 @@
     function closeJourneyModal() {
       document.getElementById('journeyModal').classList.remove('open');
       document.getElementById('journeyForm').reset();
+      resetJourneySelect('journeyHearSelect');
       const churchField = document.getElementById('churchField');
       const churchInput = document.getElementById('churchInput');
       churchField.classList.remove('show');
@@ -2047,10 +2140,75 @@
       }
     }
 
+    function initJourneySelect(selectWrapperId) {
+      const wrapper = document.getElementById(selectWrapperId);
+      if (!wrapper) return;
+      const select = document.getElementById(wrapper.dataset.selectTarget);
+      const button = wrapper.querySelector('.journey-select__button');
+      const buttonText = button?.querySelector('span');
+      const options = wrapper.querySelectorAll('.journey-select__option');
+      if (!select || !button || !buttonText) return;
+
+      function close() {
+        wrapper.classList.remove('open');
+        button.setAttribute('aria-expanded', 'false');
+      }
+
+      function choose(option) {
+        select.value = option.dataset.value || '';
+        buttonText.textContent = option.textContent;
+        options.forEach((item) => {
+          const selected = item === option;
+          item.classList.toggle('selected', selected);
+          item.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        close();
+      }
+
+      button.addEventListener('click', () => {
+        const isOpen = wrapper.classList.toggle('open');
+        button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      options.forEach((option) => {
+        option.addEventListener('click', () => choose(option));
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!event.target.closest('#' + selectWrapperId)) close();
+      });
+    }
+
+    function resetJourneySelect(selectWrapperId) {
+      const wrapper = document.getElementById(selectWrapperId);
+      if (!wrapper) return;
+      const select = document.getElementById(wrapper.dataset.selectTarget);
+      const firstOption = wrapper.querySelector('.journey-select__option');
+      const buttonText = wrapper.querySelector('.journey-select__button span');
+      if (select) select.value = '';
+      if (firstOption && buttonText) {
+        buttonText.textContent = firstOption.textContent;
+        wrapper.querySelectorAll('.journey-select__option').forEach((item) => {
+          const selected = item === firstOption;
+          item.classList.toggle('selected', selected);
+          item.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+      }
+      wrapper.classList.remove('open');
+      wrapper.querySelector('.journey-select__button')?.setAttribute('aria-expanded', 'false');
+    }
+
     async function handleJourneySubmit(event) {
       event.preventDefault();
       
       const form = event.target;
+      const hearAbout = document.getElementById('hearAbout');
+      if (!hearAbout.value) {
+        document.getElementById('journeyHearSelect')?.querySelector('.journey-select__button')?.focus();
+        showNotification('Please choose an option', 'Select how you heard about us before submitting.');
+        return;
+      }
       const token = await executeRecaptcha('journey_signup');
       const formData = new FormData(form);
       formData.set('recaptcha_token', token);
@@ -2206,6 +2364,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       initMJGPlayer('hero');
       initMJGPlayer('modal');
+      initJourneySelect('journeyHearSelect');
       document.getElementById('audioModal')?.addEventListener('click', (e) => {
         if (e.target.id === 'audioModal') closeAudioModal();
       });
@@ -2265,7 +2424,7 @@
 
         <div class="form-group">
           <label for="hearAbout">How did you hear about us? *</label>
-          <select id="hearAbout" name="hear_about" required onchange="toggleConditionalField()">
+          <select id="hearAbout" name="hear_about" class="journey-native-select" tabindex="-1" aria-hidden="true" onchange="toggleConditionalField()">
             <option value="">Select an option...</option>
             <option value="Google">Google</option>
             <option value="AI">AI</option>
@@ -2278,6 +2437,27 @@
             <option value="Strategic Income Group">Strategic Income Group</option>
             <option value="Other">Other</option>
           </select>
+          <div class="journey-select" id="journeyHearSelect" data-select-target="hearAbout">
+            <button class="journey-select__button" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span>Select an option...</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="journey-select__menu" role="listbox" aria-label="How did you hear about us?">
+              <button class="journey-select__option selected" type="button" role="option" aria-selected="true" data-value="">Select an option...</button>
+              <button class="journey-select__option" type="button" role="option" data-value="Google">Google</button>
+              <button class="journey-select__option" type="button" role="option" data-value="AI">AI</button>
+              <button class="journey-select__option" type="button" role="option" data-value="YouTube">YouTube</button>
+              <button class="journey-select__option" type="button" role="option" data-value="LinkedIn">LinkedIn</button>
+              <button class="journey-select__option" type="button" role="option" data-value="Facebook">Facebook</button>
+              <button class="journey-select__option" type="button" role="option" data-value="Church">Church</button>
+              <button class="journey-select__option" type="button" role="option" data-value="Friend">Friend</button>
+              <button class="journey-select__option" type="button" role="option" data-value="Family">Family</button>
+              <button class="journey-select__option" type="button" role="option" data-value="Strategic Income Group">Strategic Income Group</button>
+              <button class="journey-select__option" type="button" role="option" data-value="Other">Other</button>
+            </div>
+          </div>
           <p class="helper-text">Select the option that best describes how you found us. If you choose Church, an additional field will appear.</p>
         </div>
 

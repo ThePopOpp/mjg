@@ -1,4 +1,4 @@
-import { ROLES, type AppRole } from "./roles";
+import { ROLES, normalizeAppRole, type AppRole } from "./roles";
 
 export const PERMISSIONS = {
   VIEW_DASHBOARD: "view_dashboard",
@@ -40,7 +40,9 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
   [ROLES.PARTICIPANT]: [],
 };
 
-export function can(role: AppRole | null | undefined, permission: Permission) {
-  if (!role) return false;
-  return ROLE_PERMISSIONS[role]?.includes(permission) ?? false;
+export function can(role: string | null | undefined, permission: Permission) {
+  const normalizedRole = normalizeAppRole(role);
+  if (!normalizedRole) return false;
+  if (normalizedRole === ROLES.SUPER_ADMIN) return true;
+  return ROLE_PERMISSIONS[normalizedRole]?.includes(permission) ?? false;
 }
