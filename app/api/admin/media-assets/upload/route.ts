@@ -5,6 +5,7 @@ import { requireAdminManager } from "@/lib/user-management/auth";
 const BUCKET = "media-assets";
 const AUDIO_TYPES = new Set(["audio/webm", "audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/mp4"]);
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const VIDEO_TYPES = new Set(["video/mp4", "video/webm", "video/quicktime", "video/x-msvideo"]);
 
 export async function POST(request: Request) {
   try {
@@ -25,11 +26,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Please upload a supported image file." }, { status: 400 });
     }
 
+    if (intent === "video" && !VIDEO_TYPES.has(file.type)) {
+      return NextResponse.json({ error: "Please upload a supported video file." }, { status: 400 });
+    }
+
     const supabase = createSupabaseAdminClient();
     await ensureBucket(supabase);
 
     const extension = extensionFromName(file.name, file.type);
-    const folder = intent === "thumbnail" ? "thumbnails" : "audio";
+    const folder = intent === "thumbnail" ? "thumbnails" : intent === "video" ? "video" : "audio";
     const path = `${folder}/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}${extension}`;
     const bytes = Buffer.from(await file.arrayBuffer());
 
@@ -61,7 +66,7 @@ async function ensureBucket(supabase: ReturnType<typeof createSupabaseAdminClien
   await supabase.storage.createBucket(BUCKET, {
     public: true,
     fileSizeLimit: 1024 * 1024 * 100,
-    allowedMimeTypes: [...AUDIO_TYPES, ...IMAGE_TYPES],
+    allowedMimeTypes: [...AUDIO_TYPES, ...IMAGE_TYPES, ...VIDEO_TYPES],
   });
 }
 
@@ -74,5 +79,8 @@ function extensionFromName(name: string, type: string) {
   if (type === "image/png") return ".png";
   if (type === "image/webp") return ".webp";
   if (type === "image/gif") return ".gif";
+  if (type === "video/mp4") return ".mp4";
+  if (type === "video/webm") return ".webm";
+  if (type === "video/quicktime") return ".mov";
   return ".jpg";
 }

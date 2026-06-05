@@ -27,6 +27,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, post });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Blog post save failed.";
-    return NextResponse.json({ error: message }, { status: message.includes("permission") ? 403 : 500 });
+    const status = message.includes("Authentication required") ? 401 : message.includes("permission") ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }
