@@ -29,7 +29,7 @@ const displayTargets = [
 ];
 
 const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, "0"));
-const minutes = ["00", "15", "30", "45"];
+const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, "0"));
 
 export function MediaStudioDashboard({ assets }: { assets: any[] }) {
   const router = useRouter();

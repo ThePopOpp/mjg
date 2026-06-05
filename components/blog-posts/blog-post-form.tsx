@@ -14,6 +14,8 @@ type BlogPostFormProps = {
 };
 
 const statuses = ["draft", "scheduled", "published", "hidden", "archived"] as const;
+const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, "0"));
+const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, "0"));
 
 export function BlogPostForm({ post, categories }: BlogPostFormProps) {
   const router = useRouter();
@@ -22,7 +24,11 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
   const [authorName, setAuthorName] = useState(post?.author_name ?? "Michael J. Gauthier");
   const [category, setCategory] = useState(post?.category?.name ?? categories[0]?.name ?? "Stewardship Blueprint");
   const [status, setStatus] = useState(post?.status ?? "draft");
-  const [publishAt, setPublishAt] = useState(toDateTimeLocal(post?.publish_at));
+  const initialPublish = splitPublishDate(post?.publish_at);
+  const [publishDate, setPublishDate] = useState(initialPublish.date);
+  const [publishHour, setPublishHour] = useState(initialPublish.hour);
+  const [publishMinute, setPublishMinute] = useState(initialPublish.minute);
+  const [publishPeriod, setPublishPeriod] = useState(initialPublish.period);
   const [featuredImageUrl, setFeaturedImageUrl] = useState(post?.featured_image_url ?? "");
   const [videoUrl, setVideoUrl] = useState(post?.video_url ?? "");
   const [tags, setTags] = useState((post?.tags ?? []).map((link: any) => link.blog_post_tags?.name).filter(Boolean).join(", "));
@@ -34,6 +40,7 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
   const [saving, setSaving] = useState(false);
 
   const renderedSlug = useMemo(() => slug || slugify(title), [slug, title]);
+  const publishAt = buildPublishAt(publishDate, publishHour, publishMinute, publishPeriod);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -43,6 +50,7 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
 
     const response = await fetch("/api/admin/blog-posts", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: post?.id,
@@ -51,7 +59,7 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
         authorName,
         category,
         status,
-        publishAt: publishAt ? new Date(publishAt).toISOString() : null,
+        publishAt: publishAt || null,
         featuredImageUrl,
         videoUrl,
         tags: tags.split(",").map((tag: string) => tag.trim()).filter(Boolean),
@@ -95,14 +103,33 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
           </label>
           <label className="space-y-2">
             <span className="text-sm font-medium">Publish date</span>
-            <Input type="datetime-local" value={publishAt} onChange={(event) => setPublishAt(event.target.value)} />
+            <div className="grid gap-3 sm:grid-cols-[1fr_110px_110px_110px]">
+              <Input value={publishDate} onChange={(event) => setPublishDate(event.target.value)} placeholder="MM/DD/YYYY" />
+              <Select value={publishHour} onValueChange={setPublishHour}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{hours.map((hour) => <SelectItem key={hour} value={hour}>{hour}</SelectItem>)}</SelectContent>
+              </Select>
+              <Select value={publishMinute} onValueChange={setPublishMinute}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{minutes.map((minute) => <SelectItem key={minute} value={minute}>{minute}</SelectItem>)}</SelectContent>
+              </Select>
+              <Select value={publishPeriod} onValueChange={setPublishPeriod}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="AM">AM</SelectItem>
+                  <SelectItem value="PM">PM</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </label>
           <label className="space-y-2">
             <span className="text-sm font-medium">Category</span>
-            <Input list="blog-categories" value={category} onChange={(event) => setCategory(event.target.value)} />
-            <datalist id="blog-categories">
-              {categories.map((item) => <option key={item.id} value={item.name} />)}
-            </datalist>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+              <SelectContent>
+                {categories.map((item) => <SelectItem key={item.id} value={item.name}>{item.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </label>
           <label className="space-y-2">
             <span className="text-sm font-medium">Status</span>
@@ -155,11 +182,30 @@ function slugify(value: string) {
   return value.toLowerCase().trim().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-function toDateTimeLocal(value?: string | null) {
-  if (!value) return "";
+function splitPublishDate(value?: string | null) {
+  if (!value) return { date: "", hour: "08", minute: "00", period: "AM" };
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 16);
+  if (Number.isNaN(date.getTime())) return { date: "", hour: "08", minute: "00", period: "AM" };
+  const hour = date.getHours();
+  return {
+    date: `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}/${date.getFullYear()}`,
+    hour: String(hour % 12 || 12).padStart(2, "0"),
+    minute: String(date.getMinutes()).padStart(2, "0"),
+    period: hour >= 12 ? "PM" : "AM",
+  };
+}
+
+function buildPublishAt(date: string, hour: string, minute: string, period: string) {
+  if (!date.trim()) return "";
+  const match = date.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!match) return "";
+
+  const [, month, day, year] = match;
+  let hour24 = Number(hour);
+  if (period === "PM" && hour24 < 12) hour24 += 12;
+  if (period === "AM" && hour24 === 12) hour24 = 0;
+  const parsed = new Date(Number(year), Number(month) - 1, Number(day), hour24, Number(minute));
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString();
 }
 
 function labelize(value: string) {
