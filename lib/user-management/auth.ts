@@ -4,20 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const OWNER_EMAILS = new Set(["jw@michaeljgauthier.com"]);
 
-export async function requireUserManager() {
-  const supabase = await createClient();
-
-  if (!supabase) {
-    throw new Error("Supabase Auth is not configured.");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("Authentication required.");
-  }
+export async function requireUserManager(request?: Request) {
+  const { user } = await getAuthenticatedUser(request);
 
   const { profile, error } = await getProfileForAuthUser(user);
 
@@ -33,20 +21,8 @@ export async function requireUserManager() {
   return { ...profile, role };
 }
 
-export async function requireParticipantManager() {
-  const supabase = await createClient();
-
-  if (!supabase) {
-    throw new Error("Supabase Auth is not configured.");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("Authentication required.");
-  }
+export async function requireParticipantManager(request?: Request) {
+  const { user } = await getAuthenticatedUser(request);
 
   const { profile, error } = await getProfileForAuthUser(user);
 
@@ -62,20 +38,8 @@ export async function requireParticipantManager() {
   return { ...profile, role };
 }
 
-export async function requireContentManager() {
-  const supabase = await createClient();
-
-  if (!supabase) {
-    throw new Error("Supabase Auth is not configured.");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("Authentication required.");
-  }
+export async function requireContentManager(request?: Request) {
+  const { user } = await getAuthenticatedUser(request);
 
   const { profile, error } = await getProfileForAuthUser(user);
 
@@ -91,20 +55,8 @@ export async function requireContentManager() {
   return { ...profile, role };
 }
 
-export async function requireAdminManager() {
-  const supabase = await createClient();
-
-  if (!supabase) {
-    throw new Error("Supabase Auth is not configured.");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("Authentication required.");
-  }
+export async function requireAdminManager(request?: Request) {
+  const { user } = await getAuthenticatedUser(request);
 
   const { profile, error } = await getProfileForAuthUser(user);
 
@@ -118,6 +70,31 @@ export async function requireAdminManager() {
   }
 
   return { ...profile, role };
+}
+
+async function getAuthenticatedUser(request?: Request) {
+  const supabase = await createClient();
+
+  if (!supabase) {
+    throw new Error("Supabase Auth is not configured.");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) return { user };
+
+  const token = request?.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
+  if (token) {
+    const admin = createSupabaseAdminClient();
+    const {
+      data: { user: tokenUser },
+    } = await admin.auth.getUser(token);
+    if (tokenUser) return { user: tokenUser };
+  }
+
+  throw new Error("Authentication required.");
 }
 
 function normalizeResolvedRole(profile: { email?: string | null; role?: string | null } | null, authEmail?: string | null) {

@@ -4,7 +4,7 @@ import { requireAdminManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireAdminManager();
+    const actor = await requireAdminManager(request);
     const body = await request.json();
     const asset = await saveMediaAsset({
       id: body.id,
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, asset });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Media asset save failed.";
-    return NextResponse.json({ error: message }, { status: message.includes("permission") ? 403 : 500 });
+    const status = message.includes("Authentication required") ? 401 : message.includes("permission") ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

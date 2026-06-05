@@ -2,12 +2,32 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, ChevronLeft, ChevronRight, ImageIcon, Save, Upload, Video } from "lucide-react";
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  Bold,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
+  Italic,
+  Link as LinkIcon,
+  MousePointerClick,
+  PanelTop,
+  Rows3,
+  Save,
+  Square,
+  Type,
+  Upload,
+  Video,
+} from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { createClient } from "@/lib/supabase/browser";
 
 type BlogPostFormProps = {
   post?: any;
@@ -41,6 +61,10 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
   const [galleryFiles, setGalleryFiles] = useState<string[]>([]);
   const [videoFile, setVideoFile] = useState("");
   const [uploading, setUploading] = useState<string | null>(null);
+  const [editorMode, setEditorMode] = useState<"simple" | "html" | "wysiwyg">("simple");
+  const [fontSize, setFontSize] = useState("18");
+  const [textColor, setTextColor] = useState("#0f1f1a");
+  const [buttonColor, setButtonColor] = useState("#2f6848");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -54,10 +78,11 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
     setError(null);
     setMessage(null);
 
+    const authHeaders = await getAuthHeaders();
     const response = await fetch("/api/admin/blog-posts", {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders },
       body: JSON.stringify({
         id: post?.id,
         title,
@@ -88,6 +113,36 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
     if (!post?.id) router.push(`/dashboard/blog-posts/${data.post.id}`);
   }
 
+  function insertSnippet(snippet: string) {
+    setContentHtml((current: string) => `${current}${current ? "\n" : ""}${snippet}`);
+  }
+
+  function insertImageSnippet() {
+    const url = window.prompt("Image URL");
+    if (!url) return;
+    insertSnippet(`<figure style="margin:24px 0;"><img src="${escapeAttribute(url)}" alt="" style="display:block;width:100%;height:auto;border-radius:8px;" /></figure>`);
+  }
+
+  function insertLinkSnippet() {
+    const url = window.prompt("Link URL");
+    if (!url) return;
+    const text = window.prompt("Link text") || "Read more";
+    insertSnippet(`<a href="${escapeAttribute(url)}" style="color:#2f6848;text-decoration:underline;">${escapeHtml(text)}</a>`);
+  }
+
+  function insertButtonSnippet() {
+    const url = window.prompt("Button URL");
+    if (!url) return;
+    const text = window.prompt("Button text") || "Learn more";
+    insertSnippet(`<p style="margin:28px 0;"><a href="${escapeAttribute(url)}" style="display:inline-block;background:${buttonColor};color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700;">${escapeHtml(text)}</a></p>`);
+  }
+
+  function execEditor(command: string, value?: string) {
+    document.execCommand(command, false, value);
+    const editor = document.getElementById("blog-wysiwyg-editor");
+    if (editor) setContentHtml(editor.innerHTML);
+  }
+
   async function uploadFeaturedImage(file: File) {
     setUploading("featured");
     setError(null);
@@ -114,7 +169,7 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
         ...current.split(/\n+/).map((url: string) => url.trim()).filter(Boolean),
         ...uploads.map((upload) => upload.url),
       ].join("\n"));
-      setGalleryFiles((current) => [...current, ...Array.from(files).map((file) => file.name)]);
+      setGalleryFiles((current: string[]) => [...current, ...Array.from(files).map((file) => file.name)]);
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : "Gallery upload failed.");
     } finally {
@@ -248,10 +303,72 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
             <span className="text-sm font-medium">Excerpt</span>
             <textarea className="min-h-32 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={excerpt} onChange={(event) => setExcerpt(event.target.value)} />
           </label>
-          <label className="space-y-2 lg:col-span-2">
-            <span className="text-sm font-medium">Blog post HTML editor</span>
-            <textarea className="min-h-[36rem] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm" value={contentHtml} onChange={(event) => setContentHtml(event.target.value)} placeholder="<p>Write or paste your post content here...</p>" />
-          </label>
+          <div className="space-y-3 lg:col-span-2">
+            <div>
+              <span className="text-sm font-medium">Post content editor</span>
+              <p className="text-xs text-muted-foreground">Use Simple Builder for styled blocks, Advanced HTML for full control, or WYSIWYG for direct editing.</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant={editorMode === "simple" ? "default" : "outline"} onClick={() => setEditorMode("simple")}>Simple Builder</Button>
+              <Button type="button" variant={editorMode === "html" ? "default" : "outline"} onClick={() => setEditorMode("html")}>Advanced HTML</Button>
+              <Button type="button" variant={editorMode === "wysiwyg" ? "default" : "outline"} onClick={() => setEditorMode("wysiwyg")}>WYSIWYG</Button>
+            </div>
+
+            {editorMode === "simple" ? (
+              <div className="space-y-4 rounded-md border bg-card p-4">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <label className="space-y-2 text-sm font-medium">
+                    <span>Font size</span>
+                    <Input type="number" min="12" max="72" value={fontSize} onChange={(event) => setFontSize(event.target.value)} />
+                  </label>
+                  <ColorField label="Text color" value={textColor} onChange={setTextColor} />
+                  <ColorField label="Button color" value={buttonColor} onChange={setButtonColor} />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <SnippetButton icon={<Rows3 className="h-4 w-4" />} label="Row" onClick={() => insertSnippet(blogBlocks.row)} />
+                  <SnippetButton icon={<PanelTop className="h-4 w-4" />} label="2 Columns" onClick={() => insertSnippet(blogBlocks.columns)} />
+                  <SnippetButton icon={<Type className="h-4 w-4" />} label="Text" onClick={() => insertSnippet(`<p style="font-size:${fontSize}px;line-height:1.7;color:${textColor};margin:0 0 20px;">Write your paragraph here.</p>`)} />
+                  <SnippetButton icon={<Bold className="h-4 w-4" />} label="Bold Text" onClick={() => insertSnippet(`<p style="font-size:${fontSize}px;line-height:1.7;color:${textColor};font-weight:700;margin:0 0 20px;">Bold paragraph text.</p>`)} />
+                  <SnippetButton icon={<Italic className="h-4 w-4" />} label="Italic Text" onClick={() => insertSnippet(`<p style="font-size:${fontSize}px;line-height:1.7;color:${textColor};font-style:italic;margin:0 0 20px;">Italic paragraph text.</p>`)} />
+                  <SnippetButton icon={<AlignLeft className="h-4 w-4" />} label="Left" onClick={() => insertSnippet(alignedText("left", fontSize, textColor))} />
+                  <SnippetButton icon={<AlignCenter className="h-4 w-4" />} label="Center" onClick={() => insertSnippet(alignedText("center", fontSize, textColor))} />
+                  <SnippetButton icon={<AlignRight className="h-4 w-4" />} label="Right" onClick={() => insertSnippet(alignedText("right", fontSize, textColor))} />
+                  <SnippetButton icon={<ImageIcon className="h-4 w-4" />} label="Image" onClick={insertImageSnippet} />
+                  <SnippetButton icon={<LinkIcon className="h-4 w-4" />} label="Link" onClick={insertLinkSnippet} />
+                  <SnippetButton icon={<MousePointerClick className="h-4 w-4" />} label="Button" onClick={insertButtonSnippet} />
+                  <SnippetButton icon={<Square className="h-4 w-4" />} label="Divider" onClick={() => insertSnippet(blogBlocks.divider)} />
+                </div>
+                <textarea className="min-h-[24rem] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm" value={contentHtml} onChange={(event) => setContentHtml(event.target.value)} placeholder="<p>Build your post content here...</p>" />
+              </div>
+            ) : null}
+
+            {editorMode === "html" ? (
+              <textarea className="min-h-[36rem] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm" value={contentHtml} onChange={(event) => setContentHtml(event.target.value)} placeholder="<p>Write or paste your post content here...</p>" />
+            ) : null}
+
+            {editorMode === "wysiwyg" ? (
+              <div className="space-y-3 rounded-md border bg-card p-4">
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" size="sm" variant="outline" onClick={() => execEditor("bold")}><Bold className="h-4 w-4" />Bold</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => execEditor("italic")}><Italic className="h-4 w-4" />Italic</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => execEditor("justifyLeft")}><AlignLeft className="h-4 w-4" />Left</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => execEditor("justifyCenter")}><AlignCenter className="h-4 w-4" />Center</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => execEditor("justifyRight")}><AlignRight className="h-4 w-4" />Right</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => execEditor("foreColor", textColor)}>Apply color</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={insertLinkSnippet}><LinkIcon className="h-4 w-4" />Add link</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={insertImageSnippet}><ImageIcon className="h-4 w-4" />Add image</Button>
+                </div>
+                <div
+                  id="blog-wysiwyg-editor"
+                  className="min-h-[28rem] rounded-md border border-input bg-background px-4 py-3 text-base leading-7 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  contentEditable
+                  dangerouslySetInnerHTML={{ __html: contentHtml || "<p>Write your post here...</p>" }}
+                  onInput={(event) => setContentHtml(event.currentTarget.innerHTML)}
+                  suppressContentEditableWarning
+                />
+              </div>
+            ) : null}
+          </div>
         </CardContent>
       </Card>
 
@@ -396,19 +513,77 @@ function UploadField({
   );
 }
 
+function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return (
+    <label className="space-y-2 text-sm font-medium">
+      <span>{label}</span>
+      <div className="flex gap-2">
+        <Input className="h-9 w-12 p-1" type="color" value={value} onChange={(event) => onChange(event.target.value)} />
+        <Input value={value} onChange={(event) => onChange(event.target.value)} />
+      </div>
+    </label>
+  );
+}
+
+function SnippetButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
+  return (
+    <Button size="sm" type="button" variant="outline" onClick={onClick}>
+      {icon}
+      {label}
+    </Button>
+  );
+}
+
 async function uploadBlogFile(file: File, intent: "thumbnail" | "video"): Promise<UploadedFile> {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("intent", intent);
+  const authHeaders = await getAuthHeaders();
   const response = await fetch("/api/admin/media-assets/upload", {
     method: "POST",
     credentials: "include",
+    headers: authHeaders,
     body: formData,
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error ?? "Upload failed.");
   return data;
 }
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  try {
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
+function alignedText(alignment: "left" | "center" | "right", fontSize: string, color: string) {
+  return `<p style="font-size:${fontSize}px;line-height:1.7;color:${color};text-align:${alignment};margin:0 0 20px;">Aligned paragraph text.</p>`;
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[char] ?? char));
+}
+
+function escapeAttribute(value: string) {
+  return escapeHtml(value).replace(/`/g, "&#096;");
+}
+
+const blogBlocks = {
+  row: `<section style="margin:0 0 28px;">
+  <p style="font-size:18px;line-height:1.7;margin:0;">Add row content here.</p>
+</section>`,
+  columns: `<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:0 0 28px;">
+  <div><p style="font-size:18px;line-height:1.7;margin:0;">Left column content.</p></div>
+  <div><p style="font-size:18px;line-height:1.7;margin:0;">Right column content.</p></div>
+</div>`,
+  divider: `<hr style="border:none;border-top:1px solid #ddd8cc;margin:32px 0;" />`,
+};
 
 function parseDateValue(value: string) {
   const match = value.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
