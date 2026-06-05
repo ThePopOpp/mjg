@@ -1,4 +1,5 @@
 import { ROLES, normalizeAppRole } from "@/lib/rbac/roles";
+import { verifyAdminActionToken } from "@/lib/auth/action-token";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -92,6 +93,11 @@ async function getAuthenticatedUser(request?: Request) {
       data: { user: tokenUser },
     } = await admin.auth.getUser(token);
     if (tokenUser) return { user: tokenUser };
+  }
+
+  const actionPayload = verifyAdminActionToken(request?.headers.get("x-mjg-action-token") ?? null);
+  if (actionPayload) {
+    return { user: { id: actionPayload.profileId, email: actionPayload.email } };
   }
 
   throw new Error("Authentication required.");

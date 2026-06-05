@@ -30,6 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createClient } from "@/lib/supabase/browser";
 
 type BlogPostFormProps = {
+  actionToken: string;
   post?: any;
   categories: any[];
 };
@@ -39,7 +40,7 @@ const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStar
 const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, "0"));
 type UploadedFile = { url: string; bucket: string; path: string; mimeType: string; fileSize: number };
 
-export function BlogPostForm({ post, categories }: BlogPostFormProps) {
+export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(post?.title ?? "");
   const [slug, setSlug] = useState(post?.slug ?? "");
@@ -82,7 +83,7 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
     const response = await fetch("/api/admin/blog-posts", {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json", ...authHeaders },
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken, ...authHeaders },
       body: JSON.stringify({
         id: post?.id,
         title,
@@ -147,7 +148,7 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
     setUploading("featured");
     setError(null);
     try {
-      const upload = await uploadBlogFile(file, "thumbnail");
+      const upload = await uploadBlogFile(file, "thumbnail", actionToken);
       setFeaturedImageUrl(upload.url);
       setFeaturedImageFile(file.name);
     } catch (uploadError) {
@@ -163,7 +164,7 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
     try {
       const uploads: UploadedFile[] = [];
       for (const file of Array.from(files)) {
-        uploads.push(await uploadBlogFile(file, "thumbnail"));
+        uploads.push(await uploadBlogFile(file, "thumbnail", actionToken));
       }
       setGalleryUrls((current: string) => [
         ...current.split(/\n+/).map((url: string) => url.trim()).filter(Boolean),
@@ -181,7 +182,7 @@ export function BlogPostForm({ post, categories }: BlogPostFormProps) {
     setUploading("video");
     setError(null);
     try {
-      const upload = await uploadBlogFile(file, "video");
+      const upload = await uploadBlogFile(file, "video", actionToken);
       setVideoUrl(upload.url);
       setVideoFile(file.name);
     } catch (uploadError) {
@@ -534,7 +535,7 @@ function SnippetButton({ icon, label, onClick }: { icon: React.ReactNode; label:
   );
 }
 
-async function uploadBlogFile(file: File, intent: "thumbnail" | "video"): Promise<UploadedFile> {
+async function uploadBlogFile(file: File, intent: "thumbnail" | "video", actionToken: string): Promise<UploadedFile> {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("intent", intent);
@@ -542,7 +543,7 @@ async function uploadBlogFile(file: File, intent: "thumbnail" | "video"): Promis
   const response = await fetch("/api/admin/media-assets/upload", {
     method: "POST",
     credentials: "include",
-    headers: authHeaders,
+    headers: { "x-mjg-action-token": actionToken, ...authHeaders },
     body: formData,
   });
   const data = await response.json();

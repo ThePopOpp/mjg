@@ -4,11 +4,13 @@ import { BlogPostActions } from "@/components/blog-posts/blog-post-actions";
 import { BlogPostForm } from "@/components/blog-posts/blog-post-form";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createAdminActionToken } from "@/lib/auth/action-token";
+import { getCurrentProfile } from "@/lib/auth/server";
 import { getBlogAdminData, getBlogPostById } from "@/lib/content/blog";
 
 export default async function EditBlogPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [post, data] = await Promise.all([getBlogPostById(id), getBlogAdminData()]);
+  const [post, data, profile] = await Promise.all([getBlogPostById(id), getBlogAdminData(), getCurrentProfile()]);
   if (!post) notFound();
 
   return (
@@ -27,7 +29,7 @@ export default async function EditBlogPostPage({ params }: { params: Promise<{ i
         </CardContent>
       </Card>
 
-      <BlogPostForm post={post} categories={data.categories as any[]} />
+      <BlogPostForm actionToken={profile ? createAdminActionToken(profile) : ""} post={post} categories={data.categories as any[]} />
     </div>
   );
 }
