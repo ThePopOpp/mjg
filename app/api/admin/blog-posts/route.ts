@@ -4,7 +4,7 @@ import { requireContentManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireContentManager(request);
+    const actor = await requireContentManager();
     const body = await request.json();
     const post = await saveBlogPost({
       id: body.id,

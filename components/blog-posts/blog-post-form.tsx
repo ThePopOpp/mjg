@@ -79,11 +79,9 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
     setError(null);
     setMessage(null);
 
-    const authHeaders = await getAuthHeaders();
     const response = await fetch("/api/admin/blog-posts", {
       method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken, ...authHeaders },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: post?.id,
         title,
