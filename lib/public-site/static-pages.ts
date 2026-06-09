@@ -14,39 +14,154 @@ const STATIC_ROUTES: Record<string, string> = {
   "created-for-more.html": "/created-for-more",
 };
 
-export function renderSiteHeader(siteUrl: string) {
-  return `<header>
-    <a class="brand" href="${siteUrl}/"><strong>MJG</strong><span>Michael J. Gauthier</span></a>
-    <nav>
-      <a href="${siteUrl}/">Home</a>
-      <a href="${siteUrl}/about">About</a>
-      <a href="${siteUrl}/mission">Mission</a>
-      <a href="${siteUrl}/listen">Listen</a>
-      <a href="${siteUrl}/resources">Resources</a>
-      <a href="${siteUrl}/contact">Contact</a>
-      <a class="cta" href="${siteUrl}/#join">Join the Journey</a>
-      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
-        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
-    </nav>
-  </header>`;
+/** Inline script for <head> — sets data-theme before first paint to prevent flash */
+export function renderThemeScript() {
+  return `<script>(function(){var s=localStorage.getItem('theme');var m=window.matchMedia('(prefers-color-scheme:dark)').matches;document.documentElement.dataset.theme=(s==='dark'||(s!=='light'&&m))?'dark':'light';})();</script>`;
 }
 
-export function renderThemeScript() {
-  return `<script>
-    (function(){
-      var s=localStorage.getItem('mjg-theme');
-      var m=window.matchMedia('(prefers-color-scheme:dark)').matches;
-      var dark=s==='dark'||(s!=='light'&&m);
-      document.documentElement.dataset.theme=dark?'dark':'light';
-    })();
-    function toggleTheme(){
-      var dark=document.documentElement.dataset.theme!=='dark';
-      document.documentElement.dataset.theme=dark?'dark':'light';
-      localStorage.setItem('mjg-theme',dark?'dark':'light');
+/** Google Fonts <link> tags — must go in <head> */
+export function renderFonts() {
+  return `<link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />`;
+}
+
+/** Nav CSS — include inside the page <style> block */
+export function renderNavStyles() {
+  return `
+    :root {
+      --font-display: 'DM Serif Display', serif;
+      --font-body: 'Roboto', sans-serif;
+      --nav-bg: #ffffff;
+      --nav-text: #111110;
+      --btn-bg: #111110;
+      --btn-text: #ffffff;
+      --border: #e8e6e0;
+      --gold: #C9A46E;
+      --ctrl-bg: rgba(17,17,17,0.06);
+      --ctrl-border: rgba(17,17,17,0.16);
+      --ctrl-hover: rgba(17,17,17,0.10);
+      --ctrl-text: #111111;
     }
-  </script>`;
+    [data-theme="dark"] {
+      --nav-bg: #0f0f0f;
+      --nav-text: #f7f5f2;
+      --btn-bg: #f7f5f2;
+      --btn-text: #0f0f0f;
+      --border: rgba(255,255,255,0.08);
+      --ctrl-bg: rgba(255,255,255,0.08);
+      --ctrl-border: rgba(255,255,255,0.18);
+      --ctrl-hover: rgba(255,255,255,0.12);
+      --ctrl-text: #f7f5f2;
+    }
+    nav {
+      position: sticky; top: 0; z-index: 100; width: 100%;
+      background: var(--nav-bg); border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1160px; width: 100%; margin: 0 auto; padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between; min-height: 60px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo img { height: 36px; width: auto; display: block; }
+    .nav-logo-text {
+      font-family: var(--font-display); font-size: 0.95rem; font-style: italic;
+      color: var(--nav-text); letter-spacing: -0.02em;
+    }
+    .nav-logo-text .gold { color: var(--gold); }
+    .nav-links {
+      display: flex; align-items: center; gap: 1.75rem;
+      list-style: none; margin: 0; padding: 0;
+    }
+    .nav-links a {
+      font-family: var(--font-body); font-size: 0.875rem;
+      color: var(--nav-text); text-decoration: none; transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 0.7; }
+    .nav-cta {
+      display: inline-block; padding: 0.55rem 1.25rem; border-radius: 4px;
+      background: var(--btn-bg); color: var(--btn-text) !important;
+      font-weight: 500; font-size: 0.875rem; text-decoration: none; transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.9; }
+    .theme-toggle, .mobile-menu-toggle {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px; border-radius: 14px; padding: 0; cursor: pointer;
+      background: var(--ctrl-bg); border: 1px solid var(--ctrl-border); color: var(--ctrl-text);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .theme-toggle:hover, .mobile-menu-toggle:hover { background: var(--ctrl-hover); transform: translateY(-1px); }
+    .mobile-menu-toggle { display: none; }
+    .nav-links.open { display: flex; }
+    @media (max-width: 768px) {
+      .mobile-menu-toggle { display: inline-flex; }
+      .nav-links {
+        position: absolute; top: 60px; left: 0; right: 0;
+        flex-direction: column; gap: 1rem; padding: 1.25rem 1.5rem 1.75rem;
+        background: var(--nav-bg); border-bottom: 1px solid var(--border); display: none;
+      }
+      .nav-links li { width: 100%; }
+      .nav-links a, .nav-cta { width: 100%; box-sizing: border-box; }
+      .nav-cta { text-align: center; }
+      .theme-toggle { width: 100%; border-radius: 8px; height: 44px; }
+    }`;
+}
+
+/** Nav HTML — the <nav> element with logo, links, and controls */
+export function renderSiteHeader(siteUrl: string) {
+  return `<nav>
+    <div class="nav-inner">
+      <a href="${siteUrl}/" class="nav-logo">
+        <img id="nav-logo"
+          src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+          alt="Michael J. Gauthier"
+          data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+          data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+        <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
+      </a>
+      <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="Open menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="${siteUrl}/">Home</a></li>
+        <li><a href="${siteUrl}/about">About</a></li>
+        <li><a href="${siteUrl}/mission">Mission</a></li>
+        <li><a href="${siteUrl}/#listen">Listen</a></li>
+        <li><a href="${siteUrl}/resources">Resources</a></li>
+        <li><a href="${siteUrl}/contact">Contact</a></li>
+        <li><a href="${siteUrl}/#join" class="nav-cta">Join the Journey</a></li>
+        <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode">
+          <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        </button></li>
+      </ul>
+    </div>
+  </nav>`;
+}
+
+/** Nav JS — place just before </body> */
+export function renderNavScript() {
+  return `<script>(function(){
+    var logo=document.getElementById('nav-logo'),ti=document.getElementById('theme-icon'),
+        tt=document.getElementById('theme-toggle'),mt=document.getElementById('mobile-menu-toggle'),
+        nl=document.getElementById('nav-links');
+    var SUN='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    var MOON='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    var HAM='<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
+    var X='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+    function applyTheme(t){
+      document.documentElement.dataset.theme=t;
+      localStorage.setItem('theme',t);
+      if(logo)logo.src=t==='dark'?logo.dataset.logoDark:logo.dataset.logoLight;
+      if(ti)ti.innerHTML=t==='dark'?MOON:SUN;
+    }
+    function openMenu(){nl&&nl.classList.add('open');mt&&(mt.querySelector('svg').innerHTML=X);}
+    function closeMenu(){nl&&nl.classList.remove('open');mt&&(mt.querySelector('svg').innerHTML=HAM);}
+    tt&&tt.addEventListener('click',function(){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');});
+    mt&&mt.addEventListener('click',function(){nl&&nl.classList.contains('open')?closeMenu():openMenu();});
+    document.addEventListener('click',function(e){if(nl&&nl.classList.contains('open')&&!e.target.closest('nav'))closeMenu();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu();});
+    applyTheme(document.documentElement.dataset.theme||'light');
+  })();</script>`;
 }
 
 export function publicSiteUrl() {
