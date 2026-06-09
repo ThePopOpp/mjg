@@ -1,5 +1,5 @@
 import { getPublishedPosts, normalizePostTags } from "@/lib/content/blog";
-import { publicSiteUrl, renderStaticPage } from "@/lib/public-site/static-pages";
+import { publicSiteUrl, renderSiteHeader, renderStaticPage, renderThemeScript } from "@/lib/public-site/static-pages";
 
 export async function GET() {
   const posts = await getPublishedPosts();
@@ -18,19 +18,27 @@ function renderArchive(posts: any[], siteUrl: string) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Resources | Michael J. Gauthier</title>
+  ${renderThemeScript()}
   <style>
     :root { color-scheme: light dark; --ink:#070807; --muted:#5f6d66; --line:#e4ded2; --gold:#c9a96d; --green:#315f43; --paper:#fbfaf7; --card:#fff; }
-    @media (prefers-color-scheme: dark) { :root { --ink:#f8f6f1; --muted:#b6bcb6; --line:#2b2a25; --paper:#10110f; --card:#151713; } }
+    [data-theme="dark"] { --ink:#f8f6f1; --muted:#b6bcb6; --line:#2b2a25; --paper:#10110f; --card:#151713; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#f8f6f1; --muted:#b6bcb6; --line:#2b2a25; --paper:#10110f; --card:#151713; } }
     * { box-sizing:border-box; }
     body { margin:0; background:var(--paper); color:var(--ink); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     header, main { width:min(1180px, calc(100% - 40px)); margin:0 auto; }
-    header { display:flex; align-items:center; justify-content:space-between; padding:28px 0; border-bottom:1px solid var(--line); }
-    .brand { display:flex; align-items:baseline; gap:14px; text-decoration:none; color:var(--ink); }
+    header { display:flex; align-items:center; justify-content:space-between; padding:28px 0; border-bottom:1px solid var(--line); gap:16px; }
+    .brand { display:flex; align-items:baseline; gap:14px; text-decoration:none; color:var(--ink); flex-shrink:0; }
     .brand strong { font-size:42px; font-weight:950; letter-spacing:-.05em; }
     .brand span { font-family:Georgia,serif; font-style:italic; font-weight:700; }
-    nav { display:flex; align-items:center; gap:26px; }
-    nav a { color:var(--ink); text-decoration:none; font-weight:650; }
-    .cta { background:var(--ink); color:var(--paper); padding:13px 18px; border-radius:6px; }
+    nav { display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
+    nav a { color:var(--ink); text-decoration:none; font-weight:650; white-space:nowrap; font-size:15px; }
+    .cta { background:var(--ink); color:var(--paper) !important; padding:11px 16px; border-radius:6px; font-weight:700 !important; }
+    .theme-toggle { background:none; border:1px solid var(--line); border-radius:6px; cursor:pointer; color:var(--ink); padding:7px; display:flex; align-items:center; justify-content:center; }
+    [data-theme="dark"] .icon-sun, :root:not([data-theme="light"]) .icon-sun { display:none; }
+    [data-theme="light"] .icon-moon { display:none; }
+    [data-theme="dark"] .icon-moon, :root:not([data-theme="light"]) .icon-moon { display:block; }
+    @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .icon-sun { display:none; } :root:not([data-theme="dark"]) .icon-moon { display:block; } }
+    @media (max-width: 700px) { nav a:not(.cta) { display:none; } }
     .hero { padding:80px 0 44px; text-align:center; }
     .eyebrow { color:var(--gold); font-weight:800; letter-spacing:.16em; text-transform:uppercase; font-size:13px; }
     h1 { font-family:Georgia,serif; font-size:clamp(48px, 9vw, 90px); line-height:.95; margin:18px 0; }
@@ -48,16 +56,7 @@ function renderArchive(posts: any[], siteUrl: string) {
   </style>
 </head>
 <body>
-  <header>
-    <a class="brand" href="${siteUrl}/"><strong>MJG</strong><span>Michael J. Gauthier</span></a>
-    <nav>
-      <a href="${siteUrl}/about">About</a>
-      <a href="${siteUrl}/mission">Mission</a>
-      <a href="${siteUrl}/resources">Resources</a>
-      <a href="${siteUrl}/contact">Contact</a>
-      <a class="cta" href="${siteUrl}/#join">Join the Journey</a>
-    </nav>
-  </header>
+  ${renderSiteHeader(siteUrl)}
   <main>
     <section class="hero">
       <div class="eyebrow">Resources</div>
