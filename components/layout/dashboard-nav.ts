@@ -10,6 +10,7 @@ import {
   MonitorPlay,
   MessageSquareText,
   Settings,
+  TrendingUp,
   UsersRound,
   Waves,
 } from "lucide-react";
@@ -24,6 +25,7 @@ export const dashboardNavItems = [
   { href: "/dashboard/pastor-elder-review", label: "Pastor/Elder Review", icon: CircleUserRound },
   { href: "/dashboard/inner-circle", label: "Inner Circle", icon: CalendarRange },
   { href: "/dashboard/blog-posts", label: "Blog Posts", icon: FileText, permission: PERMISSIONS.REVIEW_CONTENT },
+  { href: "/dashboard/impact-score", label: "Impact Score", icon: TrendingUp, permission: PERMISSIONS.REVIEW_CONTENT },
   { href: "/dashboard/emails", label: "Emails", icon: MailCheck },
   { href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { href: "/dashboard/reports", label: "Reports", icon: FileBarChart },
