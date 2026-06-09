@@ -64,7 +64,7 @@ export default async function BlogPostsPage() {
                   {post.category?.name ? <span className="rounded-md bg-muted px-2 py-1">{post.category.name}</span> : null}
                   {tags.map((tag: any) => <span key={tag.id} className="rounded-md bg-muted px-2 py-1"><Tags className="mr-1 inline h-3 w-3" />{tag.name}</span>)}
                 </div>
-                <BlogPostActions postId={post.id} />
+                <BlogPostActions postId={post.id} slug={post.slug} title={post.title} />
               </CardContent>
             </Card>
           );

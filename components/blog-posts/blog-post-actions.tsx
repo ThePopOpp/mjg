@@ -1,15 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { Archive, EyeOff, MailPlus, Rocket, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Archive, Eye, EyeOff, MailPlus, Pencil, Rocket, Share2, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-export function BlogPostActions({ postId }: { postId: string }) {
+export function BlogPostActions({ postId, slug, title }: { postId: string; slug: string; title: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const shareRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!shareOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
+        setShareOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [shareOpen]);
 
   async function run(action: string) {
     setLoading(action);
@@ -33,9 +48,67 @@ export function BlogPostActions({ postId }: { postId: string }) {
     router.refresh();
   }
 
+  function shareUrl() {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    return `${origin}/resources/${slug}`;
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(shareUrl());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard unavailable
+    }
+  }
+
+  function shareOn(platform: string) {
+    const url = encodeURIComponent(shareUrl());
+    const text = encodeURIComponent(title);
+    const links: Record<string, string> = {
+      twitter: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+      sms: `sms:?body=${text}%20${url}`,
+      email: `mailto:?subject=${text}&body=${text}%0A%0A${url}`,
+    };
+    window.open(links[platform], "_blank", "noopener,noreferrer");
+  }
+
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant="outline" asChild>
+          <Link href={`/dashboard/blog-posts/${postId}`}>
+            <Pencil className="h-4 w-4" />
+            Edit
+          </Link>
+        </Button>
+        <Button size="sm" variant="outline" asChild>
+          <a href={`/resources/${slug}`} target="_blank" rel="noopener noreferrer">
+            <Eye className="h-4 w-4" />
+            View
+          </a>
+        </Button>
+        <div className="relative" ref={shareRef}>
+          <Button size="sm" variant="outline" onClick={() => setShareOpen((o) => !o)}>
+            <Share2 className="h-4 w-4" />
+            Share
+          </Button>
+          {shareOpen && (
+            <div className="absolute left-0 top-full z-50 mt-1 w-44 rounded-md border bg-card p-1 shadow-md">
+              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={copyLink}>
+                {copied ? "Copied!" : "Copy link"}
+              </button>
+              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("twitter")}>Share on X</button>
+              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("facebook")}>Share on Facebook</button>
+              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("linkedin")}>Share on LinkedIn</button>
+              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("sms")}>Send via SMS</button>
+              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("email")}>Share via Email</button>
+            </div>
+          )}
+        </div>
         <Button size="sm" onClick={() => run("published")} disabled={Boolean(loading)}>
           <Rocket className="h-4 w-4" />
           Deploy

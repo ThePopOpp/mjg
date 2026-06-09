@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { requireAdminManager } from "@/lib/user-management/auth";
+import { requireContentManager } from "@/lib/user-management/auth";
 
 const BUCKET = "media-assets";
 const AUDIO_TYPES = new Set(["audio/webm", "audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/mp4"]);
@@ -9,7 +9,7 @@ const VIDEO_TYPES = new Set(["video/mp4", "video/webm", "video/quicktime", "vide
 
 export async function POST(request: Request) {
   try {
-    await requireAdminManager(request);
+    await requireContentManager(request);
     const formData = await request.formData();
     const file = formData.get("file");
     const intent = String(formData.get("intent") || "media");
@@ -61,13 +61,16 @@ export async function POST(request: Request) {
 }
 
 async function ensureBucket(supabase: ReturnType<typeof createSupabaseAdminClient>) {
-  const { data } = await supabase.storage.getBucket(BUCKET);
-  if (data) return;
-  await supabase.storage.createBucket(BUCKET, {
+  const { data: existing } = await supabase.storage.getBucket(BUCKET);
+  if (existing) return;
+  const { error } = await supabase.storage.createBucket(BUCKET, {
     public: true,
     fileSizeLimit: 1024 * 1024 * 100,
     allowedMimeTypes: [...AUDIO_TYPES, ...IMAGE_TYPES, ...VIDEO_TYPES],
   });
+  if (error && !error.message.toLowerCase().includes("already exist")) {
+    throw new Error(`Storage bucket setup failed: ${error.message}`);
+  }
 }
 
 function extensionFromName(name: string, type: string) {
