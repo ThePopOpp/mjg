@@ -81,7 +81,7 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
 
     const response = await fetch("/api/admin/blog-posts", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
       body: JSON.stringify({
         id: post?.id,
         title,
