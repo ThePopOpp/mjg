@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/browser";
-import { signInWithPassword } from "@/app/actions/auth";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -31,15 +30,20 @@ export function LoginForm() {
     setStatus(null);
     setLoading("password");
 
-    const result = await signInWithPassword(email, password);
+    const res = await fetch("/api/auth/sign-in", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
 
-    if (result.error) {
-      setError(result.error);
+    if (!res.ok || data.error) {
+      setError(data.error ?? "Sign-in failed.");
       setLoading(null);
       return;
     }
 
-    // Server Action set session cookies in response headers — navigate now
+    // Route Handler wrote Set-Cookie headers — navigate with the fresh session
     window.location.assign(nextPath);
   }
 

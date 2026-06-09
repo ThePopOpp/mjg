@@ -15,7 +15,8 @@ export async function middleware(request: NextRequest) {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        // Only name+value needed for the request — options are for the Set-Cookie response header
+        // Only name+value needed for the internal request propagation;
+        // full options go on the response Set-Cookie header.
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         supabaseResponse = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
@@ -25,9 +26,12 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // IMPORTANT: Do not add any logic between createServerClient and getUser().
-  // A simple mistake could make it very hard to debug session issues.
-  await supabase.auth.getUser();
+  // Use getSession() instead of getUser() in middleware.
+  // getUser() makes a live Supabase API call and will call _removeSession() on any
+  // 401 response — silently deleting the cookies and logging the user out.
+  // getSession() reads from cookies, refreshes expired tokens locally, and never
+  // destroys valid session data due to transient network failures.
+  await supabase.auth.getSession();
 
   return supabaseResponse;
 }

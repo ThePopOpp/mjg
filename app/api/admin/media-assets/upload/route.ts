@@ -56,7 +56,8 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Upload failed.";
-    return NextResponse.json({ error: message }, { status: message.includes("permission") ? 403 : 500 });
+    const status = message.includes("Authentication required") ? 401 : message.includes("permission") ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }
 
