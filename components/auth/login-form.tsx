@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/browser";
+import { signInWithPassword } from "@/app/actions/auth";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -24,21 +25,21 @@ export function LoginForm() {
     return `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
   }, [nextPath]);
 
-  async function signInWithPassword(event: FormEvent<HTMLFormElement>) {
+  async function handleSignInWithPassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setStatus(null);
     setLoading("password");
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const result = await signInWithPassword(email, password);
 
-    if (signInError) {
-      setError(signInError.message);
+    if (result.error) {
+      setError(result.error);
       setLoading(null);
       return;
     }
 
+    // Server Action set session cookies in response headers — navigate now
     window.location.assign(nextPath);
   }
 
@@ -78,7 +79,7 @@ export function LoginForm() {
         <CardDescription>Sign in to manage Created for More pilot records and admin workflows.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" onSubmit={signInWithPassword}>
+        <form className="space-y-4" onSubmit={handleSignInWithPassword}>
           <label className="block space-y-2 text-sm font-medium">
             <span>Email</span>
             <Input
