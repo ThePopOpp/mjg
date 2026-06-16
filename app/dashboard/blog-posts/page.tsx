@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CalendarClock, FileText, Plus, Send, Tags } from "lucide-react";
-import { BlogPostActions } from "@/components/blog-posts/blog-post-actions";
+import { BlogPostActions, BlogPostImageActions } from "@/components/blog-posts/blog-post-actions";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
@@ -39,32 +39,38 @@ export default async function BlogPostsPage() {
           const tags = normalizePostTags(post);
           return (
             <Card key={post.id} className="overflow-hidden">
-              {post.featured_image_url ? (
-                <div className="relative aspect-[16/7] bg-muted">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+              <div className="relative aspect-[16/7] bg-muted">
+                {post.featured_image_url ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img src={post.featured_image_url} alt="" className="h-full w-full object-cover" />
-                </div>
-              ) : null}
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No featured image</div>
+                )}
+                <BlogPostImageActions slug={post.slug} title={post.title} />
+              </div>
               <CardHeader>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <CardTitle className="text-xl">
                       <Link className="hover:underline" href={`/dashboard/blog-posts/${post.id}`}>{post.title}</Link>
                     </CardTitle>
-                    <CardDescription>
-                      /resources/{post.slug} · {post.author_name ?? "Michael J. Gauthier"}
-                    </CardDescription>
+                    <CardDescription>/resources/{post.slug} - {post.author_name ?? "Michael J. Gauthier"}</CardDescription>
                   </div>
                   <StatusBadge status={post.status} />
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">{post.excerpt || "No excerpt yet."}</p>
+                <p
+                  className="text-sm text-muted-foreground"
+                  style={{ display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 3, overflow: "hidden" }}
+                >
+                  {post.excerpt || "No excerpt yet."}
+                </p>
                 <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                   {post.category?.name ? <span className="rounded-md bg-muted px-2 py-1">{post.category.name}</span> : null}
                   {tags.map((tag: any) => <span key={tag.id} className="rounded-md bg-muted px-2 py-1"><Tags className="mr-1 inline h-3 w-3" />{tag.name}</span>)}
                 </div>
-                <BlogPostActions postId={post.id} slug={post.slug} title={post.title} />
+                <BlogPostActions postId={post.id} />
               </CardContent>
             </Card>
           );

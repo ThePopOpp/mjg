@@ -17,11 +17,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   }
 }
 
-export function BlogPostActions({ postId, slug, title }: { postId: string; slug: string; title: string }) {
-  const router = useRouter();
-  const [loading, setLoading] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+export function BlogPostImageActions({ slug, title }: { slug: string; title: string }) {
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
@@ -36,30 +32,6 @@ export function BlogPostActions({ postId, slug, title }: { postId: string; slug:
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [shareOpen]);
-
-  async function run(action: string) {
-    setLoading(action);
-    setMessage(null);
-    setError(null);
-
-    const authHeaders = await getAuthHeaders();
-    const response = await fetch(`/api/admin/blog-posts/${postId}/actions`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json", ...authHeaders },
-      body: JSON.stringify({ action }),
-    });
-    const data = await response.json();
-    setLoading(null);
-
-    if (!response.ok) {
-      setError(data.error ?? "Action failed.");
-      return;
-    }
-
-    setMessage(action === "convert_to_email" ? "Email template created/updated." : "Post updated.");
-    router.refresh();
-  }
 
   function shareUrl() {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -90,38 +62,74 @@ export function BlogPostActions({ postId, slug, title }: { postId: string; slug:
   }
 
   return (
+    <div className="absolute right-3 top-3 z-10 flex flex-col gap-2" ref={shareRef}>
+      <Button size="sm" variant="secondary" asChild className="bg-background/90 shadow-sm backdrop-blur hover:bg-background">
+        <a href={`/resources/${slug}`} target="_blank" rel="noopener noreferrer">
+          <Eye className="h-4 w-4" />
+          View
+        </a>
+      </Button>
+      <div className="relative">
+        <Button size="sm" variant="secondary" onClick={() => setShareOpen((o) => !o)} className="w-full bg-background/90 shadow-sm backdrop-blur hover:bg-background">
+          <Share2 className="h-4 w-4" />
+          Share
+        </Button>
+        {shareOpen && (
+          <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-md border bg-card p-1 shadow-md">
+            <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={copyLink}>
+              {copied ? "Copied!" : "Copy link"}
+            </button>
+            <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("twitter")}>Share on X</button>
+            <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("facebook")}>Share on Facebook</button>
+            <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("linkedin")}>Share on LinkedIn</button>
+            <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("sms")}>Send via SMS</button>
+            <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("email")}>Share via Email</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function BlogPostActions({ postId }: { postId: string }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run(action: string) {
+    setLoading(action);
+    setMessage(null);
+    setError(null);
+
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`/api/admin/blog-posts/${postId}/actions`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...authHeaders },
+      body: JSON.stringify({ action }),
+    });
+    const data = await response.json();
+    setLoading(null);
+
+    if (!response.ok) {
+      setError(data.error ?? "Action failed.");
+      return;
+    }
+
+    setMessage(action === "convert_to_email" ? "Email template created/updated." : "Post updated.");
+    router.refresh();
+  }
+
+  return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1">
         <Button size="sm" variant="outline" asChild>
           <Link href={`/dashboard/blog-posts/${postId}`}>
             <Pencil className="h-4 w-4" />
             Edit
           </Link>
         </Button>
-        <Button size="sm" variant="outline" asChild>
-          <a href={`/resources/${slug}`} target="_blank" rel="noopener noreferrer">
-            <Eye className="h-4 w-4" />
-            View
-          </a>
-        </Button>
-        <div className="relative" ref={shareRef}>
-          <Button size="sm" variant="outline" onClick={() => setShareOpen((o) => !o)}>
-            <Share2 className="h-4 w-4" />
-            Share
-          </Button>
-          {shareOpen && (
-            <div className="absolute left-0 top-full z-50 mt-1 w-44 rounded-md border bg-card p-1 shadow-md">
-              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={copyLink}>
-                {copied ? "Copied!" : "Copy link"}
-              </button>
-              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("twitter")}>Share on X</button>
-              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("facebook")}>Share on Facebook</button>
-              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("linkedin")}>Share on LinkedIn</button>
-              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("sms")}>Send via SMS</button>
-              <button className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-muted" onClick={() => shareOn("email")}>Share via Email</button>
-            </div>
-          )}
-        </div>
         <Button size="sm" onClick={() => run("published")} disabled={Boolean(loading)}>
           <Rocket className="h-4 w-4" />
           Deploy
@@ -136,7 +144,7 @@ export function BlogPostActions({ postId, slug, title }: { postId: string; slug:
         </Button>
         <Button size="sm" variant="outline" onClick={() => run("convert_to_email")} disabled={Boolean(loading)}>
           <MailPlus className="h-4 w-4" />
-          Blog to email
+          Email Blog
         </Button>
         <Button size="sm" variant="destructive" onClick={() => run("deleted")} disabled={Boolean(loading)}>
           <Trash2 className="h-4 w-4" />

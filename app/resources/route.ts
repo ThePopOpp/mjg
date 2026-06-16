@@ -1,5 +1,5 @@
 import { getPublishedPosts, normalizePostTags } from "@/lib/content/blog";
-import { publicSiteUrl, renderFonts, renderNavScript, renderNavStyles, renderSiteHeader, renderStaticPage, renderThemeScript } from "@/lib/public-site/static-pages";
+import { publicSiteUrl, renderFaviconLinks, renderFonts, renderNavScript, renderNavStyles, renderSiteHeader, renderStaticPage, renderThemeScript } from "@/lib/public-site/static-pages";
 
 export async function GET() {
   const posts = await getPublishedPosts();
@@ -18,6 +18,7 @@ function renderArchive(posts: any[], siteUrl: string) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Resources | Michael J. Gauthier</title>
+  ${renderFaviconLinks()}
   ${renderThemeScript()}
   ${renderFonts()}
   <style>

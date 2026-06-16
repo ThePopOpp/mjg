@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   AlignCenter,
   AlignLeft,
@@ -42,7 +41,6 @@ const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(
 type UploadedFile = { url: string; bucket: string; path: string; mimeType: string; fileSize: number };
 
 export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProps) {
-  const router = useRouter();
   const dashboardActionToken = useDashboardActionToken();
   const effectiveActionToken = actionToken || dashboardActionToken;
   const [title, setTitle] = useState(post?.title ?? "");
@@ -118,9 +116,7 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
       return;
     }
 
-    setMessage("Blog post saved.");
-    router.refresh();
-    if (!post?.id) router.push(`/dashboard/blog-posts/${data.post.id}`);
+    setMessage(post?.id ? "Blog post saved." : "Blog post saved. Return to Blog Posts when you are ready to review it.");
   }
 
   function insertSnippet(snippet: string) {

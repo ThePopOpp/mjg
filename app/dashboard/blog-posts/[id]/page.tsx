@@ -27,7 +27,7 @@ export default async function EditBlogPostPage({ params }: { params: Promise<{ i
           <CardTitle>Post actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <BlogPostActions postId={post.id} slug={post.slug} title={post.title} />
+          <BlogPostActions postId={post.id} />
         </CardContent>
       </Card>
 

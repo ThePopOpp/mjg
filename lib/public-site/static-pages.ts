@@ -26,6 +26,11 @@ export function renderFonts() {
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />`;
 }
 
+export function renderFaviconLinks() {
+  return `<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.svg" />`;
+}
+
 /** Nav CSS — include inside the page <style> block */
 export function renderNavStyles() {
   return `
@@ -188,6 +193,7 @@ export function renderGeneratedPage(input: { title: string; eyebrow: string; bod
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(input.title)} | Michael J. Gauthier</title>
+  ${renderFaviconLinks()}
   <style>
     :root { color-scheme: light dark; --ink:#070807; --muted:#5f6d66; --line:#e4ded2; --gold:#c9a96d; --green:#315f43; --paper:#fbfaf7; }
     @media (prefers-color-scheme: dark) { :root { --ink:#f8f6f1; --muted:#b6bcb6; --line:#2b2a25; --paper:#10110f; } }
@@ -242,7 +248,12 @@ function transformStaticHtml(html: string) {
       .replace(new RegExp(`href='${escapeRegExp(fileName)}'`, "g"), `href='${absolute}'`);
   }
 
-  return output;
+  return injectFaviconLinks(output);
+}
+
+function injectFaviconLinks(html: string) {
+  if (/<link[^>]+rel=["'](?:shortcut )?icon["']/i.test(html)) return html;
+  return html.replace(/<\/head>/i, `  ${renderFaviconLinks()}\n</head>`);
 }
 
 function escapeRegExp(value: string) {
