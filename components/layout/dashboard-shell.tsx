@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogOut, Menu, Search } from "lucide-react";
+import { DashboardActionTokenProvider } from "@/components/layout/dashboard-action-token";
 import { dashboardNavItems } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +10,12 @@ import { can } from "@/lib/rbac/permissions";
 import type { DashboardProfile } from "@/lib/auth/server";
 
 type DashboardShellProps = {
+  actionToken: string;
   children: React.ReactNode;
   profile: DashboardProfile;
 };
 
-export function DashboardShell({ children, profile }: DashboardShellProps) {
+export function DashboardShell({ actionToken, children, profile }: DashboardShellProps) {
   const displayName = `${profile.firstName} ${profile.lastName}`.trim() || profile.email;
   const visibleNavItems = dashboardNavItems.filter((item) => !("permission" in item) || can(profile.role, item.permission));
 
@@ -81,7 +83,9 @@ export function DashboardShell({ children, profile }: DashboardShellProps) {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[112rem] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        <DashboardActionTokenProvider token={actionToken}>
+          <main className="mx-auto w-full max-w-[112rem] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        </DashboardActionTokenProvider>
       </div>
     </div>
   );

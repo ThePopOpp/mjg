@@ -91,7 +91,7 @@ export function LoginForm() {
               inputMode="email"
               name="email"
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="jw@michaeljgauthier.com"
+              placeholder="Email address"
               required
               type="email"
               value={email}

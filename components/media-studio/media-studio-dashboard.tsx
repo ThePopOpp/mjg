@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { cn } from "@/lib/utils";
 
 type AssetType = "audio" | "video" | "photo";
@@ -33,6 +34,8 @@ const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(
 
 export function MediaStudioDashboard({ actionToken, assets }: { actionToken: string; assets: any[] }) {
   const router = useRouter();
+  const dashboardActionToken = useDashboardActionToken();
+  const effectiveActionToken = actionToken || dashboardActionToken;
   const [active, setActive] = useState<AssetType>("audio");
   const [title, setTitle] = useState("");
   const [fileUrl, setFileUrl] = useState("");
@@ -48,7 +51,7 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!actionToken) {
+    if (!effectiveActionToken) {
       setError("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
       return;
     }
@@ -60,9 +63,9 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
     const response = await fetch("/api/admin/media-assets", {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": effectiveActionToken },
       body: JSON.stringify({
-        actionToken,
+        actionToken: effectiveActionToken,
         title,
         assetType: active,
         sourceType: embedUrl ? "embed" : "external_url",
@@ -112,7 +115,7 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
       </div>
 
       {active === "audio" ? (
-        <AudioStudio actionToken={actionToken} assets={visibleAssets} />
+        <AudioStudio actionToken={effectiveActionToken} assets={visibleAssets} />
       ) : (
         <>
           <Card>

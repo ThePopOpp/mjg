@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { createAdminActionToken } from "@/lib/auth/action-token";
 import { getCurrentProfile, isActiveDashboardProfile } from "@/lib/auth/server";
 
 export default async function DashboardLayout({
@@ -17,5 +18,9 @@ export default async function DashboardLayout({
     redirect("/access-restricted");
   }
 
-  return <DashboardShell profile={profile}>{children}</DashboardShell>;
+  return (
+    <DashboardShell actionToken={createAdminActionToken(profile)} profile={profile}>
+      {children}
+    </DashboardShell>
+  );
 }

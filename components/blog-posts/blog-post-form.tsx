@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { createClient } from "@/lib/supabase/browser";
 
 type BlogPostFormProps = {
@@ -42,6 +43,8 @@ type UploadedFile = { url: string; bucket: string; path: string; mimeType: strin
 
 export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProps) {
   const router = useRouter();
+  const dashboardActionToken = useDashboardActionToken();
+  const effectiveActionToken = actionToken || dashboardActionToken;
   const [title, setTitle] = useState(post?.title ?? "");
   const [slug, setSlug] = useState(post?.slug ?? "");
   const [authorName, setAuthorName] = useState(post?.author_name ?? "Michael J. Gauthier");
@@ -75,7 +78,7 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!actionToken) {
+    if (!effectiveActionToken) {
       setError("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
       return;
     }
@@ -88,9 +91,9 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
     const response = await fetch("/api/admin/blog-posts", {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken, ...authHeaders },
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": effectiveActionToken, ...authHeaders },
       body: JSON.stringify({
-        actionToken,
+        actionToken: effectiveActionToken,
         id: post?.id,
         title,
         slug: renderedSlug,
@@ -154,7 +157,7 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
     setUploading("featured");
     setError(null);
     try {
-      const upload = await uploadBlogFile(file, "thumbnail", actionToken);
+      const upload = await uploadBlogFile(file, "thumbnail", effectiveActionToken);
       setFeaturedImageUrl(upload.url);
       setFeaturedImageFile(file.name);
     } catch (uploadError) {
@@ -170,7 +173,7 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
     try {
       const uploads: UploadedFile[] = [];
       for (const file of Array.from(files)) {
-        uploads.push(await uploadBlogFile(file, "thumbnail", actionToken));
+        uploads.push(await uploadBlogFile(file, "thumbnail", effectiveActionToken));
       }
       setGalleryUrls((current: string) => [
         ...current.split(/\n+/).map((url: string) => url.trim()).filter(Boolean),
@@ -188,7 +191,7 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
     setUploading("video");
     setError(null);
     try {
-      const upload = await uploadBlogFile(file, "video", actionToken);
+      const upload = await uploadBlogFile(file, "video", effectiveActionToken);
       setVideoUrl(upload.url);
       setVideoFile(file.name);
     } catch (uploadError) {
