@@ -75,14 +75,22 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!actionToken) {
+      setError("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
+      return;
+    }
+
     setSaving(true);
     setError(null);
     setMessage(null);
 
+    const authHeaders = await getAuthHeaders();
     const response = await fetch("/api/admin/blog-posts", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      credentials: "include",
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken, ...authHeaders },
       body: JSON.stringify({
+        actionToken,
         id: post?.id,
         title,
         slug: renderedSlug,
@@ -543,9 +551,14 @@ function SnippetButton({ icon, label, onClick }: { icon: React.ReactNode; label:
 }
 
 async function uploadBlogFile(file: File, intent: "thumbnail" | "video", actionToken: string): Promise<UploadedFile> {
+  if (!actionToken) {
+    throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try uploading.");
+  }
+
   const formData = new FormData();
   formData.append("file", file);
   formData.append("intent", intent);
+  formData.append("actionToken", actionToken);
   const authHeaders = await getAuthHeaders();
   const response = await fetch("/api/admin/media-assets/upload", {
     method: "POST",

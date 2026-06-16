@@ -31,7 +31,7 @@ const displayTargets = [
 const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, "0"));
 const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, "0"));
 
-export function MediaStudioDashboard({ assets }: { assets: any[] }) {
+export function MediaStudioDashboard({ actionToken, assets }: { actionToken: string; assets: any[] }) {
   const router = useRouter();
   const [active, setActive] = useState<AssetType>("audio");
   const [title, setTitle] = useState("");
@@ -48,6 +48,11 @@ export function MediaStudioDashboard({ assets }: { assets: any[] }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!actionToken) {
+      setError("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
+      return;
+    }
+
     setSaving(true);
     setMessage(null);
     setError(null);
@@ -55,8 +60,9 @@ export function MediaStudioDashboard({ assets }: { assets: any[] }) {
     const response = await fetch("/api/admin/media-assets", {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
       body: JSON.stringify({
+        actionToken,
         title,
         assetType: active,
         sourceType: embedUrl ? "embed" : "external_url",
@@ -106,7 +112,7 @@ export function MediaStudioDashboard({ assets }: { assets: any[] }) {
       </div>
 
       {active === "audio" ? (
-        <AudioStudio assets={visibleAssets} />
+        <AudioStudio actionToken={actionToken} assets={visibleAssets} />
       ) : (
         <>
           <Card>
@@ -173,7 +179,7 @@ export function MediaStudioDashboard({ assets }: { assets: any[] }) {
   );
 }
 
-function AudioStudio({ assets }: { assets: any[] }) {
+function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any[] }) {
   const router = useRouter();
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
@@ -245,7 +251,7 @@ function AudioStudio({ assets }: { assets: any[] }) {
 
   async function handleAudioUpload(file: File) {
     setError(null);
-    const upload = await uploadFile(file, "audio");
+    const upload = await uploadFile(file, "audio", actionToken);
     setUploadedAudio(upload);
     setAudioFileName(file.name);
     setAudioUrl("");
@@ -255,7 +261,7 @@ function AudioStudio({ assets }: { assets: any[] }) {
 
   async function handleThumbnailUpload(file: File) {
     setError(null);
-    const upload = await uploadFile(file, "thumbnail");
+    const upload = await uploadFile(file, "thumbnail", actionToken);
     setUploadedThumbnail(upload);
     setThumbnailFileName(file.name);
   }
@@ -266,10 +272,14 @@ function AudioStudio({ assets }: { assets: any[] }) {
     setError(null);
 
     try {
+      if (!actionToken) {
+        throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
+      }
+
       let audio = uploadedAudio;
       if (!audio && recordedBlob) {
         const file = new File([recordedBlob], `${title || "audio-recording"}.webm`, { type: recordedBlob.type || "audio/webm" });
-        audio = await uploadFile(file, "audio");
+        audio = await uploadFile(file, "audio", actionToken);
         setUploadedAudio(audio);
       }
 
@@ -281,8 +291,9 @@ function AudioStudio({ assets }: { assets: any[] }) {
       const response = await fetch("/api/admin/media-assets", {
         method: "POST",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
         body: JSON.stringify({
+          actionToken,
           title,
           assetType: "audio",
           sourceType: recordedBlob ? "recording" : audio ? "upload" : "external_url",
@@ -679,13 +690,19 @@ function AudioPlayerSheet({ asset, onClose }: { asset: any | null; onClose: () =
   );
 }
 
-async function uploadFile(file: File, intent: "audio" | "thumbnail"): Promise<UploadedFile> {
+async function uploadFile(file: File, intent: "audio" | "thumbnail", actionToken: string): Promise<UploadedFile> {
+  if (!actionToken) {
+    throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try uploading.");
+  }
+
   const formData = new FormData();
   formData.append("file", file);
   formData.append("intent", intent);
+  formData.append("actionToken", actionToken);
   const response = await fetch("/api/admin/media-assets/upload", {
     method: "POST",
     credentials: "same-origin",
+    headers: { "x-mjg-action-token": actionToken },
     body: formData,
   });
   const data = await response.json();

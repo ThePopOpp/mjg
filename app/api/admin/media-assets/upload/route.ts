@@ -9,8 +9,9 @@ const VIDEO_TYPES = new Set(["video/mp4", "video/webm", "video/quicktime", "vide
 
 export async function POST(request: Request) {
   try {
-    await requireContentManager(request);
     const formData = await request.formData();
+    const actionToken = String(formData.get("actionToken") || "");
+    await requireContentManager(request, actionToken);
     const file = formData.get("file");
     const intent = String(formData.get("intent") || "media");
 

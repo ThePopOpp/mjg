@@ -8,6 +8,8 @@ import { createAdminActionToken } from "@/lib/auth/action-token";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getBlogAdminData, getBlogPostById } from "@/lib/content/blog";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditBlogPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [post, data, profile] = await Promise.all([getBlogPostById(id), getBlogAdminData(), getCurrentProfile()]);

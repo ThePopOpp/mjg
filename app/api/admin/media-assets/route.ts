@@ -4,8 +4,8 @@ import { requireAdminManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireAdminManager(request);
     const body = await request.json();
+    const actor = await requireAdminManager(request, body.actionToken);
     const asset = await saveMediaAsset({
       id: body.id,
       title: body.title,

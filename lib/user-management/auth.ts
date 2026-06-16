@@ -5,8 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const OWNER_EMAILS = new Set(["jw@michaeljgauthier.com"]);
 
-export async function requireUserManager(request?: Request) {
-  const { user } = await getAuthenticatedUser(request);
+export async function requireUserManager(request?: Request, actionToken?: string | null) {
+  const { user } = await getAuthenticatedUser(request, actionToken);
 
   const { profile, error } = await getProfileForAuthUser(user);
 
@@ -22,8 +22,8 @@ export async function requireUserManager(request?: Request) {
   return { ...profile, role };
 }
 
-export async function requireParticipantManager(request?: Request) {
-  const { user } = await getAuthenticatedUser(request);
+export async function requireParticipantManager(request?: Request, actionToken?: string | null) {
+  const { user } = await getAuthenticatedUser(request, actionToken);
 
   const { profile, error } = await getProfileForAuthUser(user);
 
@@ -39,8 +39,8 @@ export async function requireParticipantManager(request?: Request) {
   return { ...profile, role };
 }
 
-export async function requireContentManager(request?: Request) {
-  const { user } = await getAuthenticatedUser(request);
+export async function requireContentManager(request?: Request, actionToken?: string | null) {
+  const { user } = await getAuthenticatedUser(request, actionToken);
 
   const { profile, error } = await getProfileForAuthUser(user);
 
@@ -56,8 +56,8 @@ export async function requireContentManager(request?: Request) {
   return { ...profile, role };
 }
 
-export async function requireAdminManager(request?: Request) {
-  const { user } = await getAuthenticatedUser(request);
+export async function requireAdminManager(request?: Request, actionToken?: string | null) {
+  const { user } = await getAuthenticatedUser(request, actionToken);
 
   const { profile, error } = await getProfileForAuthUser(user);
 
@@ -73,7 +73,7 @@ export async function requireAdminManager(request?: Request) {
   return { ...profile, role };
 }
 
-async function getAuthenticatedUser(request?: Request) {
+async function getAuthenticatedUser(request?: Request, actionToken?: string | null) {
   const supabase = await createClient();
 
   if (!supabase) {
@@ -95,7 +95,8 @@ async function getAuthenticatedUser(request?: Request) {
     if (tokenUser) return { user: tokenUser };
   }
 
-  const actionPayload = verifyAdminActionToken(request?.headers.get("x-mjg-action-token") ?? null);
+  const requestActionToken = actionToken || request?.headers.get("x-mjg-action-token") || null;
+  const actionPayload = verifyAdminActionToken(requestActionToken);
   if (actionPayload) {
     return { user: { id: actionPayload.profileId, email: actionPayload.email } };
   }
