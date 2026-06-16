@@ -6,6 +6,7 @@ import { Archive, ChevronDown, EyeOff, Mail, Trash2 } from "lucide-react";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { cn } from "@/lib/utils";
 
 export type EmailHistoryRow = {
@@ -27,6 +28,7 @@ export type EmailHistoryRow = {
 };
 
 export function EmailHistoryTable({ rows, emptyMessage, mode = "history" }: { rows: EmailHistoryRow[]; emptyMessage: string; mode?: "inbox" | "history" }) {
+  const actionToken = useDashboardActionToken();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -39,8 +41,8 @@ export function EmailHistoryTable({ rows, emptyMessage, mode = "history" }: { ro
 
     const response = await fetch(`/api/admin/email/messages/${row.sourceId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: actionName }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ action: actionName, actionToken }),
     });
     const payload = await response.json();
     if (!response.ok) {

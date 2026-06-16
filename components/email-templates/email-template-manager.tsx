@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 
 type EmailTemplateRow = {
   id: string;
@@ -22,6 +23,7 @@ type EmailTemplateRow = {
 };
 
 export function EmailTemplateManager({ templates }: { templates: EmailTemplateRow[] }) {
+  const actionToken = useDashboardActionToken();
   const [search, setSearch] = useState("");
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplateRow | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
@@ -35,8 +37,9 @@ export function EmailTemplateManager({ templates }: { templates: EmailTemplateRo
     setActionError(null);
     const response = await fetch("/api/admin/email/templates", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
       body: JSON.stringify({
+        actionToken,
         name: `${template.name} Copy`,
         subject: template.subject,
         category: template.category,
@@ -61,8 +64,9 @@ export function EmailTemplateManager({ templates }: { templates: EmailTemplateRo
     setActionError(null);
     const response = await fetch("/api/admin/email/templates", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
       body: JSON.stringify({
+        actionToken,
         id: template.id,
         name: template.name,
         subject: template.subject,

@@ -5,7 +5,7 @@ import { requireUserManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireUserManager();
+    const actor = await requireUserManager(request);
     const formData = await request.formData();
     const subject = String(formData.get("subject") ?? "").trim();
     const html = String(formData.get("html") ?? "").trim();

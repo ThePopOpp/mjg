@@ -6,7 +6,7 @@ import { upsertProfile } from "@/lib/user-management/repository";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireUserManager();
+    const actor = await requireUserManager(request);
     const body = await request.json();
 
     if (!isAppRole(body.role)) {

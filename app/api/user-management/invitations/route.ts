@@ -5,7 +5,7 @@ import { isAppRole } from "@/lib/rbac/roles";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireUserManager();
+    const actor = await requireUserManager(request);
     const body = await request.json();
 
     if (!isAppRole(body.role)) {

@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +23,7 @@ type EditableProfile = {
 
 export function UserProfileEditor({ profile }: { profile: EditableProfile }) {
   const router = useRouter();
+  const actionToken = useDashboardActionToken();
   const [firstName, setFirstName] = useState(profile.first_name ?? "");
   const [lastName, setLastName] = useState(profile.last_name ?? "");
   const [email, setEmail] = useState(profile.email ?? "");
@@ -42,7 +44,7 @@ export function UserProfileEditor({ profile }: { profile: EditableProfile }) {
 
     const response = await fetch("/api/user-management/users", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
       body: JSON.stringify({
         id: profile.id,
         firstName,
@@ -53,6 +55,7 @@ export function UserProfileEditor({ profile }: { profile: EditableProfile }) {
         status,
         notes,
         statusChangeReason,
+        actionToken,
       }),
     });
     const payload = await response.json();

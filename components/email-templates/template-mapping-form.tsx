@@ -6,6 +6,7 @@ import { EMAIL_EVENT_KEYS, type EmailEventKey } from "@/lib/email/constants";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 
 type TemplateOption = { id: string; name: string; status: string };
 type Mapping = {
@@ -16,6 +17,7 @@ type Mapping = {
 };
 
 export function TemplateMappingForm({ templates, mappings }: { templates: TemplateOption[]; mappings: Mapping[] }) {
+  const actionToken = useDashboardActionToken();
   const activeTemplates = templates.filter((template) => template.status !== "archived");
   const mappingByEvent = useMemo(() => new Map(mappings.map((mapping) => [mapping.event_key, mapping])), [mappings]);
   const [eventKey, setEventKey] = useState<EmailEventKey>("user_invitation");
@@ -43,8 +45,8 @@ export function TemplateMappingForm({ templates, mappings }: { templates: Templa
 
     const response = await fetch("/api/admin/email/template-mappings", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ eventKey, templateId: templateId || null, enabled }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ eventKey, templateId: templateId || null, enabled, actionToken }),
     });
     const payload = await response.json();
     if (!response.ok) {

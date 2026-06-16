@@ -5,8 +5,8 @@ import { requireUserManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireUserManager();
     const body = await request.json();
+    const actor = await requireUserManager(request, body.actionToken);
     const eventKey = String(body.eventKey ?? "") as EmailEventKey;
     if (!EMAIL_EVENT_KEYS.some((event) => event.key === eventKey)) {
       return NextResponse.json({ error: "Unknown email event." }, { status: 400 });

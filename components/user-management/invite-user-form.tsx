@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Send } from "lucide-react";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,6 +13,7 @@ const inviteRoles = [ROLES.ADMIN, ROLES.TEAM_MEMBER, ROLES.CONTENT_REVIEWER, ROL
 
 export function InviteUserForm() {
   const router = useRouter();
+  const actionToken = useDashboardActionToken();
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState<AppRole>(ROLES.TEAM_MEMBER);
@@ -28,8 +30,8 @@ export function InviteUserForm() {
 
     const response = await fetch("/api/user-management/invitations", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, phone, role, inviteMethod, siteUrl: window.location.origin }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ email, phone, role, inviteMethod, siteUrl: window.location.origin, actionToken }),
     });
     const payload = await response.json();
 

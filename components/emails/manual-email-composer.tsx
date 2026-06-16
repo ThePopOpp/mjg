@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 
 type UserOption = {
   id: string;
@@ -15,6 +16,7 @@ type UserOption = {
 };
 
 export function ManualEmailComposer({ users }: { users: UserOption[] }) {
+  const actionToken = useDashboardActionToken();
   const editorRef = useRef<HTMLDivElement>(null);
   const [selectedUserEmails, setSelectedUserEmails] = useState<string[]>([]);
   const [manualEmails, setManualEmails] = useState("");
@@ -61,9 +63,10 @@ export function ManualEmailComposer({ users }: { users: UserOption[] }) {
     data.set("subject", subject);
     data.set("html", html);
     data.set("text", stripHtml(html));
+    data.set("actionToken", actionToken);
     attachments.forEach((file) => data.append("attachments", file));
 
-    const response = await fetch("/api/admin/email/manual", { method: "POST", body: data });
+    const response = await fetch("/api/admin/email/manual", { method: "POST", headers: { "x-mjg-action-token": actionToken }, body: data });
     const payload = await response.json();
     if (!response.ok) {
       setError(payload.error ?? "Email could not be sent.");

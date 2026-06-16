@@ -5,10 +5,12 @@ import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 
 type TemplateOption = { id: string; name: string; status: string };
 
 export function DeployEmailForm({ templates, defaultEmail }: { templates: TemplateOption[]; defaultEmail: string }) {
+  const actionToken = useDashboardActionToken();
   const activeTemplates = templates.filter((template) => template.status !== "archived");
   const [templateId, setTemplateId] = useState(activeTemplates[0]?.id ?? "");
   const [mode, setMode] = useState<"test" | "audience">("test");
@@ -33,8 +35,8 @@ export function DeployEmailForm({ templates, defaultEmail }: { templates: Templa
     setRecipientCount(null);
     fetch("/api/admin/email/recipient-count", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ audience }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ audience, actionToken }),
     })
       .then((response) => response.json())
       .then((payload) => {
@@ -50,7 +52,7 @@ export function DeployEmailForm({ templates, defaultEmail }: { templates: Templa
     return () => {
       active = false;
     };
-  }, [audience, mode]);
+  }, [actionToken, audience, mode]);
 
   async function deploy(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,8 +69,8 @@ export function DeployEmailForm({ templates, defaultEmail }: { templates: Templa
 
     const response = await fetch("/api/admin/email/deploy", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ templateId, mode, testEmail, audience, limit, testSent }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ templateId, mode, testEmail, audience, limit, testSent, actionToken }),
     });
     const payload = await response.json();
 

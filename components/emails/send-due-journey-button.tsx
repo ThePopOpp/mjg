@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 
 export function SendDueJourneyButton() {
+  const actionToken = useDashboardActionToken();
   const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -19,8 +21,8 @@ export function SendDueJourneyButton() {
 
     const response = await fetch("/api/admin/email/journey/send-due", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ limit }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ limit, actionToken }),
     });
     const payload = await response.json();
     if (!response.ok) {

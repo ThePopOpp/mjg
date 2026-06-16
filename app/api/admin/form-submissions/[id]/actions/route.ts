@@ -4,7 +4,7 @@ import { requireParticipantManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const actor = await requireParticipantManager();
+    const actor = await requireParticipantManager(request);
     const { id } = await context.params;
     const body = await request.json();
     const action = String(body.action ?? "");

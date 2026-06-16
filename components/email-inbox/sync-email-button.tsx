@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 
 export function SyncEmailButton() {
   const router = useRouter();
+  const actionToken = useDashboardActionToken();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -18,8 +20,8 @@ export function SyncEmailButton() {
 
     const response = await fetch("/api/admin/email/sync", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mailbox: "INBOX", limit: 25 }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ mailbox: "INBOX", limit: 25, actionToken }),
     });
     const payload = await response.json();
 

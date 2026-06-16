@@ -4,8 +4,10 @@ import { FormEvent, useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 
 export function EmailTestForm({ defaultTo }: { defaultTo: string }) {
+  const actionToken = useDashboardActionToken();
   const [to, setTo] = useState(defaultTo);
   const [subject, setSubject] = useState("MJG Dashboard test email");
   const [message, setMessage] = useState("This is a test email from the MJG Dashboard SMTP configuration.");
@@ -21,8 +23,8 @@ export function EmailTestForm({ defaultTo }: { defaultTo: string }) {
 
     const response = await fetch("/api/admin/email/test", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ to, subject, message }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ to, subject, message, actionToken }),
     });
     const payload = await response.json();
 

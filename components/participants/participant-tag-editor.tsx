@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save, Tag } from "lucide-react";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ export function ParticipantTagEditor({
   selectedTagIds: string[];
 }) {
   const router = useRouter();
+  const actionToken = useDashboardActionToken();
   const [selected, setSelected] = useState<string[]>(selectedTagIds);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -50,8 +52,8 @@ export function ParticipantTagEditor({
 
     const response = await fetch(`/api/participants/${participantId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tagIds: selected }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ tagIds: selected, actionToken }),
     });
     const payload = await response.json();
 

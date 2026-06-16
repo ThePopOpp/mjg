@@ -6,6 +6,7 @@ import { Check, Copy, Eye, Image, Link as LinkIcon, MousePointerClick, PanelTop,
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 
 const sampleMergeData: Record<string, string> = {
   first_name: "Jeremy",
@@ -70,6 +71,7 @@ export function EmailTemplateForm({
   onSaved?: () => void;
 }) {
   const router = useRouter();
+  const actionToken = useDashboardActionToken();
   const [editorMode, setEditorMode] = useState<"advanced" | "simple">("advanced");
   const [editingId, setEditingId] = useState(initialTemplate?.id);
   const [name, setName] = useState(initialTemplate?.name ?? "");
@@ -116,8 +118,8 @@ export function EmailTemplateForm({
 
     const response = await fetch("/api/admin/email/templates", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: editingId, name, subject, category, status, htmlBody, textBody }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ id: editingId, name, subject, category, status, htmlBody, textBody, actionToken }),
     });
     const payload = await response.json();
 

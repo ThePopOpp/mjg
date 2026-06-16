@@ -5,6 +5,7 @@ import { Archive, Eye, EyeOff, MailPlus, Pencil, Rocket, Share2, Trash2 } from "
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { createClient } from "@/lib/supabase/browser";
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
@@ -93,6 +94,7 @@ export function BlogPostImageActions({ slug, title }: { slug: string; title: str
 
 export function BlogPostActions({ postId }: { postId: string }) {
   const router = useRouter();
+  const actionToken = useDashboardActionToken();
   const [loading, setLoading] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -106,8 +108,8 @@ export function BlogPostActions({ postId }: { postId: string }) {
     const response = await fetch(`/api/admin/blog-posts/${postId}/actions`, {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json", ...authHeaders },
-      body: JSON.stringify({ action }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken, ...authHeaders },
+      body: JSON.stringify({ action, actionToken }),
     });
     const data = await response.json();
     setLoading(null);

@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { cn } from "@/lib/utils";
 
 export function FormSubmissionsTable({ submissions }: { submissions: any[] }) {
   const router = useRouter();
+  const actionToken = useDashboardActionToken();
   const [query, setQuery] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
@@ -28,8 +30,8 @@ export function FormSubmissionsTable({ submissions }: { submissions: any[] }) {
     setLoading(`${id}:${actionName}`);
     await fetch(`/api/admin/form-submissions/${id}/actions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: actionName }),
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ action: actionName, actionToken }),
     });
     setLoading(null);
     router.refresh();

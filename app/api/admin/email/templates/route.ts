@@ -4,8 +4,8 @@ import { requireUserManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireUserManager();
     const body = await request.json();
+    const actor = await requireUserManager(request, body.actionToken);
     const template = await saveEmailTemplate({
       id: body.id,
       name: body.name,

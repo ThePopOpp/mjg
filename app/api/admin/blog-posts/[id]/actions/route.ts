@@ -4,9 +4,9 @@ import { requireContentManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const actor = await requireContentManager(request);
     const { id } = await context.params;
     const body = await request.json();
+    const actor = await requireContentManager(request, body.actionToken);
     const action = String(body.action ?? "");
 
     if (action === "convert_to_email") {

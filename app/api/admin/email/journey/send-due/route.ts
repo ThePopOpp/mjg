@@ -4,7 +4,7 @@ import { requireUserManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireUserManager();
+    const actor = await requireUserManager(request);
     const body = await request.json().catch(() => ({}));
     const result = await sendDueJourneyEmails({ actorUserId: actor.id, limit: Number(body.limit ?? 10) });
     return NextResponse.json({ ok: true, ...result });
