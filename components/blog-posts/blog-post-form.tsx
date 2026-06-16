@@ -256,9 +256,10 @@ export function BlogPostForm({ actionToken, post, categories }: BlogPostFormProp
             <UploadField
               accept="image/*"
               busy={uploading === "featured"}
-              description={featuredImageFile || featuredImageUrl || "Upload the main image for this post."}
+              description={featuredImageFile || (featuredImageUrl ? "Image set via URL" : "Upload the main image for this post.")}
               icon={<ImageIcon className="h-6 w-6 text-primary" />}
               label="Featured image"
+              previewUrl={featuredImageUrl || undefined}
               onChange={(files) => files?.[0] && uploadFeaturedImage(files[0])}
             />
             <UploadField
@@ -489,6 +490,7 @@ function UploadField({
   icon,
   label,
   multiple,
+  previewUrl,
   onChange,
 }: {
   accept: string;
@@ -497,16 +499,23 @@ function UploadField({
   icon: React.ReactNode;
   label: string;
   multiple?: boolean;
+  previewUrl?: string;
   onChange: (files: FileList | null) => void;
 }) {
   return (
-    <label className="flex min-h-40 cursor-pointer flex-col justify-between rounded-md border border-dashed bg-muted/30 p-4 transition-colors hover:bg-muted/50">
-      <span className="flex items-center gap-2 text-sm font-semibold">{icon}{label}</span>
-      <span className="mt-4 line-clamp-2 text-sm text-muted-foreground">{busy ? "Uploading..." : description}</span>
-      <span className="mt-4 inline-flex w-fit items-center gap-2 rounded-md border bg-background px-3 py-2 text-xs font-medium">
-        <Upload className="h-4 w-4" />
-        Choose file
-      </span>
+    <label className="flex min-h-40 cursor-pointer flex-col rounded-md border border-dashed bg-muted/30 transition-colors hover:bg-muted/50 overflow-hidden">
+      {previewUrl ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img src={previewUrl} alt="" className="w-full aspect-[16/9] object-cover" />
+      ) : null}
+      <div className="flex flex-1 flex-col justify-between p-4">
+        <span className="flex items-center gap-2 text-sm font-semibold">{icon}{label}</span>
+        <span className="mt-4 line-clamp-2 text-sm text-muted-foreground">{busy ? "Uploading..." : description}</span>
+        <span className="mt-4 inline-flex w-fit items-center gap-2 rounded-md border bg-background px-3 py-2 text-xs font-medium">
+          <Upload className="h-4 w-4" />
+          {previewUrl ? "Change file" : "Choose file"}
+        </span>
+      </div>
       <input className="sr-only" type="file" accept={accept} multiple={multiple} onChange={(event) => onChange(event.target.files)} />
     </label>
   );

@@ -22,6 +22,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ error: "Unknown blog post action." }, { status: 400 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Blog post action failed.";
-    return NextResponse.json({ error: message }, { status: message.includes("permission") ? 403 : 500 });
+    const status = message.includes("Authentication required") ? 401 : message.includes("permission") ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

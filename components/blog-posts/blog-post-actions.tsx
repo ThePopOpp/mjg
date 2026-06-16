@@ -5,6 +5,17 @@ import { Archive, Eye, EyeOff, MailPlus, Pencil, Rocket, Share2, Trash2 } from "
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/browser";
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  try {
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+  } catch {
+    return {};
+  }
+}
 
 export function BlogPostActions({ postId, slug, title }: { postId: string; slug: string; title: string }) {
   const router = useRouter();
@@ -31,9 +42,11 @@ export function BlogPostActions({ postId, slug, title }: { postId: string; slug:
     setMessage(null);
     setError(null);
 
+    const authHeaders = await getAuthHeaders();
     const response = await fetch(`/api/admin/blog-posts/${postId}/actions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...authHeaders },
       body: JSON.stringify({ action }),
     });
     const data = await response.json();
