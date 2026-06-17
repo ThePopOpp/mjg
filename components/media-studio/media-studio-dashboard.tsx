@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useRef, useState } from "react";
-import { Copy, FileAudio, ImageIcon, LinkIcon, Mic, Pause, Play, RotateCcw, Save, Square, Upload, Video, X } from "lucide-react";
+import { Copy, FileAudio, ImageIcon, LinkIcon, Mic, Pause, Pencil, Play, RotateCcw, Save, Square, Upload, Video, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -209,6 +209,7 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [playerAsset, setPlayerAsset] = useState<any | null>(null);
+  const [editingAsset, setEditingAsset] = useState<any | null>(null);
 
   const currentAudioUrl = uploadedAudio?.url || audioUrl || audioPreviewUrl;
   const currentThumbnail = uploadedThumbnail?.url || thumbnailUrl;
@@ -290,6 +291,7 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
       if (!resolvedAudioUrl) {
         throw new Error("Record, upload, or add an audio file URL first.");
       }
+      const resolvedSourceType = recordedBlob ? "recording" : audio ? "upload" : editingAsset?.source_type || "external_url";
 
       const response = await fetch("/api/admin/media-assets", {
         method: "POST",
@@ -297,14 +299,15 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
         headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
         body: JSON.stringify({
           actionToken,
+          id: editingAsset?.id,
           title,
           assetType: "audio",
-          sourceType: recordedBlob ? "recording" : audio ? "upload" : "external_url",
+          sourceType: resolvedSourceType,
           fileUrl: resolvedAudioUrl,
-          storageBucket: audio?.bucket,
-          storagePath: audio?.path,
-          mimeType: audio?.mimeType,
-          fileSize: audio?.fileSize,
+          storageBucket: audio?.bucket ?? editingAsset?.storage_bucket,
+          storagePath: audio?.path ?? editingAsset?.storage_path,
+          mimeType: audio?.mimeType ?? editingAsset?.mime_type,
+          fileSize: audio?.fileSize ?? editingAsset?.file_size,
           description,
           status: nextStatus,
           visibility,
@@ -319,21 +322,8 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Audio save failed.");
 
-      setTitle("");
-      setDescription("");
-      setAudioUrl("");
-      setThumbnailUrl("");
-      setPublishDate("");
-      setPublishHour("08");
-      setPublishMinute("00");
-      setPublishPeriod("AM");
-      setStatus("draft");
-      setVisibility("private");
-      setTargets(["frontend_resources"]);
-      setUploadedThumbnail(null);
-      setThumbnailFileName("");
-      resetRecording();
-      setMessage(nextStatus === "draft" ? "Audio track saved as draft." : "Audio track saved.");
+      resetForm();
+      setMessage(editingAsset ? "Audio track updated." : nextStatus === "draft" ? "Audio track saved as draft." : "Audio track saved.");
       router.refresh();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Audio save failed.");
@@ -346,12 +336,62 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
     setTargets((current) => (current.includes(target) ? current.filter((item) => item !== target) : [...current, target]));
   }
 
+  function resetForm() {
+    setEditingAsset(null);
+    setTitle("");
+    setDescription("");
+    setAudioUrl("");
+    setThumbnailUrl("");
+    setPublishDate("");
+    setPublishHour("08");
+    setPublishMinute("00");
+    setPublishPeriod("AM");
+    setStatus("draft");
+    setVisibility("private");
+    setTargets(["frontend_resources"]);
+    setUploadedAudio(null);
+    setUploadedThumbnail(null);
+    setAudioFileName("");
+    setThumbnailFileName("");
+    resetRecording();
+  }
+
+  function editAsset(asset: any) {
+    const publishAt = asset.metadata?.publish_at ? new Date(asset.metadata.publish_at) : null;
+    const hasPublishAt = Boolean(publishAt && !Number.isNaN(publishAt.getTime()));
+    const publishHourValue = hasPublishAt ? publishAt!.getHours() : 8;
+    const displayHour = publishHourValue % 12 || 12;
+    setEditingAsset(asset);
+    setTitle(asset.title ?? "");
+    setDescription(asset.description ?? "");
+    setAudioUrl(asset.file_url ?? "");
+    setThumbnailUrl(asset.metadata?.thumbnail_url ?? "");
+    setStatus(asset.status ?? "draft");
+    setVisibility(asset.visibility ?? "private");
+    setTargets(Array.isArray(asset.metadata?.display_targets) && asset.metadata.display_targets.length ? asset.metadata.display_targets : ["frontend_resources"]);
+    setPublishDate(hasPublishAt ? `${String(publishAt!.getMonth() + 1).padStart(2, "0")}/${String(publishAt!.getDate()).padStart(2, "0")}/${publishAt!.getFullYear()}` : "");
+    setPublishHour(String(displayHour).padStart(2, "0"));
+    setPublishMinute(hasPublishAt ? String(publishAt!.getMinutes()).padStart(2, "0") : "00");
+    setPublishPeriod(publishHourValue >= 12 ? "PM" : "AM");
+    setUploadedAudio(null);
+    setUploadedThumbnail(null);
+    setAudioFileName("");
+    setThumbnailFileName("");
+    setRecordedBlob(null);
+    setAudioPreviewUrl("");
+    setMessage("Editing audio track. Save to update the existing card.");
+    setError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Audio recorder</CardTitle>
-          <CardDescription>Record or upload an audio track, add its card details, and choose where it should appear.</CardDescription>
+          <CardTitle>{editingAsset ? "Edit audio track" : "Audio recorder"}</CardTitle>
+          <CardDescription>
+            {editingAsset ? `Editing ${editingAsset.title}. Save to update the existing audio card.` : "Record or upload an audio track, add its card details, and choose where it should appear."}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]" onSubmit={(event) => { event.preventDefault(); saveAudioAsset(status); }}>
@@ -502,13 +542,18 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
               {message ? <p className="rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</p> : null}
               {error ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
               <div className="flex flex-wrap gap-3">
+                {editingAsset ? (
+                  <Button type="button" variant="ghost" disabled={saving} onClick={resetForm}>
+                    Cancel edit
+                  </Button>
+                ) : null}
                 <Button type="button" variant="outline" disabled={saving || !title || !currentAudioUrl} onClick={() => saveAudioAsset("draft")}>
                   <Save className="h-4 w-4" />
                   Save as draft
                 </Button>
                 <Button type="submit" disabled={saving || !title || !currentAudioUrl}>
                   <Save className="h-4 w-4" />
-                  {saving ? "Saving..." : "Save audio track"}
+                  {saving ? "Saving..." : editingAsset ? "Update audio track" : "Save audio track"}
                 </Button>
               </div>
             </div>
@@ -538,13 +583,13 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
         </CardContent>
       </Card>
 
-      <MediaLibrary active="audio" assets={assets} onPlay={setPlayerAsset} />
+      <MediaLibrary active="audio" assets={assets} onPlay={setPlayerAsset} onEdit={editAsset} />
       <AudioPlayerSheet asset={playerAsset} onClose={() => setPlayerAsset(null)} />
     </>
   );
 }
 
-function MediaLibrary({ active, assets, onPlay }: { active: AssetType; assets: any[]; onPlay?: (asset: any) => void }) {
+function MediaLibrary({ active, assets, onPlay, onEdit }: { active: AssetType; assets: any[]; onPlay?: (asset: any) => void; onEdit?: (asset: any) => void }) {
   return (
     <Card>
       <CardHeader>
@@ -554,7 +599,7 @@ function MediaLibrary({ active, assets, onPlay }: { active: AssetType; assets: a
       <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {assets.map((asset) =>
           active === "audio" ? (
-            <AudioCard key={asset.id} asset={asset} onPlay={() => onPlay?.(asset)} />
+            <AudioCard key={asset.id} asset={asset} onPlay={() => onPlay?.(asset)} onEdit={onEdit ? () => onEdit(asset) : undefined} />
           ) : (
             <div key={asset.id} className="grid gap-3 rounded-md border p-4">
               <div>
@@ -583,7 +628,7 @@ function MediaLibrary({ active, assets, onPlay }: { active: AssetType; assets: a
   );
 }
 
-function AudioCard({ asset, onPlay }: { asset: any; onPlay: () => void }) {
+function AudioCard({ asset, onPlay, onEdit }: { asset: any; onPlay: () => void; onEdit?: () => void }) {
   const thumbnail = asset.metadata?.thumbnail_url;
   const targets = Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : [];
   return (
@@ -619,6 +664,12 @@ function AudioCard({ asset, onPlay }: { asset: any; onPlay: () => void }) {
             <Play className="h-4 w-4" />
             Review audio
           </Button>
+          {onEdit ? (
+            <Button type="button" size="sm" variant="outline" onClick={onEdit}>
+              <Pencil className="h-4 w-4" />
+              Edit
+            </Button>
+          ) : null}
           {asset.slug ? (
             <Button
               type="button"

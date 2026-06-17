@@ -7,8 +7,8 @@ export async function POST(request: Request) {
   let actor: Awaited<ReturnType<typeof requireUserManager>> | null = null;
 
   try {
-    actor = await requireUserManager(request);
     const body = await request.json().catch(() => ({}));
+    actor = await requireUserManager(request, body.actionToken);
     const result = await syncInboxEmails({
       mailbox: body.mailbox ?? "INBOX",
       limit: Number(body.limit ?? 25),

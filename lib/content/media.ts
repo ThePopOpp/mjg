@@ -36,6 +36,27 @@ export async function getMediaStudioData() {
   };
 }
 
+export async function getPublishedAudioForTarget(target: string, limit = 6) {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("media_assets")
+    .select("*")
+    .eq("asset_type", "audio")
+    .eq("status", "published")
+    .not("file_url", "is", null)
+    .order("updated_at", { ascending: false })
+    .limit(100);
+
+  if (error) return [];
+
+  return (data ?? [])
+    .filter((asset) => {
+      const targets = Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : [];
+      return targets.includes(target);
+    })
+    .slice(0, limit);
+}
+
 export async function saveMediaAsset(input: MediaAssetInput) {
   const supabase = createSupabaseAdminClient();
   const slug = slugify(input.slug || input.title);

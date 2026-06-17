@@ -4,8 +4,8 @@ import { requireUserManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    await requireUserManager(request);
     const body = await request.json();
+    await requireUserManager(request, body.actionToken);
     const audience = body.audience === "participants" ? "participants" : "profiles";
     const count = await countRecipientsForAudience(audience);
     return NextResponse.json({ ok: true, audience, count });

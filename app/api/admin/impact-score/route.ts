@@ -4,8 +4,8 @@ import { requireContentManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireContentManager(request);
     const body = await request.json();
+    const actor = await requireContentManager(request, body.actionToken);
     const score = await saveImpactScore({
       scoreDate: body.scoreDate,
       totalAmount: Number(body.totalAmount),

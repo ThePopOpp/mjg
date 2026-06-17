@@ -163,7 +163,7 @@ export function ImpactScoreForm({ score, actionToken }: Props) {
       const res = await fetch("/api/admin/impact-score", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
-        body: JSON.stringify({ scoreDate, totalAmount, goalLabel, headline, bodyText, notes, published, categories }),
+        body: JSON.stringify({ scoreDate, totalAmount, goalLabel, headline, bodyText, notes, published, categories, actionToken }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to save.");

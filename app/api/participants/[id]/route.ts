@@ -4,9 +4,9 @@ import { requireParticipantManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const actor = await requireParticipantManager(request);
     const { id } = await params;
     const body = await request.json();
+    const actor = await requireParticipantManager(request, body.actionToken);
 
     const participant = await updateParticipant({
       id,
@@ -38,9 +38,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const actor = await requireParticipantManager(request);
     const { id } = await params;
     const body = await request.json();
+    const actor = await requireParticipantManager(request, body.actionToken);
 
     const result = await updateParticipantTags({
       participantId: id,

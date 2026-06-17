@@ -174,14 +174,18 @@ export function publicSiteUrl() {
 }
 
 export function renderStaticPage(fileName: string) {
-  const filePath = path.join(process.cwd(), "main", fileName);
-  const html = transformStaticHtml(readFileSync(filePath, "utf8"));
+  const html = getStaticPageHtml(fileName);
 
   return new NextResponse(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",
     },
   });
+}
+
+export function getStaticPageHtml(fileName: string) {
+  const filePath = path.join(process.cwd(), "main", fileName);
+  return transformStaticHtml(readFileSync(filePath, "utf8"));
 }
 
 export function renderGeneratedPage(input: { title: string; eyebrow: string; body: string; ctaLabel?: string; ctaHref?: string }) {

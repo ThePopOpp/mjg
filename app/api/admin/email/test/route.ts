@@ -10,8 +10,8 @@ export async function POST(request: Request) {
   let message = "";
 
   try {
-    actor = await requireUserManager(request);
     const body = await request.json();
+    actor = await requireUserManager(request, body.actionToken);
     to = String(body.to ?? "").trim();
     subject = String(body.subject ?? "").trim();
     message = String(body.message ?? "").trim();

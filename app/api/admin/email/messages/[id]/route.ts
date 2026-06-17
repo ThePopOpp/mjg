@@ -4,9 +4,9 @@ import { requireUserManager } from "@/lib/user-management/auth";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const actor = await requireUserManager(request);
     const { id } = await params;
     const body = await request.json();
+    const actor = await requireUserManager(request, body.actionToken);
     const action = body.action === "delete" ? "delete" : body.action === "remove" ? "remove" : body.action === "hide" ? "hide" : null;
 
     if (!action) {

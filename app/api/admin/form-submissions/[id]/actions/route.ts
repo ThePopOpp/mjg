@@ -4,9 +4,9 @@ import { requireParticipantManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const actor = await requireParticipantManager(request);
     const { id } = await context.params;
     const body = await request.json();
+    const actor = await requireParticipantManager(request, body.actionToken);
     const action = String(body.action ?? "");
     const now = new Date().toISOString();
 
