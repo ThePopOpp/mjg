@@ -595,7 +595,7 @@ export function ContactsManager({ initialType = "contact" }: { initialType?: "co
       <Dialog open={showConvert} onOpenChange={setShowConvert}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Convert {fullName(selectedContact!)}</DialogTitle>
+            <DialogTitle>Convert {selectedContact ? fullName(selectedContact) : "contact"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">Choose what to create from this {tab}:</p>
@@ -626,7 +626,7 @@ export function ContactsManager({ initialType = "contact" }: { initialType?: "co
       ───────────────────────────────────────────────────── */}
       <Dialog open={!!deleteConfirm} onOpenChange={(o: boolean) => { if (!o) setDeleteConfirm(null); }}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Delete {fullName(deleteConfirm!)}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Delete {deleteConfirm ? fullName(deleteConfirm) : "contact"}</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">This action cannot be undone.</p>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
