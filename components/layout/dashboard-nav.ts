@@ -14,6 +14,7 @@ import {
   Settings,
   TrendingUp,
   UsersRound,
+  UserCircle,
   Waves,
 } from "lucide-react";
 import { PERMISSIONS } from "@/lib/rbac/permissions";
@@ -21,6 +22,7 @@ import { PERMISSIONS } from "@/lib/rbac/permissions";
 export const dashboardNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/participants", label: "Participants", icon: UsersRound },
+  { href: "/dashboard/contacts", label: "Contacts", icon: UserCircle },
   { href: "/dashboard/waves", label: "Waves", icon: Waves },
   { href: "/dashboard/check-in-results", label: "Check-In Results", icon: CheckSquare },
   { href: "/dashboard/surveys", label: "Surveys", icon: MessageSquareText },
