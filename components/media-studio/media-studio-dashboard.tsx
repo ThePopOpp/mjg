@@ -1,7 +1,10 @@
 "use client";
 
-import { FormEvent, useMemo, useRef, useState } from "react";
-import { Copy, FileAudio, ImageIcon, LinkIcon, Mic, Pause, Pencil, Play, RotateCcw, Save, Square, Upload, Video, X } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Copy, FileAudio, ImageIcon, LayoutGrid, LayoutList, LinkIcon, Mic,
+  Pause, Pencil, Play, RotateCcw, Save, Square, Table, Upload, Video, X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,9 +16,11 @@ import { useDashboardActionToken } from "@/components/layout/dashboard-action-to
 import { cn } from "@/lib/utils";
 
 type AssetType = "audio" | "video" | "photo";
+type ViewMode = "card" | "list" | "table";
+type SubTab = "studio" | "files";
 type UploadedFile = { url: string; bucket: string; path: string; mimeType: string; fileSize: number };
 
-const tabs: { value: AssetType; label: string; icon: any }[] = [
+const mediaTypes: { value: AssetType; label: string; icon: React.ElementType }[] = [
   { value: "audio", label: "Audio", icon: Mic },
   { value: "video", label: "Video", icon: Video },
   { value: "photo", label: "Photos", icon: ImageIcon },
@@ -29,83 +34,49 @@ const displayTargets = [
   { key: "selected_users", label: "Selected users later" },
 ];
 
-const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, "0"));
-const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, "0"));
+const hours = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0"));
+const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
 
 export function MediaStudioDashboard({ actionToken, assets }: { actionToken: string; assets: any[] }) {
-  const router = useRouter();
   const dashboardActionToken = useDashboardActionToken();
   const effectiveActionToken = actionToken || dashboardActionToken;
   const [active, setActive] = useState<AssetType>("audio");
-  const [title, setTitle] = useState("");
-  const [fileUrl, setFileUrl] = useState("");
-  const [embedUrl, setEmbedUrl] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("draft");
-  const [visibility, setVisibility] = useState("private");
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [subTab, setSubTab] = useState<SubTab>("studio");
+  const [viewMode, setViewMode] = useState<ViewMode>("card");
+  const [playerAsset, setPlayerAsset] = useState<any | null>(null);
+  const editSeq = useRef(0);
+  const [audioEditTrigger, setAudioEditTrigger] = useState<{ asset: any; seq: number } | null>(null);
 
-  const visibleAssets = useMemo(() => assets.filter((asset) => asset.asset_type === active), [active, assets]);
+  const visibleAssets = useMemo(() => assets.filter((a) => a.asset_type === active), [active, assets]);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!effectiveActionToken) {
-      setError("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
-      return;
-    }
-
-    setSaving(true);
-    setMessage(null);
-    setError(null);
-
-    const response = await fetch("/api/admin/media-assets", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json", "x-mjg-action-token": effectiveActionToken },
-      body: JSON.stringify({
-        actionToken: effectiveActionToken,
-        title,
-        assetType: active,
-        sourceType: embedUrl ? "embed" : "external_url",
-        fileUrl,
-        embedUrl,
-        description,
-        status,
-        visibility,
-      }),
-    });
-    const data = await response.json();
-    setSaving(false);
-
-    if (!response.ok) {
-      setError(data.error ?? "Media save failed.");
-      return;
-    }
-
-    setTitle("");
-    setFileUrl("");
-    setEmbedUrl("");
-    setDescription("");
-    setMessage("Media asset saved.");
-    router.refresh();
+  function switchMediaType(tab: AssetType) {
+    setActive(tab);
+    setSubTab("studio");
   }
 
+  function handleEditAudio(asset: any) {
+    editSeq.current += 1;
+    setAudioEditTrigger({ asset, seq: editSeq.current });
+    setSubTab("studio");
+  }
+
+  const typeLabel = active === "audio" ? "Audio" : active === "video" ? "Video" : "Photo";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Main media type tabs */}
       <div className="flex flex-wrap gap-2 rounded-md border bg-card p-1">
-        {tabs.map((tab) => {
+        {mediaTypes.map((tab) => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.value}
+              type="button"
               className={cn(
                 "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
                 active === tab.value && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
               )}
-              onClick={() => setActive(tab.value)}
-              type="button"
+              onClick={() => switchMediaType(tab.value)}
             >
               <Icon className="h-4 w-4" />
               {tab.label}
@@ -114,75 +85,70 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
         })}
       </div>
 
-      {active === "audio" ? (
-        <AudioStudio actionToken={effectiveActionToken} assets={visibleAssets} />
-      ) : (
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle>{active === "video" ? "Video" : "Photo"} asset</CardTitle>
-              <CardDescription>Add URLs now. Uploads and publishing targets can follow the audio workflow in the next pass.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="grid gap-4 lg:grid-cols-2" onSubmit={submit}>
-                <label className="space-y-2">
-                  <span className="text-sm font-medium">Title</span>
-                  <Input value={title} onChange={(event) => setTitle(event.target.value)} required />
-                </label>
-                <label className="space-y-2">
-                  <span className="text-sm font-medium">Status</span>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="hidden">Hidden</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </label>
-                <label className="space-y-2">
-                  <span className="text-sm font-medium">File URL</span>
-                  <Input value={fileUrl} onChange={(event) => setFileUrl(event.target.value)} placeholder="https://..." />
-                </label>
-                <label className="space-y-2">
-                  <span className="text-sm font-medium">Embed URL</span>
-                  <Input value={embedUrl} onChange={(event) => setEmbedUrl(event.target.value)} placeholder="https://..." />
-                </label>
-                <label className="space-y-2">
-                  <span className="text-sm font-medium">Visibility</span>
-                  <Select value={visibility} onValueChange={setVisibility}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="private">Private</SelectItem>
-                      <SelectItem value="public">Public</SelectItem>
-                      <SelectItem value="assigned">Assigned</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </label>
-                <label className="space-y-2 lg:col-span-2">
-                  <span className="text-sm font-medium">Description</span>
-                  <textarea className="min-h-24 w-full rounded-md border bg-background p-3 text-sm" value={description} onChange={(event) => setDescription(event.target.value)} />
-                </label>
-                <div className="lg:col-span-2">
-                  {message ? <p className="mb-3 rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</p> : null}
-                  {error ? <p className="mb-3 rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
-                  <Button disabled={saving || !title} type="submit">
-                    <Save className="h-4 w-4" />
-                    {saving ? "Saving..." : "Save media asset"}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-          <MediaLibrary active={active} assets={visibleAssets} />
-        </>
+      {/* Studio / Files sub-tabs */}
+      <div className="flex w-fit items-center gap-1 rounded-lg border bg-muted p-1">
+        {(["studio", "files"] as SubTab[]).map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={cn(
+              "inline-flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+              subTab === s
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+            onClick={() => setSubTab(s)}
+          >
+            {s === "studio" ? `${typeLabel} Studio` : `${typeLabel} Files`}
+            {s === "files" && visibleAssets.length > 0 && (
+              <span className="ml-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-xs leading-none text-primary">
+                {visibleAssets.length}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Studio content */}
+      {subTab === "studio" && active === "audio" && (
+        <AudioStudio
+          actionToken={effectiveActionToken}
+          editTrigger={audioEditTrigger}
+          onPlay={setPlayerAsset}
+        />
       )}
+      {subTab === "studio" && active !== "audio" && (
+        <VideoPhotoStudio active={active as "video" | "photo"} actionToken={effectiveActionToken} />
+      )}
+
+      {/* Files content */}
+      {subTab === "files" && (
+        <MediaLibrary
+          active={active}
+          assets={visibleAssets}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onPlay={active === "audio" ? setPlayerAsset : undefined}
+          onEdit={active === "audio" ? handleEditAudio : undefined}
+        />
+      )}
+
+      <AudioPlayerSheet asset={playerAsset} onClose={() => setPlayerAsset(null)} />
     </div>
   );
 }
 
-function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any[] }) {
+// ─── Audio Studio ────────────────────────────────────────────────────────────
+
+function AudioStudio({
+  actionToken,
+  editTrigger,
+  onPlay,
+}: {
+  actionToken: string;
+  editTrigger: { asset: any; seq: number } | null;
+  onPlay: (asset: any) => void;
+}) {
   const router = useRouter();
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
@@ -208,12 +174,48 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [playerAsset, setPlayerAsset] = useState<any | null>(null);
   const [editingAsset, setEditingAsset] = useState<any | null>(null);
 
   const currentAudioUrl = uploadedAudio?.url || audioUrl || audioPreviewUrl;
   const currentThumbnail = uploadedThumbnail?.url || thumbnailUrl;
   const publishAt = buildPublishAt(publishDate, publishHour, publishMinute, publishPeriod);
+
+  function editAsset(asset: any) {
+    const at = asset.metadata?.publish_at ? new Date(asset.metadata.publish_at) : null;
+    const hasAt = Boolean(at && !Number.isNaN(at.getTime()));
+    const hr = hasAt ? at!.getHours() : 8;
+    const displayHr = hr % 12 || 12;
+    setEditingAsset(asset);
+    setTitle(asset.title ?? "");
+    setDescription(asset.description ?? "");
+    setAudioUrl(asset.file_url ?? "");
+    setThumbnailUrl(asset.metadata?.thumbnail_url ?? "");
+    setStatus(asset.status ?? "draft");
+    setVisibility(asset.visibility ?? "private");
+    setTargets(Array.isArray(asset.metadata?.display_targets) && asset.metadata.display_targets.length ? asset.metadata.display_targets : ["frontend_resources"]);
+    setPublishDate(hasAt ? `${String(at!.getMonth() + 1).padStart(2, "0")}/${String(at!.getDate()).padStart(2, "0")}/${at!.getFullYear()}` : "");
+    setPublishHour(String(displayHr).padStart(2, "0"));
+    setPublishMinute(hasAt ? String(at!.getMinutes()).padStart(2, "0") : "00");
+    setPublishPeriod(hr >= 12 ? "PM" : "AM");
+    setUploadedAudio(null);
+    setUploadedThumbnail(null);
+    setAudioFileName("");
+    setThumbnailFileName("");
+    setRecordedBlob(null);
+    setAudioPreviewUrl("");
+    setMessage("Editing audio track. Save to update the existing card.");
+    setError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Keep a stable ref so the useEffect below always calls the latest version.
+  const editAssetRef = useRef(editAsset);
+  editAssetRef.current = editAsset;
+
+  // When the parent requests an edit (user clicked Edit in Files tab), populate the form.
+  useEffect(() => {
+    if (editTrigger?.asset) editAssetRef.current(editTrigger.asset);
+  }, [editTrigger?.seq]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function startRecording() {
     setError(null);
@@ -221,16 +223,13 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
       setError("This browser does not support in-browser audio recording.");
       return;
     }
-
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     chunks.current = [];
     const recorder = new MediaRecorder(stream);
     mediaRecorder.current = recorder;
-    recorder.ondataavailable = (event) => {
-      if (event.data.size > 0) chunks.current.push(event.data);
-    };
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.current.push(e.data); };
     recorder.onstop = () => {
-      stream.getTracks().forEach((track) => track.stop());
+      stream.getTracks().forEach((t) => t.stop());
       const blob = new Blob(chunks.current, { type: recorder.mimeType || "audio/webm" });
       setRecordedBlob(blob);
       setUploadedAudio(null);
@@ -274,23 +273,16 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
     setSaving(true);
     setMessage(null);
     setError(null);
-
     try {
-      if (!actionToken) {
-        throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
-      }
-
+      if (!actionToken) throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
       let audio = uploadedAudio;
       if (!audio && recordedBlob) {
         const file = new File([recordedBlob], `${title || "audio-recording"}.webm`, { type: recordedBlob.type || "audio/webm" });
         audio = await uploadFile(file, "audio", actionToken);
         setUploadedAudio(audio);
       }
-
       const resolvedAudioUrl = audio?.url || audioUrl.trim();
-      if (!resolvedAudioUrl) {
-        throw new Error("Record, upload, or add an audio file URL first.");
-      }
+      if (!resolvedAudioUrl) throw new Error("Record, upload, or add an audio file URL first.");
       const resolvedSourceType = recordedBlob ? "recording" : audio ? "upload" : editingAsset?.source_type || "external_url";
 
       const response = await fetch("/api/admin/media-assets", {
@@ -321,7 +313,6 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Audio save failed.");
-
       resetForm();
       setMessage(editingAsset ? "Audio track updated." : nextStatus === "draft" ? "Audio track saved as draft." : "Audio track saved.");
       router.refresh();
@@ -332,8 +323,8 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
     }
   }
 
-  function toggleTarget(target: string) {
-    setTargets((current) => (current.includes(target) ? current.filter((item) => item !== target) : [...current, target]));
+  function toggleTarget(key: string) {
+    setTargets((prev) => prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]);
   }
 
   function resetForm() {
@@ -356,277 +347,556 @@ function AudioStudio({ actionToken, assets }: { actionToken: string; assets: any
     resetRecording();
   }
 
-  function editAsset(asset: any) {
-    const publishAt = asset.metadata?.publish_at ? new Date(asset.metadata.publish_at) : null;
-    const hasPublishAt = Boolean(publishAt && !Number.isNaN(publishAt.getTime()));
-    const publishHourValue = hasPublishAt ? publishAt!.getHours() : 8;
-    const displayHour = publishHourValue % 12 || 12;
-    setEditingAsset(asset);
-    setTitle(asset.title ?? "");
-    setDescription(asset.description ?? "");
-    setAudioUrl(asset.file_url ?? "");
-    setThumbnailUrl(asset.metadata?.thumbnail_url ?? "");
-    setStatus(asset.status ?? "draft");
-    setVisibility(asset.visibility ?? "private");
-    setTargets(Array.isArray(asset.metadata?.display_targets) && asset.metadata.display_targets.length ? asset.metadata.display_targets : ["frontend_resources"]);
-    setPublishDate(hasPublishAt ? `${String(publishAt!.getMonth() + 1).padStart(2, "0")}/${String(publishAt!.getDate()).padStart(2, "0")}/${publishAt!.getFullYear()}` : "");
-    setPublishHour(String(displayHour).padStart(2, "0"));
-    setPublishMinute(hasPublishAt ? String(publishAt!.getMinutes()).padStart(2, "0") : "00");
-    setPublishPeriod(publishHourValue >= 12 ? "PM" : "AM");
-    setUploadedAudio(null);
-    setUploadedThumbnail(null);
-    setAudioFileName("");
-    setThumbnailFileName("");
-    setRecordedBlob(null);
-    setAudioPreviewUrl("");
-    setMessage("Editing audio track. Save to update the existing card.");
-    setError(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle>{editingAsset ? "Edit audio track" : "Audio recorder"}</CardTitle>
-          <CardDescription>
-            {editingAsset ? `Editing ${editingAsset.title}. Save to update the existing audio card.` : "Record or upload an audio track, add its card details, and choose where it should appear."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]" onSubmit={(event) => { event.preventDefault(); saveAudioAsset(status); }}>
-            <div className="space-y-5">
-              <div className="rounded-md border bg-muted/30 p-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button type="button" onClick={recording ? stopRecording : startRecording} variant={recording ? "destructive" : "default"}>
-                    {recording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                    {recording ? "Stop recording" : "Start recording"}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={resetRecording} disabled={!currentAudioUrl}>
-                    <RotateCcw className="h-4 w-4" />
-                    Reset
-                  </Button>
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm font-medium shadow-sm">
-                    <Upload className="h-4 w-4" />
-                    Upload audio
-                    <input className="sr-only" type="file" accept="audio/*" onChange={(event) => event.target.files?.[0] && handleAudioUpload(event.target.files[0])} />
-                  </label>
-                  {recording ? <Badge variant="secondary">Recording</Badge> : null}
-                </div>
-                {audioFileName ? (
-                  <p className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">
-                    <FileAudio className="h-4 w-4" />
-                    {audioFileName}
-                  </p>
-                ) : null}
-                {currentAudioUrl ? (
-                  <audio ref={previewAudio} className="mt-4 w-full" controls src={currentAudioUrl}>
-                    <track kind="captions" />
-                  </audio>
-                ) : (
-                  <p className="mt-4 text-sm text-muted-foreground">No audio recorded or uploaded yet.</p>
-                )}
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-2">
-                <label className="space-y-2">
-                  <span className="text-sm font-medium">Audio title</span>
-                  <Input value={title} onChange={(event) => setTitle(event.target.value)} required placeholder="Created for More reflection" />
-                </label>
-                <label className="space-y-2">
-                  <span className="text-sm font-medium">Status</span>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="scheduled">Scheduled</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="hidden">Hidden</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </label>
-                <label className="space-y-2 lg:col-span-2">
-                  <span className="text-sm font-medium">Audio file URL</span>
-                  <div className="relative">
-                    <LinkIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      className="pl-9"
-                      value={audioUrl}
-                      onChange={(event) => {
-                        setAudioUrl(event.target.value);
-                        setUploadedAudio(null);
-                        setAudioFileName("");
-                        setAudioPreviewUrl("");
-                      }}
-                      placeholder="https://..."
-                    />
-                  </div>
-                </label>
-                <label className="space-y-2 lg:col-span-2">
-                  <span className="text-sm font-medium">Short description</span>
-                  <textarea
-                    className="min-h-[96px] w-full rounded-md border bg-background px-3 py-2 text-sm"
-                    value={description}
-                    onChange={(event) => setDescription(limitWords(event.target.value, 50))}
-                    placeholder="50 words max. The card preview will show up to three lines."
-                  />
-                  <span className="text-xs text-muted-foreground">{wordCount(description)}/50 words</span>
-                </label>
-                <div className="space-y-2 lg:col-span-2">
-                  <span className="text-sm font-medium">Publish schedule</span>
-                  <div className="grid gap-3 sm:grid-cols-[1fr_110px_110px_110px]">
-                    <Input value={publishDate} onChange={(event) => setPublishDate(event.target.value)} placeholder="MM/DD/YYYY" />
-                    <Select value={publishHour} onValueChange={setPublishHour}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>{hours.map((hour) => <SelectItem key={hour} value={hour}>{hour}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Select value={publishMinute} onValueChange={setPublishMinute}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>{minutes.map((minute) => <SelectItem key={minute} value={minute}>{minute}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Select value={publishPeriod} onValueChange={setPublishPeriod}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="AM">AM</SelectItem>
-                        <SelectItem value="PM">PM</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <label className="space-y-2 lg:col-span-2">
-                  <span className="text-sm font-medium">Thumbnail URL</span>
-                  <Input value={thumbnailUrl} onChange={(event) => setThumbnailUrl(event.target.value)} placeholder="https://..." />
-                </label>
-                <label className="space-y-2 lg:col-span-2">
-                  <span className="text-sm font-medium">Upload thumbnail</span>
-                  <span className="flex min-h-24 cursor-pointer items-center justify-center rounded-md border border-dashed bg-muted/30 px-4 py-6 text-center transition-colors hover:bg-muted/50">
-                    <span className="flex flex-col items-center gap-2 text-sm">
-                      <ImageIcon className="h-6 w-6 text-primary" />
-                      <span className="font-medium">{thumbnailFileName || "Choose thumbnail image"}</span>
-                      <span className="text-xs text-muted-foreground">JPG, PNG, WebP, or GIF</span>
-                    </span>
-                    <input className="sr-only" type="file" accept="image/*" onChange={(event) => event.target.files?.[0] && handleThumbnailUpload(event.target.files[0])} />
-                  </span>
-                </label>
-              </div>
-
-              <div className="rounded-md border p-4">
-                <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium">Visibility</span>
-                    <Select value={visibility} onValueChange={setVisibility}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="private">Private</SelectItem>
-                        <SelectItem value="public">Public</SelectItem>
-                        <SelectItem value="assigned">Assigned</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </label>
-                  <div>
-                    <p className="text-sm font-medium">Display locations</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Choose where this audio card can appear after it is published.</p>
-                  </div>
-                </div>
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  {displayTargets.map((target) => (
-                    <label key={target.key} className="flex items-center justify-between gap-3 rounded-md border bg-background p-3 text-sm">
-                      <span>{target.label}</span>
-                      <Switch checked={targets.includes(target.key)} onCheckedChange={() => toggleTarget(target.key)} />
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {message ? <p className="rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</p> : null}
-              {error ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
-              <div className="flex flex-wrap gap-3">
-                {editingAsset ? (
-                  <Button type="button" variant="ghost" disabled={saving} onClick={resetForm}>
-                    Cancel edit
-                  </Button>
-                ) : null}
-                <Button type="button" variant="outline" disabled={saving || !title || !currentAudioUrl} onClick={() => saveAudioAsset("draft")}>
-                  <Save className="h-4 w-4" />
-                  Save as draft
-                </Button>
-                <Button type="submit" disabled={saving || !title || !currentAudioUrl}>
-                  <Save className="h-4 w-4" />
-                  {saving ? "Saving..." : editingAsset ? "Update audio track" : "Save audio track"}
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-sm font-medium">Audio card preview</p>
-              <AudioCard
-                asset={{
-                  title: title || "Audio track title",
-                  description: description || "Short description",
-                  file_url: currentAudioUrl,
-                  status,
-                  visibility,
-                  metadata: { thumbnail_url: currentThumbnail, publish_at: publishAt, display_targets: targets },
-                }}
-                onPlay={() =>
-                  setPlayerAsset({
-                    title: title || "Audio track title",
-                    description,
-                    file_url: currentAudioUrl,
-                    metadata: { thumbnail_url: currentThumbnail },
-                  })
-                }
-              />
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      <MediaLibrary active="audio" assets={assets} onPlay={setPlayerAsset} onEdit={editAsset} />
-      <AudioPlayerSheet asset={playerAsset} onClose={() => setPlayerAsset(null)} />
-    </>
-  );
-}
-
-function MediaLibrary({ active, assets, onPlay, onEdit }: { active: AssetType; assets: any[]; onPlay?: (asset: any) => void; onEdit?: (asset: any) => void }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{active === "audio" ? "Audio" : active === "video" ? "Video" : "Photo"} library</CardTitle>
-        <CardDescription>Each asset has a unique URL and an embed reference for dashboard or frontend use.</CardDescription>
+        <CardTitle>{editingAsset ? "Edit audio track" : "Audio recorder"}</CardTitle>
+        <CardDescription>
+          {editingAsset
+            ? `Editing ${editingAsset.title}. Save to update the existing audio card.`
+            : "Record or upload an audio track, add its card details, and choose where it should appear."}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {assets.map((asset) =>
-          active === "audio" ? (
-            <AudioCard key={asset.id} asset={asset} onPlay={() => onPlay?.(asset)} onEdit={onEdit ? () => onEdit(asset) : undefined} />
-          ) : (
-            <div key={asset.id} className="grid gap-3 rounded-md border p-4">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-semibold">{asset.title}</p>
-                  <Badge variant="secondary">{asset.status}</Badge>
-                  <Badge variant="outline">{asset.visibility}</Badge>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">{asset.description || asset.file_url || asset.embed_url || "No description."}</p>
-                <p className="mt-2 rounded-md bg-muted p-2 font-mono text-xs">/media/{asset.slug}</p>
+      <CardContent>
+        <form
+          className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]"
+          onSubmit={(e) => { e.preventDefault(); saveAudioAsset(status); }}
+        >
+          <div className="space-y-5">
+            {/* Recorder controls */}
+            <div className="rounded-md border bg-muted/30 p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button type="button" onClick={recording ? stopRecording : startRecording} variant={recording ? "destructive" : "default"}>
+                  {recording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  {recording ? "Stop recording" : "Start recording"}
+                </Button>
+                <Button type="button" variant="outline" onClick={resetRecording} disabled={!currentAudioUrl}>
+                  <RotateCcw className="h-4 w-4" />
+                  Reset
+                </Button>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm font-medium shadow-sm">
+                  <Upload className="h-4 w-4" />
+                  Upload audio
+                  <input className="sr-only" type="file" accept="audio/*" onChange={(e) => e.target.files?.[0] && handleAudioUpload(e.target.files[0])} />
+                </label>
+                {recording ? <Badge variant="secondary">Recording</Badge> : null}
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => navigator.clipboard?.writeText(`<iframe src="/media/${asset.slug}" title="${asset.title}"></iframe>`)}
-              >
-                <Copy className="h-4 w-4" />
-                Copy embed
+              {audioFileName ? (
+                <p className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">
+                  <FileAudio className="h-4 w-4" />
+                  {audioFileName}
+                </p>
+              ) : null}
+              {currentAudioUrl ? (
+                <audio ref={previewAudio} className="mt-4 w-full" controls src={currentAudioUrl}>
+                  <track kind="captions" />
+                </audio>
+              ) : (
+                <p className="mt-4 text-sm text-muted-foreground">No audio recorded or uploaded yet.</p>
+              )}
+            </div>
+
+            {/* Form fields */}
+            <div className="grid gap-4 lg:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-sm font-medium">Audio title</span>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Created for More reflection" />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-medium">Status</span>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="hidden">Hidden</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
+              </label>
+              <label className="space-y-2 lg:col-span-2">
+                <span className="text-sm font-medium">Audio file URL</span>
+                <div className="relative">
+                  <LinkIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    className="pl-9"
+                    value={audioUrl}
+                    onChange={(e) => { setAudioUrl(e.target.value); setUploadedAudio(null); setAudioFileName(""); setAudioPreviewUrl(""); }}
+                    placeholder="https://..."
+                  />
+                </div>
+              </label>
+              <label className="space-y-2 lg:col-span-2">
+                <span className="text-sm font-medium">Short description</span>
+                <textarea
+                  className="min-h-[96px] w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  value={description}
+                  onChange={(e) => setDescription(limitWords(e.target.value, 50))}
+                  placeholder="50 words max. The card preview will show up to three lines."
+                />
+                <span className="text-xs text-muted-foreground">{wordCount(description)}/50 words</span>
+              </label>
+              <div className="space-y-2 lg:col-span-2">
+                <span className="text-sm font-medium">Publish schedule</span>
+                <div className="grid gap-3 sm:grid-cols-[1fr_110px_110px_110px]">
+                  <Input value={publishDate} onChange={(e) => setPublishDate(e.target.value)} placeholder="MM/DD/YYYY" />
+                  <Select value={publishHour} onValueChange={setPublishHour}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{hours.map((h) => <SelectItem key={h} value={h}>{h}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Select value={publishMinute} onValueChange={setPublishMinute}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{minutes.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Select value={publishPeriod} onValueChange={setPublishPeriod}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="AM">AM</SelectItem>
+                      <SelectItem value="PM">PM</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <label className="space-y-2 lg:col-span-2">
+                <span className="text-sm font-medium">Thumbnail URL</span>
+                <Input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="https://..." />
+              </label>
+              <label className="space-y-2 lg:col-span-2">
+                <span className="text-sm font-medium">Upload thumbnail</span>
+                <span className="flex min-h-24 cursor-pointer items-center justify-center rounded-md border border-dashed bg-muted/30 px-4 py-6 text-center transition-colors hover:bg-muted/50">
+                  <span className="flex flex-col items-center gap-2 text-sm">
+                    <ImageIcon className="h-6 w-6 text-primary" />
+                    <span className="font-medium">{thumbnailFileName || "Choose thumbnail image"}</span>
+                    <span className="text-xs text-muted-foreground">JPG, PNG, WebP, or GIF</span>
+                  </span>
+                  <input className="sr-only" type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleThumbnailUpload(e.target.files[0])} />
+                </span>
+              </label>
+            </div>
+
+            {/* Visibility + display targets */}
+            <div className="rounded-md border p-4">
+              <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+                <label className="space-y-2">
+                  <span className="text-sm font-medium">Visibility</span>
+                  <Select value={visibility} onValueChange={setVisibility}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="private">Private</SelectItem>
+                      <SelectItem value="public">Public</SelectItem>
+                      <SelectItem value="assigned">Assigned</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </label>
+                <div>
+                  <p className="text-sm font-medium">Display locations</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Choose where this audio card can appear after it is published.</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {displayTargets.map((t) => (
+                  <label key={t.key} className="flex items-center justify-between gap-3 rounded-md border bg-background p-3 text-sm">
+                    <span>{t.label}</span>
+                    <Switch checked={targets.includes(t.key)} onCheckedChange={() => toggleTarget(t.key)} />
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {message ? <p className="rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</p> : null}
+            {error ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
+
+            <div className="flex flex-wrap gap-3">
+              {editingAsset ? (
+                <Button type="button" variant="ghost" disabled={saving} onClick={resetForm}>Cancel edit</Button>
+              ) : null}
+              <Button type="button" variant="outline" disabled={saving || !title || !currentAudioUrl} onClick={() => saveAudioAsset("draft")}>
+                <Save className="h-4 w-4" />
+                Save as draft
+              </Button>
+              <Button type="submit" disabled={saving || !title || !currentAudioUrl}>
+                <Save className="h-4 w-4" />
+                {saving ? "Saving..." : editingAsset ? "Update audio track" : "Save audio track"}
               </Button>
             </div>
-          ),
-        )}
-        {!assets.length ? <p className="text-sm text-muted-foreground">No {active} assets yet.</p> : null}
+          </div>
+
+          {/* Card preview */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Audio card preview</p>
+            <AudioCard
+              asset={{
+                title: title || "Audio track title",
+                description: description || "Short description",
+                file_url: currentAudioUrl,
+                status,
+                visibility,
+                metadata: { thumbnail_url: currentThumbnail, publish_at: publishAt, display_targets: targets },
+              }}
+              onPlay={() => onPlay({
+                title: title || "Audio track title",
+                description,
+                file_url: currentAudioUrl,
+                metadata: { thumbnail_url: currentThumbnail },
+              })}
+            />
+          </div>
+        </form>
       </CardContent>
     </Card>
   );
 }
+
+// ─── Video / Photo Studio ─────────────────────────────────────────────────────
+
+function VideoPhotoStudio({ active, actionToken }: { active: "video" | "photo"; actionToken: string }) {
+  const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+  const [embedUrl, setEmbedUrl] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("draft");
+  const [visibility, setVisibility] = useState("private");
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    setError(null);
+    const response = await fetch("/api/admin/media-assets", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ actionToken, title, assetType: active, sourceType: embedUrl ? "embed" : "external_url", fileUrl, embedUrl, description, status, visibility }),
+    });
+    const data = await response.json();
+    setSaving(false);
+    if (!response.ok) { setError(data.error ?? "Media save failed."); return; }
+    setTitle(""); setFileUrl(""); setEmbedUrl(""); setDescription("");
+    setMessage("Media asset saved.");
+    router.refresh();
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{active === "video" ? "Video" : "Photo"} Studio</CardTitle>
+        <CardDescription>Add URLs now. Uploads and publishing targets can follow the audio workflow in the next pass.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form className="grid gap-4 lg:grid-cols-2" onSubmit={submit}>
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Title</span>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </label>
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Status</span>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="hidden">Hidden</SelectItem>
+                <SelectItem value="archived">Archived</SelectItem>
+              </SelectContent>
+            </Select>
+          </label>
+          <label className="space-y-2">
+            <span className="text-sm font-medium">File URL</span>
+            <Input value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://..." />
+          </label>
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Embed URL</span>
+            <Input value={embedUrl} onChange={(e) => setEmbedUrl(e.target.value)} placeholder="https://..." />
+          </label>
+          <label className="space-y-2">
+            <span className="text-sm font-medium">Visibility</span>
+            <Select value={visibility} onValueChange={setVisibility}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="private">Private</SelectItem>
+                <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="assigned">Assigned</SelectItem>
+              </SelectContent>
+            </Select>
+          </label>
+          <label className="space-y-2 lg:col-span-2">
+            <span className="text-sm font-medium">Description</span>
+            <textarea className="min-h-24 w-full rounded-md border bg-background p-3 text-sm" value={description} onChange={(e) => setDescription(e.target.value)} />
+          </label>
+          <div className="lg:col-span-2">
+            {message ? <p className="mb-3 rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</p> : null}
+            {error ? <p className="mb-3 rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
+            <Button disabled={saving || !title} type="submit">
+              <Save className="h-4 w-4" />
+              {saving ? "Saving..." : "Save media asset"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Media Library (card / list / table) ─────────────────────────────────────
+
+function MediaLibrary({
+  active,
+  assets,
+  viewMode,
+  onViewModeChange,
+  onPlay,
+  onEdit,
+}: {
+  active: AssetType;
+  assets: any[];
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
+  onPlay?: (asset: any) => void;
+  onEdit?: (asset: any) => void;
+}) {
+  const typeLabel = active === "audio" ? "Audio" : active === "video" ? "Video" : "Photo";
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle>{typeLabel} library</CardTitle>
+            <CardDescription>Each asset has a unique URL and an embed reference for dashboard or frontend use.</CardDescription>
+          </div>
+          <div className="flex shrink-0 items-center gap-1 rounded-md border bg-background p-1">
+            <Button
+              type="button"
+              size="sm"
+              variant={viewMode === "card" ? "default" : "ghost"}
+              className="h-8 px-2.5"
+              onClick={() => onViewModeChange("card")}
+              title="Card view"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              <span className="ml-1.5 hidden sm:inline">Cards</span>
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={viewMode === "list" ? "default" : "ghost"}
+              className="h-8 px-2.5"
+              onClick={() => onViewModeChange("list")}
+              title="List view"
+            >
+              <LayoutList className="h-4 w-4" />
+              <span className="ml-1.5 hidden sm:inline">List</span>
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={viewMode === "table" ? "default" : "ghost"}
+              className="h-8 px-2.5"
+              onClick={() => onViewModeChange("table")}
+              title="Table view"
+            >
+              <Table className="h-4 w-4" />
+              <span className="ml-1.5 hidden sm:inline">Table</span>
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        {!assets.length ? (
+          <p className="text-sm text-muted-foreground">
+            No {active} files yet. Create one in the {typeLabel} Studio tab.
+          </p>
+        ) : viewMode === "card" ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {assets.map((asset) =>
+              active === "audio" ? (
+                <AudioCard
+                  key={asset.id}
+                  asset={asset}
+                  onPlay={() => onPlay?.(asset)}
+                  onEdit={onEdit ? () => onEdit(asset) : undefined}
+                />
+              ) : (
+                <GenericMediaCard key={asset.id} asset={asset} />
+              ),
+            )}
+          </div>
+        ) : viewMode === "list" ? (
+          <div className="divide-y">
+            {assets.map((asset) => (
+              <AssetListRow
+                key={asset.id}
+                active={active}
+                asset={asset}
+                onPlay={onPlay ? () => onPlay(asset) : undefined}
+                onEdit={onEdit ? () => onEdit(asset) : undefined}
+              />
+            ))}
+          </div>
+        ) : (
+          <AssetTable active={active} assets={assets} onPlay={onPlay} onEdit={onEdit} />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── List row ─────────────────────────────────────────────────────────────────
+
+function AssetListRow({
+  active,
+  asset,
+  onPlay,
+  onEdit,
+}: {
+  active: AssetType;
+  asset: any;
+  onPlay?: () => void;
+  onEdit?: () => void;
+}) {
+  const thumbnail = asset.metadata?.thumbnail_url;
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
+        {thumbnail ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={thumbnail} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full items-center justify-center text-muted-foreground">
+            {active === "audio" ? <Mic className="h-5 w-5" /> : active === "video" ? <Video className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
+          </div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium">{asset.title}</p>
+        <p className="truncate text-sm text-muted-foreground">{asset.description || asset.file_url || "No description."}</p>
+      </div>
+      <div className="hidden shrink-0 items-center gap-2 sm:flex">
+        <Badge variant="secondary">{asset.status}</Badge>
+        <Badge variant="outline">{asset.visibility}</Badge>
+      </div>
+      <div className="flex shrink-0 gap-1">
+        {onPlay ? (
+          <Button type="button" size="icon" variant="ghost" className="h-8 w-8" onClick={onPlay} disabled={!asset.file_url} title="Play">
+            <Play className="h-4 w-4" />
+          </Button>
+        ) : null}
+        {onEdit ? (
+          <Button type="button" size="icon" variant="ghost" className="h-8 w-8" onClick={onEdit} title="Edit">
+            <Pencil className="h-4 w-4" />
+          </Button>
+        ) : null}
+        {asset.slug ? (
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8"
+            title="Copy embed"
+            onClick={() => navigator.clipboard?.writeText(`<iframe src="/media/${asset.slug}" title="${asset.title}"></iframe>`)}
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+// ─── Table view ───────────────────────────────────────────────────────────────
+
+function AssetTable({
+  active,
+  assets,
+  onPlay,
+  onEdit,
+}: {
+  active: AssetType;
+  assets: any[];
+  onPlay?: (asset: any) => void;
+  onEdit?: (asset: any) => void;
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b text-left">
+            <th className="pb-3 pr-4 font-medium text-muted-foreground">Title</th>
+            <th className="pb-3 pr-4 font-medium text-muted-foreground">Status</th>
+            <th className="pb-3 pr-4 font-medium text-muted-foreground">Visibility</th>
+            {active === "audio" && <th className="pb-3 pr-4 font-medium text-muted-foreground">Scheduled</th>}
+            <th className="pb-3 text-right font-medium text-muted-foreground">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y">
+          {assets.map((asset) => (
+            <tr key={asset.id} className="hover:bg-muted/30">
+              <td className="py-3 pr-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 shrink-0 overflow-hidden rounded bg-muted">
+                    {asset.metadata?.thumbnail_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={asset.metadata.thumbnail_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-muted-foreground">
+                        {active === "audio" ? <Mic className="h-4 w-4" /> : active === "video" ? <Video className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium">{asset.title}</p>
+                    {asset.description ? <p className="truncate text-xs text-muted-foreground max-w-xs">{asset.description}</p> : null}
+                  </div>
+                </div>
+              </td>
+              <td className="py-3 pr-4"><Badge variant="secondary">{asset.status}</Badge></td>
+              <td className="py-3 pr-4"><Badge variant="outline">{asset.visibility}</Badge></td>
+              {active === "audio" && (
+                <td className="py-3 pr-4 text-muted-foreground">
+                  {asset.metadata?.publish_at ? formatDate(asset.metadata.publish_at) : "—"}
+                </td>
+              )}
+              <td className="py-3 text-right">
+                <div className="flex justify-end gap-1">
+                  {onPlay ? (
+                    <Button type="button" size="icon" variant="ghost" className="h-8 w-8" onClick={() => onPlay(asset)} disabled={!asset.file_url} title="Play">
+                      <Play className="h-4 w-4" />
+                    </Button>
+                  ) : null}
+                  {onEdit ? (
+                    <Button type="button" size="icon" variant="ghost" className="h-8 w-8" onClick={() => onEdit(asset)} title="Edit">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  ) : null}
+                  {asset.slug ? (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8"
+                      title="Copy embed"
+                      onClick={() => navigator.clipboard?.writeText(`<iframe src="/media/${asset.slug}" title="${asset.title}"></iframe>`)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  ) : null}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ─── Audio card ───────────────────────────────────────────────────────────────
 
 function AudioCard({ asset, onPlay, onEdit }: { asset: any; onPlay: () => void; onEdit?: () => void }) {
   const thumbnail = asset.metadata?.thumbnail_url;
@@ -687,6 +957,34 @@ function AudioCard({ asset, onPlay, onEdit }: { asset: any; onPlay: () => void; 
   );
 }
 
+// ─── Generic video/photo card ─────────────────────────────────────────────────
+
+function GenericMediaCard({ asset }: { asset: any }) {
+  return (
+    <div className="grid gap-3 rounded-md border p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="font-semibold">{asset.title}</p>
+        <Badge variant="secondary">{asset.status}</Badge>
+        <Badge variant="outline">{asset.visibility}</Badge>
+      </div>
+      <p className="text-sm text-muted-foreground">{asset.description || asset.file_url || asset.embed_url || "No description."}</p>
+      {asset.slug ? <p className="rounded-md bg-muted p-2 font-mono text-xs">/media/{asset.slug}</p> : null}
+      {asset.slug ? (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => navigator.clipboard?.writeText(`<iframe src="/media/${asset.slug}" title="${asset.title}"></iframe>`)}
+        >
+          <Copy className="h-4 w-4" />
+          Copy embed
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+// ─── Audio player sheet ───────────────────────────────────────────────────────
+
 function AudioPlayerSheet({ asset, onClose }: { asset: any | null; onClose: () => void }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   if (!asset) return null;
@@ -744,11 +1042,10 @@ function AudioPlayerSheet({ asset, onClose }: { asset: any | null; onClose: () =
   );
 }
 
-async function uploadFile(file: File, intent: "audio" | "thumbnail", actionToken: string): Promise<UploadedFile> {
-  if (!actionToken) {
-    throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try uploading.");
-  }
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
+async function uploadFile(file: File, intent: "audio" | "thumbnail", actionToken: string): Promise<UploadedFile> {
+  if (!actionToken) throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try uploading.");
   const formData = new FormData();
   formData.append("file", file);
   formData.append("intent", intent);
@@ -766,25 +1063,22 @@ async function uploadFile(file: File, intent: "audio" | "thumbnail", actionToken
 
 function formatDate(value: string) {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
 function wordCount(value: string) {
   return value.trim().split(/\s+/).filter(Boolean).length;
 }
 
-function limitWords(value: string, maxWords: number) {
+function limitWords(value: string, max: number) {
   const words = value.trimStart().split(/\s+/).filter(Boolean);
-  if (words.length <= maxWords) return value;
-  return words.slice(0, maxWords).join(" ");
+  return words.length <= max ? value : words.slice(0, max).join(" ");
 }
 
 function buildPublishAt(date: string, hour: string, minute: string, period: string) {
   if (!date.trim()) return "";
   const match = date.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (!match) return `${date.trim()} ${hour}:${minute} ${period}`;
-
   const [, month, day, year] = match;
   let hour24 = Number(hour);
   if (period === "PM" && hour24 < 12) hour24 += 12;
