@@ -21,6 +21,12 @@ export default async function UserManagementPage() {
         <SummaryCard label="Participant links" value={data.links.length} />
       </div>
 
+      <div className="flex gap-3">
+        <Link href="/dashboard/user-management/communications" className="inline-flex items-center gap-2 rounded-md border bg-card px-4 py-2 text-sm font-medium hover:bg-accent transition-colors">
+          Communications & Opt-In Management →
+        </Link>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Invite user</CardTitle>

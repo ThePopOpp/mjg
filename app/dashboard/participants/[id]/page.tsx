@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ParticipantEditor } from "@/components/participants/participant-editor";
 import { ParticipantTagEditor } from "@/components/participants/participant-tag-editor";
+import { ParticipantCommunicationsCard } from "@/components/participants/participant-communications-card";
 import { getParticipantDetail } from "@/lib/dashboard/pilot-data";
 
 export default async function ParticipantDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -63,6 +64,16 @@ export default async function ParticipantDetailPage({ params }: { params: Promis
           </CardContent>
         </Card>
       </div>
+
+      <ParticipantCommunicationsCard
+        participantId={participant.id}
+        smsOptIn={participant.sms_opt_in ?? true}
+        emailOptIn={participant.email_opt_in ?? true}
+        smsOptInAt={participant.sms_opt_in_at ?? null}
+        smsOptOutAt={participant.sms_opt_out_at ?? null}
+        emailOptInAt={participant.email_opt_in_at ?? null}
+        emailOptOutAt={participant.email_opt_out_at ?? null}
+      />
 
       {participant.notes ? (
         <Card>
