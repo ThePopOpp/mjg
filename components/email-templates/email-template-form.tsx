@@ -79,10 +79,12 @@ const builderMarker = "MJG_BUILDER_SCHEMA:";
 
 type BlockType = "header" | "columns" | "heading" | "text" | "button" | "image" | "divider" | "spacer" | "footer";
 type Align = "left" | "center" | "right";
+type LogoChoice = "custom" | "white" | "black" | "gold" | "green" | "green_gold" | "favicon_black";
 
 type EmailBlock = {
   id: string;
   type: BlockType;
+  logoChoice?: LogoChoice;
   title?: string;
   text?: string;
   url?: string;
@@ -137,6 +139,15 @@ const blockPalette: Array<{ type: BlockType; label: string; description: string;
   { type: "divider", label: "Divider", description: "Horizontal rule", icon: <Square className="h-4 w-4" /> },
   { type: "spacer", label: "Spacer", description: "Empty vertical gap", icon: <AlignCenter className="h-4 w-4" /> },
   { type: "footer", label: "Footer", description: "Company info footer", icon: <LayoutTemplate className="h-4 w-4" /> },
+];
+
+const logoOptions: Array<{ value: LogoChoice; label: string; group: string; url: string; background: string; width: number; alt: string }> = [
+  { value: "white", label: "White (Light)", group: "Core", url: "/mjg-logos/mjg_white.png", background: "#111111", width: 260, alt: "MJG white logo" },
+  { value: "black", label: "Black (Dark)", group: "Core", url: "/mjg-logos/mjg_black_white.png", background: "#ffffff", width: 260, alt: "MJG black logo" },
+  { value: "gold", label: "Gold (Other)", group: "Core", url: "/mjg-logos/mjg_gold.png", background: "#111111", width: 260, alt: "MJG gold logo" },
+  { value: "green", label: "Green", group: "Other", url: "/mjg-logos/mjg_green.png", background: "#ffffff", width: 260, alt: "MJG green logo" },
+  { value: "green_gold", label: "Green + Gold", group: "Other", url: "/mjg-logos/mjg_green_gold.png", background: "#ffffff", width: 260, alt: "MJG green and gold logo" },
+  { value: "favicon_black", label: "Square Mark", group: "Other", url: "/mjg-logos/mjg_favicon_black_50px.svg", background: "#ffffff", width: 96, alt: "MJG square mark" },
 ];
 
 export function EmailTemplateForm({
@@ -501,6 +512,11 @@ function SettingsPanel({
 
       {block.type === "header" ? (
         <>
+          <LogoSelect
+            label="Logo"
+            value={block.logoChoice ?? "white"}
+            onChange={(logoChoice) => onBlockChange(logoPatchForChoice(logoChoice, block.type))}
+          />
           <TextField label="Logo/Image URL" value={block.url ?? ""} onChange={(url) => onBlockChange({ url })} placeholder="https://.../logo.png" />
           <TextField label="Alt text" value={block.alt ?? ""} onChange={(alt) => onBlockChange({ alt })} />
           <ColorTextField label="Background color" value={block.backgroundColor ?? "#111111"} onChange={(backgroundColor) => onBlockChange({ backgroundColor })} />
@@ -549,6 +565,12 @@ function SettingsPanel({
 
       {block.type === "image" ? (
         <>
+          <LogoSelect
+            label="MJG logo preset"
+            value={block.logoChoice ?? "custom"}
+            includeCustom
+            onChange={(logoChoice) => onBlockChange(logoPatchForChoice(logoChoice, block.type))}
+          />
           <TextField label="Image URL" value={block.url ?? ""} onChange={(url) => onBlockChange({ url })} placeholder="https://.../image.jpg" />
           <TextField label="Alt text" value={block.alt ?? ""} onChange={(alt) => onBlockChange({ alt })} />
           <TextField label="Link URL" value={block.linkUrl ?? ""} onChange={(linkUrl) => onBlockChange({ linkUrl })} placeholder="https://..." />
@@ -579,7 +601,19 @@ function SettingsPanel({
 
       {block.type === "columns" ? (
         <>
+          <LogoSelect
+            label="Left column logo"
+            value={block.columns?.[0]?.blocks[0]?.logoChoice ?? "custom"}
+            includeCustom
+            onChange={(logoChoice) => onBlockChange({ columns: setColumnLogo(block, 0, logoChoice) })}
+          />
           <TextareaField label="Left column" value={block.columns?.[0]?.blocks[0]?.text ?? ""} onChange={(text) => onBlockChange({ columns: setColumnText(block, 0, text) })} />
+          <LogoSelect
+            label="Right column logo"
+            value={block.columns?.[1]?.blocks[0]?.logoChoice ?? "custom"}
+            includeCustom
+            onChange={(logoChoice) => onBlockChange({ columns: setColumnLogo(block, 1, logoChoice) })}
+          />
           <TextareaField label="Right column" value={block.columns?.[1]?.blocks[0]?.text ?? ""} onChange={(text) => onBlockChange({ columns: setColumnText(block, 1, text) })} />
         </>
       ) : null}
@@ -623,6 +657,51 @@ function TextareaField({ label, value, onChange }: { label: string; value: strin
     <label className="space-y-2 text-sm font-medium">
       <span className="uppercase tracking-[0.16em] text-muted-foreground">{label}</span>
       <textarea className="min-h-28 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={value} onChange={(event) => onChange(event.target.value)} />
+    </label>
+  );
+}
+
+function LogoSelect({
+  label,
+  value,
+  includeCustom,
+  onChange,
+}: {
+  label: string;
+  value: LogoChoice;
+  includeCustom?: boolean;
+  onChange: (value: LogoChoice) => void;
+}) {
+  return (
+    <label className="space-y-2 text-sm font-medium">
+      <span className="uppercase tracking-[0.16em] text-muted-foreground">{label}</span>
+      <Select value={value} onValueChange={(next) => onChange(next as LogoChoice)}>
+        <SelectTrigger><SelectValue /></SelectTrigger>
+        <SelectContent>
+          {includeCustom ? <SelectItem value="custom">Custom image URL</SelectItem> : null}
+          {logoOptions.map((logo) => (
+            <SelectItem key={logo.value} value={logo.value}>{logo.label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <div className="grid grid-cols-3 gap-2">
+        {logoOptions.map((logo) => (
+          <button
+            key={logo.value}
+            type="button"
+            className={[
+              "flex h-16 items-center justify-center rounded-md border p-2 transition-colors",
+              value === logo.value ? "border-primary ring-1 ring-primary" : "hover:border-primary/70",
+            ].join(" ")}
+            style={{ background: logo.background }}
+            onClick={() => onChange(logo.value)}
+            title={logo.label}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logo.url} alt={logo.alt} className="max-h-9 max-w-full object-contain" />
+          </button>
+        ))}
+      </div>
     </label>
   );
 }
@@ -688,7 +767,7 @@ function createBlock(type: BlockType): EmailBlock {
   const base = { id, type, padTop: 24, padBottom: 24, padX: 40 };
   switch (type) {
     case "header":
-      return { ...base, url: "", alt: "Michael J. Gauthier", backgroundColor: "#111111", width: 260, align: "center", padTop: 28, padBottom: 28 };
+      return { ...base, ...logoPatchForChoice("white", "header"), align: "center", padTop: 28, padBottom: 28 };
     case "columns":
       return {
         ...base,
@@ -704,7 +783,7 @@ function createBlock(type: BlockType): EmailBlock {
     case "button":
       return { ...base, text: "Click Here ->", url: "{{site_url}}", buttonColor: "#c77c43", buttonTextColor: "#ffffff", align: "left", padTop: 8 };
     case "image":
-      return { ...base, url: "", alt: "", linkUrl: "", width: 520, align: "center" };
+      return { ...base, logoChoice: "custom", url: "", alt: "", linkUrl: "", width: 520, align: "center" };
     case "divider":
       return { ...base, dividerColor: "#e5e0d7", padTop: 16, padBottom: 16 };
     case "spacer":
@@ -758,7 +837,7 @@ function renderBlockContent(block: EmailBlock, settings: EmailBuilderSchema["set
   switch (block.type) {
     case "header": {
       const logo = block.url
-        ? `<img src="${escapeAttribute(block.url)}" width="${block.width ?? 260}" alt="${escapeAttribute(block.alt ?? "")}" style="display:block;width:${block.width ?? 260}px;max-width:100%;height:auto;margin:0 auto;" />`
+        ? `<img src="${escapeAttribute(resolveImageUrl(block.url))}" width="${block.width ?? 260}" alt="${escapeAttribute(block.alt ?? "")}" style="display:block;width:${block.width ?? 260}px;max-width:100%;height:auto;margin:0 auto;" />`
         : `<div style="font-weight:700;letter-spacing:8px;color:#ffffff;text-align:center;">MICHAEL J. GAUTHIER</div>`;
       return `<div style="text-align:${align};">${logo}</div>`;
     }
@@ -774,7 +853,7 @@ function renderBlockContent(block: EmailBlock, settings: EmailBuilderSchema["set
       return `<div style="text-align:${align};"><a href="${escapeAttribute(block.url ?? "#")}" style="display:inline-block;background:${block.buttonColor ?? "#2f6848"};color:${block.buttonTextColor ?? "#ffffff"};text-decoration:none;padding:14px 24px;border-radius:6px;font-size:16px;font-weight:700;">${escapeHtml(block.text ?? "Click Here")}</a></div>`;
     case "image": {
       const image = block.url
-        ? `<img src="${escapeAttribute(block.url)}" width="${block.width ?? 520}" alt="${escapeAttribute(block.alt ?? "")}" style="display:block;width:${block.width ?? 520}px;max-width:100%;height:auto;border:0;margin:0 auto;" />`
+        ? `<img src="${escapeAttribute(resolveImageUrl(block.url))}" width="${block.width ?? 520}" alt="${escapeAttribute(block.alt ?? "")}" style="display:block;width:${block.width ?? 520}px;max-width:100%;height:auto;border:0;margin:0 auto;" />`
         : `<div style="height:128px;border-radius:6px;background:#f0f1f4;color:#9aa3b2;display:flex;align-items:center;justify-content:center;">No image URL set</div>`;
       const wrapped = block.linkUrl ? `<a href="${escapeAttribute(block.linkUrl)}" style="text-decoration:none;">${image}</a>` : image;
       return `<div style="text-align:${align};">${wrapped}</div>`;
@@ -833,6 +912,41 @@ function setColumnText(block: EmailBlock, index: number, text: string) {
   const child = columns[index]?.blocks[0] ?? createBlock("text");
   columns[index] = { blocks: [{ ...child, type: "text", text, fontSize: 15, textColor: "#334155" }] };
   return columns;
+}
+
+function setColumnLogo(block: EmailBlock, index: number, logoChoice: LogoChoice) {
+  const columns = block.columns?.map((column) => ({ blocks: column.blocks.map((child) => ({ ...child })) })) ?? [{ blocks: [] }, { blocks: [] }];
+  const child = columns[index]?.blocks[0] ?? createBlock("image");
+  columns[index] = {
+    blocks: [{
+      ...child,
+      type: "image",
+      ...logoPatchForChoice(logoChoice, "image"),
+      align: "center",
+      padX: 0,
+      padTop: 0,
+      padBottom: 0,
+    }],
+  };
+  return columns;
+}
+
+function logoPatchForChoice(logoChoice: LogoChoice, blockType: BlockType): Partial<EmailBlock> {
+  if (logoChoice === "custom") return { logoChoice, url: "", alt: "", width: blockType === "header" ? 260 : 520 };
+  const logo = logoOptions.find((item) => item.value === logoChoice) ?? logoOptions[0];
+  return {
+    logoChoice,
+    url: logo.url,
+    alt: logo.alt,
+    width: logo.width,
+    ...(blockType === "header" ? { backgroundColor: logo.background } : {}),
+  };
+}
+
+function resolveImageUrl(url: string) {
+  if (/^(https?:)?\/\//i.test(url) || url.startsWith("{{")) return url;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://my.michaeljgauthier.com";
+  return `${siteUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
 }
 
 function encodeSchema(schema: EmailBuilderSchema) {
