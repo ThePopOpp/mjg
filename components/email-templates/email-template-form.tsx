@@ -172,6 +172,7 @@ export function EmailTemplateForm({
   const [textBody, setTextBody] = useState(initialTemplate?.text_body ?? "Hi {{first_name}},\n\nYour message goes here.\n\n{{site_url}}");
   const [selectedBlockId, setSelectedBlockId] = useState(schema.blocks[0]?.id ?? "");
   const [draggingBlockId, setDraggingBlockId] = useState<string | null>(null);
+  const [rawHtmlPreview, setRawHtmlPreview] = useState(() => !initialSchema && !!initialTemplate?.html_body);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -253,6 +254,7 @@ export function EmailTemplateForm({
     setHtmlBody(buildHtmlWithSchema(next, ""));
     setTextBody("Hi {{first_name}},\n\nYour message goes here.\n\n{{site_url}}");
     setEditorMode("visual");
+    setRawHtmlPreview(false);
     setMessage(null);
     setError(null);
   }
@@ -264,14 +266,30 @@ export function EmailTemplateForm({
   }
 
   function switchToAdvanced() {
-    setHtmlBody(generatedHtml);
+    if (!rawHtmlPreview) setHtmlBody(generatedHtml);
+    setRawHtmlPreview(false);
     setEditorMode("advanced");
   }
 
   function switchToVisual() {
     const parsed = extractBuilderSchema(htmlBody);
-    if (parsed) setSchema(parsed);
+    if (parsed) {
+      setSchema(parsed);
+      setRawHtmlPreview(false);
+    } else if (htmlBody) {
+      setRawHtmlPreview(true);
+    } else {
+      setRawHtmlPreview(false);
+    }
     setEditorMode("visual");
+  }
+
+  function startFreshInBlockEditor() {
+    if (!window.confirm("This will replace the existing HTML with a new blank visual template. Continue?")) return;
+    const next = createDefaultSchema();
+    setSchema(next);
+    setSelectedBlockId(next.blocks[0]?.id ?? "");
+    setRawHtmlPreview(false);
   }
 
   return (
@@ -356,7 +374,26 @@ export function EmailTemplateForm({
         <p className="mt-1 font-semibold">{renderedSubject}</p>
       </div>
 
-      {editorMode === "visual" ? (
+      {editorMode === "visual" && rawHtmlPreview ? (
+        <div className="overflow-hidden rounded-md border bg-background">
+          <div className="flex items-center justify-between gap-4 border-b bg-amber-50 px-4 py-3">
+            <div>
+              <p className="text-sm font-semibold">This template was built with custom HTML</p>
+              <p className="text-xs text-muted-foreground">Switch to HTML mode to edit it directly, or start fresh with the block editor below.</p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={switchToAdvanced}>Edit HTML</Button>
+              <Button type="button" variant="default" size="sm" onClick={startFreshInBlockEditor}>Start fresh in block editor</Button>
+            </div>
+          </div>
+          <iframe
+            className="h-[48rem] w-full bg-white"
+            sandbox=""
+            srcDoc={previewHtml}
+            title="Template HTML preview"
+          />
+        </div>
+      ) : editorMode === "visual" ? (
         <div className="grid min-h-[46rem] overflow-hidden rounded-md border bg-background lg:grid-cols-[220px_minmax(0,1fr)_320px]">
           <aside className="border-b bg-card p-3 lg:border-b-0 lg:border-r">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Add Block</p>
