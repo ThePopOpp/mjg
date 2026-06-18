@@ -27,11 +27,17 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
     };
   }
 
+  // Use getSession() instead of getUser() in Server Components.
+  // getUser() makes a live Supabase network call and tries to refresh expired
+  // tokens via setAll(), but Server Components cannot write cookies — so the
+  // refreshed token is silently lost and router.refresh() redirects to login.
+  // The middleware already validates and refreshes the session; we just read it.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (!user) return null;
+  if (!session?.user) return null;
+  const user = session.user;
 
   const admin = createSupabaseAdminClient();
   let { data: profile } = await admin
