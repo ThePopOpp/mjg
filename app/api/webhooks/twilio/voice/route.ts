@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { buildInboundCallTwiml } from "@/lib/twilio/voice";
+import { buildInboundCallTwiml, buildOutboundCallTwiml } from "@/lib/twilio/voice";
 
 export async function POST(request: Request) {
   try {
@@ -10,9 +10,25 @@ export async function POST(request: Request) {
     const to = String(formData.get("To") ?? "");
     const direction = String(formData.get("Direction") ?? "inbound");
 
+    // Outbound calls from the browser client: Direction=outbound-api, From=client:identity
+    const isOutbound = direction === "outbound-api" || from.startsWith("client:");
+    if (isOutbound) {
+      const supabase = createSupabaseAdminClient();
+      await supabase.from("calls").insert({
+        twilio_call_sid: callSid,
+        direction: "outbound",
+        from_number: from,
+        to_number: to,
+        status: "initiated",
+        started_at: new Date().toISOString(),
+      });
+      const twiml = buildOutboundCallTwiml(to);
+      return new NextResponse(twiml, { headers: { "Content-Type": "text/xml" } });
+    }
+
+    // Inbound call from external caller
     const supabase = createSupabaseAdminClient();
 
-    // Look up participant or profile by phone
     const { data: participant } = await supabase
       .from("participants")
       .select("id")

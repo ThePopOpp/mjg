@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const actor = await requireParticipantManager(request, body.actionToken);
-    const identity = `mjg-${actor.id.replace(/-/g, "").slice(0, 20)}`;
+    const identity = "mjg-agent";
     const token = generateVoiceAccessToken(actor.id, identity);
     return NextResponse.json({ token, identity });
   } catch (error) {
