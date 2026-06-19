@@ -159,6 +159,7 @@ export async function sendTemplateForEvent(input: {
       ok: false,
       skipped: true,
       reason: `No active template mapping is configured for ${input.eventKey}.`,
+      messageId: undefined,
     };
   }
 

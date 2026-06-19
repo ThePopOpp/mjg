@@ -15,6 +15,13 @@ export type SendEmailInput = {
   }>;
 };
 
+export type SmtpResult = {
+  ok: boolean;
+  skipped: boolean;
+  messageId?: string;
+  reason?: string;
+};
+
 function hasResendConfig() {
   return Boolean(process.env.RESEND_API_KEY);
 }
@@ -29,7 +36,7 @@ export function hasSmtpConfig() {
   return hasResendConfig() || hasSmtpCredentials();
 }
 
-async function sendViaResend(input: SendEmailInput) {
+async function sendViaResend(input: SendEmailInput): Promise<SmtpResult> {
   const apiKey = process.env.RESEND_API_KEY!;
   const from =
     process.env.RESEND_FROM_EMAIL ??
@@ -66,7 +73,7 @@ async function sendViaResend(input: SendEmailInput) {
   return { ok: true, skipped: false, messageId: data.id };
 }
 
-export async function sendSmtpEmail(input: SendEmailInput) {
+export async function sendSmtpEmail(input: SendEmailInput): Promise<SmtpResult> {
   if (hasResendConfig()) {
     return sendViaResend(input);
   }
