@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { renderFaviconLinks } from "@/lib/public-site/static-pages";
 
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
@@ -29,6 +30,7 @@ function renderAsset(asset: any) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(asset.title)} | Media</title>
+  ${renderFaviconLinks()}
   <style>
     body { margin:0; background:#10110f; color:#f8f6f1; font-family:Inter, system-ui, sans-serif; }
     main { min-height:100vh; display:grid; place-items:center; padding:24px; }

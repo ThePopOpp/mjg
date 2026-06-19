@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPublishedImpactScore } from "@/lib/content/impact-score";
 import {
   publicSiteUrl,
+  renderFaviconLinks,
   renderFonts,
   renderNavScript,
   renderNavStyles,
@@ -73,6 +74,7 @@ export async function GET() {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mission | Michael J. Gauthier</title>
+  ${renderFaviconLinks()}
   ${renderThemeScript()}
   ${renderFonts()}
   <style>

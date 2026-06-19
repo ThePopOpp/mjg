@@ -14,7 +14,15 @@ interface IncomingCall {
   connection: any;
 }
 
-export function Softphone() {
+export function Softphone({
+  callbackNumber,
+  onCallbackNumberUsed,
+  onCallEnded,
+}: {
+  callbackNumber?: string | null;
+  onCallbackNumberUsed?: () => void;
+  onCallEnded?: () => void;
+} = {}) {
   const token = useDashboardActionToken();
   const [dialNumber, setDialNumber] = useState("");
   const [callState, setCallState] = useState<CallState>("idle");
@@ -69,6 +77,13 @@ export function Softphone() {
     };
   }, []);
 
+  useEffect(() => {
+    if (callbackNumber && callState === "idle") {
+      setDialNumber(callbackNumber);
+      onCallbackNumberUsed?.();
+    }
+  }, [callbackNumber]); // eslint-disable-line react-hooks/exhaustive-deps
+
   function startTimer() {
     setCallDuration(0);
     timerRef.current = setInterval(() => setCallDuration((d) => d + 1), 1000);
@@ -86,6 +101,7 @@ export function Softphone() {
     connectionRef.current = null;
     setCallState("ended");
     stopTimer();
+    onCallEnded?.();
     setTimeout(() => setCallState("idle"), 2000);
   }
 
