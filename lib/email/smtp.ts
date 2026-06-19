@@ -76,6 +76,7 @@ export async function sendSmtpEmail(input: SendEmailInput) {
       ok: false,
       skipped: true,
       reason: "No email provider configured. Add RESEND_API_KEY or SMTP credentials to enable sending.",
+      messageId: undefined,
     };
   }
 
