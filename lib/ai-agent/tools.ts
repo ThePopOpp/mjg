@@ -11,7 +11,7 @@ import {
   sendDueJourneyEmails,
 } from "@/lib/email/templates";
 import { EMAIL_EVENT_KEYS } from "@/lib/email/constants";
-import { getBlogAdminData, saveBlogPost, updateBlogPostStatus } from "@/lib/content/blog";
+import { getBlogAdminData, getBlogPostById, saveBlogPost, updateBlogPostStatus, normalizePostTags } from "@/lib/content/blog";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { saveMediaAsset, getMediaStudioData } from "@/lib/content/media";
 
@@ -429,39 +429,112 @@ const listBlogPosts: AgentTool = {
   },
 };
 
+const getBlogPost: AgentTool = {
+  name: "get_blog_post",
+  description:
+    "Read one blog post's full editable fields by id (title, body HTML, excerpt, featured image, gallery, video, category, tags, status, publish date). Call this before update_blog_post so you only change the intended fields.",
+  parameters: {
+    type: "object",
+    properties: { id: { type: "string", description: "Blog post id." } },
+    required: ["id"],
+  },
+  requiresConfirmation: false,
+  async execute(args) {
+    const post: any = await getBlogPostById(String(args.id));
+    if (!post) throw new Error("Blog post not found.");
+    return {
+      id: post.id, title: post.title, slug: post.slug, excerpt: post.excerpt,
+      contentHtml: post.content_html, featuredImageUrl: post.featured_image_url,
+      galleryUrls: post.gallery_urls ?? [], videoUrl: post.video_url,
+      category: post.category?.name ?? null,
+      tags: normalizePostTags(post).map((t: any) => t.name),
+      status: post.status, publishAt: post.publish_at,
+    };
+  },
+};
+
 const createBlogPost: AgentTool = {
   name: "create_blog_post",
   description:
-    "Create a blog post. Provide HTML content. Posts default to 'draft'; set status to 'published' to publish immediately or 'scheduled' with publishAt to schedule.",
+    "Create a blog post. Provide HTML content for the body. IMPORTANT: a header/cover image URL goes in the 'featuredImageUrl' field — do NOT embed it in contentHtml. Posts default to 'draft'; set status 'published' to publish now, or 'scheduled' with publishAt to schedule.",
   parameters: {
     type: "object",
     properties: {
       title: { type: "string" },
-      contentHtml: { type: "string", description: "HTML body of the post." },
+      contentHtml: { type: "string", description: "HTML body of the post. Do not put the cover image here." },
       excerpt: { type: "string", description: "Short summary." },
       category: { type: "string" },
       tags: { type: "array", items: { type: "string" } },
-      featuredImageUrl: { type: "string" },
+      featuredImageUrl: { type: "string", description: "URL of the post's featured/cover image (the header image)." },
+      videoUrl: { type: "string" },
       status: { type: "string", enum: BLOG_STATUSES, description: "Default draft." },
       publishAt: { type: "string", description: "ISO timestamp if scheduling." },
     },
     required: ["title", "contentHtml"],
   },
   requiresConfirmation: true,
-  summarize: (a) => `Create blog post “${a.title}” (status: ${a.status ?? "draft"})`,
+  summarize: (a) => `Create blog post “${a.title}” (status: ${a.status ?? "draft"}${a.featuredImageUrl ? ", with featured image" : ""})`,
   async execute(args, ctx) {
     const post = await saveBlogPost({
       title: args.title, contentHtml: args.contentHtml, excerpt: args.excerpt,
       category: args.category, tags: args.tags, featuredImageUrl: args.featuredImageUrl,
-      status: args.status ?? "draft", publishAt: args.publishAt, actorUserId: ctx.actorId,
+      videoUrl: args.videoUrl, status: args.status ?? "draft", publishAt: args.publishAt,
+      actorUserId: ctx.actorId,
     });
     return { id: post.id, title: post.title, slug: post.slug, status: post.status };
   },
 };
 
+const updateBlogPost: AgentTool = {
+  name: "update_blog_post",
+  description:
+    "Update an existing blog post by id. Only pass the fields you want to change — everything else is preserved. Use 'featuredImageUrl' to set the header/cover image (NOT in the body). To set a cover image on a post, call this with id + featuredImageUrl.",
+  parameters: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "Blog post id to update." },
+      title: { type: "string" },
+      contentHtml: { type: "string", description: "New HTML body. Do not put the cover image here." },
+      excerpt: { type: "string" },
+      category: { type: "string" },
+      tags: { type: "array", items: { type: "string" } },
+      featuredImageUrl: { type: "string", description: "URL of the featured/cover image." },
+      videoUrl: { type: "string" },
+      status: { type: "string", enum: BLOG_STATUSES },
+      publishAt: { type: "string", description: "ISO timestamp." },
+    },
+    required: ["id"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => {
+    const changed = Object.keys(a).filter((k) => k !== "id");
+    return `Update blog post ${a.id} (${changed.join(", ") || "no fields"})`;
+  },
+  async execute(args, ctx) {
+    // Fetch-before-edit: saveBlogPost replaces the full row, so backfill unchanged
+    // fields from the existing post to avoid wiping content/image/tags.
+    const existing: any = await getBlogPostById(String(args.id));
+    if (!existing) throw new Error("Blog post not found.");
+    const post = await saveBlogPost({
+      id: args.id,
+      title: args.title ?? existing.title,
+      contentHtml: args.contentHtml ?? existing.content_html ?? "",
+      excerpt: args.excerpt ?? existing.excerpt ?? undefined,
+      category: args.category ?? existing.category?.name ?? undefined,
+      tags: args.tags ?? normalizePostTags(existing).map((t: any) => t.name),
+      featuredImageUrl: args.featuredImageUrl ?? existing.featured_image_url ?? undefined,
+      videoUrl: args.videoUrl ?? existing.video_url ?? undefined,
+      status: args.status ?? existing.status,
+      publishAt: args.publishAt ?? existing.publish_at ?? undefined,
+      actorUserId: ctx.actorId,
+    });
+    return { id: post.id, title: post.title, slug: post.slug, status: post.status, featuredImageUrl: post.featured_image_url };
+  },
+};
+
 const updateBlogPostStatusAction: AgentTool = {
   name: "update_blog_post_status",
-  description: "Change a blog post's status (draft, scheduled, published, hidden, archived, deleted).",
+  description: "Change only a blog post's status (draft, scheduled, published, hidden, archived, deleted). For content/image edits use update_blog_post.",
   parameters: {
     type: "object",
     properties: {
@@ -552,6 +625,42 @@ const createContact: AgentTool = {
   },
 };
 
+const updateContact: AgentTool = {
+  name: "update_contact",
+  description: "Update an existing contact by id. Only pass the fields you want to change.",
+  parameters: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "Contact id." },
+      firstName: { type: "string" },
+      lastName: { type: "string" },
+      email: { type: "string" },
+      phone: { type: "string" },
+      company: { type: "string" },
+      church: { type: "string" },
+      type: { type: "string" },
+      status: { type: "string" },
+      source: { type: "string" },
+      notes: { type: "string" },
+    },
+    required: ["id"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Update contact ${a.id} (${Object.keys(a).filter((k) => k !== "id").join(", ") || "no fields"})`,
+  async execute(args) {
+    const map: Record<string, string> = {
+      firstName: "first_name", lastName: "last_name", email: "email", phone: "phone",
+      company: "company", church: "church", type: "type", status: "status", source: "source", notes: "notes",
+    };
+    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    for (const [arg, col] of Object.entries(map)) if (args[arg] !== undefined) patch[col] = args[arg];
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.from("contacts").update(patch).eq("id", args.id).select("id, first_name, last_name, email").single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+};
+
 // ──────────────────────────────────────────────────────────────────────────────
 // Participants & tags
 // ──────────────────────────────────────────────────────────────────────────────
@@ -582,6 +691,49 @@ const createParticipant: AgentTool = {
       relationshipCategory: args.relationshipCategory,
     });
     return { id: (p as any)?.id ?? null, email: args.email };
+  },
+};
+
+const updateParticipant: AgentTool = {
+  name: "update_participant",
+  description:
+    "Update an existing participant by id. Only pass fields you want to change. Use get_participant first to confirm the id and current values.",
+  parameters: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "Participant id." },
+      firstName: { type: "string" },
+      lastName: { type: "string" },
+      email: { type: "string" },
+      phone: { type: "string" },
+      wave: { type: "string" },
+      source: { type: "string" },
+      participantType: { type: "string" },
+      relationshipCategory: { type: "string" },
+      checkInStatus: { type: "string" },
+      journeyStatus: { type: "string" },
+      surveyStatus: { type: "string" },
+      innerCircleStatus: { type: "string" },
+      notes: { type: "string" },
+    },
+    required: ["id"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Update participant ${a.id} (${Object.keys(a).filter((k) => k !== "id").join(", ") || "no fields"})`,
+  async execute(args, ctx) {
+    const map: Record<string, string> = {
+      firstName: "first_name", lastName: "last_name", email: "email", phone: "phone",
+      wave: "wave", source: "source", participantType: "participant_type", relationshipCategory: "relationship_category",
+      checkInStatus: "check_in_status", journeyStatus: "journey_status", surveyStatus: "survey_status",
+      innerCircleStatus: "inner_circle_status", notes: "notes",
+    };
+    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    for (const [arg, col] of Object.entries(map)) if (args[arg] !== undefined) patch[col] = args[arg];
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.from("participants").update(patch).eq("id", args.id).select("id, first_name, last_name, email").single();
+    if (error) throw new Error(error.message);
+    await logUserActivity({ userId: ctx.actorId, action: "ai_agent_update_participant", entityType: "participants", entityId: args.id }).catch(() => {});
+    return data;
   },
 };
 
@@ -667,6 +819,38 @@ const createMediaAsset: AgentTool = {
   },
 };
 
+const updateMediaAsset: AgentTool = {
+  name: "update_media_asset",
+  description: "Update an existing media asset by id (title, description, URL, status, visibility). Only pass fields to change.",
+  parameters: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "Media asset id." },
+      title: { type: "string" },
+      description: { type: "string" },
+      fileUrl: { type: "string" },
+      embedUrl: { type: "string" },
+      status: { type: "string", enum: ["draft", "published", "hidden", "archived"] },
+      visibility: { type: "string", enum: ["private", "public", "assigned"] },
+    },
+    required: ["id"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Update media asset ${a.id} (${Object.keys(a).filter((k) => k !== "id").join(", ") || "no fields"})`,
+  async execute(args, ctx) {
+    const map: Record<string, string> = {
+      title: "title", description: "description", fileUrl: "file_url", embedUrl: "embed_url",
+      status: "status", visibility: "visibility",
+    };
+    const patch: Record<string, unknown> = { updated_by: ctx.actorId, updated_at: new Date().toISOString() };
+    for (const [arg, col] of Object.entries(map)) if (args[arg] !== undefined) patch[col] = args[arg];
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.from("media_assets").update(patch).eq("id", args.id).select("id, title, status").single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+};
+
 export const AGENT_TOOLS: AgentTool[] = [
   // Reads
   searchParticipants,
@@ -676,6 +860,7 @@ export const AGENT_TOOLS: AgentTool[] = [
   listSmsConversations,
   listEmailTemplates,
   listBlogPosts,
+  getBlogPost,
   listContacts,
   listTags,
   listMediaAssets,
@@ -688,11 +873,15 @@ export const AGENT_TOOLS: AgentTool[] = [
   sendTemplateEmailAction,
   runDueJourneyEmails,
   createBlogPost,
+  updateBlogPost,
   updateBlogPostStatusAction,
   createContact,
+  updateContact,
   createParticipant,
+  updateParticipant,
   setParticipantTags,
   createMediaAsset,
+  updateMediaAsset,
 ];
 
 export const TOOL_MAP: Record<string, AgentTool> = Object.fromEntries(
