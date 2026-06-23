@@ -4,11 +4,13 @@ import { Fragment, useState, useEffect, useCallback, useMemo } from "react";
 import {
   Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed,
   Voicemail, Mic, MessageSquare, RotateCcw, RefreshCw, Clock,
+  NotebookPen, Loader2, Sparkles,
 } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Softphone } from "./softphone";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,13 +25,19 @@ type Call = {
   recording_url: string | null;
   voicemail_url: string | null;
   transcription_text: string | null;
+  transcription_status: string | null;
   voicemail_transcription: string | null;
+  price: number | null;
+  price_unit: string | null;
+  notes: string | null;
   started_at: string | null;
+  answered_at: string | null;
+  ended_at: string | null;
   participants: { first_name: string; last_name: string } | null;
   profiles: { full_name: string } | null;
 };
 
-type ExpandedRow = { id: string; type: "recording" | "voicemail" | "transcript" } | null;
+type ExpandedRow = { id: string; type: "recording" | "voicemail" | "transcript" | "notes" } | null;
 
 export function DialerDashboard() {
   const actionToken = useDashboardActionToken();
@@ -39,6 +47,10 @@ export function DialerDashboard() {
   const [activeTab, setActiveTab] = useState("all");
   const [expanded, setExpanded] = useState<ExpandedRow>(null);
   const [callbackNumber, setCallbackNumber] = useState<string | null>(null);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
+  const [transcribingId, setTranscribingId] = useState<string | null>(null);
+  const [transcribeError, setTranscribeError] = useState<string | null>(null);
 
   const fetchCalls = useCallback(async (quiet = false) => {
     quiet ? setRefreshing(true) : setLoading(true);
@@ -58,31 +70,97 @@ export function DialerDashboard() {
 
   useEffect(() => { fetchCalls(); }, [fetchCalls]);
 
+  // A call counts as missed if Twilio reported no-answer/busy, or if an inbound
+  // call ended without ever being answered by the agent (rang out to voicemail).
+  const isMissed = useCallback(
+    (c: Call) =>
+      c.status === "no-answer" ||
+      c.status === "busy" ||
+      (c.direction === "inbound" && !c.answered_at && !!c.ended_at),
+    [],
+  );
+
   const stats = useMemo(() => ({
     total: calls.length,
     inbound: calls.filter((c) => c.direction === "inbound").length,
     outbound: calls.filter((c) => c.direction === "outbound").length,
-    missed: calls.filter((c) => c.status === "no-answer" || c.status === "busy").length,
+    missed: calls.filter(isMissed).length,
     talkTime: calls.reduce((sum, c) => sum + (c.duration_seconds ?? 0), 0),
     voicemails: calls.filter((c) => c.voicemail_url).length,
     recordings: calls.filter((c) => c.recording_url).length,
-  }), [calls]);
+    cost: calls.reduce((sum, c) => sum + (c.price ?? 0), 0),
+    costUnit: calls.find((c) => c.price_unit)?.price_unit ?? "USD",
+  }), [calls, isMissed]);
 
   const filtered = useMemo(() => {
     switch (activeTab) {
       case "inbound":    return calls.filter((c) => c.direction === "inbound");
       case "outbound":   return calls.filter((c) => c.direction === "outbound");
-      case "missed":     return calls.filter((c) => c.status === "no-answer" || c.status === "busy");
+      case "missed":     return calls.filter(isMissed);
       case "voicemails": return calls.filter((c) => c.voicemail_url);
       case "recordings": return calls.filter((c) => c.recording_url);
       default:           return calls;
     }
-  }, [calls, activeTab]);
+  }, [calls, activeTab, isMissed]);
 
-  function toggleRow(id: string, type: "recording" | "voicemail" | "transcript") {
-    setExpanded((prev) =>
-      prev?.id === id && prev?.type === type ? null : { id, type }
-    );
+  function toggleRow(id: string, type: "recording" | "voicemail" | "transcript" | "notes", note?: string | null) {
+    setTranscribeError(null);
+    setExpanded((prev) => {
+      const next = prev?.id === id && prev?.type === type ? null : { id, type };
+      if (next?.type === "notes") setNoteDraft(note ?? "");
+      return next;
+    });
+  }
+
+  async function saveNote(id: string) {
+    setSavingNote(true);
+    try {
+      const res = await fetch(`/api/admin/voice/calls/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actionToken, notes: noteDraft }),
+      });
+      if (res.ok) {
+        setCalls((prev) => prev.map((c) => (c.id === id ? { ...c, notes: noteDraft } : c)));
+        setExpanded(null);
+      }
+    } finally {
+      setSavingNote(false);
+    }
+  }
+
+  async function transcribe(id: string, target: "recording" | "voicemail") {
+    setTranscribingId(id);
+    setTranscribeError(null);
+    try {
+      const res = await fetch(`/api/admin/voice/calls/${id}/transcribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actionToken, target }),
+      });
+      const data = await res.json();
+      if (res.ok && data.text) {
+        setCalls((prev) =>
+          prev.map((c) =>
+            c.id === id
+              ? {
+                  ...c,
+                  transcription_status: "completed",
+                  ...(target === "voicemail"
+                    ? { voicemail_transcription: data.text }
+                    : { transcription_text: data.text }),
+                }
+              : c,
+          ),
+        );
+      } else {
+        setTranscribeError(data.error ?? "Transcription failed.");
+      }
+    } catch {
+      setTranscribeError("Transcription failed.");
+    } finally {
+      setTranscribingId(null);
+    }
   }
 
   return (
@@ -113,15 +191,22 @@ export function DialerDashboard() {
         <Card className="flex flex-col">
           <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle>Call log</CardTitle>
-            <Button
-              variant="outline" size="sm"
-              onClick={() => fetchCalls(true)}
-              disabled={refreshing}
-              className="gap-1.5"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
-              Refresh
-            </Button>
+            <div className="flex items-center gap-3">
+              {!loading && stats.cost > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  Total cost: <span className="font-medium text-foreground">{formatCost(stats.cost, stats.costUnit)}</span>
+                </span>
+              )}
+              <Button
+                variant="outline" size="sm"
+                onClick={() => fetchCalls(true)}
+                disabled={refreshing}
+                className="gap-1.5"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+            </div>
           </CardHeader>
 
           <div className="px-6 pb-3">
@@ -146,20 +231,21 @@ export function DialerDashboard() {
                   <TableHead>Number</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Duration</TableHead>
+                  <TableHead>Cost</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead className="text-right w-[120px]">Actions</TableHead>
+                  <TableHead className="text-right w-[150px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-12">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-12">
                       Loading call log…
                     </TableCell>
                   </TableRow>
                 ) : filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-12">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-12">
                       No calls yet.
                     </TableCell>
                   </TableRow>
@@ -198,6 +284,9 @@ export function DialerDashboard() {
                           <TableCell className="text-sm">
                             {call.duration_seconds != null ? formatDuration(call.duration_seconds) : "—"}
                           </TableCell>
+                          <TableCell className="text-sm tabular-nums">
+                            {call.price != null ? formatCost(call.price, call.price_unit) : "—"}
+                          </TableCell>
                           <TableCell className="text-sm text-muted-foreground">
                             {call.started_at
                               ? new Date(call.started_at).toLocaleString([], {
@@ -235,6 +324,14 @@ export function DialerDashboard() {
                                   <MessageSquare className="h-3.5 w-3.5" />
                                 </ActionBtn>
                               )}
+                              <ActionBtn
+                                title={call.notes ? "Edit notes" : "Add notes"}
+                                active={isThisExpanded && expanded?.type === "notes"}
+                                onClick={() => toggleRow(call.id, "notes", call.notes)}
+                                hoverColor={call.notes ? "hover:text-primary" : "hover:text-primary"}
+                              >
+                                <NotebookPen className={`h-3.5 w-3.5 ${call.notes ? "text-primary" : ""}`} />
+                              </ActionBtn>
                               {displayNumber && (
                                 <ActionBtn
                                   title="Call back"
@@ -251,17 +348,23 @@ export function DialerDashboard() {
 
                         {isThisExpanded && (
                           <TableRow key={`${call.id}-exp`}>
-                            <TableCell colSpan={7} className="bg-muted/40 px-6 py-4">
+                            <TableCell colSpan={8} className="bg-muted/40 px-6 py-4">
                               {expanded?.type === "recording" && call.recording_url && (
                                 <div className="space-y-2">
                                   <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Recording</p>
                                   <audio controls preload="none" className="w-full h-10">
                                     <source src={call.recording_url} type="audio/mpeg" />
                                   </audio>
-                                  {call.transcription_text && (
+                                  {call.transcription_text ? (
                                     <p className="text-sm italic text-muted-foreground border-l-2 border-border pl-3 mt-2">
                                       &ldquo;{call.transcription_text}&rdquo;
                                     </p>
+                                  ) : (
+                                    <TranscribeControl
+                                      busy={transcribingId === call.id}
+                                      error={transcribeError}
+                                      onClick={() => transcribe(call.id, "recording")}
+                                    />
                                   )}
                                 </div>
                               )}
@@ -271,10 +374,16 @@ export function DialerDashboard() {
                                   <audio controls preload="none" className="w-full h-10">
                                     <source src={call.voicemail_url} type="audio/mpeg" />
                                   </audio>
-                                  {call.voicemail_transcription && (
+                                  {call.voicemail_transcription ? (
                                     <p className="text-sm italic text-muted-foreground border-l-2 border-border pl-3 mt-2">
                                       &ldquo;{call.voicemail_transcription}&rdquo;
                                     </p>
+                                  ) : (
+                                    <TranscribeControl
+                                      busy={transcribingId === call.id}
+                                      error={transcribeError}
+                                      onClick={() => transcribe(call.id, "voicemail")}
+                                    />
                                   )}
                                 </div>
                               )}
@@ -284,6 +393,25 @@ export function DialerDashboard() {
                                   <p className="text-sm italic text-muted-foreground border-l-2 border-border pl-3">
                                     &ldquo;{call.transcription_text ?? call.voicemail_transcription}&rdquo;
                                   </p>
+                                </div>
+                              )}
+                              {expanded?.type === "notes" && (
+                                <div className="space-y-2">
+                                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Notes</p>
+                                  <Textarea
+                                    value={noteDraft}
+                                    onChange={(e) => setNoteDraft(e.target.value)}
+                                    placeholder="Add notes about this call…"
+                                    rows={3}
+                                    className="resize-none text-sm bg-background"
+                                  />
+                                  <div className="flex items-center gap-2">
+                                    <Button size="sm" onClick={() => saveNote(call.id)} disabled={savingNote} className="gap-1.5">
+                                      {savingNote ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <NotebookPen className="h-3.5 w-3.5" />}
+                                      Save notes
+                                    </Button>
+                                    <Button size="sm" variant="ghost" onClick={() => setExpanded(null)}>Cancel</Button>
+                                  </div>
                                 </div>
                               )}
                             </TableCell>
@@ -358,6 +486,32 @@ function CallStatusBadge({ status }: { status: string }) {
       {status.replace(/-/g, " ")}
     </Badge>
   );
+}
+
+function TranscribeControl({ busy, error, onClick }: { busy: boolean; error: string | null; onClick: () => void }) {
+  return (
+    <div className="space-y-1.5">
+      <Button size="sm" variant="outline" onClick={onClick} disabled={busy} className="gap-1.5">
+        {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+        {busy ? "Transcribing…" : "Transcribe recording"}
+      </Button>
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  );
+}
+
+function formatCost(amount: number, unit: string | null) {
+  const currency = unit ?? "USD";
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 4,
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(4)} ${currency}`;
+  }
 }
 
 function formatDuration(s: number) {

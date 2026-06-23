@@ -4,8 +4,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Phone, PhoneOff, PhoneIncoming, Mic, MicOff, Volume2, VolumeX, RotateCcw } from "lucide-react";
+import { Phone, PhoneOff, PhoneIncoming, Mic, MicOff, Volume2, VolumeX, RotateCcw, NotebookPen, Check } from "lucide-react";
 
 type CallState = "idle" | "connecting" | "ringing" | "in-progress" | "ended" | "failed";
 
@@ -32,8 +33,11 @@ export function Softphone({
   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
   const [deviceReady, setDeviceReady] = useState(false);
   const [deviceError, setDeviceError] = useState<string | null>(null);
+  const [liveNotes, setLiveNotes] = useState("");
+  const [notesSaved, setNotesSaved] = useState(false);
   const deviceRef = useRef<any>(null);
   const connectionRef = useRef<any>(null);
+  const callSidRef = useRef<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const initDevice = useCallback(async () => {
@@ -96,13 +100,40 @@ export function Softphone({
     }
   }
 
+  const saveNotes = useCallback(async (notes: string, callSid: string | null) => {
+    if (!notes.trim() || !callSid) return;
+    try {
+      await fetch("/api/admin/voice/calls/by-sid", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actionToken: token, callSid, notes }),
+      });
+      setNotesSaved(true);
+    } catch {
+      /* notes can still be edited later from the call log */
+    }
+  }, [token]);
+
+  function resetToIdle() {
+    setCallState("idle");
+    setLiveNotes("");
+    setNotesSaved(false);
+    callSidRef.current = null;
+  }
+
   function endCall() {
     connectionRef.current?.disconnect();
     connectionRef.current = null;
     setCallState("ended");
     stopTimer();
     onCallEnded?.();
-    setTimeout(() => setCallState("idle"), 2000);
+    // If notes were taken, save them and keep the panel open so they can be
+    // reviewed/edited; otherwise auto-return to the dial pad.
+    if (liveNotes.trim()) {
+      void saveNotes(liveNotes, callSidRef.current);
+    } else {
+      setTimeout(resetToIdle, 2000);
+    }
   }
 
   async function makeCall() {
@@ -113,7 +144,11 @@ export function Softphone({
         params: { To: dialNumber.trim() },
       });
       connectionRef.current = conn;
-      conn.on("accept", () => { setCallState("in-progress"); startTimer(); });
+      conn.on("accept", () => {
+        callSidRef.current = conn.parameters?.CallSid ?? callSidRef.current;
+        setCallState("in-progress");
+        startTimer();
+      });
       conn.on("disconnect", endCall);
       conn.on("reject", () => { setCallState("idle"); });
       setCallState("ringing");
@@ -127,6 +162,7 @@ export function Softphone({
     if (!incomingCall) return;
     incomingCall.connection.accept();
     connectionRef.current = incomingCall.connection;
+    callSidRef.current = incomingCall.connection.parameters?.CallSid ?? null;
     setIncomingCall(null);
     setCallState("in-progress");
     startTimer();
@@ -274,12 +310,62 @@ export function Softphone({
               ))}
             </div>
           )}
+
+          {/* Call notes — captured live, saved automatically when the call ends */}
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <NotebookPen className="h-3.5 w-3.5" /> Call notes
+            </label>
+            <Textarea
+              value={liveNotes}
+              onChange={(e) => setLiveNotes(e.target.value)}
+              placeholder="Type notes during the call…"
+              rows={3}
+              className="resize-none text-sm"
+            />
+          </div>
         </div>
       )}
 
       {callState === "ended" && (
-        <div className="flex items-center gap-2 rounded-md bg-muted p-3 text-sm text-muted-foreground">
-          <RotateCcw className="h-4 w-4" /> Call ended
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 rounded-md bg-muted p-3 text-sm text-muted-foreground">
+            <RotateCcw className="h-4 w-4" /> Call ended
+          </div>
+          {liveNotes.trim() && (
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <NotebookPen className="h-3.5 w-3.5" /> Call notes
+                </label>
+                {notesSaved && (
+                  <span className="flex items-center gap-1 text-xs text-green-600">
+                    <Check className="h-3.5 w-3.5" /> Saved
+                  </span>
+                )}
+              </div>
+              <Textarea
+                value={liveNotes}
+                onChange={(e) => { setLiveNotes(e.target.value); setNotesSaved(false); }}
+                rows={3}
+                className="resize-none text-sm"
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => saveNotes(liveNotes, callSidRef.current)}
+                  disabled={notesSaved || !liveNotes.trim()}
+                  className="flex-1 gap-1.5"
+                >
+                  <Check className="h-3.5 w-3.5" /> {notesSaved ? "Saved" : "Save notes"}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={resetToIdle} className="gap-1.5">
+                  <Phone className="h-3.5 w-3.5" /> New call
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

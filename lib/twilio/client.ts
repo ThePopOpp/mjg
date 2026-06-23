@@ -22,3 +22,22 @@ export function validateTwilioRequest(url: string, params: Record<string, string
   const { validateRequest } = twilio;
   return validateRequest(TWILIO_AUTH_TOKEN, signature, url, params);
 }
+
+/**
+ * Fetches the finalized price of a call from Twilio. Twilio reports price as a
+ * negative string (a charge) and may not populate it until shortly after the
+ * call completes. Returns the positive magnitude, or null if not yet available.
+ */
+export async function fetchCallPrice(callSid: string): Promise<{ price: number; priceUnit: string | null } | null> {
+  if (!callSid) return null;
+  try {
+    const call = await getTwilioClient().calls(callSid).fetch();
+    if (call.price == null || call.price === "") return null;
+    const value = Math.abs(parseFloat(String(call.price)));
+    if (Number.isNaN(value)) return null;
+    return { price: value, priceUnit: call.priceUnit ?? null };
+  } catch (error) {
+    console.error("fetchCallPrice error:", error);
+    return null;
+  }
+}

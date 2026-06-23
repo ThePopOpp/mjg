@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { fetchCallPrice } from "@/lib/twilio/client";
 
 export async function POST(request: Request) {
   try {
@@ -13,8 +14,16 @@ export async function POST(request: Request) {
     const supabase = createSupabaseAdminClient();
     const update: Record<string, unknown> = { status: callStatus, updated_at: new Date().toISOString() };
     if (duration !== null) update.duration_seconds = duration;
-    if (callStatus === "completed" || callStatus === "failed" || callStatus === "no-answer" || callStatus === "busy" || callStatus === "canceled") {
+    const isTerminal = ["completed", "failed", "no-answer", "busy", "canceled"].includes(callStatus);
+    if (isTerminal) {
       update.ended_at = new Date().toISOString();
+      // Twilio populates price asynchronously; this often returns null right at
+      // call end and gets backfilled later by the calls list endpoint.
+      const priceInfo = await fetchCallPrice(callSid);
+      if (priceInfo) {
+        update.price = priceInfo.price;
+        update.price_unit = priceInfo.priceUnit;
+      }
     }
     if (callStatus === "in-progress") {
       update.answered_at = new Date().toISOString();
