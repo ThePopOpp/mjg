@@ -1,20 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-function isAuthCookie(name: string) {
-  return name.startsWith("sb-") && name.includes("auth-token");
-}
-
-function clearAuthCookies(request: NextRequest, response: NextResponse) {
-  for (const cookie of request.cookies.getAll()) {
-    if (isAuthCookie(cookie.name)) {
-      // Expire every Supabase auth cookie chunk so a stale/corrupt cookie cannot
-      // keep failing on the next request.
-      response.cookies.set(cookie.name, "", { maxAge: 0, path: "/" });
-    }
-  }
-}
-
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -40,41 +26,18 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // IMPORTANT: Do not run any code between createServerClient and getUser().
+  // The ONLY job of this middleware is to keep the session token fresh.
   //
-  // getUser() validates the access token against the Supabase Auth server and, when
-  // the token has expired, performs the refresh-token rotation HERE in middleware —
-  // the one server context that can reliably persist the rotated cookies onto the
-  // response (Server Components cannot write cookies). Centralizing the refresh here
-  // keeps the session alive across saves, page refreshes, and Next.js link prefetches,
-  // and avoids partial/duplicated cookie writes from multiple refreshers.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const pathname = request.nextUrl.pathname;
-  const hasAuthCookie = request.cookies.getAll().some((cookie) => isAuthCookie(cookie.name));
-
-  // Self-heal: auth cookies are present but no valid session could be derived from
-  // them. This is the corrupt/partial/stale-cookie case (e.g. a dropped chunk or a
-  // cookie written by an older build). Clear the bad cookies so the user gets a clean
-  // slate instead of being redirected to /login on every single request.
-  if (!user && hasAuthCookie) {
-    if (pathname.startsWith("/dashboard")) {
-      const redirect = NextResponse.redirect(
-        new URL(`/login?next=${encodeURIComponent(pathname)}`, request.url)
-      );
-      clearAuthCookies(request, redirect);
-      return redirect;
-    }
-    clearAuthCookies(request, supabaseResponse);
-    return supabaseResponse;
-  }
-
-  // Standard gate: no session at all and trying to reach the dashboard.
-  if (!user && pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(pathname)}`, request.url));
-  }
+  // getSession() reads the session from the cookie locally and, when the access
+  // token has expired, refreshes it and persists the rotated cookies onto the
+  // response. Unlike getUser(), it does NOT make a live validation call to the
+  // Supabase Auth server — so a transient 401/network blip during rapid link
+  // clicks and prefetch bursts can never wipe a valid session and log the user out.
+  //
+  // We deliberately do NOT redirect or clear cookies here. Access control lives in
+  // the dashboard layout (getCurrentProfile), which reads the (now fresh) session
+  // locally and is not subject to per-request network failures.
+  await supabase.auth.getSession();
 
   // IMPORTANT: return supabaseResponse unchanged so any refreshed Set-Cookie headers
   // reach the browser. Returning a different response object drops those cookies and
