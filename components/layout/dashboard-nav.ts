@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Bot,
   CalendarRange,
   CheckSquare,
   CircleUserRound,
@@ -33,6 +34,7 @@ export const dashboardNavItems = [
   { href: "/dashboard/emails", label: "Emails", icon: MailCheck },
   { href: "/dashboard/sms", label: "SMS", icon: MessageSquare },
   { href: "/dashboard/dialer", label: "Dialer", icon: Phone },
+  { href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
   { href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { href: "/dashboard/reports", label: "Reports", icon: FileBarChart },
   { href: "/dashboard/settings", label: "Settings", icon: Settings, permission: PERMISSIONS.MANAGE_SETTINGS },
