@@ -1,5 +1,8 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { LogOut, Menu, Search } from "lucide-react";
+import { LogOut, Menu, Search, PanelLeft, X } from "lucide-react";
 import { DashboardActionTokenProvider } from "@/components/layout/dashboard-action-token";
 import { dashboardNavItems } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
@@ -15,52 +18,137 @@ type DashboardShellProps = {
   profile: DashboardProfile;
 };
 
+const STORAGE_KEY = "mjg-sidebar-collapsed";
+
 export function DashboardShell({ actionToken, children, profile }: DashboardShellProps) {
   const displayName = `${profile.firstName} ${profile.lastName}`.trim() || profile.email;
   const visibleNavItems = dashboardNavItems.filter((item) => !("permission" in item) || can(profile.role, item.permission));
 
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Restore the persisted desktop collapse state after mount (avoids hydration mismatch).
+  useEffect(() => {
+    if (localStorage.getItem(STORAGE_KEY) === "1") setCollapsed(true);
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      return next;
+    });
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r bg-card lg:block">
-        <div className="flex h-20 items-center border-b px-6">
-          <Link href="/dashboard" className="flex flex-col items-start" aria-label="Michael J. Gauthier dashboard">
-            <span className="relative block h-12 w-28 shrink-0">
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={[
+          "fixed inset-y-0 left-0 z-40 w-72 border-r bg-card transition-all duration-200",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:translate-x-0",
+          collapsed ? "lg:w-16" : "lg:w-72",
+        ].join(" ")}
+      >
+        <div className={`flex h-20 items-center border-b ${collapsed ? "lg:justify-center lg:px-2" : "px-6"}`}>
+          <Link
+            href="/dashboard"
+            className="flex flex-col items-start"
+            aria-label="Michael J. Gauthier dashboard"
+            onClick={() => setMobileOpen(false)}
+          >
+            <span className={`relative block h-12 ${collapsed ? "lg:h-9 lg:w-9 w-28" : "w-28"}`}>
               <img
                 src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
                 alt="MJG"
-                className="h-full w-full object-contain dark:hidden"
+                className="h-full w-full object-contain object-left dark:hidden"
               />
               <img
                 src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg"
                 alt="MJG"
-                className="hidden h-full w-full object-contain dark:block"
+                className="hidden h-full w-full object-contain object-left dark:block"
               />
             </span>
-            <span className="mt-1 font-serif text-sm font-semibold italic leading-none text-foreground">
+            <span className={`mt-1 font-serif text-sm font-semibold italic leading-none text-foreground ${collapsed ? "lg:hidden" : ""}`}>
               Michael <span className="text-[#c9aa70]">J.</span> Gauthier
             </span>
           </Link>
+
+          {/* Close button (mobile only) */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="ml-auto lg:hidden"
+            aria-label="Close navigation"
+            onClick={() => setMobileOpen(false)}
+          >
+            <X className="h-5 w-5" />
+          </Button>
         </div>
-        <nav className="space-y-1 p-4">
+
+        <nav className="space-y-1 p-3">
           {visibleNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              onClick={() => setMobileOpen(false)}
+              title={collapsed ? item.label : undefined}
+              className={[
+                "group relative flex h-10 items-center gap-3 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+                collapsed ? "lg:justify-center lg:px-0 px-3" : "px-3",
+              ].join(" ")}
             >
-              <item.icon className="h-4 w-4" />
-              {item.label}
+              <item.icon className="h-4 w-4 shrink-0" />
+              <span className={collapsed ? "lg:hidden" : ""}>{item.label}</span>
+
+              {/* Tooltip — only when collapsed on desktop */}
+              <span
+                className={[
+                  "pointer-events-none absolute left-full z-50 ml-2 hidden whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-md",
+                  collapsed ? "lg:group-hover:block" : "",
+                ].join(" ")}
+              >
+                {item.label}
+              </span>
             </Link>
           ))}
         </nav>
       </aside>
 
-      <div className="lg:pl-72">
+      <div className={`transition-all duration-200 ${collapsed ? "lg:pl-16" : "lg:pl-72"}`}>
         <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-[112rem] items-center gap-3 px-4 sm:px-6 lg:px-8">
-            <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation">
+            {/* Mobile: open drawer */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              aria-label="Open navigation"
+              onClick={() => setMobileOpen(true)}
+            >
               <Menu className="h-5 w-5" />
             </Button>
+            {/* Desktop: collapse/expand */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden lg:inline-flex"
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-pressed={collapsed}
+              onClick={toggleCollapsed}
+            >
+              <PanelLeft className="h-5 w-5" />
+            </Button>
+
             <div className="relative hidden w-full max-w-xl sm:block">
               <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input className="pl-9" placeholder="Search participants, waves, tags..." />

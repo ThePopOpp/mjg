@@ -110,8 +110,8 @@ export function AgentChat() {
             <Bot className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-sm font-semibold leading-none">Hermes</p>
-            <p className="text-xs text-muted-foreground">AI operations agent</p>
+            <p className="text-sm font-semibold leading-none">Siggey</p>
+            <p className="text-xs text-muted-foreground">AI Operations Agent</p>
           </div>
         </div>
         {hasConversation && (
@@ -188,7 +188,7 @@ export function AgentChat() {
 
         {loading && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Hermes is thinking…
+            <Loader2 className="h-4 w-4 animate-spin" /> Siggey is thinking…
           </div>
         )}
 
@@ -211,7 +211,7 @@ export function AgentChat() {
                 send(input);
               }
             }}
-            placeholder="Ask Hermes… (Enter to send, Shift+Enter for a new line)"
+            placeholder="Ask Siggey… (Enter to send, Shift+Enter for a new line)"
             rows={1}
             disabled={loading}
             className="max-h-32 min-h-[42px] resize-none"

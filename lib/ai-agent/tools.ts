@@ -1,8 +1,22 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { getParticipantDetail } from "@/lib/dashboard/pilot-data";
+import { getParticipantDetail, updateParticipantTags } from "@/lib/dashboard/pilot-data";
 import { sendSms, getOrCreateConversation } from "@/lib/twilio/sms";
 import { sendSmtpEmail } from "@/lib/email/smtp";
 import { logUserActivity } from "@/lib/user-management/repository";
+import {
+  getEmailTemplateData,
+  saveEmailTemplate,
+  sendTemplateEmail,
+  saveEmailTemplateMapping,
+  sendDueJourneyEmails,
+} from "@/lib/email/templates";
+import { EMAIL_EVENT_KEYS } from "@/lib/email/constants";
+import { getBlogAdminData, saveBlogPost, updateBlogPostStatus } from "@/lib/content/blog";
+import { upsertParticipant } from "@/lib/pilot/repository";
+import { saveMediaAsset, getMediaStudioData } from "@/lib/content/media";
+
+const EMAIL_EVENT_OPTIONS = EMAIL_EVENT_KEYS.map((e) => e.key);
+const BLOG_STATUSES = ["draft", "scheduled", "published", "hidden", "archived", "deleted"];
 
 export type AgentContext = {
   actorId: string;
@@ -239,14 +253,446 @@ const sendEmailAction: AgentTool = {
   },
 };
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Email templates & automations
+// ──────────────────────────────────────────────────────────────────────────────
+
+const listEmailTemplates: AgentTool = {
+  name: "list_email_templates",
+  description:
+    "List all email templates (id, name, subject, category, status) and the current automation mappings (which template fires for each event).",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    const data = await getEmailTemplateData();
+    if (data.error) throw new Error(data.error);
+    return {
+      templates: data.templates.map((t: any) => ({
+        id: t.id, name: t.name, slug: t.slug, subject: t.subject, category: t.category, status: t.status,
+      })),
+      automations: data.mappings.map((m: any) => ({
+        eventKey: m.event_key, enabled: m.enabled, templateId: m.template_id, templateName: m.email_templates?.name ?? null,
+      })),
+    };
+  },
+};
+
+const createEmailTemplate: AgentTool = {
+  name: "create_email_template",
+  description:
+    "Create a new email template. Provide HTML for the body. Supports {{merge_fields}} like {{first_name}}, {{site_url}}, {{checkin_link}}. New templates start as 'draft' unless status is set.",
+  parameters: {
+    type: "object",
+    properties: {
+      name: { type: "string", description: "Internal template name." },
+      subject: { type: "string", description: "Email subject line (supports merge fields)." },
+      htmlBody: { type: "string", description: "HTML body of the email (supports merge fields)." },
+      preheader: { type: "string", description: "Optional preview text." },
+      textBody: { type: "string", description: "Optional plain-text version." },
+      category: { type: "string", description: "Optional category label." },
+      status: { type: "string", enum: ["draft", "active", "archived"], description: "Default draft." },
+    },
+    required: ["name", "subject", "htmlBody"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Create email template “${a.name}” (subject: “${a.subject}”, status: ${a.status ?? "draft"})`,
+  async execute(args, ctx) {
+    const tpl = await saveEmailTemplate({
+      name: args.name, subject: args.subject, htmlBody: args.htmlBody,
+      preheader: args.preheader, textBody: args.textBody, category: args.category,
+      status: args.status ?? "draft", actorUserId: ctx.actorId,
+    });
+    return { id: tpl.id, name: tpl.name, status: tpl.status };
+  },
+};
+
+const updateEmailTemplate: AgentTool = {
+  name: "update_email_template",
+  description: "Update an existing email template by id. Only pass the fields you want to change (name, subject, htmlBody, status, etc.).",
+  parameters: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "Template id to update." },
+      name: { type: "string" },
+      subject: { type: "string" },
+      htmlBody: { type: "string" },
+      preheader: { type: "string" },
+      textBody: { type: "string" },
+      category: { type: "string" },
+      status: { type: "string", enum: ["draft", "active", "archived"] },
+    },
+    required: ["id"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Update email template ${a.id}`,
+  async execute(args, ctx) {
+    // saveEmailTemplate requires name/subject/htmlBody — backfill from the existing row.
+    const data = await getEmailTemplateData();
+    const existing = data.templates.find((t: any) => t.id === args.id);
+    if (!existing) throw new Error("Template not found.");
+    const tpl = await saveEmailTemplate({
+      id: args.id,
+      name: args.name ?? existing.name,
+      subject: args.subject ?? existing.subject,
+      htmlBody: args.htmlBody ?? existing.html_body,
+      preheader: args.preheader ?? existing.preheader ?? undefined,
+      textBody: args.textBody ?? existing.text_body ?? undefined,
+      category: args.category ?? existing.category ?? undefined,
+      status: args.status ?? existing.status,
+      actorUserId: ctx.actorId,
+    });
+    return { id: tpl.id, name: tpl.name, status: tpl.status };
+  },
+};
+
+const setEmailAutomation: AgentTool = {
+  name: "set_email_automation",
+  description:
+    "Configure which email template automatically fires for a lifecycle/journey event (e.g. check_in_completed, email_journey_day_1). Set enabled true/false and the template to use.",
+  parameters: {
+    type: "object",
+    properties: {
+      eventKey: { type: "string", enum: EMAIL_EVENT_OPTIONS, description: "The event to map." },
+      templateId: { type: "string", description: "Template id to fire (omit to clear)." },
+      enabled: { type: "boolean", description: "Whether this automation is active." },
+    },
+    required: ["eventKey", "enabled"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Set automation for “${a.eventKey}” → ${a.enabled ? "enabled" : "disabled"}${a.templateId ? `, template ${a.templateId}` : ""}`,
+  async execute(args, ctx) {
+    const m = await saveEmailTemplateMapping({
+      eventKey: args.eventKey, templateId: args.templateId ?? null, enabled: Boolean(args.enabled), actorUserId: ctx.actorId,
+    });
+    return { eventKey: m.event_key, enabled: m.enabled, templateId: m.template_id };
+  },
+};
+
+const sendTemplateEmailAction: AgentTool = {
+  name: "send_template_email",
+  description: "Send a specific email template to one recipient. Merge fields are filled from the recipient details you provide.",
+  parameters: {
+    type: "object",
+    properties: {
+      templateId: { type: "string", description: "Template id to send." },
+      email: { type: "string", description: "Recipient email address." },
+      firstName: { type: "string" },
+      lastName: { type: "string" },
+    },
+    required: ["templateId", "email"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Send template ${a.templateId} to ${a.email}`,
+  async execute(args, ctx) {
+    const result = await sendTemplateEmail({
+      templateId: args.templateId,
+      recipient: { email: args.email, first_name: args.firstName, last_name: args.lastName },
+      actorUserId: ctx.actorId,
+    });
+    return { ok: result.ok, skipped: result.skipped, messageId: result.messageId };
+  },
+};
+
+const runDueJourneyEmails: AgentTool = {
+  name: "run_due_journey_emails",
+  description:
+    "Process and send any scheduled email-journey (automation) messages that are now due. Returns how many were sent/skipped/failed. This sends real emails.",
+  parameters: {
+    type: "object",
+    properties: { limit: { type: "number", description: "Max events to process (1–50, default 10)." } },
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Send all due journey/automation emails (up to ${a.limit ?? 10})`,
+  async execute(args, ctx) {
+    return await sendDueJourneyEmails({ actorUserId: ctx.actorId, limit: Number(args.limit) || 10 });
+  },
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Blog posts
+// ──────────────────────────────────────────────────────────────────────────────
+
+const listBlogPosts: AgentTool = {
+  name: "list_blog_posts",
+  description: "List blog posts (id, title, slug, status, category, publish date).",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    const data = await getBlogAdminData();
+    if (data.error) throw new Error(data.error);
+    return {
+      posts: data.posts.map((p: any) => ({
+        id: p.id, title: p.title, slug: p.slug, status: p.status,
+        category: p.category?.name ?? null, publishAt: p.publish_at, updatedAt: p.updated_at,
+      })),
+    };
+  },
+};
+
+const createBlogPost: AgentTool = {
+  name: "create_blog_post",
+  description:
+    "Create a blog post. Provide HTML content. Posts default to 'draft'; set status to 'published' to publish immediately or 'scheduled' with publishAt to schedule.",
+  parameters: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      contentHtml: { type: "string", description: "HTML body of the post." },
+      excerpt: { type: "string", description: "Short summary." },
+      category: { type: "string" },
+      tags: { type: "array", items: { type: "string" } },
+      featuredImageUrl: { type: "string" },
+      status: { type: "string", enum: BLOG_STATUSES, description: "Default draft." },
+      publishAt: { type: "string", description: "ISO timestamp if scheduling." },
+    },
+    required: ["title", "contentHtml"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Create blog post “${a.title}” (status: ${a.status ?? "draft"})`,
+  async execute(args, ctx) {
+    const post = await saveBlogPost({
+      title: args.title, contentHtml: args.contentHtml, excerpt: args.excerpt,
+      category: args.category, tags: args.tags, featuredImageUrl: args.featuredImageUrl,
+      status: args.status ?? "draft", publishAt: args.publishAt, actorUserId: ctx.actorId,
+    });
+    return { id: post.id, title: post.title, slug: post.slug, status: post.status };
+  },
+};
+
+const updateBlogPostStatusAction: AgentTool = {
+  name: "update_blog_post_status",
+  description: "Change a blog post's status (draft, scheduled, published, hidden, archived, deleted).",
+  parameters: {
+    type: "object",
+    properties: {
+      id: { type: "string" },
+      status: { type: "string", enum: BLOG_STATUSES },
+    },
+    required: ["id", "status"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Set blog post ${a.id} status to “${a.status}”`,
+  async execute(args, ctx) {
+    const post = await updateBlogPostStatus({ id: args.id, status: args.status, actorUserId: ctx.actorId });
+    return { id: post.id, status: post.status };
+  },
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Contacts
+// ──────────────────────────────────────────────────────────────────────────────
+
+const listContacts: AgentTool = {
+  name: "list_contacts",
+  description: "List contacts/leads (name, email, phone, type, status). Optionally filter by a search term.",
+  parameters: {
+    type: "object",
+    properties: {
+      search: { type: "string", description: "Optional name/email/phone search." },
+      limit: { type: "number", description: "Max results (default 20, max 50)." },
+    },
+  },
+  requiresConfirmation: false,
+  async execute(args) {
+    const supabase = createSupabaseAdminClient();
+    const limit = Math.min(Number(args.limit) || 20, 50);
+    let query = supabase
+      .from("contacts")
+      .select("id, first_name, last_name, email, phone, company, church, type, status, source")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    const q = String(args.search ?? "").trim();
+    if (q) {
+      const like = `%${q}%`;
+      query = query.or(`first_name.ilike.${like},last_name.ilike.${like},email.ilike.${like},phone.ilike.${like}`);
+    }
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    return { count: data?.length ?? 0, contacts: data ?? [] };
+  },
+};
+
+const createContact: AgentTool = {
+  name: "create_contact",
+  description: "Add a new contact/lead to the dashboard.",
+  parameters: {
+    type: "object",
+    properties: {
+      firstName: { type: "string" },
+      lastName: { type: "string" },
+      email: { type: "string" },
+      phone: { type: "string" },
+      company: { type: "string" },
+      church: { type: "string" },
+      type: { type: "string", description: "e.g. lead, contact, partner." },
+      status: { type: "string" },
+      source: { type: "string" },
+      notes: { type: "string" },
+    },
+    required: ["firstName", "lastName"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Add contact ${a.firstName} ${a.lastName}${a.email ? ` (${a.email})` : ""}`,
+  async execute(args, ctx) {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from("contacts")
+      .insert({
+        first_name: args.firstName, last_name: args.lastName,
+        email: args.email ?? null, phone: args.phone ?? null,
+        company: args.company ?? null, church: args.church ?? null,
+        type: args.type ?? "contact", status: args.status ?? "active",
+        source: args.source ?? "ai_agent", notes: args.notes ?? null,
+        created_by: ctx.actorId,
+      })
+      .select("id, first_name, last_name, email")
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Participants & tags
+// ──────────────────────────────────────────────────────────────────────────────
+
+const createParticipant: AgentTool = {
+  name: "create_participant",
+  description:
+    "Create a pilot participant (or update one by matching email). Use this to enroll someone in the pilot.",
+  parameters: {
+    type: "object",
+    properties: {
+      firstName: { type: "string" },
+      lastName: { type: "string" },
+      email: { type: "string" },
+      phone: { type: "string" },
+      wave: { type: "string", description: "Wave / source label." },
+      participantType: { type: "string" },
+      relationshipCategory: { type: "string" },
+    },
+    required: ["firstName", "lastName", "email"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Create/enroll participant ${a.firstName} ${a.lastName} (${a.email})`,
+  async execute(args) {
+    const p = await upsertParticipant({
+      firstName: args.firstName, lastName: args.lastName, email: args.email,
+      phone: args.phone, waveSource: args.wave, participantType: args.participantType,
+      relationshipCategory: args.relationshipCategory,
+    });
+    return { id: (p as any)?.id ?? null, email: args.email };
+  },
+};
+
+const listTags: AgentTool = {
+  name: "list_tags",
+  description: "List all participant tags (id, name, category).",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.from("tags").select("id, name, category").order("name");
+    if (error) throw new Error(error.message);
+    return { tags: data ?? [] };
+  },
+};
+
+const setParticipantTags: AgentTool = {
+  name: "set_participant_tags",
+  description: "Replace the full set of tags on a participant. Pass the complete list of tag ids the participant should have.",
+  parameters: {
+    type: "object",
+    properties: {
+      participantId: { type: "string" },
+      tagIds: { type: "array", items: { type: "string" }, description: "Complete list of tag ids." },
+    },
+    required: ["participantId", "tagIds"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Set ${Array.isArray(a.tagIds) ? a.tagIds.length : 0} tag(s) on participant ${a.participantId}`,
+  async execute(args, ctx) {
+    await updateParticipantTags({ participantId: args.participantId, tagIds: args.tagIds ?? [], actorId: ctx.actorId });
+    return { participantId: args.participantId, tagCount: (args.tagIds ?? []).length };
+  },
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Media studio
+// ──────────────────────────────────────────────────────────────────────────────
+
+const listMediaAssets: AgentTool = {
+  name: "list_media_assets",
+  description: "List media studio assets (id, title, type, status, visibility).",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    const data = await getMediaStudioData();
+    const assets = (data as any).assets ?? (data as any).media ?? [];
+    return {
+      assets: (assets as any[]).map((a) => ({
+        id: a.id, title: a.title, type: a.asset_type, status: a.status, visibility: a.visibility,
+      })),
+    };
+  },
+};
+
+const createMediaAsset: AgentTool = {
+  name: "create_media_asset",
+  description: "Add a media asset (audio, video, photo, or gallery) by external URL or embed URL.",
+  parameters: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      assetType: { type: "string", enum: ["audio", "video", "photo", "gallery"] },
+      fileUrl: { type: "string", description: "Direct file URL (for uploads/external files)." },
+      embedUrl: { type: "string", description: "Embed URL (e.g. YouTube/Vimeo)." },
+      description: { type: "string" },
+      status: { type: "string", enum: ["draft", "published", "hidden", "archived"] },
+      visibility: { type: "string", enum: ["private", "public", "assigned"] },
+    },
+    required: ["title", "assetType"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Create ${a.assetType} media asset “${a.title}” (${a.status ?? "draft"})`,
+  async execute(args, ctx) {
+    const asset = await saveMediaAsset({
+      title: args.title, assetType: args.assetType,
+      sourceType: args.embedUrl ? "embed" : "external_url",
+      fileUrl: args.fileUrl, embedUrl: args.embedUrl, description: args.description,
+      status: args.status ?? "draft", visibility: args.visibility ?? "private",
+      actorUserId: ctx.actorId,
+    });
+    return { id: (asset as any)?.id ?? null, title: args.title };
+  },
+};
+
 export const AGENT_TOOLS: AgentTool[] = [
+  // Reads
   searchParticipants,
   getParticipant,
   getPilotOverview,
   listRecentCalls,
   listSmsConversations,
+  listEmailTemplates,
+  listBlogPosts,
+  listContacts,
+  listTags,
+  listMediaAssets,
+  // Actions (confirmation-gated)
   sendSmsAction,
   sendEmailAction,
+  createEmailTemplate,
+  updateEmailTemplate,
+  setEmailAutomation,
+  sendTemplateEmailAction,
+  runDueJourneyEmails,
+  createBlogPost,
+  updateBlogPostStatusAction,
+  createContact,
+  createParticipant,
+  setParticipantTags,
+  createMediaAsset,
 ];
 
 export const TOOL_MAP: Record<string, AgentTool> = Object.fromEntries(
