@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { isAppRole } from "@/lib/rbac/roles";
+import { ROLES, isAppRole } from "@/lib/rbac/roles";
 import { requireUserManager } from "@/lib/user-management/auth";
 import { USER_STATUSES } from "@/lib/user-management/constants";
-import { upsertProfile } from "@/lib/user-management/repository";
+import { getUserManagementProfile, upsertProfile } from "@/lib/user-management/repository";
 
 export async function POST(request: Request) {
   try {
@@ -11,6 +11,19 @@ export async function POST(request: Request) {
 
     if (!isAppRole(body.role)) {
       return NextResponse.json({ error: "Invalid role." }, { status: 400 });
+    }
+
+    // Only a Super Admin may grant the Super Admin role. This applies both when
+    // promoting a user TO super_admin and when editing an existing super_admin
+    // (so an admin cannot quietly take over a Super Admin account).
+    if (body.role === ROLES.SUPER_ADMIN && actor.role !== ROLES.SUPER_ADMIN) {
+      return NextResponse.json({ error: "Only a Super Admin can assign the Super Admin role." }, { status: 403 });
+    }
+    if (actor.role !== ROLES.SUPER_ADMIN && body.id) {
+      const existing = await getUserManagementProfile(body.id);
+      if ((existing.profile as { role?: string } | null)?.role === ROLES.SUPER_ADMIN) {
+        return NextResponse.json({ error: "Only a Super Admin can modify a Super Admin account." }, { status: 403 });
+      }
     }
     if (!USER_STATUSES.includes(body.status)) {
       return NextResponse.json({ error: "Invalid status." }, { status: 400 });

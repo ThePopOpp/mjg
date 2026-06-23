@@ -21,9 +21,13 @@ type EditableProfile = {
   notes: string | null;
 };
 
-export function UserProfileEditor({ profile }: { profile: EditableProfile }) {
+export function UserProfileEditor({ profile, currentUserRole }: { profile: EditableProfile; currentUserRole?: AppRole }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
+  // Only a Super Admin can assign or keep the Super Admin role on a profile.
+  const assignableRoles = Object.values(ROLES).filter(
+    (item) => item !== ROLES.SUPER_ADMIN || currentUserRole === ROLES.SUPER_ADMIN
+  );
   const [firstName, setFirstName] = useState(profile.first_name ?? "");
   const [lastName, setLastName] = useState(profile.last_name ?? "");
   const [email, setEmail] = useState(profile.email ?? "");
@@ -97,7 +101,7 @@ export function UserProfileEditor({ profile }: { profile: EditableProfile }) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-            {Object.values(ROLES).map((item) => (
+            {assignableRoles.map((item) => (
               <SelectItem key={item} value={item}>
                 {ROLE_LABELS[item]}
               </SelectItem>

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUserManager } from "@/lib/user-management/auth";
 import { createUserInvitation } from "@/lib/user-management/repository";
-import { isAppRole } from "@/lib/rbac/roles";
+import { ROLES, isAppRole } from "@/lib/rbac/roles";
 
 export async function POST(request: Request) {
   try {
@@ -10,6 +10,11 @@ export async function POST(request: Request) {
 
     if (!isAppRole(body.role)) {
       return NextResponse.json({ error: "Invalid role." }, { status: 400 });
+    }
+
+    // Only a Super Admin may grant the Super Admin role — prevents privilege escalation.
+    if (body.role === ROLES.SUPER_ADMIN && actor.role !== ROLES.SUPER_ADMIN) {
+      return NextResponse.json({ error: "Only a Super Admin can invite another Super Admin." }, { status: 403 });
     }
 
     const invitation = await createUserInvitation({

@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserProfileEditor } from "@/components/user-management/user-profile-editor";
 import { ROLE_LABELS, isAppRole } from "@/lib/rbac/roles";
+import { getCurrentProfile } from "@/lib/auth/server";
 import { getUserManagementProfile } from "@/lib/user-management/repository";
 
 export default async function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const data = await getUserManagementProfile(id);
+  const [data, currentProfile] = await Promise.all([getUserManagementProfile(id), getCurrentProfile()]);
 
   if (!data.profile) {
     return (
@@ -37,7 +38,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           <CardTitle>Edit profile</CardTitle>
         </CardHeader>
         <CardContent>
-          <UserProfileEditor profile={profile} />
+          <UserProfileEditor profile={profile} currentUserRole={currentProfile?.role} />
         </CardContent>
       </Card>
 

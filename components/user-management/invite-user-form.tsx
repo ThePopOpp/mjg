@@ -9,11 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ROLE_LABELS, ROLES, type AppRole } from "@/lib/rbac/roles";
 
-const inviteRoles = [ROLES.ADMIN, ROLES.TEAM_MEMBER, ROLES.CONTENT_REVIEWER, ROLES.PASTOR_ELDER_REVIEWER, ROLES.PARTICIPANT];
+const baseInviteRoles = [ROLES.ADMIN, ROLES.TEAM_MEMBER, ROLES.CONTENT_REVIEWER, ROLES.PASTOR_ELDER_REVIEWER, ROLES.PARTICIPANT];
 
-export function InviteUserForm() {
+export function InviteUserForm({ currentUserRole }: { currentUserRole?: AppRole }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
+  // Only a Super Admin can invite another Super Admin.
+  const inviteRoles =
+    currentUserRole === ROLES.SUPER_ADMIN ? [ROLES.SUPER_ADMIN, ...baseInviteRoles] : baseInviteRoles;
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState<AppRole>(ROLES.TEAM_MEMBER);
