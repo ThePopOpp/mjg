@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminManager } from "@/lib/user-management/auth";
-import { runAgent, SYSTEM_PROMPT, type ChatMessage, type AgentDecision } from "@/lib/ai-agent/agent";
+import { runAgent, buildSystemPrompt, type ChatMessage, type AgentDecision } from "@/lib/ai-agent/agent";
+import { getAgentMemories } from "@/lib/ai-agent/memory";
 
 export const maxDuration = 60;
 
@@ -12,11 +13,12 @@ export async function POST(request: Request) {
     const incoming: ChatMessage[] = Array.isArray(body.messages) ? body.messages : [];
     const decisions: Record<string, AgentDecision> = body.decisions ?? {};
 
-    // Ensure the system prompt leads the conversation exactly once.
-    const messages: ChatMessage[] =
-      incoming[0]?.role === "system"
-        ? incoming
-        : [{ role: "system", content: SYSTEM_PROMPT }, ...incoming];
+    // Rebuild a fresh system prompt every turn (skills + latest recalled memory),
+    // replacing any stale system message the client echoed back.
+    const memories = await getAgentMemories();
+    const systemContent = buildSystemPrompt(memories);
+    const conversation = incoming.filter((m) => m.role !== "system");
+    const messages: ChatMessage[] = [{ role: "system", content: systemContent }, ...conversation];
 
     const ctx = { actorId: actor.id, actorEmail: actor.email ?? "" };
     const result = await runAgent(messages, ctx, decisions);

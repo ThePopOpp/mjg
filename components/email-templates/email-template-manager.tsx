@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Archive, Copy, Eye, Pencil } from "lucide-react";
+import { Archive, Copy, Eye, Pencil, Trash2 } from "lucide-react";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -87,6 +87,26 @@ export function EmailTemplateManager({ templates }: { templates: EmailTemplateRo
     window.location.reload();
   }
 
+  async function deleteTemplate(template: EmailTemplateRow) {
+    setActionMessage(null);
+    setActionError(null);
+    if (!window.confirm(`Permanently delete the template “${template.name}”? This cannot be undone.`)) return;
+    const response = await fetch("/api/admin/email/templates", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+      body: JSON.stringify({ actionToken, id: template.id }),
+    });
+    const payload = await response.json();
+
+    if (!response.ok) {
+      setActionError(payload.error ?? "Template could not be deleted.");
+      return;
+    }
+
+    setActionMessage("Template deleted.");
+    window.location.reload();
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -139,6 +159,10 @@ export function EmailTemplateManager({ templates }: { templates: EmailTemplateRo
                       <Button disabled={template.status === "archived"} size="sm" type="button" variant="outline" onClick={() => archiveTemplate(template)}>
                         <Archive className="h-4 w-4" />
                         Archive
+                      </Button>
+                      <Button size="sm" type="button" variant="outline" className="text-destructive hover:text-destructive" onClick={() => deleteTemplate(template)}>
+                        <Trash2 className="h-4 w-4" />
+                        Delete
                       </Button>
                     </div>
                   </TableCell>

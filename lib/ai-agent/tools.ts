@@ -6,6 +6,7 @@ import { logUserActivity } from "@/lib/user-management/repository";
 import {
   getEmailTemplateData,
   saveEmailTemplate,
+  deleteEmailTemplate,
   sendTemplateEmail,
   saveEmailTemplateMapping,
   sendDueJourneyEmails,
@@ -14,6 +15,8 @@ import { EMAIL_EVENT_KEYS } from "@/lib/email/constants";
 import { getBlogAdminData, getBlogPostById, saveBlogPost, updateBlogPostStatus, normalizePostTags } from "@/lib/content/blog";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { saveMediaAsset, getMediaStudioData } from "@/lib/content/media";
+import { BRAND_KIT, brandEmailButton, brandEmailHeader } from "@/lib/brand/assets";
+import { saveAgentMemory, deleteAgentMemory } from "@/lib/ai-agent/memory";
 
 const EMAIL_EVENT_OPTIONS = EMAIL_EVENT_KEYS.map((e) => e.key);
 const BLOG_STATUSES = ["draft", "scheduled", "published", "hidden", "archived", "deleted"];
@@ -851,6 +854,87 @@ const updateMediaAsset: AgentTool = {
   },
 };
 
+const deleteEmailTemplateAction: AgentTool = {
+  name: "delete_email_template",
+  description: "Permanently delete an email template by id. This cannot be undone; any automation pointing at it is disabled. Prefer archiving (update_email_template status=archived) unless the user explicitly wants it removed.",
+  parameters: {
+    type: "object",
+    properties: { id: { type: "string", description: "Template id to delete." } },
+    required: ["id"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Permanently delete email template ${a.id}`,
+  async execute(args) {
+    await deleteEmailTemplate(String(args.id));
+    return { deleted: true, id: args.id };
+  },
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Brand kit / design system
+// ──────────────────────────────────────────────────────────────────────────────
+
+const getBrandKit: AgentTool = {
+  name: "get_brand_kit",
+  description:
+    "Get the MJG brand kit / design system: official logo URLs, color palette (hex), font stacks, brand voice, and ready-to-use on-brand email header & button HTML snippets. ALWAYS call this before generating member-facing email or blog content so it stays on-brand.",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    return {
+      name: BRAND_KIT.name,
+      tagline: BRAND_KIT.tagline,
+      logos: BRAND_KIT.logos,
+      colors: BRAND_KIT.colors,
+      fonts: BRAND_KIT.fonts,
+      voice: BRAND_KIT.voice,
+      links: BRAND_KIT.links,
+      snippets: {
+        emailHeaderHtml: brandEmailHeader(),
+        emailButtonExample: brandEmailButton("{{site_url}}", "Read more"),
+      },
+    };
+  },
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Memory
+// ──────────────────────────────────────────────────────────────────────────────
+
+const rememberTool: AgentTool = {
+  name: "remember",
+  description:
+    "Save a durable, non-sensitive fact to recall in future conversations (e.g. an ongoing task, a created entity id, or an owner preference). Do NOT store financial, legal, medical, or other sensitive personal data.",
+  parameters: {
+    type: "object",
+    properties: {
+      key: { type: "string", description: "Short identifier, e.g. 'draft_blog_post_id' or 'reminder_preference'." },
+      value: { type: "string", description: "The fact to remember." },
+    },
+    required: ["key", "value"],
+  },
+  requiresConfirmation: false,
+  async execute(args, ctx) {
+    const m = await saveAgentMemory({ key: String(args.key), value: String(args.value), createdBy: ctx.actorId });
+    return { saved: true, key: m.key };
+  },
+};
+
+const forgetTool: AgentTool = {
+  name: "forget",
+  description: "Delete a saved memory fact by its key when it is obsolete.",
+  parameters: {
+    type: "object",
+    properties: { key: { type: "string", description: "The memory key to remove." } },
+    required: ["key"],
+  },
+  requiresConfirmation: false,
+  async execute(args) {
+    await deleteAgentMemory(String(args.key));
+    return { forgotten: true, key: args.key };
+  },
+};
+
 export const AGENT_TOOLS: AgentTool[] = [
   // Reads
   searchParticipants,
@@ -864,11 +948,13 @@ export const AGENT_TOOLS: AgentTool[] = [
   listContacts,
   listTags,
   listMediaAssets,
+  getBrandKit,
   // Actions (confirmation-gated)
   sendSmsAction,
   sendEmailAction,
   createEmailTemplate,
   updateEmailTemplate,
+  deleteEmailTemplateAction,
   setEmailAutomation,
   sendTemplateEmailAction,
   runDueJourneyEmails,
@@ -882,6 +968,9 @@ export const AGENT_TOOLS: AgentTool[] = [
   setParticipantTags,
   createMediaAsset,
   updateMediaAsset,
+  // Memory (internal, no confirmation)
+  rememberTool,
+  forgetTool,
 ];
 
 export const TOOL_MAP: Record<string, AgentTool> = Object.fromEntries(

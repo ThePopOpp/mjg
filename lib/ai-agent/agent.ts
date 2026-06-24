@@ -1,4 +1,6 @@
 import { AGENT_TOOLS, TOOL_MAP, openAiToolSchemas, type AgentContext } from "./tools";
+import { renderSkillsForPrompt } from "./skills";
+import { renderMemoryForPrompt, type AgentMemory } from "./memory";
 
 export type ToolCall = {
   id: string;
@@ -47,6 +49,11 @@ Guidelines:
 - Prefer creating drafts unless the user explicitly asks to publish or activate.
 - If a request is ambiguous or missing a required detail, ask a brief clarifying question instead of guessing.
 - This is a faith-based stewardship pilot; keep tone warm and pastoral in member-facing content. Keep your own replies concise and professional.`;
+
+// Compose the full system prompt: base persona + skill playbooks + recalled memory.
+export function buildSystemPrompt(memories: AgentMemory[] = []): string {
+  return SYSTEM_PROMPT + renderSkillsForPrompt() + renderMemoryForPrompt(memories);
+}
 
 function getModel(): string {
   const model = process.env.OPENAI_MODEL?.trim();

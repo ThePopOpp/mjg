@@ -84,6 +84,18 @@ export async function saveEmailTemplate(input: {
   return data;
 }
 
+export async function deleteEmailTemplate(id: string) {
+  if (!id) throw new Error("Template id is required.");
+  const supabase = createSupabaseAdminClient();
+  // All template_id foreign keys (send logs, mappings, journey events, blog links)
+  // are ON DELETE SET NULL, so removing the template is safe and non-destructive
+  // to history; we also disable any automation mapping that pointed at it.
+  await supabase.from("email_template_mappings").update({ enabled: false }).eq("template_id", id);
+  const { error } = await supabase.from("email_templates").delete().eq("id", id);
+  if (error) throw error;
+  return { id };
+}
+
 export async function sendTemplateEmail(input: {
   templateId: string;
   recipient: EmailRecipient;
