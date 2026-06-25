@@ -776,6 +776,31 @@ const setParticipantTags: AgentTool = {
 // Media studio
 // ──────────────────────────────────────────────────────────────────────────────
 
+const listBusinessCards: AgentTool = {
+  name: "list_business_cards",
+  description: "List digital business cards (name, owner, status, public slug, view/click counts, lead count).",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from("business_cards")
+      .select("id, card_name, display_name, slug, status, view_count, click_count, owner:profiles!business_cards_staff_user_id_fkey(full_name)")
+      .neq("status", "archived")
+      .order("updated_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    const { count: leadCount } = await supabase.from("business_card_leads").select("id", { count: "exact", head: true }).eq("status", "new");
+    return {
+      newLeads: leadCount ?? 0,
+      cards: (data ?? []).map((c: any) => ({
+        id: c.id, name: c.display_name || c.card_name, slug: c.slug, status: c.status,
+        owner: c.owner?.full_name ?? null, views: c.view_count, clicks: c.click_count,
+      })),
+    };
+  },
+};
+
 const listMediaAssets: AgentTool = {
   name: "list_media_assets",
   description: "List media studio assets (id, title, type, status, visibility).",
@@ -948,6 +973,7 @@ export const AGENT_TOOLS: AgentTool[] = [
   listContacts,
   listTags,
   listMediaAssets,
+  listBusinessCards,
   getBrandKit,
   // Actions (confirmation-gated)
   sendSmsAction,
