@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Copy, Heart, Moon, Share2, Sun, UserPlus, X } from "lucide-react";
 import { CardPreview } from "@/components/business-card/card-preview";
+import StewardshipBlueprint from "@/components/stewardship-blueprint";
 import type { BusinessCard, BusinessCardLink, EventType, LeadFormField } from "@/lib/business-cards/types";
 
 export function PublicCard({ card, publicUrl }: { card: BusinessCard; publicUrl: string }) {
@@ -218,7 +219,12 @@ function Splash({ content, card, onView }: { content: Record<string, unknown>; c
       className="fixed inset-0 z-40 flex flex-col items-center justify-center px-6 text-center transition-all duration-[450ms] ease-out"
       style={{ background: card.background_color, color: card.text_color, ...transformStyle }}
     >
-      {mode === "video" ? (
+      {mode === "animation" ? (
+        <>
+          <div className="w-full max-w-3xl"><StewardshipBlueprint theme="dark" autoPlay loop fonts /></div>
+          <button onClick={close} className="mt-6 rounded-full px-6 py-2.5 text-sm font-semibold" style={{ background: "rgba(127,127,127,0.18)", color: accent }}>{primary}</button>
+        </>
+      ) : mode === "video" ? (
         <>
           <SplashVideo content={content} muted={muted} />
           <button onClick={close} className="mt-6 rounded-full px-6 py-2.5 text-sm font-semibold" style={{ background: "rgba(127,127,127,0.18)", color: accent }}>{primary}</button>

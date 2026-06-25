@@ -730,7 +730,7 @@ function SplashPanel({
   }
 
   const tabs: [string, string, React.ElementType][] = [
-    ["standard", "Standard", User], ["video", "Video", PlayCircle], ["slideshow", "Slideshow", GalleryHorizontal],
+    ["standard", "Standard", User], ["animation", "Animation", Sparkles], ["video", "Video", PlayCircle], ["slideshow", "Slideshow", GalleryHorizontal],
   ];
 
   return (
@@ -775,6 +775,10 @@ function SplashPanel({
           <F label="Primary button"><input className={iCls} value={str("primary_label")} onChange={(e) => setContent({ primary_label: e.target.value })} placeholder="View card" /></F>
           <F label="Secondary button"><input className={iCls} value={str("secondary_label")} onChange={(e) => setContent({ secondary_label: e.target.value })} placeholder="Call me" /></F>
         </>
+      )}
+
+      {mode === "animation" && (
+        <p className="mb-2 text-xs text-muted-foreground">Plays the MJG “Stewardship Blueprint” animation as your splash — no setup needed. Use “Auto-dismiss” above to control how long it shows (0 = until tapped), or set a transition.</p>
       )}
 
       {mode === "video" && <VideoSplashFields content={content} setContent={setContent} />}
