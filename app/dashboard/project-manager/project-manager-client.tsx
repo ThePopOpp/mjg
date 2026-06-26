@@ -41,6 +41,19 @@ const statusClass: Record<string, string> = {
   complete: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
   canceled: "bg-muted text-muted-foreground line-through",
 };
+// Gantt bars need stronger fills + a status-colored border that read clearly in
+// BOTH light and dark mode (darker text on light, lighter text on dark).
+const ganttBarClass: Record<string, string> = {
+  pending: "bg-slate-400/20 text-slate-700 dark:text-slate-200 border-slate-400/50",
+  scheduled: "bg-blue-500/20 text-blue-700 dark:text-blue-200 border-blue-500/50",
+  in_progress: "bg-primary/25 text-primary border-primary/60",
+  waiting: "bg-amber-500/20 text-amber-700 dark:text-amber-200 border-amber-500/50",
+  delayed: "bg-orange-500/20 text-orange-700 dark:text-orange-200 border-orange-500/50",
+  blocked: "bg-red-500/20 text-red-700 dark:text-red-200 border-red-500/50",
+  needs_approval: "bg-purple-500/20 text-purple-700 dark:text-purple-200 border-purple-500/50",
+  complete: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 border-emerald-500/50",
+  canceled: "bg-muted text-muted-foreground border-border line-through",
+};
 const priorityClass: Record<string, string> = {
   low: "text-muted-foreground", normal: "text-foreground", high: "text-amber-600 dark:text-amber-400",
   urgent: "text-orange-600 dark:text-orange-400", critical: "text-red-600 dark:text-red-400",
@@ -503,7 +516,7 @@ function CalendarView({ items, onEdit }: { items: ProjectScheduleItem[]; onEdit:
 }
 
 // ── Gantt ────────────────────────────────────────────────────────────────────
-const GANTT_ROW_H = 34;     // px per row (label + bar lane)
+const GANTT_ROW_H = 42;     // px per row (label + bar lane)
 const GANTT_HEAD_H = 44;    // px timeline header (two tiers)
 const GANTT_LABEL_W = 224;  // px left label column
 
@@ -767,7 +780,7 @@ function GanttView({
         </div>
 
         {/* Right scrollable timeline */}
-        <div className="flex-1 overflow-x-auto">
+        <div className="gantt-scroll flex-1 overflow-x-auto">
           <div style={{ width: totalW }}>
             {/* Two-tier header */}
             <div style={{ height: GANTT_HEAD_H }} className="relative border-b border-border">
@@ -810,10 +823,10 @@ function GanttView({
                     <div
                       onMouseDown={(e) => onDown(e, it, "move")}
                       title={`${it.title} · ${fmtMs(g.s)} → ${fmtMs(g.e)}`}
-                      className={cn("group relative flex h-full cursor-grab items-center overflow-hidden rounded-md border active:cursor-grabbing", statusClass[it.status] ?? "bg-muted text-muted-foreground", "border-border/70")}
+                      className={cn("group relative flex h-full cursor-grab items-center overflow-hidden rounded-md border shadow-sm active:cursor-grabbing", ganttBarClass[it.status] ?? "bg-muted text-muted-foreground border-border")}
                     >
                       {it.progress > 0 && <div className="absolute inset-y-0 left-0 bg-primary/25" style={{ width: `${Math.min(100, it.progress)}%` }} />}
-                      <span className="relative truncate px-2 text-[10px] font-medium">{it.title}</span>
+                      <span className="relative truncate px-2.5 text-[11px] font-medium">{it.title}</span>
                       <span onMouseDown={(e) => onDown(e, it, "l")} className="absolute inset-y-0 left-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
                       <span onMouseDown={(e) => onDown(e, it, "r")} className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
                     </div>
