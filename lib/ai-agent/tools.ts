@@ -17,6 +17,14 @@ import { upsertParticipant } from "@/lib/pilot/repository";
 import { saveMediaAsset, getMediaStudioData } from "@/lib/content/media";
 import { BRAND_KIT, brandEmailButton, brandEmailHeader } from "@/lib/brand/assets";
 import { saveAgentMemory, deleteAgentMemory } from "@/lib/ai-agent/memory";
+import {
+  getSocialTemplateData, saveSocialTemplate, listAccounts as listSocialAccounts,
+  listPosts as listSocialPosts, createPost as createSocialPostRow, publishPost as publishSocialPostRow,
+  getSocialReport, listMessages as listSocialMessages, saveAutomation as saveSocialAutomation,
+} from "@/lib/social-media/data";
+import { SOCIAL_EVENT_KEYS } from "@/lib/social-media/constants";
+
+const SOCIAL_EVENT_OPTIONS = SOCIAL_EVENT_KEYS.map((e) => e.key);
 
 const EMAIL_EVENT_OPTIONS = EMAIL_EVENT_KEYS.map((e) => e.key);
 const BLOG_STATUSES = ["draft", "scheduled", "published", "hidden", "archived", "deleted"];
@@ -960,6 +968,149 @@ const forgetTool: AgentTool = {
   },
 };
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Social Media tools
+// ──────────────────────────────────────────────────────────────────────────────
+
+const listSocialTemplatesTool: AgentTool = {
+  name: "list_social_templates",
+  description: "List social media post templates (id, name, category, status, platforms, body) and the current social automations.",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    const data = await getSocialTemplateData();
+    return {
+      templates: data.templates.map((t) => ({ id: t.id, name: t.name, category: t.category, status: t.status, platforms: t.platforms, body: t.body_text, hashtags: t.hashtags })),
+      automations: data.automations.map((a) => ({ eventKey: a.event_key, enabled: a.enabled, templateId: a.template_id, platforms: a.platforms })),
+    };
+  },
+};
+
+const listSocialAccountsTool: AgentTool = {
+  name: "list_social_accounts",
+  description: "List connected social media accounts (id, platform, display name, status, active). Credentials are never returned. Use the account id when creating a post.",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    const accounts = await listSocialAccounts();
+    return { accounts: accounts.map((a) => ({ id: a.id, platform: a.platform, displayName: a.display_name, status: a.status, active: a.is_active })) };
+  },
+};
+
+const listSocialPostsTool: AgentTool = {
+  name: "list_social_posts",
+  description: "List social posts, optionally filtered by status (draft, scheduled, published, failed). Returns platform, status, body, schedule/publish time, and engagement.",
+  parameters: { type: "object", properties: { status: { type: "string", enum: ["draft", "scheduled", "published", "failed", "skipped"], description: "Optional status filter." } } },
+  requiresConfirmation: false,
+  async execute(args) {
+    const posts = await listSocialPosts({ status: args.status, limit: 50 });
+    return { posts: posts.map((p) => ({ id: p.id, platform: p.platform, status: p.status, body: p.body_text, scheduledAt: p.scheduled_at, publishedAt: p.published_at, engagement: p.engagement })) };
+  },
+};
+
+const getSocialReportTool: AgentTool = {
+  name: "get_social_report",
+  description: "Get a social media performance report for a date range (default 30 days): totals, per-platform breakdown, daily activity, and top posts. Use to run reports and analyze data.",
+  parameters: { type: "object", properties: { rangeDays: { type: "number", description: "Days to include (default 30)." } } },
+  requiresConfirmation: false,
+  async execute(args) { return await getSocialReport(Number(args.rangeDays) || 30); },
+};
+
+const listSocialInboxTool: AgentTool = {
+  name: "list_social_inbox",
+  description: "List social inbox items (messages, comments, reviews, mentions), optionally filtered by kind or status.",
+  parameters: { type: "object", properties: { kind: { type: "string", enum: ["message", "comment", "review", "mention"] }, status: { type: "string", enum: ["new", "read", "replied", "archived"] } } },
+  requiresConfirmation: false,
+  async execute(args) {
+    const messages = await listSocialMessages({ kind: args.kind, status: args.status, limit: 50 });
+    return { messages: messages.map((m) => ({ id: m.id, kind: m.kind, platform: m.platform, author: m.author_name, text: m.text, rating: m.rating, status: m.status, receivedAt: m.received_at })) };
+  },
+};
+
+const createSocialTemplateTool: AgentTool = {
+  name: "create_social_template",
+  description: "Create a social media post template. Provide the post body text, target platforms, and optional hashtags. New templates default to 'draft'.",
+  parameters: {
+    type: "object",
+    properties: {
+      name: { type: "string", description: "Template name." },
+      bodyText: { type: "string", description: "The post copy. Supports {{merge_fields}} like {{event_title}}, {{event_url}}, {{site_url}}." },
+      platforms: { type: "array", items: { type: "string" }, description: "Target platforms, e.g. [\"facebook\",\"linkedin\"]." },
+      hashtags: { type: "array", items: { type: "string" }, description: "Optional hashtags." },
+      category: { type: "string", description: "Optional category label." },
+      status: { type: "string", enum: ["draft", "active", "archived"], description: "Default draft." },
+    },
+    required: ["name", "bodyText"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Create social template "${a.name}" for ${(a.platforms ?? []).join(", ") || "no platforms"} (status: ${a.status ?? "draft"})`,
+  async execute(args, ctx) {
+    const t = await saveSocialTemplate({ name: args.name, bodyText: args.bodyText, platforms: args.platforms ?? [], hashtags: args.hashtags ?? [], category: args.category, status: args.status ?? "draft", actorUserId: ctx.actorId });
+    return { id: t.id, name: t.name, status: t.status };
+  },
+};
+
+const createSocialPostTool: AgentTool = {
+  name: "create_social_post",
+  description: "Create a social media post as a draft or scheduled. Provide platform and body. Pass accountId (from list_social_accounts) to attach an account. Pass scheduledAt (ISO) to schedule; otherwise it is a draft. Does NOT publish — use publish_social_post or let the owner publish from History.",
+  parameters: {
+    type: "object",
+    properties: {
+      platform: { type: "string", description: "Platform id, e.g. facebook or linkedin." },
+      bodyText: { type: "string", description: "The post copy." },
+      accountId: { type: "string", description: "Optional account id from list_social_accounts." },
+      hashtags: { type: "array", items: { type: "string" } },
+      mediaUrls: { type: "array", items: { type: "string" } },
+      linkUrl: { type: "string" },
+      scheduledAt: { type: "string", description: "Optional ISO datetime to schedule the post." },
+    },
+    required: ["platform", "bodyText"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `${a.scheduledAt ? `Schedule (${a.scheduledAt})` : "Draft"} a ${a.platform} post: "${String(a.bodyText).slice(0, 80)}…"`,
+  async execute(args, ctx) {
+    const post = await createSocialPostRow({
+      platform: args.platform, account_id: args.accountId ?? null, body_text: args.bodyText,
+      hashtags: args.hashtags ?? [], media_urls: args.mediaUrls ?? [], link_url: args.linkUrl ?? null,
+      scheduled_at: args.scheduledAt ?? null, status: args.scheduledAt ? "scheduled" : "draft", actorUserId: ctx.actorId,
+    });
+    return { id: post.id, status: post.status, platform: post.platform };
+  },
+};
+
+const publishSocialPostTool: AgentTool = {
+  name: "publish_social_post",
+  description: "Publish an existing social post now (by id). The post must have a connected account. Use list_social_posts to find the id.",
+  parameters: { type: "object", properties: { id: { type: "string", description: "The post id." } }, required: ["id"] },
+  requiresConfirmation: true,
+  summarize: (a) => `Publish social post ${a.id} now`,
+  async execute(args) {
+    const post = await publishSocialPostRow(String(args.id));
+    return { id: post.id, status: post.status, url: post.external_url };
+  },
+};
+
+const setSocialAutomationTool: AgentTool = {
+  name: "set_social_automation",
+  description: "Bind a social template to an automation event (or enable/disable it). Events: " + SOCIAL_EVENT_OPTIONS.join(", ") + ".",
+  parameters: {
+    type: "object",
+    properties: {
+      eventKey: { type: "string", enum: SOCIAL_EVENT_OPTIONS, description: "The automation event." },
+      templateId: { type: "string", description: "Template id to fire (from list_social_templates), or omit to clear." },
+      platforms: { type: "array", items: { type: "string" } },
+      enabled: { type: "boolean", description: "Whether the automation is active." },
+    },
+    required: ["eventKey", "enabled"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `${a.enabled ? "Enable" : "Disable"} social automation "${a.eventKey}"${a.templateId ? ` → template ${a.templateId}` : ""}`,
+  async execute(args, ctx) {
+    await saveSocialAutomation({ event_key: args.eventKey, template_id: args.templateId ?? null, platforms: args.platforms ?? [], enabled: Boolean(args.enabled), actorUserId: ctx.actorId });
+    return { ok: true, eventKey: args.eventKey, enabled: Boolean(args.enabled) };
+  },
+};
+
 export const AGENT_TOOLS: AgentTool[] = [
   // Reads
   searchParticipants,
@@ -975,6 +1126,11 @@ export const AGENT_TOOLS: AgentTool[] = [
   listMediaAssets,
   listBusinessCards,
   getBrandKit,
+  listSocialTemplatesTool,
+  listSocialAccountsTool,
+  listSocialPostsTool,
+  getSocialReportTool,
+  listSocialInboxTool,
   // Actions (confirmation-gated)
   sendSmsAction,
   sendEmailAction,
@@ -994,6 +1150,10 @@ export const AGENT_TOOLS: AgentTool[] = [
   setParticipantTags,
   createMediaAsset,
   updateMediaAsset,
+  createSocialTemplateTool,
+  createSocialPostTool,
+  publishSocialPostTool,
+  setSocialAutomationTool,
   // Memory (internal, no confirmation)
   rememberTool,
   forgetTool,
