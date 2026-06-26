@@ -2,9 +2,9 @@ node_modules
 .next
 .git
 .github
-docs
 _archive
 .claude
-*.md
 .env*
 npm-debug.log*
+# NOTE: do NOT ignore docs/ — app/login/page.tsx imports logos from
+# @/docs/mjg-logos/*.png, so those assets must be in the build context.
