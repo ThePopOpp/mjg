@@ -8,6 +8,7 @@ import {
   Sparkles, Trash2, Upload, User, Wand2, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FieldSelect } from "@/components/ui/field-select";
 import { cn } from "@/lib/utils";
 import { CardPreview } from "@/components/business-card/card-preview";
 import { COLOR_PRESETS, makeDefaultSections, makeNewCard } from "@/lib/business-cards/defaults";
@@ -356,9 +357,7 @@ function PanelBody(props: {
               <button onClick={() => setLinks(links.filter((x) => x.id !== l.id))} className="text-destructive"><Trash2 className="h-4 w-4" /></button>
             </div>
             <input className={cn(iCls, "mb-2 h-8")} value={l.url} onChange={(e) => update(l.id, { url: e.target.value })} placeholder="https://…" />
-            <select className={cn(iCls, "h-8")} value={l.link_type} onChange={(e) => update(l.id, { link_type: e.target.value as LinkType })}>
-              {LINK_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
+            <FieldSelect value={l.link_type} onChange={(v) => update(l.id, { link_type: v as LinkType })} options={LINK_TYPES.map((t) => ({ value: t, label: t }))} className="h-8" />
           </div>
         ))}
         <Button size="sm" variant="outline" onClick={add}><Plus className="h-3.5 w-3.5" /> Add link</Button>
@@ -371,11 +370,7 @@ function PanelBody(props: {
     return (
       <Section title="Colors & theme">
         <F label="Theme mode">
-          <select className={iCls} value={draft.theme_mode} onChange={(e) => set("theme_mode", e.target.value as ThemeMode)}>
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-            <option value="both">Both (visitor toggle)</option>
-          </select>
+          <FieldSelect value={draft.theme_mode} onChange={(v) => set("theme_mode", v as ThemeMode)} options={[{ value: "dark", label: "Dark" }, { value: "light", label: "Light" }, { value: "both", label: "Both (visitor toggle)" }]} />
         </F>
         <div className="mb-3">
           <div className="mb-1.5 text-xs font-medium text-muted-foreground">Presets</div>
@@ -481,18 +476,11 @@ function PanelBody(props: {
           </div>
         </F>
         <F label="Status">
-          <select className={iCls} value={draft.status} onChange={(e) => set("status", e.target.value as BusinessCard["status"])}>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="unpublished">Unpublished</option>
-          </select>
+          <FieldSelect value={draft.status} onChange={(v) => set("status", v as BusinessCard["status"])} options={[{ value: "draft", label: "Draft" }, { value: "published", label: "Published" }, { value: "unpublished", label: "Unpublished" }]} />
         </F>
         {isAdmin && (
           <F label="Assign to staff member" hint="Admins can assign this card to any staff member.">
-            <select className={iCls} value={draft.staff_user_id ?? ""} onChange={(e) => set("staff_user_id", e.target.value || null)}>
-              <option value="">Unassigned</option>
-              {staffOptions.map((s) => <option key={s.id} value={s.id}>{s.display_name}{s.role_slug ? ` (${s.role_slug})` : ""}</option>)}
-            </select>
+            <FieldSelect value={draft.staff_user_id ?? ""} onChange={(v) => set("staff_user_id", v || null)} options={[{ value: "", label: "Unassigned" }, ...staffOptions.map((s) => ({ value: s.id, label: `${s.display_name}${s.role_slug ? ` (${s.role_slug})` : ""}` }))]} />
           </F>
         )}
       </Section>
@@ -572,12 +560,7 @@ function NfcPanel({
   return (
     <Section title="NFC tap-to-share">
       <F label="NFC status">
-        <select className={iCls} value={draft.nfc_status} onChange={(e) => set("nfc_status", e.target.value)}>
-          <option value="not_ordered">Not ordered</option>
-          <option value="ordered">Ordered</option>
-          <option value="assigned">Assigned to a tag</option>
-          <option value="active">Active</option>
-        </select>
+        <FieldSelect value={draft.nfc_status} onChange={(v) => set("nfc_status", v)} options={[{ value: "not_ordered", label: "Not ordered" }, { value: "ordered", label: "Ordered" }, { value: "assigned", label: "Assigned to a tag" }, { value: "active", label: "Active" }]} />
       </F>
 
       <F label="Tag destination URL" hint="Program your NFC tag/card to open this URL. Taps are tracked as NFC scans.">
@@ -746,13 +729,7 @@ function SplashPanel({
           <input type="number" min={0} className={iCls} value={(content.duration_seconds as number) ?? 0} onChange={(e) => setContent({ duration_seconds: Number(e.target.value) })} />
         </F>
         <F label="Transition">
-          <select className={iCls} value={(content.transition as string) || "fade"} onChange={(e) => setContent({ transition: e.target.value })}>
-            <option value="none">None</option>
-            <option value="fade">Fade</option>
-            <option value="slide-up">Slide up</option>
-            <option value="slide-down">Slide down</option>
-            <option value="zoom">Zoom</option>
-          </select>
+          <FieldSelect value={(content.transition as string) || "fade"} onChange={(v) => setContent({ transition: v })} options={[{ value: "none", label: "None" }, { value: "fade", label: "Fade" }, { value: "slide-up", label: "Slide up" }, { value: "slide-down", label: "Slide down" }, { value: "zoom", label: "Zoom" }]} />
         </F>
       </div>
 
@@ -913,11 +890,7 @@ function MediaPanel({
       </Section>
       <Section title="Profile image">
         <F label="Shape">
-          <select className={iCls} value={media.profile_shape || "circle"} onChange={(e) => setMedia({ profile_shape: e.target.value as MediaSettings["profile_shape"] })}>
-            <option value="circle">Circle</option>
-            <option value="rounded">Rounded</option>
-            <option value="square">Square</option>
-          </select>
+          <FieldSelect value={media.profile_shape || "circle"} onChange={(v) => setMedia({ profile_shape: v as MediaSettings["profile_shape"] })} options={[{ value: "circle", label: "Circle" }, { value: "rounded", label: "Rounded" }, { value: "square", label: "Square" }]} />
         </F>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={Boolean(media.profile_outline)} onChange={(e) => setMedia({ profile_outline: e.target.checked })} />
@@ -926,10 +899,7 @@ function MediaPanel({
       </Section>
       <Section title="Layout">
         <F label="Content alignment">
-          <select className={iCls} value={media.content_align || "center"} onChange={(e) => setMedia({ content_align: e.target.value as MediaSettings["content_align"] })}>
-            <option value="center">Centered</option>
-            <option value="left">Left aligned</option>
-          </select>
+          <FieldSelect value={media.content_align || "center"} onChange={(v) => setMedia({ content_align: v as MediaSettings["content_align"] })} options={[{ value: "center", label: "Centered" }, { value: "left", label: "Left aligned" }]} />
         </F>
       </Section>
     </>
