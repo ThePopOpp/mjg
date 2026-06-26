@@ -4,12 +4,15 @@ import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { InviteUserForm } from "@/components/user-management/invite-user-form";
+import { DeleteUserButton } from "@/components/user-management/delete-user-button";
 import { ROLE_LABELS, ROLES, isAppRole } from "@/lib/rbac/roles";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getUserManagementData } from "@/lib/user-management/repository";
 
 export default async function UserManagementPage() {
   const [data, profile] = await Promise.all([getUserManagementData(), getCurrentProfile()]);
+  const currentUserId = profile?.id ?? null;
+  const OWNER_EMAIL = "jw@michaeljgauthier.com";
 
   return (
     <div className="space-y-6">
@@ -69,9 +72,17 @@ export default async function UserManagementPage() {
                   <TableCell>{profile.participants ? `${profile.participants.first_name} ${profile.participants.last_name}` : "-"}</TableCell>
                   <TableCell>{profile.last_login_at ? new Date(profile.last_login_at).toLocaleDateString() : "-"}</TableCell>
                   <TableCell className="text-right">
-                    <Link className="text-sm font-medium text-primary hover:underline" href={`/dashboard/user-management/${profile.id}`}>
-                      Edit
-                    </Link>
+                    <div className="flex items-center justify-end gap-4">
+                      <Link className="text-sm font-medium text-primary hover:underline" href={`/dashboard/user-management/${profile.id}`}>
+                        Edit
+                      </Link>
+                      {profile.id !== currentUserId && String(profile.email ?? "").toLowerCase() !== OWNER_EMAIL ? (
+                        <DeleteUserButton
+                          userId={profile.id}
+                          userName={profile.full_name || `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim() || profile.email || "this user"}
+                        />
+                      ) : null}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

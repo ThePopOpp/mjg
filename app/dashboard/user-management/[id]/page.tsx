@@ -3,6 +3,7 @@ import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserProfileEditor } from "@/components/user-management/user-profile-editor";
+import { DeleteUserButton } from "@/components/user-management/delete-user-button";
 import { ROLE_LABELS, isAppRole } from "@/lib/rbac/roles";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getUserManagementProfile } from "@/lib/user-management/repository";
@@ -21,6 +22,9 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
 
   const profile = data.profile as any;
   const displayName = profile.full_name || `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim() || profile.email;
+  const isSelf = currentProfile?.id === profile.id;
+  const isOwner = String(profile.email ?? "").toLowerCase() === "jw@michaeljgauthier.com";
+  const canDelete = !isSelf && !isOwner;
 
   return (
     <div className="space-y-6">
@@ -41,6 +45,26 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           <UserProfileEditor profile={profile} currentUserRole={currentProfile?.role} />
         </CardContent>
       </Card>
+
+      {canDelete ? (
+        <Card className="border-destructive/40">
+          <CardHeader>
+            <CardTitle className="text-destructive">Danger zone</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              Permanently delete this user&apos;s login and profile. This cannot be undone.
+            </p>
+            <DeleteUserButton
+              userId={profile.id}
+              userName={displayName}
+              redirectTo="/dashboard/user-management"
+              label="Delete user"
+              variant="button"
+            />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 xl:grid-cols-2">
         <Card>

@@ -384,6 +384,48 @@ export async function upsertProfile(input: {
   return profile;
 }
 
+// Permanently delete a user: removes their Supabase Auth login AND their profile
+// row. All FK references to profiles(id) are `on delete set null`/`cascade`, so
+// dependent records clean up automatically. Guard rails (self/owner/super-admin)
+// live in the API route. NOTE: do not set logUserActivity.userId to the deleted
+// id — the profile is gone, so we log against the actor + metadata only.
+export async function deleteUserProfile(input: { id: string; actorUserId?: string }) {
+  const supabase = createSupabaseAdminClient();
+
+  const { data: profile, error: loadError } = await supabase
+    .from("profiles")
+    .select("id, auth_user_id, email, full_name, role")
+    .eq("id", input.id)
+    .maybeSingle();
+  if (loadError) throw loadError;
+  if (!profile) throw new Error("User not found.");
+
+  // Remove the auth login first so they can't sign in even if a later step fails.
+  const authId = profile.auth_user_id ?? profile.id;
+  if (authId) {
+    try {
+      await supabase.auth.admin.deleteUser(authId);
+    } catch {
+      // Profile may have no backing auth user (e.g. a manually-created record) —
+      // or the profiles.id → auth.users cascade already removed it. Either is fine.
+    }
+  }
+
+  // Explicit profile delete (no-op if an auth cascade already removed it).
+  const { error: deleteError } = await supabase.from("profiles").delete().eq("id", input.id);
+  if (deleteError) throw deleteError;
+
+  await logUserActivity({
+    actorUserId: input.actorUserId,
+    action: "user_deleted",
+    entityType: "profiles",
+    entityId: input.id,
+    metadata: { email: profile.email, role: profile.role, name: profile.full_name },
+  });
+
+  return { id: input.id, email: profile.email };
+}
+
 export async function logUserActivity(input: {
   userId?: string;
   actorUserId?: string;
