@@ -222,6 +222,34 @@
   }
 }
 
+/* Minimal, theme-matched vertical scrollbar for the dashboard sidebar. */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 128, 120, 0.32) transparent;
+}
+.dark .sidebar-scroll {
+  scrollbar-color: rgba(190, 196, 188, 0.24) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(120, 128, 120, 0.3);
+  border-radius: 9999px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(120, 128, 120, 0.5);
+}
+.dark .sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(190, 196, 188, 0.22);
+}
+.dark .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(190, 196, 188, 0.42);
+}
+
 /* Minimal, theme-matched horizontal scrollbar for the Gantt timeline. */
 .gantt-scroll {
   scrollbar-width: thin;

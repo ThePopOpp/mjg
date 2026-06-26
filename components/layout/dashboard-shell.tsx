@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { LogOut, Menu, Search, PanelLeft, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ChevronDown, LogOut, Menu, Search, PanelLeft, X } from "lucide-react";
 import { DashboardActionTokenProvider } from "@/components/layout/dashboard-action-token";
-import { dashboardNavItems } from "@/components/layout/dashboard-nav";
+import { dashboardNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ROLE_LABELS } from "@/lib/rbac/roles";
 import { can } from "@/lib/rbac/permissions";
+import { cn } from "@/lib/utils";
 import type { DashboardProfile } from "@/lib/auth/server";
 
 type DashboardShellProps = {
@@ -22,10 +24,27 @@ const STORAGE_KEY = "mjg-sidebar-collapsed";
 
 export function DashboardShell({ actionToken, children, profile }: DashboardShellProps) {
   const displayName = `${profile.firstName} ${profile.lastName}`.trim() || profile.email;
-  const visibleNavItems = dashboardNavItems.filter((item) => !("permission" in item) || can(profile.role, item.permission));
+  const pathname = usePathname();
+
+  // Permission-filter: drop items the role can't see; drop now-empty groups.
+  const visibleEntries: NavEntry[] = dashboardNav
+    .map((entry): NavEntry | null => {
+      if (entry.kind === "group") {
+        const items = entry.items.filter((it) => !it.permission || can(profile.role, it.permission));
+        return items.length ? { ...entry, items } : null;
+      }
+      return !entry.permission || can(profile.role, entry.permission) ? entry : null;
+    })
+    .filter((e): e is NavEntry => e !== null);
+
+  const isActive = (href: string) => (href === "/dashboard" ? pathname === "/dashboard" : pathname === href || pathname.startsWith(`${href}/`));
+  const groupActive = (g: NavGroup) => g.items.some((it) => isActive(it.href));
 
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const isGroupOpen = (g: NavGroup) => openGroups[g.label] ?? groupActive(g);
+  const toggleGroup = (g: NavGroup) => setOpenGroups((o) => ({ ...o, [g.label]: !isGroupOpen(g) }));
 
   // Restore the persisted desktop collapse state after mount (avoids hydration mismatch).
   useEffect(() => {
@@ -53,13 +72,13 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
 
       <aside
         className={[
-          "fixed inset-y-0 left-0 z-40 w-72 border-r bg-card transition-all duration-200",
+          "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r bg-card transition-all duration-200",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0",
           collapsed ? "lg:w-16" : "lg:w-72",
         ].join(" ")}
       >
-        <div className={`flex h-20 items-center border-b ${collapsed ? "lg:justify-center lg:px-2" : "px-6"}`}>
+        <div className={`flex h-20 shrink-0 items-center border-b ${collapsed ? "lg:justify-center lg:px-2" : "px-6"}`}>
           <Link
             href="/dashboard"
             className="flex flex-col items-start"
@@ -95,32 +114,29 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
           </Button>
         </div>
 
-        <nav className="space-y-1 p-3">
-          {visibleNavItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              title={collapsed ? item.label : undefined}
-              className={[
-                "group relative flex h-10 items-center gap-3 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                collapsed ? "lg:justify-center lg:px-0 px-3" : "px-3",
-              ].join(" ")}
-            >
-              <item.icon className="h-4 w-4 shrink-0" />
-              <span className={collapsed ? "lg:hidden" : ""}>{item.label}</span>
-
-              {/* Tooltip — only when collapsed on desktop */}
-              <span
-                className={[
-                  "pointer-events-none absolute left-full z-50 ml-2 hidden whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-md",
-                  collapsed ? "lg:group-hover:block" : "",
-                ].join(" ")}
-              >
-                {item.label}
-              </span>
-            </Link>
-          ))}
+        <nav className="sidebar-scroll min-h-0 flex-1 space-y-1 overflow-y-auto p-3">
+          {visibleEntries.map((entry) =>
+            entry.kind === "group" ? (
+              <GroupBlock
+                key={entry.label}
+                group={entry}
+                collapsed={collapsed}
+                open={isGroupOpen(entry)}
+                active={groupActive(entry)}
+                onToggle={() => toggleGroup(entry)}
+                isItemActive={isActive}
+                onNavigate={() => setMobileOpen(false)}
+              />
+            ) : (
+              <LeafLink
+                key={entry.href}
+                item={entry}
+                collapsed={collapsed}
+                active={isActive(entry.href)}
+                onNavigate={() => setMobileOpen(false)}
+              />
+            ),
+          )}
         </nav>
       </aside>
 
@@ -175,6 +191,69 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
           <main className="mx-auto w-full max-w-[112rem] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
         </DashboardActionTokenProvider>
       </div>
+    </div>
+  );
+}
+
+function LeafLink({
+  item, collapsed, active, indent, onNavigate,
+}: {
+  item: NavLeaf; collapsed: boolean; active: boolean; indent?: boolean; onNavigate: () => void;
+}) {
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      title={collapsed ? item.label : undefined}
+      className={cn(
+        "group relative flex h-10 items-center gap-3 rounded-md text-sm font-medium transition-colors",
+        active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+        collapsed ? "lg:justify-center lg:px-0 px-3" : "px-3",
+        indent && !collapsed ? "lg:pl-9" : "",
+      )}
+    >
+      <item.icon className="h-4 w-4 shrink-0" />
+      <span className={collapsed ? "lg:hidden" : ""}>{item.label}</span>
+      <span className={cn("pointer-events-none absolute left-full z-50 ml-2 hidden whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-md", collapsed ? "lg:group-hover:block" : "")}>
+        {item.label}
+      </span>
+    </Link>
+  );
+}
+
+function GroupBlock({
+  group, collapsed, open, active, onToggle, isItemActive, onNavigate,
+}: {
+  group: NavGroup; collapsed: boolean; open: boolean; active: boolean;
+  onToggle: () => void; isItemActive: (href: string) => boolean; onNavigate: () => void;
+}) {
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onToggle}
+        title={collapsed ? group.label : undefined}
+        aria-expanded={open}
+        className={cn(
+          "group relative flex h-10 w-full items-center gap-3 rounded-md text-sm font-medium transition-colors",
+          active ? "text-primary" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+          collapsed ? "lg:justify-center lg:px-0 px-3" : "px-3",
+        )}
+      >
+        <group.icon className="h-4 w-4 shrink-0" />
+        <span className={collapsed ? "lg:hidden" : ""}>{group.label}</span>
+        {!collapsed && <ChevronDown className={cn("ml-auto h-4 w-4 shrink-0 transition-transform", open ? "rotate-180" : "")} />}
+        <span className={cn("pointer-events-none absolute left-full z-50 ml-2 hidden whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-md", collapsed ? "lg:group-hover:block" : "")}>
+          {group.label}
+        </span>
+      </button>
+      {open && (
+        <div className="mt-1 space-y-1">
+          {group.items.map((it) => (
+            <LeafLink key={it.href} item={it} collapsed={collapsed} active={isItemActive(it.href)} indent onNavigate={onNavigate} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
