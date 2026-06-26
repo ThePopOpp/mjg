@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m ' *)",
+      "Bash(node -e \"const p = require\\('./node_modules/@supabase/ssr/package.json'\\); console.log\\(p.version\\)\")",
+      "Bash(node -e \"const p = require\\('./node_modules/@supabase/supabase-js/package.json'\\); console.log\\(p.version\\)\")",
+      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\(JSON.stringify\\({dependencies: p.dependencies, devDependencies: p.devDependencies}, null, 2\\)\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(npx tsc *)",
+      "WebFetch(domain:my.michaeljgauthier.com)",
+      "Bash(mkdir -p \"c:/Users/jwate/Projects/MJG WebApp/mjg/app/api/admin/contacts/[id]/convert\")",
+      "Bash(mkdir -p \"c:/Users/jwate/Projects/MJG WebApp/mjg/app/api/admin/contacts/fields/[id]\")",
+      "Bash(xargs grep -l -i \"about\\\\|mission\")",
+      "Bash(cd \"c:/Users/jwate/Projects/MJG WebApp/mjg\" && echo \"=== getSession source ===\" && sed -n '/async _getSession\\\\|async getSession/,/^    }/p' node_modules/@supabase/auth-js/dist/main/GoTrueClient.js 2>/dev/null | head -70)",
+      "Bash(grep -q \"Ready\\\\|started server\\\\|Local:\" /tmp/mjg-dev.log)",
+      "Bash(break)",
+      "Read(//tmp/**)",
+      "Bash(node tmp-repro.mjs)",
+      "Bash(node tmp-repro2.mjs)",
+      "Bash(node tmp-inspect.mjs)",
+      "Bash(node tmp-repro3.mjs)",
+      "Bash(node tmp-repro4.mjs)",
+      "Bash(node tmp-repro5.mjs)",
+      "Bash(node tmp-nav.mjs)",
+      "Bash(cd \"c:/Users/jwate/Projects/MJG WebApp/mjg\" && tail -40 /tmp/mjg-dev.log)",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep -Seconds 2; $p = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue; if \\($p\\) { \"port 3000 still held by PID $\\($p.OwningProcess\\)\" } else { \"port 3000 free\" })",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(pkill -f \"next-server\")",
+      "Bash(npm run *)",
+      "Bash(cd \"c:/Users/jwate/Projects/MJG WebApp/mjg\" && cat /tmp/mjg-start.log)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\jwate\\Projects\\MJG WebApp\\mjg\\node_modules\\@supabase\\auth-js\\dist\\main",
+      "c:\\Users\\jwate\\.claude\\projects\\c--Users-jwate-Projects-MJG-WebApp-mjg\\memory"
+    ]
+  }
+}

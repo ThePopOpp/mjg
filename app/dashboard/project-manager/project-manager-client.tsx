@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import {
-  CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Columns3, LayoutTemplate,
+  CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Columns3, GanttChartSquare, LayoutTemplate,
   List as ListIcon, Loader2, Plus, Pencil, Save, Table2, Trash2, User, X, Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ const dayMs = 86400000;
 function dateOnly(s: string) { return (s || "").slice(0, 10); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function fmtDate(s: string) { if (!s) return "—"; const d = new Date(`${dateOnly(s)}T00:00:00Z`); return d.toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" }); }
+function diffDays(a: string, b: string) { return Math.round((Date.parse(`${dateOnly(b)}T00:00:00Z`) - Date.parse(`${dateOnly(a)}T00:00:00Z`)) / dayMs); }
+function addDays(s: string, n: number) { const d = new Date(`${dateOnly(s)}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
 
 const STATUSES: ScheduleStatus[] = ["pending", "scheduled", "in_progress", "waiting", "delayed", "blocked", "needs_approval", "complete", "canceled"];
 const PRIORITIES: SchedulePriority[] = ["low", "normal", "high", "urgent", "critical", "blocking_closeout"];
@@ -54,11 +56,12 @@ const PRIORITY_OPTS = opts(PRIORITIES);
 const TYPE_OPTS = opts(TYPES);
 const DEP_TYPE_OPTS = opts(DEP_TYPES);
 
-type ProjectView = "list" | "table" | "kanban" | "calendar" | "templates" | "my_tasks";
+type ProjectView = "list" | "table" | "kanban" | "gantt" | "calendar" | "templates" | "my_tasks";
 const VIEWS: { key: ProjectView; label: string; icon: React.ElementType }[] = [
   { key: "list", label: "List", icon: ListIcon },
   { key: "table", label: "Table", icon: Table2 },
   { key: "kanban", label: "Kanban", icon: Columns3 },
+  { key: "gantt", label: "Gantt", icon: GanttChartSquare },
   { key: "calendar", label: "Calendar", icon: CalendarDays },
   { key: "templates", label: "Templates", icon: LayoutTemplate },
   { key: "my_tasks", label: "My Tasks", icon: User },
@@ -144,6 +147,13 @@ export function ProjectManagerClient({
     try { await send(`/api/project-manager/schedule/${item.id}`, "PATCH", { status }); } catch { reload(); }
   }
 
+  // Gantt drag/resize persistence — optimistic, then reload to pick up any dependency auto-shifts.
+  async function moveItem(id: string, start_date: string, end_date: string) {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, start_date, end_date } : i)));
+    try { await send(`/api/project-manager/schedule/${id}`, "PATCH", { start_date, end_date }); await reload(); }
+    catch (err) { setError(err instanceof Error ? err.message : "Move failed."); reload(); }
+  }
+
   async function addDependency(targetId: string, sourceId: string, dependency_type: DependencyType, lag_days: number, auto_shift: boolean) {
     await send("/api/project-manager/dependencies", "POST", { source_item_id: sourceId, target_item_id: targetId, dependency_type, lag_days, auto_shift });
     await reload();
@@ -209,6 +219,7 @@ export function ProjectManagerClient({
       {view === "list" && <ListView items={visible} onEdit={(i) => setEditing(toDraft(i))} onDelete={deleteItem} depCount={(id) => incomingDeps(id).length} />}
       {view === "table" && <TableView items={visible} onEdit={(i) => setEditing(toDraft(i))} onDelete={deleteItem} />}
       {view === "kanban" && <KanbanView items={visible} onEdit={(i) => setEditing(toDraft(i))} onStatus={quickStatus} />}
+      {view === "gantt" && <GanttView items={visible} deps={deps} onEdit={(i) => setEditing(toDraft(i))} onMove={moveItem} />}
       {view === "calendar" && <CalendarView items={visible} onEdit={(i) => setEditing(toDraft(i))} />}
       {view === "my_tasks" && <ListView items={myItems} onEdit={(i) => setEditing(toDraft(i))} onDelete={deleteItem} depCount={(id) => incomingDeps(id).length} emptyLabel={currentUserName ? `No tasks assigned to ${currentUserName}.` : "Your profile name is not set."} />}
       {view === "templates" && <TemplatesView templates={templates} tasks={templateTasks} onApply={setApplyTpl} />}
@@ -410,6 +421,263 @@ function CalendarView({ items, onEdit }: { items: ProjectScheduleItem[]; onEdit:
       </div>
     </div>
   );
+}
+
+// ── Gantt ────────────────────────────────────────────────────────────────────
+const GANTT_DAY_W = 30;     // px per day column
+const GANTT_ROW_H = 34;     // px per row (label + bar lane)
+const GANTT_HEAD_H = 46;    // px timeline header (month + day)
+const GANTT_LABEL_W = 224;  // px left label column
+
+type GanttRow =
+  | { kind: "group"; key: string; name: string }
+  | { kind: "item"; key: string; item: ProjectScheduleItem };
+
+type DragState = {
+  id: string; mode: "move" | "l" | "r"; startX: number;
+  start0: string; end0: string; curStart: string; curEnd: string; moved: boolean;
+};
+
+function GanttView({
+  items, deps, onEdit, onMove,
+}: {
+  items: ProjectScheduleItem[];
+  deps: ProjectScheduleDependency[];
+  onEdit: (i: ProjectScheduleItem) => void;
+  onMove: (id: string, start: string, end: string) => void;
+}) {
+  const drag = React.useRef<DragState | null>(null);
+  const [preview, setPreview] = React.useState<Record<string, { start: string; end: string }>>({});
+
+  // Ordered rows: a group header followed by its items (same grouping as the List view).
+  const rows: GanttRow[] = React.useMemo(() => {
+    const out: GanttRow[] = [];
+    for (const [name, group] of groupByProject(items)) {
+      out.push({ kind: "group", key: `g:${name}`, name });
+      for (const it of group) out.push({ kind: "item", key: it.id, item: it });
+    }
+    return out;
+  }, [items]);
+
+  const rowIndex = React.useMemo(() => {
+    const m = new Map<string, number>();
+    rows.forEach((r, idx) => { if (r.kind === "item") m.set(r.item.id, idx); });
+    return m;
+  }, [rows]);
+
+  // Effective (preview-aware) dates for an item.
+  const eff = React.useCallback((it: ProjectScheduleItem) => {
+    const p = preview[it.id];
+    return { start: dateOnly(p?.start ?? it.start_date), end: dateOnly(p?.end ?? it.end_date) };
+  }, [preview]);
+
+  // Timeline range across all dated items, padded a few days each side.
+  const dated = items.filter((i) => i.start_date && i.end_date);
+  const range = React.useMemo(() => {
+    if (!dated.length) { const t = todayStr(); return { start: addDays(t, -3), days: 30 }; }
+    let min = dateOnly(dated[0].start_date), max = dateOnly(dated[0].end_date);
+    for (const i of dated) { const s = dateOnly(i.start_date), e = dateOnly(i.end_date); if (s < min) min = s; if (e > max) max = e; }
+    const start = addDays(min, -3);
+    const days = diffDays(start, max) + 7;
+    return { start, days };
+  }, [dated]);
+
+  const days = React.useMemo(
+    () => Array.from({ length: range.days }, (_, k) => addDays(range.start, k)),
+    [range],
+  );
+  const totalW = range.days * GANTT_DAY_W;
+  const xFor = (d: string) => diffDays(range.start, d) * GANTT_DAY_W;
+  const barGeom = (it: ProjectScheduleItem) => {
+    const { start, end } = eff(it);
+    const x = xFor(start);
+    const w = Math.max(GANTT_DAY_W, (diffDays(start, end) + 1) * GANTT_DAY_W);
+    return { x, w, right: x + w };
+  };
+
+  function onDown(e: React.MouseEvent, it: ProjectScheduleItem, mode: DragState["mode"]) {
+    e.preventDefault(); e.stopPropagation();
+    const { start, end } = eff(it);
+    drag.current = { id: it.id, mode, startX: e.clientX, start0: start, end0: end, curStart: start, curEnd: end, moved: false };
+    window.addEventListener("mousemove", onWinMove);
+    window.addEventListener("mouseup", onWinUp);
+  }
+  function onWinMove(e: MouseEvent) {
+    const d = drag.current; if (!d) return;
+    const delta = Math.round((e.clientX - d.startX) / GANTT_DAY_W);
+    if (delta !== 0) d.moved = true;
+    let s = d.start0, en = d.end0;
+    if (d.mode === "move") { s = addDays(d.start0, delta); en = addDays(d.end0, delta); }
+    else if (d.mode === "l") { s = addDays(d.start0, delta); if (s > en) s = en; }
+    else { en = addDays(d.end0, delta); if (en < s) en = s; }
+    d.curStart = s; d.curEnd = en;
+    setPreview((p) => ({ ...p, [d.id]: { start: s, end: en } }));
+  }
+  function onWinUp() {
+    const d = drag.current; drag.current = null;
+    window.removeEventListener("mousemove", onWinMove);
+    window.removeEventListener("mouseup", onWinUp);
+    if (!d) return;
+    if (!d.moved) {
+      const it = items.find((x) => x.id === d.id);
+      setPreview((p) => { const n = { ...p }; delete n[d.id]; return n; });
+      if (it && d.mode === "move") onEdit(it);
+      return;
+    }
+    if (d.curStart !== d.start0 || d.curEnd !== d.end0) onMove(d.id, d.curStart, d.curEnd);
+    setPreview((p) => { const n = { ...p }; delete n[d.id]; return n; });
+  }
+  // Safety: detach listeners if the view unmounts mid-drag.
+  React.useEffect(() => () => {
+    window.removeEventListener("mousemove", onWinMove);
+    window.removeEventListener("mouseup", onWinUp);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Dependency arrows between item bars currently on screen.
+  const arrows = React.useMemo(() => {
+    const present = new Set(items.map((i) => i.id));
+    const byId = new Map(items.map((i) => [i.id, i]));
+    const out: { d: string }[] = [];
+    for (const dep of deps) {
+      if (!present.has(dep.source_item_id) || !present.has(dep.target_item_id)) continue;
+      const src = byId.get(dep.source_item_id)!, tgt = byId.get(dep.target_item_id)!;
+      const sg = barGeom(src), tg = barGeom(tgt);
+      const sRow = rowIndex.get(src.id), tRow = rowIndex.get(tgt.id);
+      if (sRow == null || tRow == null) continue;
+      const y1 = sRow * GANTT_ROW_H + GANTT_ROW_H / 2;
+      const y2 = tRow * GANTT_ROW_H + GANTT_ROW_H / 2;
+      const t = dep.dependency_type;
+      const x1 = (t === "start_to_start" || t === "start_to_finish") ? sg.x : sg.right;
+      const x2 = (t === "finish_to_finish" || t === "start_to_finish") ? tg.right : tg.x;
+      out.push({ d: `M ${x1} ${y1} C ${x1 + 26} ${y1}, ${x2 - 26} ${y2}, ${x2} ${y2}` });
+    }
+    return out;
+  }, [deps, items, preview, rowIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!items.length) return <Empty label="No items yet. Create one or apply a template." />;
+
+  const bodyH = rows.length * GANTT_ROW_H;
+  const todayX = xFor(todayStr());
+  const showToday = todayStr() >= range.start && todayStr() <= addDays(range.start, range.days - 1);
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-border">
+      <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-1.5 text-[11px] text-muted-foreground">
+        Drag a bar to move · drag its edges to resize · click to edit
+      </div>
+      <div className="flex">
+        {/* Left label column (sticky) */}
+        <div className="shrink-0 border-r border-border bg-card" style={{ width: GANTT_LABEL_W }}>
+          <div className="border-b border-border" style={{ height: GANTT_HEAD_H }} />
+          {rows.map((r) =>
+            r.kind === "group" ? (
+              <div key={r.key} className="flex items-center border-b border-border bg-muted/40 px-3 text-xs font-semibold" style={{ height: GANTT_ROW_H }}>
+                <span className="truncate">{r.name}</span>
+              </div>
+            ) : (
+              <button key={r.key} onClick={() => onEdit(r.item)} className="flex w-full items-center gap-1.5 border-b border-border px-3 text-left text-xs hover:bg-muted/40" style={{ height: GANTT_ROW_H }}>
+                {r.item.type !== "task" && <span className="rounded bg-muted px-1 text-[9px] capitalize text-muted-foreground">{r.item.type[0]}</span>}
+                <span className="truncate">{r.item.title}</span>
+              </button>
+            ),
+          )}
+        </div>
+
+        {/* Right scrollable timeline */}
+        <div className="flex-1 overflow-x-auto">
+          <div style={{ width: totalW }}>
+            {/* Header: months then day numbers */}
+            <div style={{ height: GANTT_HEAD_H }} className="relative border-b border-border">
+              <div className="flex">
+                {monthSpans(days).map((m) => (
+                  <div key={m.key} className="shrink-0 border-r border-border px-2 py-1 text-[11px] font-semibold text-muted-foreground" style={{ width: m.span * GANTT_DAY_W }}>
+                    {m.label}
+                  </div>
+                ))}
+              </div>
+              <div className="flex">
+                {days.map((d) => {
+                  const dow = new Date(`${d}T00:00:00Z`).getUTCDay();
+                  const weekend = dow === 0 || dow === 6;
+                  return (
+                    <div key={d} className={cn("shrink-0 border-r border-border/60 text-center text-[9px] leading-[18px]", weekend ? "bg-muted/40 text-muted-foreground" : "text-muted-foreground")} style={{ width: GANTT_DAY_W }}>
+                      {Number(d.slice(8, 10))}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Bars + grid + arrows */}
+            <div className="relative" style={{ height: bodyH }}>
+              {/* weekend column shading */}
+              {days.map((d, k) => {
+                const dow = new Date(`${d}T00:00:00Z`).getUTCDay();
+                if (dow !== 0 && dow !== 6) return null;
+                return <div key={d} className="absolute top-0 bg-muted/30" style={{ left: k * GANTT_DAY_W, width: GANTT_DAY_W, height: bodyH }} />;
+              })}
+              {/* row separators */}
+              {rows.map((r, idx) => (
+                <div key={`sep:${r.key}`} className={cn("absolute left-0 right-0 border-b border-border/60", r.kind === "group" && "bg-muted/20")} style={{ top: idx * GANTT_ROW_H, height: GANTT_ROW_H }} />
+              ))}
+              {/* today marker */}
+              {showToday && <div className="absolute top-0 z-10 w-px bg-primary/70" style={{ left: todayX, height: bodyH }} />}
+
+              {/* dependency arrows */}
+              <svg className="pointer-events-none absolute inset-0 z-20 overflow-visible" width={totalW} height={bodyH}>
+                <defs>
+                  <marker id="gantt-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" className="fill-muted-foreground" />
+                  </marker>
+                </defs>
+                {arrows.map((a, k) => (
+                  <path key={k} d={a.d} fill="none" className="stroke-muted-foreground/60" strokeWidth={1.5} markerEnd="url(#gantt-arrow)" />
+                ))}
+              </svg>
+
+              {/* bars */}
+              {rows.map((r, idx) => {
+                if (r.kind !== "item") return null;
+                const it = r.item;
+                if (!it.start_date || !it.end_date) return null;
+                const g = barGeom(it);
+                const { start, end } = eff(it);
+                return (
+                  <div key={`bar:${it.id}`} className="absolute z-30" style={{ left: g.x, width: g.w, top: idx * GANTT_ROW_H + 6, height: GANTT_ROW_H - 12 }}>
+                    <div
+                      onMouseDown={(e) => onDown(e, it, "move")}
+                      title={`${it.title} · ${fmtDate(start)}–${fmtDate(end)}`}
+                      className={cn("group relative flex h-full cursor-grab items-center overflow-hidden rounded-md border active:cursor-grabbing", statusClass[it.status] ?? "bg-muted text-muted-foreground", "border-border/70")}
+                    >
+                      {/* progress fill */}
+                      {it.progress > 0 && <div className="absolute inset-y-0 left-0 bg-primary/25" style={{ width: `${Math.min(100, it.progress)}%` }} />}
+                      <span className="relative truncate px-2 text-[10px] font-medium">{it.title}</span>
+                      {/* resize handles */}
+                      <span onMouseDown={(e) => onDown(e, it, "l")} className="absolute inset-y-0 left-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
+                      <span onMouseDown={(e) => onDown(e, it, "r")} className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Group consecutive day cells into month spans for the Gantt header.
+function monthSpans(days: string[]) {
+  const out: { key: string; label: string; span: number }[] = [];
+  for (const d of days) {
+    const key = d.slice(0, 7);
+    const last = out[out.length - 1];
+    if (last && last.key === key) { last.span += 1; continue; }
+    const label = new Date(`${d}T00:00:00Z`).toLocaleDateString([], { month: "short", year: "numeric", timeZone: "UTC" });
+    out.push({ key, label, span: 1 });
+  }
+  return out;
 }
 
 function TemplatesView({ templates, tasks, onApply }: { templates: ProjectTemplate[]; tasks: ProjectTemplateTask[]; onApply: (t: ProjectTemplate) => void }) {

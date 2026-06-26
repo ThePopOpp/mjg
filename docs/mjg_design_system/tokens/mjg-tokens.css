@@ -1,0 +1,138 @@
+/* ============================================================
+   Michael J. Gauthier — Design System Tokens  v2
+   Matched to my.michaeljgauthier.com (light + dark).
+   Warm paper + near-black neutrals, GOLD as accent.
+   ------------------------------------------------------------
+   Usage:  <html data-theme="light">  or  data-theme="dark"
+   Reference tokens as  var(--background), var(--primary), etc.
+   ============================================================ */
+
+:root,
+[data-theme="light"] {
+  /* --- Brand raw --- */
+  --mjg-gold:        #C9A96E;  /* signature gold — italic display words, accents */
+  --mjg-gold-deep:   #B6924F;
+  --mjg-ink:         #141414;  /* near-black headings */
+  --mjg-paper:       #F4F1EA;  /* warm page background */
+  --mjg-teal:        #1A2E3B;  /* legacy logo color — supporting only */
+
+  /* --- Gold scale --- */
+  --gold-50:  #FBF7EF;
+  --gold-100: #F4EAD4;
+  --gold-200: #E9D6AC;
+  --gold-300: #DCC084;
+  --gold-400: #D0B074;
+  --gold-500: #C9A96E;
+  --gold-600: #B6924F;
+  --gold-700: #8E7139;
+  --gold-800: #61502B;
+  --gold-900: #3B301B;
+
+  /* --- Neutral / paper scale (warm) --- */
+  --neutral-50:  #FBFAF6;
+  --neutral-100: #F4F1EA;
+  --neutral-200: #E9E4D8;
+  --neutral-300: #D8D2C4;
+  --neutral-400: #B0A99B;
+  --neutral-500: #84806F;
+  --neutral-600: #605C52;
+  --neutral-700: #423F39;
+  --neutral-800: #242321;
+  --neutral-900: #141414;
+  --neutral-950: #0C0C0C;
+
+  /* --- Semantic (ShadCN) --- */
+  --background:            #F4F1EA;
+  --foreground:            #141414;
+  --card:                  #FFFFFF;
+  --card-foreground:       #141414;
+  --popover:               #FFFFFF;
+  --popover-foreground:    #141414;
+  --primary:               #161616;   /* black buttons */
+  --primary-foreground:    #F8F6F0;
+  --secondary:             #E9E4D8;
+  --secondary-foreground:  #1A1A1A;
+  --muted:                 #ECE8DF;
+  --muted-foreground:      #6B675E;
+  --accent:                #EFE7D6;    /* soft gold tint */
+  --accent-foreground:     #1A1A1A;
+  --gold:                  #C5A468;    /* filled gold CTA */
+  --gold-foreground:       #FBFAF6;
+  --destructive:           #B3261E;
+  --destructive-foreground:#F8F6F0;
+  --success:               #2F7D5B;
+  --warning:               #B5821E;
+  --border:                #E2DCD0;
+  --input:                 #E2DCD0;
+  --ring:                  #C9A96E;
+  --player-bar:            #161513;    /* dark audio pill */
+  --player-foreground:     #E7E1D3;
+
+  /* --- Typography --- */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-sans:    "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:    "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.375rem;
+  --text-2xl:  1.75rem;
+  --text-3xl:  2.25rem;
+  --text-4xl:  3rem;
+  --text-5xl:  4.5rem;
+
+  /* --- Radius (site uses generous, soft radii) --- */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* --- Spacing (4px base) --- */
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem;
+  --space-12: 3rem; --space-16: 4rem;
+
+  /* --- Shadows --- */
+  --shadow-xs: 0 1px 2px rgba(20,20,20,0.05);
+  --shadow-sm: 0 1px 3px rgba(20,20,20,0.07), 0 1px 2px rgba(20,20,20,0.04);
+  --shadow-md: 0 6px 18px rgba(20,20,20,0.08), 0 2px 5px rgba(20,20,20,0.05);
+  --shadow-lg: 0 18px 48px rgba(20,20,20,0.12), 0 6px 12px rgba(20,20,20,0.06);
+  --shadow-gold: 0 6px 28px rgba(201,169,110,0.45);
+}
+
+[data-theme="dark"] {
+  --background:            #0C0C0C;
+  --foreground:            #F4F1EA;
+  --card:                  #161616;
+  --card-foreground:       #F4F1EA;
+  --popover:               #161616;
+  --popover-foreground:    #F4F1EA;
+  --primary:               #F4F1EA;   /* cream buttons */
+  --primary-foreground:    #141414;
+  --secondary:             #1E1E1E;
+  --secondary-foreground:  #F4F1EA;
+  --muted:                 #1A1A1A;
+  --muted-foreground:      #9C968A;
+  --accent:                #2A261E;
+  --accent-foreground:     #F4F1EA;
+  --gold:                  #C9A96E;
+  --gold-foreground:       #141414;
+  --destructive:           #E5564B;
+  --destructive-foreground:#141414;
+  --success:               #4FB286;
+  --warning:               #E0B65A;
+  --border:                #262626;
+  --input:                 #262626;
+  --ring:                  #C9A96E;
+  --player-bar:            #1B1A17;
+  --player-foreground:     #E7E1D3;
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.40);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.50), 0 1px 2px rgba(0,0,0,0.40);
+  --shadow-md: 0 6px 18px rgba(0,0,0,0.55), 0 2px 5px rgba(0,0,0,0.40);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,0.65), 0 6px 12px rgba(0,0,0,0.45);
+  --shadow-gold: 0 6px 28px rgba(201,169,110,0.30);
+}
