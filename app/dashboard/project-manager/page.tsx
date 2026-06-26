@@ -1,5 +1,5 @@
 import { SectionHeader } from "@/components/dashboard/section-header";
-import { loadProjectManagerData } from "@/lib/project-manager/data";
+import { loadProjectManagerData, loadProjectLinkOptions } from "@/lib/project-manager/data";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { ProjectManagerClient } from "./project-manager-client";
@@ -8,7 +8,9 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Project Manager — MJG Dashboard" };
 
 export default async function ProjectManagerPage() {
-  const [data, profile] = await Promise.all([loadProjectManagerData("default"), getCurrentProfile()]);
+  const [data, profile, linkOptions] = await Promise.all([
+    loadProjectManagerData("default"), getCurrentProfile(), loadProjectLinkOptions(),
+  ]);
 
   const supabase = createSupabaseAdminClient();
   const { data: staff } = await supabase
@@ -26,7 +28,7 @@ export default async function ProjectManagerPage() {
         title="Project Manager"
         description="Plan stewardship and operations work across projects, phases, tasks, and milestones — with templates, dependencies, and multiple views."
       />
-      <ProjectManagerClient initialData={data} staffOptions={staffOptions} currentUserName={currentUserName} />
+      <ProjectManagerClient initialData={data} staffOptions={staffOptions} currentUserName={currentUserName} linkOptions={linkOptions} />
     </div>
   );
 }

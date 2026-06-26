@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireParticipantManager } from "@/lib/user-management/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
-const ALLOWED_PREFIXES = ["image/", "video/"];
+const ALLOWED_PREFIXES = ["image/", "video/", "audio/"];
 const ALLOWED_EXACT = ["application/pdf"];
 const MAX_BYTES = 50 * 1024 * 1024; // 50 MB
 const BUCKET = "mjg-media";

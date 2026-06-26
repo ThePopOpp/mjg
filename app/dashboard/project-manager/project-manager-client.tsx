@@ -4,7 +4,7 @@ import * as React from "react";
 import {
   Bell, CalendarDays, Camera, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Columns3, Contact,
   Copy, EyeOff, FileDown, FileText, GanttChartSquare, LayoutTemplate, List as ListIcon, Loader2, Mic,
-  Plus, Pencil, Save, StickyNote, Table2, Trash2, User, UserPlus, Users, UsersRound, X, Link2,
+  Paperclip, Plus, Pencil, Save, StickyNote, Table2, Trash2, User, UserPlus, Users, UsersRound, X, Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,8 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type {
-  DependencyType, ProjectManagerData, ProjectScheduleDependency, ProjectScheduleItem,
+  DependencyType, LinkType, ProjectItemAttachment, ProjectItemLink, ProjectLinkOptions,
+  ProjectManagerData, ProjectScheduleDependency, ProjectScheduleItem,
   ProjectTemplate, ProjectTemplateTask, SchedulePriority, ScheduleStatus, ScheduleItemType,
 } from "@/lib/project-manager/types";
 
@@ -84,17 +85,20 @@ function toDraft(item?: ProjectScheduleItem): ItemDraft {
 }
 
 export function ProjectManagerClient({
-  initialData, staffOptions, currentUserName,
+  initialData, staffOptions, currentUserName, linkOptions,
 }: {
   initialData: ProjectManagerData;
   staffOptions: string[];
   currentUserName: string;
+  linkOptions: ProjectLinkOptions;
 }) {
   const token = useDashboardActionToken();
   const [items, setItems] = React.useState<ProjectScheduleItem[]>(initialData.items);
   const [deps, setDeps] = React.useState<ProjectScheduleDependency[]>(initialData.dependencies);
   const [templates] = React.useState<ProjectTemplate[]>(initialData.templates);
   const [templateTasks] = React.useState<ProjectTemplateTask[]>(initialData.templateTasks);
+  const [attachments, setAttachments] = React.useState<ProjectItemAttachment[]>(initialData.attachments);
+  const [links, setLinks] = React.useState<ProjectItemLink[]>(initialData.links);
   const [view, setView] = React.useState<ProjectView>("list");
   const [search, setSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("");
@@ -171,6 +175,52 @@ export function ProjectManagerClient({
     } catch (err) { setError(err instanceof Error ? err.message : "Duplicate failed."); }
   }
 
+  // Attachments: pick a file → upload to mjg-media → record on the item. Used by the
+  // FAB (Add photo/audio) and the editor's attachment buttons.
+  function pickAndUpload(itemId: string, kind: "photo" | "audio" | "file") {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = kind === "photo" ? "image/*" : kind === "audio" ? "audio/*" : "image/*,audio/*,video/*,application/pdf";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      setBusy(true); setError(null);
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("folder", "project-manager");
+        const up = await fetch("/api/admin/uploads", { method: "POST", headers: { "x-mjg-action-token": token }, body: fd });
+        const uj = await up.json().catch(() => ({}));
+        if (!up.ok) throw new Error(uj.error || "Upload failed.");
+        const res = await send("/api/project-manager/attachments", "POST", {
+          item_id: itemId, kind, url: uj.url, file_name: uj.name, mime_type: uj.type, size_bytes: uj.size,
+        });
+        setAttachments((prev) => [...prev, res.attachment]);
+      } catch (err) { setError(err instanceof Error ? err.message : "Upload failed."); }
+      finally { setBusy(false); }
+    };
+    input.click();
+  }
+
+  async function deleteAttachment(id: string) {
+    try { await send(`/api/project-manager/attachments/${id}`, "DELETE", {}); setAttachments((prev) => prev.filter((a) => a.id !== id)); }
+    catch (err) { setError(err instanceof Error ? err.message : "Delete failed."); }
+  }
+
+  async function addLink(itemId: string, opt: { link_type: LinkType; id: string; name: string; email: string | null; phone: string | null }) {
+    try {
+      const res = await send("/api/project-manager/links", "POST", {
+        item_id: itemId, link_type: opt.link_type, target_id: opt.id, display_name: opt.name, email: opt.email, phone: opt.phone,
+      });
+      setLinks((prev) => [...prev, res.link]);
+    } catch (err) { setError(err instanceof Error ? err.message : "Link failed."); }
+  }
+
+  async function removeLink(id: string) {
+    try { await send(`/api/project-manager/links/${id}`, "DELETE", {}); setLinks((prev) => prev.filter((l) => l.id !== id)); }
+    catch (err) { setError(err instanceof Error ? err.message : "Unlink failed."); }
+  }
+
   async function addDependency(targetId: string, sourceId: string, dependency_type: DependencyType, lag_days: number, auto_shift: boolean) {
     await send("/api/project-manager/dependencies", "POST", { source_item_id: sourceId, target_item_id: targetId, dependency_type, lag_days, auto_shift });
     await reload();
@@ -241,6 +291,7 @@ export function ProjectManagerClient({
           items={visible} deps={deps}
           onEdit={(i) => setEditing(toDraft(i))} onMove={moveItem}
           onDuplicate={duplicateItem} onPatch={quickPatch} onDelete={deleteItem}
+          onAttach={pickAndUpload}
         />
       )}
       {view === "calendar" && <CalendarView items={visible} onEdit={(i) => setEditing(toDraft(i))} />}
@@ -254,6 +305,11 @@ export function ProjectManagerClient({
           incoming={editing.id ? incomingDeps(editing.id) : []}
           itemsById={Object.fromEntries(items.map((i) => [i.id, i]))}
           onAddDep={addDependency} onRemoveDep={removeDependency}
+          attachments={editing.id ? attachments.filter((a) => a.item_id === editing.id) : []}
+          links={editing.id ? links.filter((l) => l.item_id === editing.id) : []}
+          linkOptions={linkOptions}
+          onUpload={pickAndUpload} onRemoveAttachment={deleteAttachment}
+          onAddLink={addLink} onRemoveLink={removeLink}
         />
       )}
       {applyTpl && (
@@ -528,7 +584,7 @@ function exportGanttProject(item: ProjectScheduleItem, all: ProjectScheduleItem[
 }
 
 function GanttView({
-  items, deps, onEdit, onMove, onDuplicate, onPatch, onDelete,
+  items, deps, onEdit, onMove, onDuplicate, onPatch, onDelete, onAttach,
 }: {
   items: ProjectScheduleItem[];
   deps: ProjectScheduleDependency[];
@@ -537,6 +593,7 @@ function GanttView({
   onDuplicate: (i: ProjectScheduleItem) => void;
   onPatch: (i: ProjectScheduleItem, patch: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
+  onAttach: (itemId: string, kind: "photo" | "audio" | "file") => void;
 }) {
   const [zoom, setZoom] = React.useState<GanttZoom>("day");
   const drag = React.useRef<DragState | null>(null);
@@ -783,7 +840,7 @@ function GanttView({
       {fab && (
         <GanttFab
           fab={fab} items={items} onClose={() => setFab(null)}
-          onEdit={onEdit} onDuplicate={onDuplicate} onPatch={onPatch} onDelete={onDelete}
+          onEdit={onEdit} onDuplicate={onDuplicate} onPatch={onPatch} onDelete={onDelete} onAttach={onAttach}
         />
       )}
     </div>
@@ -791,11 +848,10 @@ function GanttView({
 }
 
 // Floating action panel for a Gantt task — MJG-reframed (no construction actions),
-// laid out as a 4×4 grid. People/attach actions open the item editor; the rest are
-// direct quick actions. (Photo/Audio attachments open the editor for now — there's
-// no media-on-task model yet.)
+// laid out as a 4×4 grid. Photo/Audio upload directly; people actions open the
+// editor's People & associations section; the rest are direct quick actions.
 function GanttFab({
-  fab, items, onClose, onEdit, onDuplicate, onPatch, onDelete,
+  fab, items, onClose, onEdit, onDuplicate, onPatch, onDelete, onAttach,
 }: {
   fab: { item: ProjectScheduleItem; x: number; y: number };
   items: ProjectScheduleItem[];
@@ -804,6 +860,7 @@ function GanttFab({
   onDuplicate: (i: ProjectScheduleItem) => void;
   onPatch: (i: ProjectScheduleItem, patch: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
+  onAttach: (itemId: string, kind: "photo" | "audio" | "file") => void;
 }) {
   const it = fab.item;
   const run = (fn: () => void) => { fn(); onClose(); };
@@ -822,8 +879,8 @@ function GanttFab({
     // Row 2 — connect & attach
     { icon: Link2, label: "Connect task", on: () => onEdit(it) },
     { icon: StickyNote, label: "Add notes", on: () => onEdit(it) },
-    { icon: Camera, label: "Add photo", on: () => onEdit(it) },
-    { icon: Mic, label: "Add audio", on: () => onEdit(it) },
+    { icon: Camera, label: "Add photo", on: () => onAttach(it.id, "photo") },
+    { icon: Mic, label: "Add audio", on: () => onAttach(it.id, "audio") },
     // Row 3 — manage
     { icon: Pencil, label: "Edit", on: () => onEdit(it) },
     { icon: Copy, label: "Duplicate", on: () => onDuplicate(it) },
@@ -900,12 +957,18 @@ function Field({ label: l, children, full }: { label: string; children: React.Re
 
 function ItemEditor({
   draft, setDraft, onSave, onClose, busy, staffOptions, allItems, incoming, itemsById, onAddDep, onRemoveDep,
+  attachments, links, linkOptions, onUpload, onRemoveAttachment, onAddLink, onRemoveLink,
 }: {
   draft: ItemDraft; setDraft: React.Dispatch<React.SetStateAction<ItemDraft | null>>;
   onSave: (d: ItemDraft) => void; onClose: () => void; busy: boolean; staffOptions: string[];
   allItems: ProjectScheduleItem[]; incoming: ProjectScheduleDependency[]; itemsById: Record<string, ProjectScheduleItem>;
   onAddDep: (targetId: string, sourceId: string, t: DependencyType, lag: number, auto: boolean) => Promise<void>;
   onRemoveDep: (id: string) => Promise<void>;
+  attachments: ProjectItemAttachment[]; links: ProjectItemLink[]; linkOptions: ProjectLinkOptions;
+  onUpload: (itemId: string, kind: "photo" | "audio" | "file") => void;
+  onRemoveAttachment: (id: string) => void;
+  onAddLink: (itemId: string, opt: { link_type: LinkType; id: string; name: string; email: string | null; phone: string | null }) => void;
+  onRemoveLink: (id: string) => void;
 }) {
   const set = <K extends keyof ItemDraft>(k: K, v: ItemDraft[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
   const [depSource, setDepSource] = React.useState(""); const [depType, setDepType] = React.useState<DependencyType>("finish_to_start");
@@ -975,12 +1038,88 @@ function ItemEditor({
           </div>
         )}
 
+        {/* Attachments (photo / audio / file) */}
+        {draft.id && (
+          <div className="mt-4 rounded-lg border border-border p-3">
+            <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold"><Paperclip className="h-4 w-4" /> Attachments</div>
+            {attachments.length === 0 && <p className="text-xs text-muted-foreground">No photos, audio, or files yet.</p>}
+            {attachments.length > 0 && (
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {attachments.map((a) => (
+                  <div key={a.id} className="group relative overflow-hidden rounded-lg border border-border p-2">
+                    {a.kind === "photo" ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={a.url} alt={a.file_name ?? ""} className="aspect-video w-full rounded object-cover" />
+                    ) : a.kind === "audio" ? (
+                      <audio src={a.url} controls className="w-full" />
+                    ) : (
+                      <a href={a.url} target="_blank" rel="noreferrer" className="block truncate py-3 text-xs text-primary hover:underline">{a.file_name || "Open file"}</a>
+                    )}
+                    <div className="mt-1 flex items-center justify-between gap-1">
+                      <span className="truncate text-[10px] text-muted-foreground">{a.file_name}</span>
+                      <button onClick={() => onRemoveAttachment(a.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" onClick={() => onUpload(draft.id!, "photo")}><Camera className="h-3.5 w-3.5" /> Photo</Button>
+              <Button size="sm" variant="outline" onClick={() => onUpload(draft.id!, "audio")}><Mic className="h-3.5 w-3.5" /> Audio</Button>
+              <Button size="sm" variant="outline" onClick={() => onUpload(draft.id!, "file")}><Paperclip className="h-3.5 w-3.5" /> File</Button>
+            </div>
+          </div>
+        )}
+
+        {/* People & associations (real user / participant / contact records) */}
+        {draft.id && (
+          <div className="mt-4 rounded-lg border border-border p-3">
+            <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold"><Users className="h-4 w-4" /> People &amp; associations</div>
+            {links.length === 0 && <p className="text-xs text-muted-foreground">No linked users, participants, or contacts yet.</p>}
+            {links.map((l) => (
+              <div key={l.id} className="mb-1 flex items-center gap-2 text-xs">
+                <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] capitalize text-muted-foreground">{l.link_type}</span>
+                <span className="flex-1 truncate">{l.display_name || "—"}{l.email ? <span className="text-muted-foreground"> · {l.email}</span> : null}</span>
+                <button onClick={() => onRemoveLink(l.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+              </div>
+            ))}
+            <LinkPicker linkOptions={linkOptions} onAdd={(opt) => onAddLink(draft.id!, opt)} />
+          </div>
+        )}
+
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={() => onSave(draft)} disabled={busy || !draft.title.trim()}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save</Button>
         </div>
-        {!draft.id && <p className="mt-2 text-right text-[11px] text-muted-foreground">Save first to add dependencies.</p>}
+        {!draft.id && <p className="mt-2 text-right text-[11px] text-muted-foreground">Save first to add dependencies, attachments, and people.</p>}
       </div>
+    </div>
+  );
+}
+
+// Picker to link a real user / participant / contact record to a task.
+function LinkPicker({ linkOptions, onAdd }: {
+  linkOptions: ProjectLinkOptions;
+  onAdd: (opt: { link_type: LinkType; id: string; name: string; email: string | null; phone: string | null }) => void;
+}) {
+  const [type, setType] = React.useState<LinkType>("participant");
+  const [sel, setSel] = React.useState("");
+  const list = type === "user" ? linkOptions.users : type === "participant" ? linkOptions.participants : linkOptions.contacts;
+  const opts: FieldSelectOption[] = [
+    { value: "", label: `Choose ${type}…` },
+    ...list.map((o) => ({ value: o.id, label: o.email ? `${o.name} (${o.email})` : o.name })),
+  ];
+  function add() {
+    const o = list.find((x) => x.id === sel);
+    if (!o) return;
+    onAdd({ link_type: type, id: o.id, name: o.name, email: o.email, phone: o.phone });
+    setSel("");
+  }
+  return (
+    <div className="mt-2 flex flex-wrap items-end gap-2">
+      <div className="w-32"><FieldSelect value={type} onChange={(v) => { setType(v as LinkType); setSel(""); }} options={[{ value: "user", label: "User" }, { value: "participant", label: "Participant" }, { value: "contact", label: "Contact" }]} className="h-8" /></div>
+      <div className="w-56"><FieldSelect value={sel} onChange={setSel} options={opts} className="h-8" /></div>
+      <Button size="sm" variant="outline" onClick={add} disabled={!sel}><Plus className="h-3.5 w-3.5" /> Add</Button>
     </div>
   );
 }

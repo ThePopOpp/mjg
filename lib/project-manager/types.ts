@@ -78,9 +78,42 @@ export type ProjectTemplateTask = {
   sort_order: number;
 };
 
+export type ProjectItemAttachment = {
+  id: string;
+  item_id: string;
+  kind: "photo" | "audio" | "file";
+  url: string;
+  file_name: string | null;
+  mime_type: string | null;
+  size_bytes: number | null;
+  caption: string | null;
+  uploaded_by: string | null;
+  created_at?: string;
+};
+
+export type LinkType = "user" | "participant" | "contact";
+
+export type ProjectItemLink = {
+  id: string;
+  item_id: string;
+  link_type: LinkType;
+  profile_id: string | null;
+  participant_id: string | null;
+  contact_id: string | null;
+  display_name: string | null;
+  email: string | null;
+  phone: string | null;
+  created_at?: string;
+};
+
+export type LinkOption = { id: string; name: string; email: string | null; phone: string | null };
+export type ProjectLinkOptions = { users: LinkOption[]; participants: LinkOption[]; contacts: LinkOption[] };
+
 export type ProjectManagerData = {
   items: ProjectScheduleItem[];
   dependencies: ProjectScheduleDependency[];
   templates: ProjectTemplate[];
   templateTasks: ProjectTemplateTask[];
+  attachments: ProjectItemAttachment[];
+  links: ProjectItemLink[];
 };
