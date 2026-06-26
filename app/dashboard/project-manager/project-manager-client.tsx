@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import {
-  CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Columns3, GanttChartSquare, LayoutTemplate,
-  List as ListIcon, Loader2, Plus, Pencil, Save, Table2, Trash2, User, X, Link2,
+  CalendarDays, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Columns3, Copy, EyeOff,
+  FileDown, FileText, GanttChartSquare, LayoutTemplate, List as ListIcon, Loader2, Plus, Pencil,
+  Save, StickyNote, Table2, Trash2, User, UserPlus, X, XCircle, Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +23,6 @@ const dayMs = 86400000;
 function dateOnly(s: string) { return (s || "").slice(0, 10); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function fmtDate(s: string) { if (!s) return "—"; const d = new Date(`${dateOnly(s)}T00:00:00Z`); return d.toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" }); }
-function diffDays(a: string, b: string) { return Math.round((Date.parse(`${dateOnly(b)}T00:00:00Z`) - Date.parse(`${dateOnly(a)}T00:00:00Z`)) / dayMs); }
-function addDays(s: string, n: number) { const d = new Date(`${dateOnly(s)}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
 
 const STATUSES: ScheduleStatus[] = ["pending", "scheduled", "in_progress", "waiting", "delayed", "blocked", "needs_approval", "complete", "canceled"];
 const PRIORITIES: SchedulePriority[] = ["low", "normal", "high", "urgent", "critical", "blocking_closeout"];
@@ -154,6 +153,24 @@ export function ProjectManagerClient({
     catch (err) { setError(err instanceof Error ? err.message : "Move failed."); reload(); }
   }
 
+  // Generic optimistic field patch (used by Gantt FAB: complete/cancel/hide).
+  async function quickPatch(item: ProjectScheduleItem, patch: Record<string, unknown>) {
+    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, ...patch } : i)));
+    try { await send(`/api/project-manager/schedule/${item.id}`, "PATCH", patch); } catch { reload(); }
+  }
+
+  async function duplicateItem(item: ProjectScheduleItem) {
+    setError(null);
+    try {
+      const draft = toDraft(item);
+      await send("/api/project-manager/schedule", "POST", {
+        ...draft, id: undefined, title: `${item.title} (copy)`,
+        schedule_group_key: item.schedule_group_key || item.project_title || null,
+      });
+      await reload();
+    } catch (err) { setError(err instanceof Error ? err.message : "Duplicate failed."); }
+  }
+
   async function addDependency(targetId: string, sourceId: string, dependency_type: DependencyType, lag_days: number, auto_shift: boolean) {
     await send("/api/project-manager/dependencies", "POST", { source_item_id: sourceId, target_item_id: targetId, dependency_type, lag_days, auto_shift });
     await reload();
@@ -219,7 +236,14 @@ export function ProjectManagerClient({
       {view === "list" && <ListView items={visible} onEdit={(i) => setEditing(toDraft(i))} onDelete={deleteItem} depCount={(id) => incomingDeps(id).length} />}
       {view === "table" && <TableView items={visible} onEdit={(i) => setEditing(toDraft(i))} onDelete={deleteItem} />}
       {view === "kanban" && <KanbanView items={visible} onEdit={(i) => setEditing(toDraft(i))} onStatus={quickStatus} />}
-      {view === "gantt" && <GanttView items={visible} deps={deps} onEdit={(i) => setEditing(toDraft(i))} onMove={moveItem} />}
+      {view === "gantt" && (
+        <GanttView
+          items={visible} deps={deps}
+          onEdit={(i) => setEditing(toDraft(i))} onMove={moveItem}
+          onDuplicate={duplicateItem} onStatus={quickStatus}
+          onHide={(it) => quickPatch(it, { visible_on_gantt: false })} onDelete={deleteItem}
+        />
+      )}
       {view === "calendar" && <CalendarView items={visible} onEdit={(i) => setEditing(toDraft(i))} />}
       {view === "my_tasks" && <ListView items={myItems} onEdit={(i) => setEditing(toDraft(i))} onDelete={deleteItem} depCount={(id) => incomingDeps(id).length} emptyLabel={currentUserName ? `No tasks assigned to ${currentUserName}.` : "Your profile name is not set."} />}
       {view === "templates" && <TemplatesView templates={templates} tasks={templateTasks} onApply={setApplyTpl} />}
@@ -424,149 +448,253 @@ function CalendarView({ items, onEdit }: { items: ProjectScheduleItem[]; onEdit:
 }
 
 // ── Gantt ────────────────────────────────────────────────────────────────────
-const GANTT_DAY_W = 30;     // px per day column
 const GANTT_ROW_H = 34;     // px per row (label + bar lane)
-const GANTT_HEAD_H = 46;    // px timeline header (month + day)
+const GANTT_HEAD_H = 44;    // px timeline header (two tiers)
 const GANTT_LABEL_W = 224;  // px left label column
+
+type GanttZoom = "hour" | "day" | "week" | "month";
+const ZOOM: Record<GanttZoom, { label: string; pxPerDay: number; snapMin: number }> = {
+  hour: { label: "Hour", pxPerDay: 24 * 26, snapMin: 15 },
+  day: { label: "Day", pxPerDay: 40, snapMin: 60 },
+  week: { label: "Week", pxPerDay: 18, snapMin: 1440 },
+  month: { label: "Month", pxPerDay: 6, snapMin: 1440 },
+};
 
 type GanttRow =
   | { kind: "group"; key: string; name: string }
   | { kind: "item"; key: string; item: ProjectScheduleItem };
 
+// Drag works in milliseconds so the Gantt supports hour/minute precision.
 type DragState = {
   id: string; mode: "move" | "l" | "r"; startX: number;
-  start0: string; end0: string; curStart: string; curEnd: string; moved: boolean;
+  s0: number; e0: number; curS: number; curE: number; moved: boolean;
 };
 
+const parseMs = (s: string) => Date.parse(s);
+function startOfDayUTC(ms: number) { const d = new Date(ms); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()); }
+function floorUnit(ms: number, kind: string) {
+  const d = new Date(ms);
+  switch (kind) {
+    case "hour": return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours());
+    case "day": return startOfDayUTC(ms);
+    case "week": { const sod = startOfDayUTC(ms); return sod - new Date(sod).getUTCDay() * dayMs; }
+    case "month": return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+    default: return Date.UTC(d.getUTCFullYear(), 0, 1); // year
+  }
+}
+function nextUnit(ms: number, kind: string) {
+  const d = new Date(ms);
+  switch (kind) {
+    case "hour": return ms + 3600000;
+    case "day": return ms + dayMs;
+    case "week": return ms + 7 * dayMs;
+    case "month": return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+    default: return Date.UTC(d.getUTCFullYear() + 1, 0, 1);
+  }
+}
+function unitTicks(from: number, to: number, kind: string) {
+  const out: { ms: number; next: number }[] = [];
+  let u = floorUnit(from, kind); let guard = 0;
+  while (u < to && guard++ < 4000) { const n = nextUnit(u, kind); out.push({ ms: u, next: n }); u = n; }
+  return out;
+}
+function fmtMs(ms: number) { return new Date(ms).toLocaleString([], { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: "UTC" }); }
+function humanDur(ms: number) {
+  const total = Math.max(0, Math.round(ms / 60000));
+  const d = Math.floor(total / 1440), h = Math.floor((total % 1440) / 60), m = total % 60;
+  const parts: string[] = [];
+  if (d) parts.push(`${d} day${d > 1 ? "s" : ""}`);
+  if (h) parts.push(`${h} hr`);
+  if (m) parts.push(`${m} min`);
+  return parts.join(" ") || "0 min";
+}
+function humanDelta(ms: number) { return `${ms > 0 ? "+" : ms < 0 ? "−" : ""}${humanDur(Math.abs(ms))}`; }
+
+// Export a project's schedule items as CSV (download) or PDF (print window).
+function exportGanttProject(item: ProjectScheduleItem, all: ProjectScheduleItem[], format: "csv" | "pdf") {
+  const key = item.schedule_group_key || item.project_title || "Ungrouped";
+  const group = all.filter((i) => (i.schedule_group_key || i.project_title || "Ungrouped") === key);
+  const head = ["Title", "Type", "Phase", "Assignee", "Status", "Priority", "Start", "End", "Progress"];
+  const rows = group.map((i) => [i.title, i.type, i.phase ?? "", i.assignee ?? "", i.status, i.priority ?? "", dateOnly(i.start_date), dateOnly(i.end_date), `${i.progress}%`]);
+  if (format === "csv") {
+    const csv = [head, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
+    a.download = `${key}.csv`; a.click();
+  } else {
+    const w = window.open("", "_blank"); if (!w) return;
+    w.document.write(`<html><head><title>${key}</title><style>body{font-family:system-ui,sans-serif;padding:24px;color:#111}h1{font-size:18px}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left}th{background:#f5f5f5}</style></head><body><h1>${key}</h1><table><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${String(c)}</td>`).join("")}</tr>`).join("")}</tbody></table><script>window.onload=function(){window.print()}<\/script></body></html>`);
+    w.document.close();
+  }
+}
+
 function GanttView({
-  items, deps, onEdit, onMove,
+  items, deps, onEdit, onMove, onDuplicate, onStatus, onHide, onDelete,
 }: {
   items: ProjectScheduleItem[];
   deps: ProjectScheduleDependency[];
   onEdit: (i: ProjectScheduleItem) => void;
   onMove: (id: string, start: string, end: string) => void;
+  onDuplicate: (i: ProjectScheduleItem) => void;
+  onStatus: (i: ProjectScheduleItem, s: ScheduleStatus) => void;
+  onHide: (i: ProjectScheduleItem) => void;
+  onDelete: (id: string) => void;
 }) {
+  const [zoom, setZoom] = React.useState<GanttZoom>("day");
   const drag = React.useRef<DragState | null>(null);
-  const [preview, setPreview] = React.useState<Record<string, { start: string; end: string }>>({});
+  const lastClick = React.useRef({ x: 0, y: 0 });
+  const [preview, setPreview] = React.useState<Record<string, { s: number; e: number }>>({});
+  const [tip, setTip] = React.useState<null | { x: number; y: number; mode: string; s: number; e: number; delta: number }>(null);
+  const [fab, setFab] = React.useState<null | { item: ProjectScheduleItem; x: number; y: number }>(null);
 
-  // Ordered rows: a group header followed by its items (same grouping as the List view).
+  // "Hide" (FAB) drops an item from the Gantt only.
+  const visibleItems = React.useMemo(() => items.filter((i) => i.visible_on_gantt !== false), [items]);
+
   const rows: GanttRow[] = React.useMemo(() => {
     const out: GanttRow[] = [];
-    for (const [name, group] of groupByProject(items)) {
+    for (const [name, group] of groupByProject(visibleItems)) {
       out.push({ kind: "group", key: `g:${name}`, name });
       for (const it of group) out.push({ kind: "item", key: it.id, item: it });
     }
     return out;
-  }, [items]);
-
+  }, [visibleItems]);
   const rowIndex = React.useMemo(() => {
     const m = new Map<string, number>();
     rows.forEach((r, idx) => { if (r.kind === "item") m.set(r.item.id, idx); });
     return m;
   }, [rows]);
 
-  // Effective (preview-aware) dates for an item.
-  const eff = React.useCallback((it: ProjectScheduleItem) => {
+  // Effective (preview-aware) ms span for an item. A same-day/legacy item (end<=start) shows as one day.
+  const effMs = React.useCallback((it: ProjectScheduleItem) => {
     const p = preview[it.id];
-    return { start: dateOnly(p?.start ?? it.start_date), end: dateOnly(p?.end ?? it.end_date) };
+    let s = p ? p.s : parseMs(it.start_date);
+    let e = p ? p.e : parseMs(it.end_date);
+    if (!Number.isFinite(s)) s = Date.now();
+    if (!Number.isFinite(e) || e <= s) e = s + dayMs;
+    return { s, e };
   }, [preview]);
 
-  // Timeline range across all dated items, padded a few days each side.
-  const dated = items.filter((i) => i.start_date && i.end_date);
+  const pxPerDay = ZOOM[zoom].pxPerDay;
+  const pxPerMs = pxPerDay / dayMs;
+  const snapMs = ZOOM[zoom].snapMin * 60000;
+
+  const dated = visibleItems.filter((i) => i.start_date && i.end_date);
   const range = React.useMemo(() => {
-    if (!dated.length) { const t = todayStr(); return { start: addDays(t, -3), days: 30 }; }
-    let min = dateOnly(dated[0].start_date), max = dateOnly(dated[0].end_date);
-    for (const i of dated) { const s = dateOnly(i.start_date), e = dateOnly(i.end_date); if (s < min) min = s; if (e > max) max = e; }
-    const start = addDays(min, -3);
-    const days = diffDays(start, max) + 7;
-    return { start, days };
+    if (!dated.length) { const now = startOfDayUTC(Date.now()); return { start: now - 3 * dayMs, end: now + 27 * dayMs }; }
+    let min = Infinity, max = -Infinity;
+    for (const i of dated) { const s = parseMs(i.start_date); let e = parseMs(i.end_date); if (e <= s) e = s + dayMs; if (s < min) min = s; if (e > max) max = e; }
+    return { start: startOfDayUTC(min) - 2 * dayMs, end: startOfDayUTC(max) + 4 * dayMs };
   }, [dated]);
 
-  const days = React.useMemo(
-    () => Array.from({ length: range.days }, (_, k) => addDays(range.start, k)),
-    [range],
+  const totalW = (range.end - range.start) * pxPerMs;
+  const x = (ms: number) => (ms - range.start) * pxPerMs;
+  const geom = (it: ProjectScheduleItem) => { const { s, e } = effMs(it); const left = x(s); const w = Math.max(6, (e - s) * pxPerMs); return { left, w, right: left + w, s, e }; };
+
+  const bottomKind = zoom === "hour" ? "hour" : zoom === "day" ? "day" : zoom === "week" ? "week" : "month";
+  const topKind = zoom === "hour" ? "day" : zoom === "month" ? "year" : "month";
+  const bottom = React.useMemo(() => unitTicks(range.start, range.end, bottomKind), [range, bottomKind]);
+  const top = React.useMemo(() => unitTicks(range.start, range.end, topKind), [range, topKind]);
+  const dayShade = React.useMemo(
+    () => (zoom === "hour" || zoom === "day")
+      ? unitTicks(range.start, range.end, "day").filter((t) => { const dow = new Date(t.ms).getUTCDay(); return dow === 0 || dow === 6; })
+      : [],
+    [range, zoom],
   );
-  const totalW = range.days * GANTT_DAY_W;
-  const xFor = (d: string) => diffDays(range.start, d) * GANTT_DAY_W;
-  const barGeom = (it: ProjectScheduleItem) => {
-    const { start, end } = eff(it);
-    const x = xFor(start);
-    const w = Math.max(GANTT_DAY_W, (diffDays(start, end) + 1) * GANTT_DAY_W);
-    return { x, w, right: x + w };
-  };
+
+  function bottomLabel(ms: number) {
+    const d = new Date(ms);
+    if (zoom === "hour") { const h = d.getUTCHours(); return h % 3 === 0 ? `${(h % 12) || 12}${h < 12 ? "a" : "p"}` : ""; }
+    if (zoom === "day") return String(d.getUTCDate());
+    if (zoom === "week") return d.toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" });
+    return d.toLocaleDateString([], { month: "short", timeZone: "UTC" });
+  }
+  function topLabel(ms: number) {
+    const d = new Date(ms);
+    if (topKind === "day") return d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+    if (topKind === "year") return String(d.getUTCFullYear());
+    return d.toLocaleDateString([], { month: "long", year: "numeric", timeZone: "UTC" });
+  }
 
   function onDown(e: React.MouseEvent, it: ProjectScheduleItem, mode: DragState["mode"]) {
     e.preventDefault(); e.stopPropagation();
-    const { start, end } = eff(it);
-    drag.current = { id: it.id, mode, startX: e.clientX, start0: start, end0: end, curStart: start, curEnd: end, moved: false };
+    lastClick.current = { x: e.clientX, y: e.clientY };
+    setFab(null);
+    const { s, e: en } = effMs(it);
+    drag.current = { id: it.id, mode, startX: e.clientX, s0: s, e0: en, curS: s, curE: en, moved: false };
     window.addEventListener("mousemove", onWinMove);
     window.addEventListener("mouseup", onWinUp);
   }
-  function onWinMove(e: MouseEvent) {
+  function onWinMove(ev: MouseEvent) {
     const d = drag.current; if (!d) return;
-    const delta = Math.round((e.clientX - d.startX) / GANTT_DAY_W);
+    const delta = Math.round(((ev.clientX - d.startX) / pxPerMs) / snapMs) * snapMs;
     if (delta !== 0) d.moved = true;
-    let s = d.start0, en = d.end0;
-    if (d.mode === "move") { s = addDays(d.start0, delta); en = addDays(d.end0, delta); }
-    else if (d.mode === "l") { s = addDays(d.start0, delta); if (s > en) s = en; }
-    else { en = addDays(d.end0, delta); if (en < s) en = s; }
-    d.curStart = s; d.curEnd = en;
-    setPreview((p) => ({ ...p, [d.id]: { start: s, end: en } }));
+    let s = d.s0, e = d.e0;
+    if (d.mode === "move") { s = d.s0 + delta; e = d.e0 + delta; }
+    else if (d.mode === "l") { s = Math.min(d.s0 + delta, d.e0 - snapMs); e = d.e0; }
+    else { e = Math.max(d.e0 + delta, d.s0 + snapMs); s = d.s0; }
+    d.curS = s; d.curE = e;
+    setPreview((p) => ({ ...p, [d.id]: { s, e } }));
+    setTip({ x: ev.clientX, y: ev.clientY, mode: d.mode, s, e, delta: d.mode === "r" ? e - d.e0 : s - d.s0 });
   }
   function onWinUp() {
     const d = drag.current; drag.current = null;
     window.removeEventListener("mousemove", onWinMove);
     window.removeEventListener("mouseup", onWinUp);
+    setTip(null);
     if (!d) return;
     if (!d.moved) {
-      const it = items.find((x) => x.id === d.id);
       setPreview((p) => { const n = { ...p }; delete n[d.id]; return n; });
-      if (it && d.mode === "move") onEdit(it);
+      if (d.mode === "move") { const it = items.find((i) => i.id === d.id); if (it) setFab({ item: it, x: lastClick.current.x, y: lastClick.current.y }); }
       return;
     }
-    if (d.curStart !== d.start0 || d.curEnd !== d.end0) onMove(d.id, d.curStart, d.curEnd);
+    if (d.curS !== d.s0 || d.curE !== d.e0) onMove(d.id, new Date(d.curS).toISOString(), new Date(d.curE).toISOString());
     setPreview((p) => { const n = { ...p }; delete n[d.id]; return n; });
   }
-  // Safety: detach listeners if the view unmounts mid-drag.
   React.useEffect(() => () => {
     window.removeEventListener("mousemove", onWinMove);
     window.removeEventListener("mouseup", onWinUp);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Dependency arrows between item bars currently on screen.
   const arrows = React.useMemo(() => {
-    const present = new Set(items.map((i) => i.id));
-    const byId = new Map(items.map((i) => [i.id, i]));
+    const present = new Set(visibleItems.map((i) => i.id));
+    const byId = new Map(visibleItems.map((i) => [i.id, i]));
     const out: { d: string }[] = [];
     for (const dep of deps) {
       if (!present.has(dep.source_item_id) || !present.has(dep.target_item_id)) continue;
       const src = byId.get(dep.source_item_id)!, tgt = byId.get(dep.target_item_id)!;
-      const sg = barGeom(src), tg = barGeom(tgt);
+      const sg = geom(src), tg = geom(tgt);
       const sRow = rowIndex.get(src.id), tRow = rowIndex.get(tgt.id);
       if (sRow == null || tRow == null) continue;
-      const y1 = sRow * GANTT_ROW_H + GANTT_ROW_H / 2;
-      const y2 = tRow * GANTT_ROW_H + GANTT_ROW_H / 2;
+      const y1 = sRow * GANTT_ROW_H + GANTT_ROW_H / 2, y2 = tRow * GANTT_ROW_H + GANTT_ROW_H / 2;
       const t = dep.dependency_type;
-      const x1 = (t === "start_to_start" || t === "start_to_finish") ? sg.x : sg.right;
-      const x2 = (t === "finish_to_finish" || t === "start_to_finish") ? tg.right : tg.x;
+      const x1 = (t === "start_to_start" || t === "start_to_finish") ? sg.left : sg.right;
+      const x2 = (t === "finish_to_finish" || t === "start_to_finish") ? tg.right : tg.left;
       out.push({ d: `M ${x1} ${y1} C ${x1 + 26} ${y1}, ${x2 - 26} ${y2}, ${x2} ${y2}` });
     }
     return out;
-  }, [deps, items, preview, rowIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [deps, visibleItems, preview, rowIndex, zoom]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!items.length) return <Empty label="No items yet. Create one or apply a template." />;
 
   const bodyH = rows.length * GANTT_ROW_H;
-  const todayX = xFor(todayStr());
-  const showToday = todayStr() >= range.start && todayStr() <= addDays(range.start, range.days - 1);
+  const nowMs = Date.now();
+  const showToday = nowMs >= range.start && nowMs <= range.end;
+  const half = GANTT_HEAD_H / 2;
 
   return (
     <div className="overflow-hidden rounded-xl border border-border">
-      <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-1.5 text-[11px] text-muted-foreground">
-        Drag a bar to move · drag its edges to resize · click to edit
+      {/* toolbar: hint + zoom levels */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/30 px-3 py-1.5">
+        <span className="text-[11px] text-muted-foreground">Drag a bar to move · drag edges to resize · click a bar for actions</span>
+        <div className="ml-auto flex items-center rounded-lg border border-border bg-card p-0.5 text-xs">
+          {(Object.keys(ZOOM) as GanttZoom[]).map((z) => (
+            <button key={z} onClick={() => setZoom(z)} className={cn("rounded-md px-2.5 py-1 font-medium", zoom === z ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground")}>{ZOOM[z].label}</button>
+          ))}
+        </div>
       </div>
+
       <div className="flex">
-        {/* Left label column (sticky) */}
+        {/* Left label column */}
         <div className="shrink-0 border-r border-border bg-card" style={{ width: GANTT_LABEL_W }}>
           <div className="border-b border-border" style={{ height: GANTT_HEAD_H }} />
           {rows.map((r) =>
@@ -575,7 +703,7 @@ function GanttView({
                 <span className="truncate">{r.name}</span>
               </div>
             ) : (
-              <button key={r.key} onClick={() => onEdit(r.item)} className="flex w-full items-center gap-1.5 border-b border-border px-3 text-left text-xs hover:bg-muted/40" style={{ height: GANTT_ROW_H }}>
+              <button key={r.key} onClick={(e) => setFab({ item: r.item, x: e.clientX, y: e.clientY })} className="flex w-full items-center gap-1.5 border-b border-border px-3 text-left text-xs hover:bg-muted/40" style={{ height: GANTT_ROW_H }}>
                 {r.item.type !== "task" && <span className="rounded bg-muted px-1 text-[9px] capitalize text-muted-foreground">{r.item.type[0]}</span>}
                 <span className="truncate">{r.item.title}</span>
               </button>
@@ -586,73 +714,51 @@ function GanttView({
         {/* Right scrollable timeline */}
         <div className="flex-1 overflow-x-auto">
           <div style={{ width: totalW }}>
-            {/* Header: months then day numbers */}
+            {/* Two-tier header */}
             <div style={{ height: GANTT_HEAD_H }} className="relative border-b border-border">
-              <div className="flex">
-                {monthSpans(days).map((m) => (
-                  <div key={m.key} className="shrink-0 border-r border-border px-2 py-1 text-[11px] font-semibold text-muted-foreground" style={{ width: m.span * GANTT_DAY_W }}>
-                    {m.label}
-                  </div>
+              <div className="relative" style={{ height: half }}>
+                {top.map((t) => (
+                  <div key={t.ms} className="absolute top-0 truncate border-r border-border px-2 py-1 text-[11px] font-semibold text-muted-foreground" style={{ left: x(t.ms), width: (t.next - t.ms) * pxPerMs, height: half }}>{topLabel(t.ms)}</div>
                 ))}
               </div>
-              <div className="flex">
-                {days.map((d) => {
-                  const dow = new Date(`${d}T00:00:00Z`).getUTCDay();
-                  const weekend = dow === 0 || dow === 6;
-                  return (
-                    <div key={d} className={cn("shrink-0 border-r border-border/60 text-center text-[9px] leading-[18px]", weekend ? "bg-muted/40 text-muted-foreground" : "text-muted-foreground")} style={{ width: GANTT_DAY_W }}>
-                      {Number(d.slice(8, 10))}
-                    </div>
-                  );
+              <div className="relative border-t border-border/60" style={{ height: half }}>
+                {bottom.map((t) => {
+                  const dow = new Date(t.ms).getUTCDay();
+                  const weekend = zoom === "day" && (dow === 0 || dow === 6);
+                  return <div key={t.ms} className={cn("absolute top-0 border-r border-border/40 text-center text-[9px] leading-[20px]", weekend ? "bg-muted/40 text-muted-foreground" : "text-muted-foreground")} style={{ left: x(t.ms), width: (t.next - t.ms) * pxPerMs, height: half }}>{bottomLabel(t.ms)}</div>;
                 })}
               </div>
             </div>
 
-            {/* Bars + grid + arrows */}
-            <div className="relative" style={{ height: bodyH }}>
-              {/* weekend column shading */}
-              {days.map((d, k) => {
-                const dow = new Date(`${d}T00:00:00Z`).getUTCDay();
-                if (dow !== 0 && dow !== 6) return null;
-                return <div key={d} className="absolute top-0 bg-muted/30" style={{ left: k * GANTT_DAY_W, width: GANTT_DAY_W, height: bodyH }} />;
-              })}
-              {/* row separators */}
+            {/* Body: shading + grid + arrows + bars */}
+            <div className="relative" style={{ height: bodyH }} onClick={() => setFab(null)}>
+              {dayShade.map((t) => <div key={t.ms} className="absolute top-0 bg-muted/25" style={{ left: x(t.ms), width: (t.next - t.ms) * pxPerMs, height: bodyH }} />)}
               {rows.map((r, idx) => (
                 <div key={`sep:${r.key}`} className={cn("absolute left-0 right-0 border-b border-border/60", r.kind === "group" && "bg-muted/20")} style={{ top: idx * GANTT_ROW_H, height: GANTT_ROW_H }} />
               ))}
-              {/* today marker */}
-              {showToday && <div className="absolute top-0 z-10 w-px bg-primary/70" style={{ left: todayX, height: bodyH }} />}
+              {showToday && <div className="absolute top-0 z-10 w-px bg-primary/70" style={{ left: x(nowMs), height: bodyH }} />}
 
-              {/* dependency arrows */}
               <svg className="pointer-events-none absolute inset-0 z-20 overflow-visible" width={totalW} height={bodyH}>
                 <defs>
-                  <marker id="gantt-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                    <path d="M0,0 L6,3 L0,6 Z" className="fill-muted-foreground" />
-                  </marker>
+                  <marker id="gantt-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" className="fill-muted-foreground" /></marker>
                 </defs>
-                {arrows.map((a, k) => (
-                  <path key={k} d={a.d} fill="none" className="stroke-muted-foreground/60" strokeWidth={1.5} markerEnd="url(#gantt-arrow)" />
-                ))}
+                {arrows.map((a, k) => <path key={k} d={a.d} fill="none" className="stroke-muted-foreground/60" strokeWidth={1.5} markerEnd="url(#gantt-arrow)" />)}
               </svg>
 
-              {/* bars */}
               {rows.map((r, idx) => {
                 if (r.kind !== "item") return null;
                 const it = r.item;
                 if (!it.start_date || !it.end_date) return null;
-                const g = barGeom(it);
-                const { start, end } = eff(it);
+                const g = geom(it);
                 return (
-                  <div key={`bar:${it.id}`} className="absolute z-30" style={{ left: g.x, width: g.w, top: idx * GANTT_ROW_H + 6, height: GANTT_ROW_H - 12 }}>
+                  <div key={`bar:${it.id}`} className="absolute z-30" style={{ left: g.left, width: g.w, top: idx * GANTT_ROW_H + 6, height: GANTT_ROW_H - 12 }}>
                     <div
                       onMouseDown={(e) => onDown(e, it, "move")}
-                      title={`${it.title} · ${fmtDate(start)}–${fmtDate(end)}`}
+                      title={`${it.title} · ${fmtMs(g.s)} → ${fmtMs(g.e)}`}
                       className={cn("group relative flex h-full cursor-grab items-center overflow-hidden rounded-md border active:cursor-grabbing", statusClass[it.status] ?? "bg-muted text-muted-foreground", "border-border/70")}
                     >
-                      {/* progress fill */}
                       {it.progress > 0 && <div className="absolute inset-y-0 left-0 bg-primary/25" style={{ width: `${Math.min(100, it.progress)}%` }} />}
                       <span className="relative truncate px-2 text-[10px] font-medium">{it.title}</span>
-                      {/* resize handles */}
                       <span onMouseDown={(e) => onDown(e, it, "l")} className="absolute inset-y-0 left-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
                       <span onMouseDown={(e) => onDown(e, it, "r")} className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
                     </div>
@@ -663,21 +769,83 @@ function GanttView({
           </div>
         </div>
       </div>
+
+      {/* live drag tooltip */}
+      {tip && (
+        <div className="pointer-events-none fixed z-[60] rounded-lg border border-border bg-popover px-3 py-2 text-xs shadow-lg" style={{ left: Math.min(tip.x + 14, (typeof window !== "undefined" ? window.innerWidth : 9999) - 230), top: tip.y + 14 }}>
+          <div className="mb-1 font-semibold">{tip.mode === "l" ? "Adjust start" : tip.mode === "r" ? "Adjust end" : "Move task"}</div>
+          <div className="text-muted-foreground">Start: <span className="text-foreground">{fmtMs(tip.s)}</span></div>
+          <div className="text-muted-foreground">End: <span className="text-foreground">{fmtMs(tip.e)}</span></div>
+          <div className={cn("mt-1 font-medium", tip.delta < 0 ? "text-orange-500" : tip.delta > 0 ? "text-primary" : "text-muted-foreground")}>Adjusted: {humanDelta(tip.delta)}</div>
+          <div className="text-muted-foreground">Duration: {humanDur(tip.e - tip.s)}</div>
+        </div>
+      )}
+
+      {/* FAB action panel */}
+      {fab && (
+        <GanttFab
+          fab={fab} items={items} onClose={() => setFab(null)}
+          onEdit={onEdit} onDuplicate={onDuplicate} onStatus={onStatus} onHide={onHide} onDelete={onDelete}
+        />
+      )}
     </div>
   );
 }
 
-// Group consecutive day cells into month spans for the Gantt header.
-function monthSpans(days: string[]) {
-  const out: { key: string; label: string; span: number }[] = [];
-  for (const d of days) {
-    const key = d.slice(0, 7);
-    const last = out[out.length - 1];
-    if (last && last.key === key) { last.span += 1; continue; }
-    const label = new Date(`${d}T00:00:00Z`).toLocaleDateString([], { month: "short", year: "numeric", timeZone: "UTC" });
-    out.push({ key, label, span: 1 });
-  }
-  return out;
+// Floating action panel for a Gantt task — MJG-reframed (no construction actions).
+function GanttFab({
+  fab, items, onClose, onEdit, onDuplicate, onStatus, onHide, onDelete,
+}: {
+  fab: { item: ProjectScheduleItem; x: number; y: number };
+  items: ProjectScheduleItem[];
+  onClose: () => void;
+  onEdit: (i: ProjectScheduleItem) => void;
+  onDuplicate: (i: ProjectScheduleItem) => void;
+  onStatus: (i: ProjectScheduleItem, s: ScheduleStatus) => void;
+  onHide: (i: ProjectScheduleItem) => void;
+  onDelete: (id: string) => void;
+}) {
+  const it = fab.item;
+  const run = (fn: () => void) => { fn(); onClose(); };
+  const W = 280, H = 320;
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+  const left = Math.min(fab.x + 8, vw - W - 8);
+  const top = Math.min(fab.y + 8, vh - H - 8);
+
+  const actions: { icon: React.ElementType; label: string; on: () => void; danger?: boolean }[] = [
+    { icon: Link2, label: "Connect", on: () => onEdit(it) },
+    { icon: UserPlus, label: "Add user", on: () => onEdit(it) },
+    { icon: Pencil, label: "Edit", on: () => onEdit(it) },
+    { icon: Copy, label: "Duplicate", on: () => onDuplicate(it) },
+    { icon: StickyNote, label: "Note", on: () => onEdit(it) },
+    { icon: CheckCircle2, label: "Complete", on: () => onStatus(it, "complete") },
+    { icon: XCircle, label: "Cancel", on: () => onStatus(it, "canceled") },
+    { icon: EyeOff, label: "Hide", on: () => onHide(it) },
+    { icon: FileDown, label: "CSV", on: () => exportGanttProject(it, items, "csv") },
+    { icon: FileText, label: "PDF", on: () => exportGanttProject(it, items, "pdf") },
+    { icon: Trash2, label: "Delete", on: () => onDelete(it.id), danger: true },
+  ];
+
+  return (
+    <>
+      <div className="fixed inset-0 z-[55]" onClick={onClose} />
+      <div className="fixed z-[60] w-[280px] rounded-xl border border-border bg-popover p-3 shadow-xl" style={{ left, top }}>
+        <div className="mb-2">
+          <div className="truncate text-sm font-semibold">{it.title}</div>
+          <div className="text-[11px] capitalize text-muted-foreground">{label(it.type)}{it.phase ? ` · ${it.phase}` : ""}</div>
+        </div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {actions.map((a) => (
+            <button key={a.label} onClick={() => run(a.on)} className={cn("flex flex-col items-center gap-1 rounded-lg border border-border px-1.5 py-2 text-[11px] hover:bg-muted", a.danger && "text-destructive hover:bg-destructive/10")}>
+              <a.icon className="h-4 w-4" /> {a.label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-2 text-[10px] leading-snug text-muted-foreground">Drag the bar to move. Use the left or right edge handles to resize duration.</p>
+      </div>
+    </>
+  );
 }
 
 function TemplatesView({ templates, tasks, onApply }: { templates: ProjectTemplate[]; tasks: ProjectTemplateTask[]; onApply: (t: ProjectTemplate) => void }) {
