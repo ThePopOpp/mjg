@@ -11,7 +11,10 @@ type AdminActionPayload = {
 export function createAdminActionToken(profile: DashboardProfile) {
   const payload: AdminActionPayload = {
     email: profile.email,
-    exp: Math.floor(Date.now() / 1000) + 60 * 60,
+    // 12h — the token is minted at page render and not refreshed, so a 1h TTL
+    // expired while a dashboard tab sat open, causing "Authentication required"
+    // on save once the session-cookie fallback also failed.
+    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 12,
     profileId: profile.id,
     role: profile.role,
   };
