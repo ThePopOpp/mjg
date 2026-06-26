@@ -38,6 +38,11 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./next.config.ts
+# The public marketing site (root /, /mission, /post, …) is served by route
+# handlers that readFileSync these static HTML files at runtime via
+# process.cwd()/main/*. Without this COPY the runner lacks main/ and every
+# public page 500s with ENOENT (the dashboard is unaffected — it never reads main/).
+COPY --from=builder /app/main ./main
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]
