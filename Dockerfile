@@ -21,7 +21,10 @@ ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL \
     NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 
 COPY package.json package-lock.json ./
-RUN npm ci --include=dev
+# Use `npm install` (not `npm ci`): the lockfile is generated on Windows and is
+# missing some Linux-only optional deps (e.g. @emnapi/*), which makes strict
+# `npm ci` fail. `npm install` resolves them — same behavior Nixpacks used.
+RUN npm install --include=dev --no-audit --no-fund
 COPY . .
 RUN npm run build
 
