@@ -6,6 +6,10 @@ import {
   List as ListIcon, Loader2, Plus, Pencil, Save, Table2, Trash2, User, X, Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { FieldSelect, type FieldSelectOption } from "@/components/ui/field-select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type {
@@ -14,12 +18,9 @@ import type {
 } from "@/lib/project-manager/types";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
-const iCls = "h-9 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-primary";
 const dayMs = 86400000;
 function dateOnly(s: string) { return (s || "").slice(0, 10); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
-function addDays(s: string, n: number) { const d = new Date(`${dateOnly(s)}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
-function daysBetween(a: string, b: string) { return Math.round((new Date(`${dateOnly(b)}T00:00:00Z`).getTime() - new Date(`${dateOnly(a)}T00:00:00Z`).getTime()) / dayMs); }
 function fmtDate(s: string) { if (!s) return "—"; const d = new Date(`${dateOnly(s)}T00:00:00Z`); return d.toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" }); }
 
 const STATUSES: ScheduleStatus[] = ["pending", "scheduled", "in_progress", "waiting", "delayed", "blocked", "needs_approval", "complete", "canceled"];
@@ -44,6 +45,14 @@ const priorityClass: Record<string, string> = {
   blocking_closeout: "text-red-700 dark:text-red-400 font-semibold",
 };
 const label = (s: string) => s.replace(/_/g, " ");
+const cap = (s: string) => { const w = label(s); return w.charAt(0).toUpperCase() + w.slice(1); };
+const opts = (arr: string[]): FieldSelectOption[] => arr.map((v) => ({ value: v, label: cap(v) }));
+
+const STATUS_FILTER_OPTS: FieldSelectOption[] = [{ value: "", label: "All statuses" }, ...opts(STATUSES)];
+const STATUS_OPTS = opts(STATUSES);
+const PRIORITY_OPTS = opts(PRIORITIES);
+const TYPE_OPTS = opts(TYPES);
+const DEP_TYPE_OPTS = opts(DEP_TYPES);
 
 type ProjectView = "list" | "table" | "kanban" | "calendar" | "templates" | "my_tasks";
 const VIEWS: { key: ProjectView; label: string; icon: React.ElementType }[] = [
@@ -185,11 +194,8 @@ export function ProjectManagerClient({
         </div>
         {view !== "templates" && (
           <>
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className={cn(iCls, "h-8 w-44")} />
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={cn(iCls, "h-8 w-40")}>
-              <option value="">All statuses</option>
-              {STATUSES.map((s) => <option key={s} value={s} className="capitalize">{label(s)}</option>)}
-            </select>
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search…" className="h-8 w-44" />
+            <div className="w-40"><FieldSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_FILTER_OPTS} className="h-8" /></div>
           </>
         )}
         <div className="ml-auto flex items-center gap-2">
@@ -460,6 +466,11 @@ function ItemEditor({
   const [depSource, setDepSource] = React.useState(""); const [depType, setDepType] = React.useState<DependencyType>("finish_to_start");
   const [depLag, setDepLag] = React.useState(0); const [depAuto, setDepAuto] = React.useState(true); const [depBusy, setDepBusy] = React.useState(false);
 
+  const depSourceOpts: FieldSelectOption[] = [
+    { value: "", label: "Depends on…" },
+    ...allItems.filter((i) => i.id !== draft.id).map((i) => ({ value: i.id, label: i.title })),
+  ];
+
   async function add() {
     if (!depSource || !draft.id) return;
     setDepBusy(true);
@@ -476,25 +487,25 @@ function ItemEditor({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Title" full><input className={iCls} value={draft.title} onChange={(e) => set("title", e.target.value)} /></Field>
-          <Field label="Type"><select className={iCls} value={draft.type} onChange={(e) => set("type", e.target.value as ScheduleItemType)}>{TYPES.map((t) => <option key={t} value={t} className="capitalize">{t}</option>)}</select></Field>
-          <Field label="Project"><input className={iCls} value={draft.project_title} onChange={(e) => set("project_title", e.target.value)} placeholder="Project / group" /></Field>
-          <Field label="Phase"><input className={iCls} value={draft.phase} onChange={(e) => set("phase", e.target.value)} /></Field>
-          <Field label="Assignee"><input className={iCls} list="pm-staff" value={draft.assignee} onChange={(e) => set("assignee", e.target.value)} /></Field>
-          <Field label="Participants (comma-separated)" full><input className={iCls} list="pm-staff" value={draft.participants} onChange={(e) => set("participants", e.target.value)} /></Field>
-          <Field label="Start date"><input type="date" className={iCls} value={draft.start_date} onChange={(e) => set("start_date", e.target.value)} /></Field>
-          <Field label="End date"><input type="date" className={iCls} value={draft.end_date} onChange={(e) => set("end_date", e.target.value)} /></Field>
-          <Field label="Status"><select className={iCls} value={draft.status} onChange={(e) => set("status", e.target.value as ScheduleStatus)}>{STATUSES.map((s) => <option key={s} value={s} className="capitalize">{label(s)}</option>)}</select></Field>
-          <Field label="Priority"><select className={iCls} value={draft.priority} onChange={(e) => set("priority", e.target.value as SchedulePriority)}>{PRIORITIES.map((p) => <option key={p} value={p} className="capitalize">{label(p)}</option>)}</select></Field>
-          <Field label={`Progress: ${draft.progress}%`} full><input type="range" min={0} max={100} value={draft.progress} onChange={(e) => set("progress", Number(e.target.value))} className="w-full" /></Field>
-          <Field label="Description" full><textarea className={cn(iCls, "h-16 resize-none py-2")} value={draft.description} onChange={(e) => set("description", e.target.value)} /></Field>
-          <Field label="Internal notes" full><textarea className={cn(iCls, "h-14 resize-none py-2")} value={draft.internal_notes} onChange={(e) => set("internal_notes", e.target.value)} /></Field>
+          <Field label="Title" full><Input value={draft.title} onChange={(e) => set("title", e.target.value)} /></Field>
+          <Field label="Type"><FieldSelect value={draft.type} onChange={(v) => set("type", v as ScheduleItemType)} options={TYPE_OPTS} /></Field>
+          <Field label="Project"><Input value={draft.project_title} onChange={(e) => set("project_title", e.target.value)} placeholder="Project / group" /></Field>
+          <Field label="Phase"><Input value={draft.phase} onChange={(e) => set("phase", e.target.value)} /></Field>
+          <Field label="Assignee"><Input list="pm-staff" value={draft.assignee} onChange={(e) => set("assignee", e.target.value)} /></Field>
+          <Field label="Participants (comma-separated)" full><Input list="pm-staff" value={draft.participants} onChange={(e) => set("participants", e.target.value)} /></Field>
+          <Field label="Start date"><DatePicker value={draft.start_date} onChange={(v) => set("start_date", v)} allowClear={false} /></Field>
+          <Field label="End date"><DatePicker value={draft.end_date} onChange={(v) => set("end_date", v)} allowClear={false} /></Field>
+          <Field label="Status"><FieldSelect value={draft.status} onChange={(v) => set("status", v as ScheduleStatus)} options={STATUS_OPTS} /></Field>
+          <Field label="Priority"><FieldSelect value={draft.priority} onChange={(v) => set("priority", v as SchedulePriority)} options={PRIORITY_OPTS} /></Field>
+          <Field label={`Progress: ${draft.progress}%`} full><input type="range" min={0} max={100} value={draft.progress} onChange={(e) => set("progress", Number(e.target.value))} className="w-full accent-primary" /></Field>
+          <Field label="Description" full><Textarea className="min-h-[64px]" value={draft.description} onChange={(e) => set("description", e.target.value)} /></Field>
+          <Field label="Internal notes" full><Textarea className="min-h-[56px]" value={draft.internal_notes} onChange={(e) => set("internal_notes", e.target.value)} /></Field>
           <div className="flex flex-wrap gap-4 sm:col-span-2">
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={draft.client_visible} onChange={(e) => set("client_visible", e.target.checked)} /> Client visible</label>
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={draft.notify} onChange={(e) => set("notify", e.target.checked)} /> Notify</label>
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={draft.is_blocked} onChange={(e) => set("is_blocked", e.target.checked)} /> Blocked</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="accent-primary" checked={draft.client_visible} onChange={(e) => set("client_visible", e.target.checked)} /> Client visible</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="accent-primary" checked={draft.notify} onChange={(e) => set("notify", e.target.checked)} /> Notify</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="accent-primary" checked={draft.is_blocked} onChange={(e) => set("is_blocked", e.target.checked)} /> Blocked</label>
           </div>
-          {draft.is_blocked && <Field label="Blocker reason" full><input className={iCls} value={draft.blocker_reason} onChange={(e) => set("blocker_reason", e.target.value)} /></Field>}
+          {draft.is_blocked && <Field label="Blocker reason" full><Input value={draft.blocker_reason} onChange={(e) => set("blocker_reason", e.target.value)} /></Field>}
         </div>
         <datalist id="pm-staff">{staffOptions.map((s) => <option key={s} value={s} />)}</datalist>
 
@@ -509,14 +520,11 @@ function ItemEditor({
                 <button onClick={() => onRemoveDep(d.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
               </div>
             ))}
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <select value={depSource} onChange={(e) => setDepSource(e.target.value)} className={cn(iCls, "h-8 w-44")}>
-                <option value="">Depends on…</option>
-                {allItems.filter((i) => i.id !== draft.id).map((i) => <option key={i.id} value={i.id}>{i.title}</option>)}
-              </select>
-              <select value={depType} onChange={(e) => setDepType(e.target.value as DependencyType)} className={cn(iCls, "h-8 w-40")}>{DEP_TYPES.map((t) => <option key={t} value={t}>{label(t)}</option>)}</select>
-              <input type="number" value={depLag} onChange={(e) => setDepLag(Number(e.target.value))} className={cn(iCls, "h-8 w-20")} title="Lag days" />
-              <label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={depAuto} onChange={(e) => setDepAuto(e.target.checked)} /> auto-shift</label>
+            <div className="mt-2 flex flex-wrap items-end gap-2">
+              <div className="w-44"><FieldSelect value={depSource} onChange={setDepSource} options={depSourceOpts} placeholder="Depends on…" className="h-8" /></div>
+              <div className="w-40"><FieldSelect value={depType} onChange={(v) => setDepType(v as DependencyType)} options={DEP_TYPE_OPTS} className="h-8" /></div>
+              <Input type="number" value={depLag} onChange={(e) => setDepLag(Number(e.target.value))} className="h-8 w-20" title="Lag days" />
+              <label className="flex items-center gap-1 pb-1.5 text-xs"><input type="checkbox" className="accent-primary" checked={depAuto} onChange={(e) => setDepAuto(e.target.checked)} /> auto-shift</label>
               <Button size="sm" variant="outline" onClick={add} disabled={!depSource || depBusy}>{depBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} Add</Button>
             </div>
           </div>
@@ -541,8 +549,8 @@ function ApplyTemplateModal({ template, taskCount, busy, onClose, onApply }: { t
       <div className="relative z-10 w-full max-w-md rounded-xl border border-border bg-card p-5 shadow-xl">
         <div className="mb-3 flex items-center justify-between"><h3 className="text-lg font-semibold">Apply template</h3><button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button></div>
         <p className="mb-3 text-sm text-muted-foreground">Generates <span className="font-medium text-foreground">{taskCount}</span> tasks from “{template.name}”, with dependencies wired automatically.</p>
-        <Field label="Project name"><input className={iCls} value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
-        <div className="mt-3"><Field label="Start date"><input type="date" className={iCls} value={start} onChange={(e) => setStart(e.target.value)} /></Field></div>
+        <Field label="Project name"><Input value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
+        <div className="mt-3"><Field label="Start date"><DatePicker value={start} onChange={setStart} allowClear={false} /></Field></div>
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={() => onApply(template, title.trim() || template.name, start)} disabled={busy || !title.trim()}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Create schedule</Button>

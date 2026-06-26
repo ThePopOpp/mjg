@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Check, ExternalLink, Loader2, Mail, Phone, RefreshCw, Trash2, UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FieldSelect } from "@/components/ui/field-select";
 import { cn } from "@/lib/utils";
 import type { BusinessCardLead, LeadStatus } from "@/lib/business-cards/types";
 
@@ -140,13 +141,14 @@ export function LeadsInbox({ isAdmin, scope, actionToken, onChanged }: { isAdmin
                   {scope === "all" && <td className="px-4 py-3 text-xs text-muted-foreground">{lead.owner?.display_name || "—"}</td>}
                   <td className="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground">{timeAgo(lead.created_at)}</td>
                   <td className="px-4 py-3">
-                    <select
-                      value={lead.status}
-                      onChange={(e) => setStatus(lead, e.target.value as LeadStatus)}
-                      className={cn("rounded-full border-0 px-2 py-1 text-[11px] font-medium capitalize outline-none", STATUS_STYLE[lead.status])}
-                    >
-                      {STATUSES.map((s) => <option key={s} value={s} className="bg-card text-foreground">{s}</option>)}
-                    </select>
+                    <div className="w-32">
+                      <FieldSelect
+                        value={lead.status}
+                        onChange={(v) => setStatus(lead, v as LeadStatus)}
+                        options={STATUSES.map((s) => ({ value: s, label: s.charAt(0).toUpperCase() + s.slice(1) }))}
+                        className="h-8"
+                      />
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
@@ -232,17 +234,13 @@ function ConvertLeadModal({ lead, actionToken, onClose, onConverted }: { lead: B
           <>
             <div className="mb-3">
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Destination</label>
-              <select className={sel} value={target} onChange={(e) => setTarget(e.target.value as ConvertTarget)}>
-                {TARGETS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </select>
+              <FieldSelect value={target} onChange={(v) => setTarget(v as ConvertTarget)} options={TARGETS.map(([v, l]) => ({ value: v, label: l }))} />
             </div>
 
             {target === "contact" && (
               <div className="mb-3">
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Contact type</label>
-                <select className={sel} value={contactType} onChange={(e) => setContactType(e.target.value)}>
-                  {CONTACT_TYPES.map((t) => <option key={t} value={t} className="capitalize">{t}</option>)}
-                </select>
+                <FieldSelect value={contactType} onChange={setContactType} options={CONTACT_TYPES.map((t) => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))} />
               </div>
             )}
             {target === "participant" && (
