@@ -162,11 +162,11 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                 {displayName.slice(0, 2).toUpperCase()}
               </div>
-              <Button asChild variant="ghost" size="icon" aria-label="Sign out">
-                <Link href="/auth/logout">
+              <form action="/auth/logout" method="post">
+                <Button type="submit" variant="ghost" size="icon" aria-label="Sign out">
                   <LogOut className="h-4 w-4" />
-                </Link>
-              </Button>
+                </Button>
+              </form>
             </div>
           </div>
         </header>

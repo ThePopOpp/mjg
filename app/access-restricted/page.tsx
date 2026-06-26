@@ -20,9 +20,9 @@ export default function AccessRestrictedPage() {
           <p className="text-sm text-muted-foreground">
             Ask a Super Admin to confirm your role, status, and profile record in Supabase.
           </p>
-          <Button asChild>
-            <Link href="/auth/logout">Sign out</Link>
-          </Button>
+          <form action="/auth/logout" method="post">
+            <Button type="submit">Sign out</Button>
+          </form>
         </CardContent>
       </Card>
     </main>
