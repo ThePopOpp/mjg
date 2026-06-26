@@ -1,6 +1,7 @@
 import {
   BarChart3,
   Bot,
+  CalendarClock,
   CalendarRange,
   Palette,
   CheckSquare,
@@ -39,6 +40,7 @@ export const dashboardNavItems = [
   { href: "/dashboard/dialer", label: "Dialer", icon: Phone },
   { href: "/dashboard/business-cards", label: "Business Cards", icon: IdCard },
   { href: "/dashboard/project-manager", label: "Project Manager", icon: FolderKanban },
+  { href: "/dashboard/bookings", label: "Bookings & Events", icon: CalendarClock },
   { href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
   { href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
