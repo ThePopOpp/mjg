@@ -252,3 +252,24 @@
 .dark .gantt-scroll::-webkit-scrollbar-thumb:hover {
   background-color: rgba(148, 163, 184, 0.6);
 }
+
+/* Gold-branded Gantt task bars + dependency lines.
+   Light mode = dark gold; dark mode = light gold. */
+.gantt-bar {
+  background-color: rgba(201, 164, 110, 0.18);
+  border-color: rgba(176, 137, 74, 0.6);
+  color: #785a1c;
+}
+.dark .gantt-bar {
+  background-color: rgba(216, 189, 134, 0.16);
+  border-color: rgba(216, 189, 134, 0.45);
+  color: #ecd9a0;
+}
+.gantt-bar-fill { background-color: rgba(176, 137, 74, 0.32); }
+.dark .gantt-bar-fill { background-color: rgba(216, 189, 134, 0.3); }
+.gantt-line { stroke: rgba(122, 93, 29, 0.55); }
+.dark .gantt-line { stroke: rgba(236, 217, 160, 0.5); }
+.gantt-line-head { fill: rgba(122, 93, 29, 0.65); }
+.dark .gantt-line-head { fill: rgba(236, 217, 160, 0.55); }
+.gantt-today { background-color: rgba(176, 137, 74, 0.85); }
+.dark .gantt-today { background-color: rgba(236, 217, 160, 0.7); }

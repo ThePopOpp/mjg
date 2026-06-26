@@ -41,19 +41,6 @@ const statusClass: Record<string, string> = {
   complete: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
   canceled: "bg-muted text-muted-foreground line-through",
 };
-// Gantt bars need stronger fills + a status-colored border that read clearly in
-// BOTH light and dark mode (darker text on light, lighter text on dark).
-const ganttBarClass: Record<string, string> = {
-  pending: "bg-slate-400/20 text-slate-700 dark:text-slate-200 border-slate-400/50",
-  scheduled: "bg-blue-500/20 text-blue-700 dark:text-blue-200 border-blue-500/50",
-  in_progress: "bg-primary/25 text-primary border-primary/60",
-  waiting: "bg-amber-500/20 text-amber-700 dark:text-amber-200 border-amber-500/50",
-  delayed: "bg-orange-500/20 text-orange-700 dark:text-orange-200 border-orange-500/50",
-  blocked: "bg-red-500/20 text-red-700 dark:text-red-200 border-red-500/50",
-  needs_approval: "bg-purple-500/20 text-purple-700 dark:text-purple-200 border-purple-500/50",
-  complete: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 border-emerald-500/50",
-  canceled: "bg-muted text-muted-foreground border-border line-through",
-};
 const priorityClass: Record<string, string> = {
   low: "text-muted-foreground", normal: "text-foreground", high: "text-amber-600 dark:text-amber-400",
   urgent: "text-orange-600 dark:text-orange-400", critical: "text-red-600 dark:text-red-400",
@@ -657,6 +644,10 @@ function GanttView({
   const totalW = (range.end - range.start) * pxPerMs;
   const x = (ms: number) => (ms - range.start) * pxPerMs;
   const geom = (it: ProjectScheduleItem) => { const { s, e } = effMs(it); const left = x(s); const w = Math.max(6, (e - s) * pxPerMs); return { left, w, right: left + w, s, e }; };
+  // Clamp a tick/shade cell to the timeline width. A month/week/year boundary can
+  // extend past the data; without clamping those absolute cells expand the scroll
+  // area, leaving blank scrollable space beyond the rendered header.
+  const clip = (ms: number, next: number) => { const l = Math.max(0, x(ms)); const r = Math.min(totalW, x(next)); return { left: l, width: Math.max(0, r - l) }; };
 
   const bottomKind = zoom === "hour" ? "hour" : zoom === "day" ? "day" : zoom === "week" ? "week" : "month";
   const topKind = zoom === "hour" ? "day" : zoom === "month" ? "year" : "month";
@@ -785,32 +776,36 @@ function GanttView({
             {/* Two-tier header */}
             <div style={{ height: GANTT_HEAD_H }} className="relative border-b border-border">
               <div className="relative" style={{ height: half }}>
-                {top.map((t) => (
-                  <div key={t.ms} className="absolute top-0 truncate border-r border-border px-2 py-1 text-[11px] font-semibold text-muted-foreground" style={{ left: x(t.ms), width: (t.next - t.ms) * pxPerMs, height: half }}>{topLabel(t.ms)}</div>
-                ))}
+                {top.map((t) => {
+                  const c = clip(t.ms, t.next);
+                  if (c.width <= 0) return null;
+                  return <div key={t.ms} className="absolute top-0 truncate border-r border-border px-2 py-1 text-[11px] font-semibold text-muted-foreground" style={{ left: c.left, width: c.width, height: half }}>{topLabel(t.ms)}</div>;
+                })}
               </div>
               <div className="relative border-t border-border/60" style={{ height: half }}>
                 {bottom.map((t) => {
+                  const c = clip(t.ms, t.next);
+                  if (c.width <= 0) return null;
                   const dow = new Date(t.ms).getUTCDay();
                   const weekend = zoom === "day" && (dow === 0 || dow === 6);
-                  return <div key={t.ms} className={cn("absolute top-0 border-r border-border/40 text-center text-[9px] leading-[20px]", weekend ? "bg-muted/40 text-muted-foreground" : "text-muted-foreground")} style={{ left: x(t.ms), width: (t.next - t.ms) * pxPerMs, height: half }}>{bottomLabel(t.ms)}</div>;
+                  return <div key={t.ms} className={cn("absolute top-0 border-r border-border/40 text-center text-[9px] leading-[20px]", weekend ? "bg-muted/40 text-muted-foreground" : "text-muted-foreground")} style={{ left: c.left, width: c.width, height: half }}>{bottomLabel(t.ms)}</div>;
                 })}
               </div>
             </div>
 
             {/* Body: shading + grid + arrows + bars (FAB closes via its own backdrop, not here) */}
             <div className="relative" style={{ height: bodyH }}>
-              {dayShade.map((t) => <div key={t.ms} className="absolute top-0 bg-muted/25" style={{ left: x(t.ms), width: (t.next - t.ms) * pxPerMs, height: bodyH }} />)}
+              {dayShade.map((t) => { const c = clip(t.ms, t.next); return c.width <= 0 ? null : <div key={t.ms} className="absolute top-0 bg-muted/25" style={{ left: c.left, width: c.width, height: bodyH }} />; })}
               {rows.map((r, idx) => (
                 <div key={`sep:${r.key}`} className={cn("absolute left-0 right-0 border-b border-border/60", r.kind === "group" && "bg-muted/20")} style={{ top: idx * GANTT_ROW_H, height: GANTT_ROW_H }} />
               ))}
-              {showToday && <div className="absolute top-0 z-10 w-px bg-primary/70" style={{ left: x(nowMs), height: bodyH }} />}
+              {showToday && <div className="gantt-today absolute top-0 z-10 w-px" style={{ left: x(nowMs), height: bodyH }} />}
 
               <svg className="pointer-events-none absolute inset-0 z-20 overflow-visible" width={totalW} height={bodyH}>
                 <defs>
-                  <marker id="gantt-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" className="fill-muted-foreground" /></marker>
+                  <marker id="gantt-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" className="gantt-line-head" /></marker>
                 </defs>
-                {arrows.map((a, k) => <path key={k} d={a.d} fill="none" className="stroke-muted-foreground/60" strokeWidth={1.5} markerEnd="url(#gantt-arrow)" />)}
+                {arrows.map((a, k) => <path key={k} d={a.d} fill="none" className="gantt-line" strokeWidth={1.5} markerEnd="url(#gantt-arrow)" />)}
               </svg>
 
               {rows.map((r, idx) => {
@@ -823,9 +818,9 @@ function GanttView({
                     <div
                       onMouseDown={(e) => onDown(e, it, "move")}
                       title={`${it.title} · ${fmtMs(g.s)} → ${fmtMs(g.e)}`}
-                      className={cn("group relative flex h-full cursor-grab items-center overflow-hidden rounded-md border shadow-sm active:cursor-grabbing", ganttBarClass[it.status] ?? "bg-muted text-muted-foreground border-border")}
+                      className={cn("gantt-bar group relative flex h-full cursor-grab items-center overflow-hidden rounded-md border shadow-sm active:cursor-grabbing", it.status === "canceled" && "line-through opacity-70")}
                     >
-                      {it.progress > 0 && <div className="absolute inset-y-0 left-0 bg-primary/25" style={{ width: `${Math.min(100, it.progress)}%` }} />}
+                      {it.progress > 0 && <div className="gantt-bar-fill absolute inset-y-0 left-0" style={{ width: `${Math.min(100, it.progress)}%` }} />}
                       <span className="relative truncate px-2.5 text-[11px] font-medium">{it.title}</span>
                       <span onMouseDown={(e) => onDown(e, it, "l")} className="absolute inset-y-0 left-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
                       <span onMouseDown={(e) => onDown(e, it, "r")} className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
