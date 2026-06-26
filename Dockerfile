@@ -1,7 +1,8 @@
-# syntax=docker/dockerfile:1
 # Reliable Node build for Coolify's "Dockerfile" build pack.
 # Avoids Nixpacks' flaky cold nixpkgs fetch (the recurring exit-255 in stage
 # "nix-env -if ..."). To use: set this app's Build Pack to "Dockerfile" in Coolify.
+# (No `# syntax=` directive on purpose — we use no BuildKit-frontend features,
+#  so we skip pulling docker/dockerfile:1.)
 
 # ── Build stage ────────────────────────────────────────────────────────────────
 FROM node:22-bookworm-slim AS builder
