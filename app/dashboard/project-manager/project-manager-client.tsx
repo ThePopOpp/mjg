@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import {
-  CalendarDays, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Columns3, Copy, EyeOff,
-  FileDown, FileText, GanttChartSquare, LayoutTemplate, List as ListIcon, Loader2, Plus, Pencil,
-  Save, StickyNote, Table2, Trash2, User, UserPlus, X, XCircle, Link2,
+  Bell, CalendarDays, Camera, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Columns3, Contact,
+  Copy, EyeOff, FileDown, FileText, GanttChartSquare, LayoutTemplate, List as ListIcon, Loader2, Mic,
+  Plus, Pencil, Save, StickyNote, Table2, Trash2, User, UserPlus, Users, UsersRound, X, Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -240,8 +240,7 @@ export function ProjectManagerClient({
         <GanttView
           items={visible} deps={deps}
           onEdit={(i) => setEditing(toDraft(i))} onMove={moveItem}
-          onDuplicate={duplicateItem} onStatus={quickStatus}
-          onHide={(it) => quickPatch(it, { visible_on_gantt: false })} onDelete={deleteItem}
+          onDuplicate={duplicateItem} onPatch={quickPatch} onDelete={deleteItem}
         />
       )}
       {view === "calendar" && <CalendarView items={visible} onEdit={(i) => setEditing(toDraft(i))} />}
@@ -529,15 +528,14 @@ function exportGanttProject(item: ProjectScheduleItem, all: ProjectScheduleItem[
 }
 
 function GanttView({
-  items, deps, onEdit, onMove, onDuplicate, onStatus, onHide, onDelete,
+  items, deps, onEdit, onMove, onDuplicate, onPatch, onDelete,
 }: {
   items: ProjectScheduleItem[];
   deps: ProjectScheduleDependency[];
   onEdit: (i: ProjectScheduleItem) => void;
   onMove: (id: string, start: string, end: string) => void;
   onDuplicate: (i: ProjectScheduleItem) => void;
-  onStatus: (i: ProjectScheduleItem, s: ScheduleStatus) => void;
-  onHide: (i: ProjectScheduleItem) => void;
+  onPatch: (i: ProjectScheduleItem, patch: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
 }) {
   const [zoom, setZoom] = React.useState<GanttZoom>("day");
@@ -730,8 +728,8 @@ function GanttView({
               </div>
             </div>
 
-            {/* Body: shading + grid + arrows + bars */}
-            <div className="relative" style={{ height: bodyH }} onClick={() => setFab(null)}>
+            {/* Body: shading + grid + arrows + bars (FAB closes via its own backdrop, not here) */}
+            <div className="relative" style={{ height: bodyH }}>
               {dayShade.map((t) => <div key={t.ms} className="absolute top-0 bg-muted/25" style={{ left: x(t.ms), width: (t.next - t.ms) * pxPerMs, height: bodyH }} />)}
               {rows.map((r, idx) => (
                 <div key={`sep:${r.key}`} className={cn("absolute left-0 right-0 border-b border-border/60", r.kind === "group" && "bg-muted/20")} style={{ top: idx * GANTT_ROW_H, height: GANTT_ROW_H }} />
@@ -785,43 +783,54 @@ function GanttView({
       {fab && (
         <GanttFab
           fab={fab} items={items} onClose={() => setFab(null)}
-          onEdit={onEdit} onDuplicate={onDuplicate} onStatus={onStatus} onHide={onHide} onDelete={onDelete}
+          onEdit={onEdit} onDuplicate={onDuplicate} onPatch={onPatch} onDelete={onDelete}
         />
       )}
     </div>
   );
 }
 
-// Floating action panel for a Gantt task — MJG-reframed (no construction actions).
+// Floating action panel for a Gantt task — MJG-reframed (no construction actions),
+// laid out as a 4×4 grid. People/attach actions open the item editor; the rest are
+// direct quick actions. (Photo/Audio attachments open the editor for now — there's
+// no media-on-task model yet.)
 function GanttFab({
-  fab, items, onClose, onEdit, onDuplicate, onStatus, onHide, onDelete,
+  fab, items, onClose, onEdit, onDuplicate, onPatch, onDelete,
 }: {
   fab: { item: ProjectScheduleItem; x: number; y: number };
   items: ProjectScheduleItem[];
   onClose: () => void;
   onEdit: (i: ProjectScheduleItem) => void;
   onDuplicate: (i: ProjectScheduleItem) => void;
-  onStatus: (i: ProjectScheduleItem, s: ScheduleStatus) => void;
-  onHide: (i: ProjectScheduleItem) => void;
+  onPatch: (i: ProjectScheduleItem, patch: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
 }) {
   const it = fab.item;
   const run = (fn: () => void) => { fn(); onClose(); };
-  const W = 280, H = 320;
+  const W = 320, H = 400;
   const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
-  const left = Math.min(fab.x + 8, vw - W - 8);
-  const top = Math.min(fab.y + 8, vh - H - 8);
+  const left = Math.max(8, Math.min(fab.x + 8, vw - W - 8));
+  const top = Math.max(8, Math.min(fab.y + 8, vh - H - 8));
 
   const actions: { icon: React.ElementType; label: string; on: () => void; danger?: boolean }[] = [
-    { icon: Link2, label: "Connect", on: () => onEdit(it) },
+    // Row 1 — people & associations (open the editor's assignee / participants)
     { icon: UserPlus, label: "Add user", on: () => onEdit(it) },
+    { icon: Users, label: "Add participant", on: () => onEdit(it) },
+    { icon: Contact, label: "Add contact", on: () => onEdit(it) },
+    { icon: UsersRound, label: "Add team", on: () => onEdit(it) },
+    // Row 2 — connect & attach
+    { icon: Link2, label: "Connect task", on: () => onEdit(it) },
+    { icon: StickyNote, label: "Add notes", on: () => onEdit(it) },
+    { icon: Camera, label: "Add photo", on: () => onEdit(it) },
+    { icon: Mic, label: "Add audio", on: () => onEdit(it) },
+    // Row 3 — manage
     { icon: Pencil, label: "Edit", on: () => onEdit(it) },
     { icon: Copy, label: "Duplicate", on: () => onDuplicate(it) },
-    { icon: StickyNote, label: "Note", on: () => onEdit(it) },
-    { icon: CheckCircle2, label: "Complete", on: () => onStatus(it, "complete") },
-    { icon: XCircle, label: "Cancel", on: () => onStatus(it, "canceled") },
-    { icon: EyeOff, label: "Hide", on: () => onHide(it) },
+    { icon: EyeOff, label: "Hide", on: () => onPatch(it, { visible_on_gantt: false }) },
+    { icon: CheckCircle2, label: "Complete", on: () => onPatch(it, { status: "complete" }) },
+    // Row 4 — remind & export
+    { icon: Bell, label: "Reminder", on: () => onPatch(it, { notify: true }) },
     { icon: FileDown, label: "CSV", on: () => exportGanttProject(it, items, "csv") },
     { icon: FileText, label: "PDF", on: () => exportGanttProject(it, items, "pdf") },
     { icon: Trash2, label: "Delete", on: () => onDelete(it.id), danger: true },
@@ -830,19 +839,19 @@ function GanttFab({
   return (
     <>
       <div className="fixed inset-0 z-[55]" onClick={onClose} />
-      <div className="fixed z-[60] w-[280px] rounded-xl border border-border bg-popover p-3 shadow-xl" style={{ left, top }}>
+      <div className="fixed z-[60] w-[320px] rounded-xl border border-border bg-popover p-3 shadow-xl" style={{ left, top }}>
         <div className="mb-2">
           <div className="truncate text-sm font-semibold">{it.title}</div>
           <div className="text-[11px] capitalize text-muted-foreground">{label(it.type)}{it.phase ? ` · ${it.phase}` : ""}</div>
         </div>
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-4 gap-1.5">
           {actions.map((a) => (
-            <button key={a.label} onClick={() => run(a.on)} className={cn("flex flex-col items-center gap-1 rounded-lg border border-border px-1.5 py-2 text-[11px] hover:bg-muted", a.danger && "text-destructive hover:bg-destructive/10")}>
+            <button key={a.label} onClick={() => run(a.on)} className={cn("flex flex-col items-center gap-1 rounded-lg border border-border px-1 py-2 text-center text-[10px] leading-tight hover:bg-muted", a.danger && "text-destructive hover:bg-destructive/10")}>
               <a.icon className="h-4 w-4" /> {a.label}
             </button>
           ))}
         </div>
-        <p className="mt-2 text-[10px] leading-snug text-muted-foreground">Drag the bar to move. Use the left or right edge handles to resize duration.</p>
+        <p className="mt-2 text-[10px] leading-snug text-muted-foreground">Drag the bar center to move. Use the left or right edge handles to resize duration.</p>
       </div>
     </>
   );
