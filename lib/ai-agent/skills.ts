@@ -47,6 +47,17 @@ export const AGENT_SKILLS: AgentSkill[] = [
     ],
   },
   {
+    name: "Project Manager",
+    whenToUse: "Anything about projects, tasks, phases, milestones, schedules, dependencies, assignees, or templates in the Project Manager.",
+    playbook: [
+      "The Project Manager plans stewardship & operations work as Projects with child Tasks, Phases, and Milestones, shown across List, Table, Kanban, Gantt (Hour/Day/Week/Month zoom with drag-to-move/resize and drag-to-connect), Calendar, Templates, and My Tasks views.",
+      "Items support: type (project/phase/task/milestone); status (pending, scheduled, in_progress, waiting, delayed, blocked, needs_approval, complete, canceled); priority (low, normal, high, urgent, critical, blocking_closeout); start/end dates; progress %; assignee + participants (by EMAIL); dependencies (finish_to_start / start_to_start / finish_to_finish / start_to_finish) drawn as Gantt arrows; reusable templates; photo/audio/file attachments; links to real user/participant/contact records; and project-level visibility (team / private / role-based / user-based, inherited by tasks).",
+      "ALWAYS call list_project_items first to get real ids and titles before connecting or updating anything — never invent ids.",
+      "To build work: create_project_item to add a Project, then add Tasks with project=<that project's name> so they nest under it. connect_project_items makes the target wait on the source. update_project_item changes status/progress/dates/assignee/priority. Use list_project_templates to see templates that scaffold a whole project.",
+      "Assignees/participants are emails. Some items may be private and hidden from you — don't claim items exist that you can't see.",
+    ],
+  },
+  {
     name: "Records (Contacts & Participants)",
     whenToUse: "Adding or updating contacts or participants.",
     playbook: [

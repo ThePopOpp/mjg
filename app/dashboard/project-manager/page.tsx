@@ -1,6 +1,8 @@
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { loadProjectManagerData, loadProjectLinkOptions } from "@/lib/project-manager/data";
 import { getCurrentProfile } from "@/lib/auth/server";
+import { can, PERMISSIONS } from "@/lib/rbac/permissions";
+import { AskSteward } from "@/components/ai-agent/ask-steward";
 import { ProjectManagerClient } from "./project-manager-client";
 
 export const dynamic = "force-dynamic";
@@ -24,14 +26,18 @@ export default async function ProjectManagerPage() {
   );
   const currentUserName = profile ? `${profile.firstName} ${profile.lastName}`.trim() : "";
   const currentUserEmail = profile?.email ?? "";
+  const canAskSteward = profile ? can(profile.role, PERMISSIONS.MANAGE_SETTINGS) : false;
 
   return (
     <div className="space-y-6">
-      <SectionHeader
-        eyebrow="Workspace"
-        title="Project Manager"
-        description="Plan stewardship and operations work across projects, phases, tasks, and milestones — with templates, dependencies, and multiple views."
-      />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <SectionHeader
+          eyebrow="Workspace"
+          title="Project Manager"
+          description="Plan stewardship and operations work across projects, phases, tasks, and milestones — with templates, dependencies, and multiple views."
+        />
+        {canAskSteward && <AskSteward />}
+      </div>
       <ProjectManagerClient
         initialData={data}
         staffOptions={staffOptions}

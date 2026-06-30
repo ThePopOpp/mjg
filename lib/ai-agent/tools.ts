@@ -23,8 +23,21 @@ import {
   getSocialReport, listMessages as listSocialMessages, saveAutomation as saveSocialAutomation,
 } from "@/lib/social-media/data";
 import { SOCIAL_EVENT_KEYS } from "@/lib/social-media/constants";
+import { loadProjectManagerData } from "@/lib/project-manager/data";
 
 const SOCIAL_EVENT_OPTIONS = SOCIAL_EVENT_KEYS.map((e) => e.key);
+
+// Project Manager validation sets (mirror the API route).
+const PM_STATUSES = new Set(["pending", "scheduled", "in_progress", "waiting", "delayed", "blocked", "needs_approval", "complete", "canceled"]);
+const PM_PRIORITIES = new Set(["low", "normal", "high", "urgent", "critical", "blocking_closeout"]);
+const PM_TYPES = new Set(["project", "phase", "task", "milestone"]);
+const PM_DEP_TYPES = new Set(["finish_to_start", "start_to_start", "finish_to_finish", "start_to_finish"]);
+
+async function pmViewer(ctx: AgentContext) {
+  const sb = createSupabaseAdminClient();
+  const { data } = await sb.from("profiles").select("role, email").eq("id", ctx.actorId).maybeSingle();
+  return { id: ctx.actorId, role: (data?.role as string) ?? "admin", email: ctx.actorEmail || (data?.email as string) || "" };
+}
 
 const EMAIL_EVENT_OPTIONS = EMAIL_EVENT_KEYS.map((e) => e.key);
 const BLOG_STATUSES = ["draft", "scheduled", "published", "hidden", "archived", "deleted"];
@@ -1111,6 +1124,148 @@ const setSocialAutomationTool: AgentTool = {
   },
 };
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Project Manager tools
+// ──────────────────────────────────────────────────────────────────────────────
+
+const listProjectItems: AgentTool = {
+  name: "list_project_items",
+  description: "List Project Manager items the current user can see (projects, phases, tasks, milestones): id, title, type, project/group, status, priority, dates, assignee, progress. Use to answer questions or to find an item's id before connecting/updating it.",
+  parameters: {
+    type: "object",
+    properties: {
+      status: { type: "string", description: "Optional status filter (e.g. in_progress, blocked, complete)." },
+      query: { type: "string", description: "Optional text filter on title / project / assignee." },
+    },
+  },
+  requiresConfirmation: false,
+  async execute(args, ctx) {
+    const data = await loadProjectManagerData("default", await pmViewer(ctx));
+    let items = data.items;
+    if (args.status) items = items.filter((i) => i.status === String(args.status));
+    if (args.query) { const q = String(args.query).toLowerCase(); items = items.filter((i) => `${i.title} ${i.project_title ?? ""} ${i.assignee ?? ""}`.toLowerCase().includes(q)); }
+    return {
+      count: items.length,
+      items: items.slice(0, 100).map((i) => ({
+        id: i.id, title: i.title, type: i.type, project: i.schedule_group_key || i.project_title || null,
+        status: i.status, priority: i.priority, start: i.start_date, end: i.end_date, assignee: i.assignee, progress: i.progress,
+      })),
+      dependencies: data.dependencies.map((d) => ({ id: d.id, source: d.source_item_id, target: d.target_item_id, type: d.dependency_type })),
+    };
+  },
+};
+
+const listProjectTemplates: AgentTool = {
+  name: "list_project_templates",
+  description: "List Project Manager templates that scaffold a whole project with phased tasks + dependencies.",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute(_args, ctx) {
+    const data = await loadProjectManagerData("default", await pmViewer(ctx));
+    return { templates: data.templates.map((t) => ({ id: t.id, name: t.name, slug: t.slug, category: t.category, suggestedDurationDays: t.suggested_duration_days })) };
+  },
+};
+
+const createProjectItem: AgentTool = {
+  name: "create_project_item",
+  description: "Create a Project Manager item. To nest a task under a project, pass that project's name as 'project'. Dates are YYYY-MM-DD.",
+  parameters: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      type: { type: "string", enum: ["project", "phase", "task", "milestone"], description: "Default task." },
+      project: { type: "string", description: "Project/group name to nest under." },
+      startDate: { type: "string", description: "YYYY-MM-DD (default today)." },
+      endDate: { type: "string", description: "YYYY-MM-DD (default = start)." },
+      status: { type: "string" },
+      priority: { type: "string" },
+      assignee: { type: "string", description: "Assignee email." },
+      description: { type: "string" },
+    },
+    required: ["title"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Create ${a.type ?? "task"} "${a.title}"${a.project ? ` under project "${a.project}"` : ""}`,
+  async execute(args, ctx) {
+    const sb = createSupabaseAdminClient();
+    const type = PM_TYPES.has(String(args.type)) ? String(args.type) : "task";
+    const today = new Date().toISOString().slice(0, 10);
+    const start = args.startDate ? String(args.startDate).slice(0, 10) : today;
+    const end = args.endDate ? String(args.endDate).slice(0, 10) : start;
+    const project = args.project ? String(args.project) : null;
+    const groupKey = type === "project" ? (project || String(args.title)) : project;
+    const row = {
+      board_id: "default", type, title: String(args.title), project_title: project,
+      assignee: args.assignee ? String(args.assignee) : null, start_date: start, end_date: end,
+      status: PM_STATUSES.has(String(args.status)) ? String(args.status) : "scheduled",
+      priority: PM_PRIORITIES.has(String(args.priority)) ? String(args.priority) : "normal",
+      description: args.description ? String(args.description) : null,
+      schedule_group_key: groupKey, created_by: ctx.actorId, visibility: "team", visible_roles: [],
+    };
+    const { data, error } = await sb.from("project_schedule_items").insert(row).select("id, title, type, status").single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+};
+
+const connectProjectItems: AgentTool = {
+  name: "connect_project_items",
+  description: "Create a dependency between two schedule items (the target waits on the source). Get ids from list_project_items.",
+  parameters: {
+    type: "object",
+    properties: {
+      sourceId: { type: "string" },
+      targetId: { type: "string" },
+      dependencyType: { type: "string", enum: ["finish_to_start", "start_to_start", "finish_to_finish", "start_to_finish"], description: "Default finish_to_start." },
+      lagDays: { type: "number" },
+      autoShift: { type: "boolean", description: "Cascade dates when the source moves. Default true." },
+    },
+    required: ["sourceId", "targetId"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Connect ${a.sourceId} → ${a.targetId} (${a.dependencyType ?? "finish_to_start"})`,
+  async execute(args) {
+    const sb = createSupabaseAdminClient();
+    const dt = PM_DEP_TYPES.has(String(args.dependencyType)) ? String(args.dependencyType) : "finish_to_start";
+    const { data, error } = await sb.from("project_schedule_dependencies").insert({
+      board_id: "default", source_item_id: String(args.sourceId), target_item_id: String(args.targetId),
+      dependency_type: dt, lag_days: Number(args.lagDays) || 0, auto_shift: args.autoShift !== false,
+    }).select("id").single();
+    if (error) throw new Error(error.message);
+    return { ok: true, id: data.id };
+  },
+};
+
+const updateProjectItem: AgentTool = {
+  name: "update_project_item",
+  description: "Update a schedule item by id — status, progress (0-100), dates (YYYY-MM-DD), assignee (email), or priority.",
+  parameters: {
+    type: "object",
+    properties: {
+      id: { type: "string" },
+      status: { type: "string" }, progress: { type: "number" },
+      startDate: { type: "string" }, endDate: { type: "string" },
+      assignee: { type: "string" }, priority: { type: "string" },
+    },
+    required: ["id"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Update project item ${a.id}`,
+  async execute(args) {
+    const sb = createSupabaseAdminClient();
+    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (args.status && PM_STATUSES.has(String(args.status))) patch.status = String(args.status);
+    if (args.priority && PM_PRIORITIES.has(String(args.priority))) patch.priority = String(args.priority);
+    if (typeof args.progress === "number") patch.progress = Math.max(0, Math.min(100, args.progress));
+    if (args.startDate) patch.start_date = String(args.startDate).slice(0, 10);
+    if (args.endDate) patch.end_date = String(args.endDate).slice(0, 10);
+    if (args.assignee !== undefined) patch.assignee = args.assignee ? String(args.assignee) : null;
+    const { data, error } = await sb.from("project_schedule_items").update(patch).eq("id", String(args.id)).select("id, title, status").single();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+};
+
 export const AGENT_TOOLS: AgentTool[] = [
   // Reads
   searchParticipants,
@@ -1131,6 +1286,8 @@ export const AGENT_TOOLS: AgentTool[] = [
   listSocialPostsTool,
   getSocialReportTool,
   listSocialInboxTool,
+  listProjectItems,
+  listProjectTemplates,
   // Actions (confirmation-gated)
   sendSmsAction,
   sendEmailAction,
@@ -1154,6 +1311,9 @@ export const AGENT_TOOLS: AgentTool[] = [
   createSocialPostTool,
   publishSocialPostTool,
   setSocialAutomationTool,
+  createProjectItem,
+  connectProjectItems,
+  updateProjectItem,
   // Memory (internal, no confirmation)
   rememberTool,
   forgetTool,
