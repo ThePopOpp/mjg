@@ -105,7 +105,7 @@ export function SocialAnalytics({ initialReport }: { initialReport: SocialReport
         )}
       </div>
 
-      <p className="text-[11px] text-muted-foreground">Engagement figures populate as posts publish and platform metrics sync. Siggey can summarize these numbers for you in the AI Agent.</p>
+      <p className="text-[11px] text-muted-foreground">Engagement figures populate as posts publish and platform metrics sync. Steward can summarize these numbers for you in the AI Agent.</p>
     </div>
   );
 }

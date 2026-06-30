@@ -34,7 +34,7 @@ export function SocialAutomations({ templates, initialAutomations }: { templates
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">Bind a template to an event so Siggey (or the system) can auto-draft a post when it happens. Drafts land in History for your review before publishing.</p>
+      <p className="text-sm text-muted-foreground">Bind a template to an event so Steward (or the system) can auto-draft a post when it happens. Drafts land in History for your review before publishing.</p>
       {rows.map((r) => (
         <div key={r.event_key} className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center gap-2">

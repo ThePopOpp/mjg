@@ -1,4 +1,4 @@
-// Siggey skills — structured playbooks (derived from docs/agents) that tell the
+// Steward skills — structured playbooks (derived from docs/agents) that tell the
 // agent HOW to perform each class of task with the available tools. Injected into
 // the system prompt so behavior is consistent and correct.
 

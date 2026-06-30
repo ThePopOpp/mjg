@@ -1,6 +1,6 @@
 // MJG Brand Kit / Design System — the single source of truth for logos, colors,
 // fonts, voice, and reusable on-brand snippets. Consumed by the dashboard Assets
-// page and by the AI agent (Siggey) so generated content stays on-brand.
+// page and by the AI agent (Steward) so generated content stays on-brand.
 
 export const BRAND_KIT = {
   name: "Michael J. Gauthier",

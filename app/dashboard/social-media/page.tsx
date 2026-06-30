@@ -31,7 +31,7 @@ export default async function SocialMediaPage() {
       <SectionHeader
         eyebrow="Workspace"
         title="Social Media"
-        description="Plan, build, schedule, and publish social content across your platforms — with templates, a block editor, an inbox, analytics, and Siggey assistance."
+        description="Plan, build, schedule, and publish social content across your platforms — with templates, a block editor, an inbox, analytics, and Steward assistance."
       />
       <SocialTabs active="overview" />
 

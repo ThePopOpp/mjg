@@ -8,7 +8,7 @@ export default function AssetsPage() {
       <SectionHeader
         eyebrow="Assets"
         title="Brand Kit & Design System"
-        description="Logos, colors, fonts, and voice for Michael J. Gauthier. Siggey uses these when generating emails and content."
+        description="Logos, colors, fonts, and voice for Michael J. Gauthier. Steward uses these when generating emails and content."
       />
 
       <Card>
