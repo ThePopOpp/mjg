@@ -36,8 +36,13 @@ export type ProjectScheduleItem = {
   template_name: string | null;
   duration_minutes: number | null;
   metadata: Record<string, unknown> | null;
+  created_by: string | null;
+  visibility: ItemVisibility;
+  visible_roles: string[];
   association_counts?: { participants: number };
 };
+
+export type ItemVisibility = "team" | "private" | "roles";
 
 export type ProjectScheduleDependency = {
   id: string;

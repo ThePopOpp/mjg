@@ -8,12 +8,44 @@ function participantCount(value: string | null | undefined) {
   return String(value || "").split(",").map((s) => s.trim()).filter(Boolean).length;
 }
 
+export type PmViewer = { id: string; role: string };
+
+function groupKeyOf(i: Pick<ProjectScheduleItem, "schedule_group_key" | "project_title" | "title" | "type">) {
+  return i.schedule_group_key || i.project_title || (i.type === "project" ? i.title : "Ungrouped");
+}
+
+// Visibility is a PROJECT-level concept; tasks/phases/milestones inherit their
+// project's rules. An item is visible if its (or its project's) visibility is
+// 'team', if the viewer is the creator, or — for 'roles' — the viewer's role is
+// listed. 'private' is strict (no super-admin override). Items with no project
+// (ungrouped) default to team.
+export function filterVisibleItems<T extends ProjectScheduleItem>(items: T[], viewer: PmViewer): T[] {
+  const projects = new Map<string, Pick<ProjectScheduleItem, "visibility" | "visible_roles" | "created_by">>();
+  for (const i of items) {
+    if (i.type === "project") {
+      const key = i.schedule_group_key || i.project_title || i.title;
+      if (key) projects.set(key, { visibility: i.visibility ?? "team", visible_roles: i.visible_roles ?? [], created_by: i.created_by ?? null });
+    }
+  }
+  const canView = (i: ProjectScheduleItem) => {
+    const rule = i.type === "project"
+      ? { visibility: i.visibility ?? "team", visible_roles: i.visible_roles ?? [], created_by: i.created_by ?? null }
+      : projects.get(groupKeyOf(i)) ?? { visibility: "team" as const, visible_roles: [] as string[], created_by: null };
+    if (rule.visibility === "team") return true;
+    if (rule.created_by && rule.created_by === viewer.id) return true; // creator always sees their own
+    if (rule.visibility === "private") return false;
+    if (rule.visibility === "roles") return (rule.visible_roles ?? []).includes(viewer.role);
+    return true;
+  };
+  return items.filter(canView);
+}
+
 // Attach lightweight computed counts (participants) used by hover badges.
 export function decorateScheduleItems(items: ProjectScheduleItem[]): ProjectScheduleItem[] {
   return items.map((item) => ({ ...item, association_counts: { participants: participantCount(item.participants) } }));
 }
 
-export async function loadProjectManagerData(boardId = "default"): Promise<ProjectManagerData> {
+export async function loadProjectManagerData(boardId = "default", viewer?: PmViewer): Promise<ProjectManagerData> {
   const supabase = createSupabaseAdminClient();
 
   const [items, dependencies, templates, templateTasks] = await Promise.all([
@@ -43,8 +75,14 @@ export async function loadProjectManagerData(boardId = "default"): Promise<Proje
     if (result.error) throw result.error;
   }
 
-  const decorated = decorateScheduleItems((items.data || []) as ProjectScheduleItem[]);
+  const all = decorateScheduleItems((items.data || []) as ProjectScheduleItem[]);
+  const decorated = viewer ? filterVisibleItems(all, viewer) : all;
   const itemIds = decorated.map((i) => i.id);
+  const visibleSet = new Set(itemIds);
+
+  // Only keep dependencies whose endpoints are both visible to this viewer.
+  const allDeps = (dependencies.data || []) as ProjectScheduleDependency[];
+  const visibleDeps = viewer ? allDeps.filter((d) => visibleSet.has(d.source_item_id) && visibleSet.has(d.target_item_id)) : allDeps;
 
   let attachments: ProjectItemAttachment[] = [];
   let links: ProjectItemLink[] = [];
@@ -59,7 +97,7 @@ export async function loadProjectManagerData(boardId = "default"): Promise<Proje
 
   return {
     items: decorated,
-    dependencies: (dependencies.data || []) as ProjectScheduleDependency[],
+    dependencies: visibleDeps,
     templates: (templates.data || []) as ProjectTemplate[],
     templateTasks: (templateTasks.data || []) as ProjectTemplateTask[],
     attachments,

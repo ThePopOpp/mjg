@@ -3,7 +3,7 @@
 import * as React from "react";
 import {
   Bell, CalendarDays, Camera, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Columns3, Contact,
-  Copy, EyeOff, FileDown, FileText, GanttChartSquare, LayoutTemplate, List as ListIcon, Loader2, Mic,
+  Copy, EyeOff, FileDown, FileText, GanttChartSquare, LayoutTemplate, List as ListIcon, Loader2, Lock, Mic,
   Paperclip, Plus, Pencil, Save, StickyNote, Table2, Trash2, User, UserPlus, Users, UsersRound, X, Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type {
-  DependencyType, LinkType, ProjectItemAttachment, ProjectItemLink, ProjectLinkOptions,
+  DependencyType, ItemVisibility, LinkType, ProjectItemAttachment, ProjectItemLink, ProjectLinkOptions,
   ProjectManagerData, ProjectScheduleDependency, ProjectScheduleItem,
   ProjectTemplate, ProjectTemplateTask, SchedulePriority, ScheduleStatus, ScheduleItemType,
 } from "@/lib/project-manager/types";
@@ -50,6 +50,19 @@ const label = (s: string) => s.replace(/_/g, " ");
 const cap = (s: string) => { const w = label(s); return w.charAt(0).toUpperCase() + w.slice(1); };
 const opts = (arr: string[]): FieldSelectOption[] => arr.map((v) => ({ value: v, label: cap(v) }));
 
+const VISIBILITY_OPTS: FieldSelectOption[] = [
+  { value: "team", label: "Everyone (team)" },
+  { value: "private", label: "Only me (private)" },
+  { value: "roles", label: "Specific roles" },
+];
+const VISIBILITY_ROLES: { value: string; label: string }[] = [
+  { value: "admin", label: "Admin" },
+  { value: "team_member", label: "Team member" },
+  { value: "content_reviewer", label: "Content reviewer" },
+  { value: "pastor_elder_reviewer", label: "Pastor/Elder reviewer" },
+  { value: "super_admin", label: "Super Admin" },
+];
+
 const STATUS_FILTER_OPTS: FieldSelectOption[] = [{ value: "", label: "All statuses" }, ...opts(STATUSES)];
 const STATUS_OPTS = opts(STATUSES);
 const PRIORITY_OPTS = opts(PRIORITIES);
@@ -72,6 +85,7 @@ type ItemDraft = {
   assignee: string; participants: string; client: string; start_date: string; end_date: string;
   status: ScheduleStatus; priority: SchedulePriority; progress: number; description: string;
   internal_notes: string; notify: boolean; client_visible: boolean; is_blocked: boolean; blocker_reason: string;
+  visibility: ItemVisibility; visible_roles: string[];
 };
 function toDraft(item?: ProjectScheduleItem): ItemDraft {
   return {
@@ -81,6 +95,7 @@ function toDraft(item?: ProjectScheduleItem): ItemDraft {
     status: item?.status ?? "scheduled", priority: (item?.priority ?? "normal") as SchedulePriority, progress: item?.progress ?? 0,
     description: item?.description ?? "", internal_notes: item?.internal_notes ?? "", notify: Boolean(item?.notify),
     client_visible: Boolean(item?.client_visible), is_blocked: Boolean(item?.is_blocked), blocker_reason: item?.blocker_reason ?? "",
+    visibility: item?.visibility ?? "team", visible_roles: item?.visible_roles ?? [],
   };
 }
 
@@ -383,6 +398,7 @@ function ListView({ items, onEdit, onDelete, depCount, emptyLabel }: { items: Pr
                       <div className="flex items-center gap-2">
                         <span className="truncate text-sm font-medium">{i.title}</span>
                         {i.type !== "task" && <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] capitalize text-muted-foreground">{i.type}</span>}
+                        {i.type === "project" && i.visibility && i.visibility !== "team" && <Lock className="h-3 w-3 text-muted-foreground" aria-label={i.visibility === "private" ? "Private" : "Role-limited"} />}
                         {depCount(i.id) > 0 && <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground"><Link2 className="h-3 w-3" />{depCount(i.id)}</span>}
                       </div>
                       <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
@@ -786,6 +802,7 @@ function GanttView({
             ) : (
               <button key={r.key} onClick={(e) => setFab({ item: r.item, x: e.clientX, y: e.clientY })} className="flex w-full items-center gap-1.5 border-b border-border px-3 text-left text-xs hover:bg-muted/40" style={{ height: GANTT_ROW_H }}>
                 {r.item.type !== "task" && <span className="rounded bg-muted px-1 text-[9px] capitalize text-muted-foreground">{r.item.type[0]}</span>}
+                {r.item.type === "project" && r.item.visibility !== "team" && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" />}
                 <span className="truncate">{r.item.title}</span>
               </button>
             ),
@@ -1035,6 +1052,42 @@ function ItemEditor({
           <Field label="End date"><DatePicker value={draft.end_date} onChange={(v) => set("end_date", v)} allowClear={false} /></Field>
           <Field label="Status"><FieldSelect value={draft.status} onChange={(v) => set("status", v as ScheduleStatus)} options={STATUS_OPTS} /></Field>
           <Field label="Priority"><FieldSelect value={draft.priority} onChange={(v) => set("priority", v as SchedulePriority)} options={PRIORITY_OPTS} /></Field>
+
+          {/* Visibility — project-level only; tasks/phases/milestones inherit. */}
+          <div className="sm:col-span-2">
+            {draft.type === "project" ? (
+              <div className="rounded-lg border border-border p-3">
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><Lock className="h-3.5 w-3.5" /> Visibility</label>
+                <FieldSelect value={draft.visibility} onChange={(v) => set("visibility", v as ItemVisibility)} options={VISIBILITY_OPTS} />
+                {draft.visibility === "roles" && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {VISIBILITY_ROLES.map((r) => {
+                      const on = draft.visible_roles.includes(r.value);
+                      return (
+                        <button key={r.value} type="button"
+                          onClick={() => set("visible_roles", on ? draft.visible_roles.filter((x) => x !== r.value) : [...draft.visible_roles, r.value])}
+                          className={cn("rounded-full border px-2.5 py-1 text-xs font-medium", on ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted")}>
+                          {r.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                <p className="mt-1.5 text-[11px] text-muted-foreground">
+                  {draft.visibility === "team"
+                    ? "Visible to everyone with dashboard access."
+                    : draft.visibility === "private"
+                      ? "Private — only you (the creator) can see this project and its tasks. Hidden from everyone else, including admins."
+                      : "Only the selected roles (and you, the creator) can see this project and its tasks."}
+                </p>
+              </div>
+            ) : (
+              <p className="rounded-lg border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
+                Visibility is inherited from this item&apos;s project — set it on the parent project.
+              </p>
+            )}
+          </div>
+
           <Field label={`Progress: ${draft.progress}%`} full><input type="range" min={0} max={100} value={draft.progress} onChange={(e) => set("progress", Number(e.target.value))} className="w-full accent-primary" /></Field>
           <Field label="Description" full><Textarea className="min-h-[64px]" value={draft.description} onChange={(e) => set("description", e.target.value)} /></Field>
           <Field label="Internal notes" full><Textarea className="min-h-[56px]" value={draft.internal_notes} onChange={(e) => set("internal_notes", e.target.value)} /></Field>

@@ -7,8 +7,10 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Project Manager — MJG Dashboard" };
 
 export default async function ProjectManagerPage() {
-  const [data, profile, linkOptions] = await Promise.all([
-    loadProjectManagerData("default"), getCurrentProfile(), loadProjectLinkOptions(),
+  const profile = await getCurrentProfile();
+  const viewer = profile ? { id: profile.id, role: profile.role } : undefined;
+  const [data, linkOptions] = await Promise.all([
+    loadProjectManagerData("default", viewer), loadProjectLinkOptions(),
   ]);
 
   // Assignee / participant suggestions: real MJG users by email, deduped (so

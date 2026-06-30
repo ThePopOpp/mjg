@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireParticipantManager } from "@/lib/user-management/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { filterVisibleItems } from "@/lib/project-manager/data";
+import type { ProjectScheduleDependency, ProjectScheduleItem } from "@/lib/project-manager/types";
 
 const dependencyTypes = new Set(["finish_to_start", "start_to_start", "finish_to_finish", "start_to_finish"]);
 
@@ -28,16 +30,18 @@ function normalizeDependency(body: Record<string, unknown>) {
 
 export async function GET(request: NextRequest) {
   try {
-    await requireParticipantManager(request);
+    const actor = await requireParticipantManager(request);
     const supabase = createSupabaseAdminClient();
     const boardId = request.nextUrl.searchParams.get("board_id") || "default";
-    const { data, error } = await supabase
-      .from("project_schedule_dependencies")
-      .select("*")
-      .eq("board_id", boardId)
-      .order("created_at", { ascending: true });
-    if (error) throw error;
-    return NextResponse.json({ dependencies: data || [] });
+    const [depsRes, itemsRes] = await Promise.all([
+      supabase.from("project_schedule_dependencies").select("*").eq("board_id", boardId).order("created_at", { ascending: true }),
+      supabase.from("project_schedule_items").select("*").eq("board_id", boardId),
+    ]);
+    if (depsRes.error) throw depsRes.error;
+    if (itemsRes.error) throw itemsRes.error;
+    const visibleIds = new Set(filterVisibleItems((itemsRes.data || []) as ProjectScheduleItem[], { id: actor.id, role: actor.role }).map((i) => i.id));
+    const dependencies = ((depsRes.data || []) as ProjectScheduleDependency[]).filter((d) => visibleIds.has(d.source_item_id) && visibleIds.has(d.target_item_id));
+    return NextResponse.json({ dependencies });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Dependencies load failed";
     return NextResponse.json({ message: msg }, { status: errStatus(msg) });
