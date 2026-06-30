@@ -128,7 +128,10 @@ export function ProjectManagerClient({
   async function saveItem(draft: ItemDraft) {
     setBusy(true); setError(null);
     try {
-      const payload = { ...draft, schedule_group_key: draft.project_title || null };
+      // A project groups under its own name so tasks that pick it as their Project
+      // land in the same group; everything else groups by its chosen Project.
+      const groupKey = draft.type === "project" ? (draft.project_title || draft.title) : (draft.project_title || null);
+      const payload = { ...draft, schedule_group_key: groupKey };
       if (draft.id) await send(`/api/project-manager/schedule/${draft.id}`, "PATCH", payload);
       else await send("/api/project-manager/schedule", "POST", payload);
       setEditing(null);
@@ -240,6 +243,18 @@ export function ProjectManagerClient({
     finally { setBusy(false); }
   }
 
+  // Existing projects/groups a task can be connected to (parent projects + any
+  // group keys already in use). Drives the Project dropdown in the editor.
+  const projectOptions = React.useMemo(() => {
+    const s = new Set<string>();
+    for (const i of items) {
+      if (i.type === "project" && i.title) s.add(i.title);
+      if (i.schedule_group_key) s.add(i.schedule_group_key);
+      if (i.project_title) s.add(i.project_title);
+    }
+    return Array.from(s).filter(Boolean).sort((a, b) => a.localeCompare(b));
+  }, [items]);
+
   // ── filtering ──
   const visible = React.useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -301,7 +316,7 @@ export function ProjectManagerClient({
       {editing && (
         <ItemEditor
           draft={editing} setDraft={setEditing} onSave={saveItem} onClose={() => setEditing(null)} busy={busy}
-          staffOptions={staffOptions} allItems={items}
+          staffOptions={staffOptions} allItems={items} projectOptions={projectOptions}
           incoming={editing.id ? incomingDeps(editing.id) : []}
           itemsById={Object.fromEntries(items.map((i) => [i.id, i]))}
           onAddDep={addDependency} onRemoveDep={removeDependency}
@@ -964,12 +979,12 @@ function Field({ label: l, children, full }: { label: string; children: React.Re
 }
 
 function ItemEditor({
-  draft, setDraft, onSave, onClose, busy, staffOptions, allItems, incoming, itemsById, onAddDep, onRemoveDep,
+  draft, setDraft, onSave, onClose, busy, staffOptions, allItems, projectOptions, incoming, itemsById, onAddDep, onRemoveDep,
   attachments, links, linkOptions, onUpload, onRemoveAttachment, onAddLink, onRemoveLink,
 }: {
   draft: ItemDraft; setDraft: React.Dispatch<React.SetStateAction<ItemDraft | null>>;
   onSave: (d: ItemDraft) => void; onClose: () => void; busy: boolean; staffOptions: string[];
-  allItems: ProjectScheduleItem[]; incoming: ProjectScheduleDependency[]; itemsById: Record<string, ProjectScheduleItem>;
+  allItems: ProjectScheduleItem[]; projectOptions: string[]; incoming: ProjectScheduleDependency[]; itemsById: Record<string, ProjectScheduleItem>;
   onAddDep: (targetId: string, sourceId: string, t: DependencyType, lag: number, auto: boolean) => Promise<void>;
   onRemoveDep: (id: string) => Promise<void>;
   attachments: ProjectItemAttachment[]; links: ProjectItemLink[]; linkOptions: ProjectLinkOptions;
@@ -1005,7 +1020,7 @@ function ItemEditor({
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Title" full><Input value={draft.title} onChange={(e) => set("title", e.target.value)} /></Field>
           <Field label="Type"><FieldSelect value={draft.type} onChange={(v) => set("type", v as ScheduleItemType)} options={TYPE_OPTS} /></Field>
-          <Field label="Project"><Input value={draft.project_title} onChange={(e) => set("project_title", e.target.value)} placeholder="Project / group" /></Field>
+          <Field label="Project"><ProjectPicker value={draft.project_title} options={projectOptions} onChange={(v) => set("project_title", v)} /></Field>
           <Field label="Phase"><Input value={draft.phase} onChange={(e) => set("phase", e.target.value)} /></Field>
           <Field label="Assignee"><Input list="pm-staff" value={draft.assignee} onChange={(e) => set("assignee", e.target.value)} /></Field>
           <Field label="Participants (comma-separated)" full><Input list="pm-staff" value={draft.participants} onChange={(e) => set("participants", e.target.value)} /></Field>
@@ -1102,6 +1117,36 @@ function ItemEditor({
         {!draft.id && <p className="mt-2 text-right text-[11px] text-muted-foreground">Save first to add dependencies, attachments, and people.</p>}
       </div>
     </div>
+  );
+}
+
+// Connect an item to a parent project: pick an existing one, or create a new name.
+function ProjectPicker({ value, options, onChange }: { value: string; options: string[]; onChange: (v: string) => void }) {
+  const known = options.includes(value);
+  const [creating, setCreating] = React.useState(value !== "" && !known);
+
+  if (creating) {
+    return (
+      <div className="flex gap-2">
+        <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder="New project name" autoFocus />
+        {options.length > 0 && (
+          <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => { setCreating(false); onChange(""); }}>Pick existing</Button>
+        )}
+      </div>
+    );
+  }
+  const opts: FieldSelectOption[] = [
+    { value: "", label: "— No project —" },
+    ...options.map((p) => ({ value: p, label: p })),
+    { value: "__new_project__", label: "+ New project…" },
+  ];
+  return (
+    <FieldSelect
+      value={value}
+      onChange={(v) => { if (v === "__new_project__") { setCreating(true); onChange(""); } else onChange(v); }}
+      options={opts}
+      placeholder="Select a project"
+    />
   );
 }
 
