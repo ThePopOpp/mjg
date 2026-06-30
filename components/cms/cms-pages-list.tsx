@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Archive, ArchiveRestore, FileText, Loader2, Pencil, Plus, Save, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { Archive, ArchiveRestore, FileText, Loader2, Pencil, Plus, Save, SquarePen, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -87,7 +88,7 @@ export function CmsPagesList({ initialPages }: { initialPages: CmsPage[] }) {
               <div key={p.id} className="flex flex-wrap items-center gap-3 px-4 py-3 hover:bg-muted/30">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate font-medium">{p.title}</span>
+                    <Link href={`/dashboard/cms/pages/${p.id}`} className="truncate font-medium hover:text-primary hover:underline">{p.title}</Link>
                     <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium capitalize", statusClass[p.status])}>{p.status}</span>
                   </div>
                   <div className="mt-0.5 text-[11px] text-muted-foreground">
@@ -95,6 +96,7 @@ export function CmsPagesList({ initialPages }: { initialPages: CmsPage[] }) {
                     {p.description ? ` · ${p.description}` : ""}
                   </div>
                 </div>
+                <Button asChild size="sm" variant="outline"><Link href={`/dashboard/cms/pages/${p.id}`}><SquarePen className="h-3.5 w-3.5" /> Edit</Link></Button>
                 <button onClick={() => setEditing(toDraft(p))} className="text-muted-foreground hover:text-primary" title="Edit details"><Pencil className="h-4 w-4" /></button>
                 {p.status === "archived" ? (
                   <button onClick={() => setStatus(p, "draft")} className="text-muted-foreground hover:text-foreground" title="Restore to draft"><ArchiveRestore className="h-4 w-4" /></button>

@@ -83,3 +83,20 @@ export async function deleteCmsPage(id: string): Promise<void> {
   const { error } = await sb.from("cms_pages").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }
+
+// Page + its editable draft block tree (draft_content jsonb). The returned page
+// includes draft_content as a CmsDraft (or {} for a never-edited page).
+export async function getCmsPageWithDraft(id: string): Promise<(CmsPage & { draft_content: unknown }) | null> {
+  const sb = createSupabaseAdminClient();
+  const { data, error } = await sb.from("cms_pages").select("*").eq("id", id).maybeSingle();
+  if (error) throw new Error(error.message);
+  return (data ?? null) as unknown as (CmsPage & { draft_content: unknown }) | null;
+}
+
+export async function saveCmsDraft(id: string, content: unknown, actorUserId?: string): Promise<void> {
+  const sb = createSupabaseAdminClient();
+  const { error } = await sb.from("cms_pages")
+    .update({ draft_content: content ?? {}, updated_by: actorUserId ?? null, updated_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+}

@@ -34,7 +34,10 @@ with checks(migration, present) as (
                                                           where constraint_name = 'project_schedule_items_visibility_check'
                                                             and check_clause ilike '%users%')),
     ('026 CMS foundation (cms_pages)',           to_regclass('public.cms_pages') is not null
-                                                   and to_regclass('public.cms_blocks') is not null)
+                                                   and to_regclass('public.cms_blocks') is not null),
+    ('027 CMS draft_content column',             exists (select 1 from information_schema.columns
+                                                          where table_schema = 'public' and table_name = 'cms_pages'
+                                                            and column_name = 'draft_content'))
 )
 select migration,
        case when present then '✅ applied' else '❌ MISSING — run this file' end as status
