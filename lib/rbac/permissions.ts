@@ -8,6 +8,9 @@ export const PERMISSIONS = {
   REVIEW_CONTENT: "review_content",
   VIEW_REPORTS: "view_reports",
   MANAGE_SETTINGS: "manage_settings",
+  // Super-Admin-only. Not granted to any other role below, so can(role, MANAGE_CMS)
+  // is true ONLY for super_admin (via the super-admin shortcut in can()).
+  MANAGE_CMS: "manage_cms",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

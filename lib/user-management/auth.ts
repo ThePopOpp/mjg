@@ -73,6 +73,23 @@ export async function requireAdminManager(request?: Request, actionToken?: strin
   return { ...profile, role };
 }
 
+export async function requireSuperAdmin(request?: Request, actionToken?: string | null) {
+  const { user } = await getAuthenticatedUser(request, actionToken);
+
+  const { profile, error } = await getProfileForAuthUser(user);
+
+  if (error) throw error;
+  const role = normalizeResolvedRole(profile, user.email);
+  if (!profile || profile.status !== "active") {
+    throw new Error("Active admin profile required.");
+  }
+  if (role !== ROLES.SUPER_ADMIN) {
+    throw new Error("Super Admin permission required.");
+  }
+
+  return { ...profile, role };
+}
+
 async function getAuthenticatedUser(request?: Request, actionToken?: string | null) {
   const supabase = await createClient();
 

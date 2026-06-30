@@ -32,7 +32,9 @@ with checks(migration, present) as (
                                                             and column_name = 'visibility')),
     ('025 visibility allows ''users''',          exists (select 1 from information_schema.check_constraints
                                                           where constraint_name = 'project_schedule_items_visibility_check'
-                                                            and check_clause ilike '%users%'))
+                                                            and check_clause ilike '%users%')),
+    ('026 CMS foundation (cms_pages)',           to_regclass('public.cms_pages') is not null
+                                                   and to_regclass('public.cms_blocks') is not null)
 )
 select migration,
        case when present then '✅ applied' else '❌ MISSING — run this file' end as status
