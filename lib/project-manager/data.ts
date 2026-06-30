@@ -41,9 +41,15 @@ export function filterVisibleItems<T extends ProjectScheduleItem>(items: T[], vi
     }
   }
   const canView = (i: ProjectScheduleItem) => {
-    const r: VisRule = i.type === "project"
-      ? ruleOf(i)
-      : projects.get(groupKeyOf(i)) ?? { visibility: "team", visible_roles: [], created_by: null, emails: [] };
+    let r: VisRule;
+    if (i.type === "project") {
+      r = ruleOf(i);
+    } else {
+      // A task inherits its project's rule, but its OWN assignee/participants also
+      // gain access (union with the project's audience) for role/user modes.
+      const base = projects.get(groupKeyOf(i)) ?? { visibility: "team", visible_roles: [], created_by: null, emails: [] };
+      r = { ...base, emails: [...base.emails, ...splitEmails(i.assignee), ...splitEmails(i.participants)] };
+    }
     if (r.visibility === "team") return true;
     if (r.created_by && r.created_by === viewer.id) return true; // creator always sees their own
     if (r.visibility === "private") return false;
