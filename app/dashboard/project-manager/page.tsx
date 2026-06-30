@@ -8,7 +8,7 @@ export const metadata = { title: "Project Manager — MJG Dashboard" };
 
 export default async function ProjectManagerPage() {
   const profile = await getCurrentProfile();
-  const viewer = profile ? { id: profile.id, role: profile.role } : undefined;
+  const viewer = profile ? { id: profile.id, role: profile.role, email: profile.email ?? "" } : undefined;
   const [data, linkOptions] = await Promise.all([
     loadProjectManagerData("default", viewer), loadProjectLinkOptions(),
   ]);

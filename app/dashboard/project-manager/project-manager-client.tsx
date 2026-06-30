@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldSelect, type FieldSelectOption } from "@/components/ui/field-select";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type {
@@ -51,9 +52,9 @@ const cap = (s: string) => { const w = label(s); return w.charAt(0).toUpperCase(
 const opts = (arr: string[]): FieldSelectOption[] => arr.map((v) => ({ value: v, label: cap(v) }));
 
 const VISIBILITY_OPTS: FieldSelectOption[] = [
-  { value: "team", label: "Everyone (team)" },
-  { value: "private", label: "Only me (private)" },
-  { value: "roles", label: "Specific roles" },
+  { value: "private", label: "Private (End-user only)" },
+  { value: "roles", label: "Role Based" },
+  { value: "users", label: "User Based" },
 ];
 const VISIBILITY_ROLES: { value: string; label: string }[] = [
   { value: "admin", label: "Admin" },
@@ -346,7 +347,7 @@ export function ProjectManagerClient({
           links={editing.id ? links.filter((l) => l.item_id === editing.id) : []}
           linkOptions={linkOptions}
           onUpload={pickAndUpload} onRemoveAttachment={deleteAttachment}
-          onAddLink={addLink} onRemoveLink={removeLink}
+          onAddLink={addLink} onRemoveLink={removeLink} currentUserEmail={currentUserEmail}
         />
       )}
       {applyTpl && (
@@ -1004,10 +1005,10 @@ function Field({ label: l, children, full }: { label: string; children: React.Re
 
 function ItemEditor({
   draft, setDraft, onSave, onClose, busy, staffOptions, allItems, projectOptions, incoming, itemsById, onAddDep, onRemoveDep,
-  attachments, links, linkOptions, onUpload, onRemoveAttachment, onAddLink, onRemoveLink,
+  attachments, links, linkOptions, onUpload, onRemoveAttachment, onAddLink, onRemoveLink, currentUserEmail,
 }: {
   draft: ItemDraft; setDraft: React.Dispatch<React.SetStateAction<ItemDraft | null>>;
-  onSave: (d: ItemDraft) => void; onClose: () => void; busy: boolean; staffOptions: { name: string; email: string }[];
+  onSave: (d: ItemDraft) => void; onClose: () => void; busy: boolean; staffOptions: { name: string; email: string }[]; currentUserEmail: string;
   allItems: ProjectScheduleItem[]; projectOptions: string[]; incoming: ProjectScheduleDependency[]; itemsById: Record<string, ProjectScheduleItem>;
   onAddDep: (targetId: string, sourceId: string, t: DependencyType, lag: number, auto: boolean) => Promise<void>;
   onRemoveDep: (id: string) => Promise<void>;
@@ -1020,6 +1021,20 @@ function ItemEditor({
   const set = <K extends keyof ItemDraft>(k: K, v: ItemDraft[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
   const [depSource, setDepSource] = React.useState(""); const [depType, setDepType] = React.useState<DependencyType>("finish_to_start");
   const [depLag, setDepLag] = React.useState(0); const [depAuto, setDepAuto] = React.useState(true); const [depBusy, setDepBusy] = React.useState(false);
+
+  // Visibility is controlled on the project; a task shows its project's inherited rule.
+  const isProject = draft.type === "project";
+  const restricted = isProject && draft.visibility !== "team";
+  const hideParticipants = restricted && draft.visibility === "private";
+  const parentProject = allItems.find((i) => i.type === "project" && (i.schedule_group_key || i.project_title || i.title) === draft.project_title);
+  const inheritedVis: ItemVisibility = !draft.project_title ? "team" : (parentProject?.visibility ?? "team");
+  const VIS_LABEL: Record<ItemVisibility, string> = { team: "Everyone", private: "Private", roles: "Role-based", users: "User-based" };
+
+  function setVisibilityMode(v: ItemVisibility) {
+    set("visibility", v);
+    if (v === "private") set("assignee", draft.assignee || currentUserEmail);
+    if (v !== "roles") set("visible_roles", []);
+  }
 
   const depSourceOpts: FieldSelectOption[] = [
     { value: "", label: "Depends on…" },
@@ -1041,53 +1056,67 @@ function ItemEditor({
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
 
+        {/* Visibility — controlled on the project; tasks inherit. */}
+        {isProject ? (
+          <div className="mb-4 rounded-lg border border-border p-3">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-sm font-medium"><Lock className="h-4 w-4 text-muted-foreground" /> Visibility</span>
+              <Switch
+                checked={draft.visibility !== "team"}
+                onCheckedChange={(on) => (on ? setVisibilityMode("private") : setVisibilityMode("team"))}
+              />
+            </div>
+            {restricted && (
+              <div className="mt-3 space-y-2">
+                <FieldSelect value={draft.visibility} onChange={(v) => setVisibilityMode(v as ItemVisibility)} options={VISIBILITY_OPTS} />
+                {draft.visibility === "roles" && (
+                  <div>
+                    <label className="mb-1 block text-[11px] font-medium text-muted-foreground">Roles that can see it</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {VISIBILITY_ROLES.map((r) => {
+                        const on = draft.visible_roles.includes(r.value);
+                        return (
+                          <button key={r.value} type="button"
+                            onClick={() => set("visible_roles", on ? draft.visible_roles.filter((x) => x !== r.value) : [...draft.visible_roles, r.value])}
+                            className={cn("rounded-full border px-2.5 py-1 text-xs font-medium", on ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted")}>
+                            {r.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground">
+                  {draft.visibility === "private"
+                    ? "Private — only you (the creator) can see this project and its tasks. Hidden from everyone, including admins."
+                    : draft.visibility === "roles"
+                      ? "Visible to the selected roles, plus the assignee and participants below (and you, the creator)."
+                      : "Visible only to the assignee and participants below (and you, the creator)."}
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mb-4 rounded-lg border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
+            {draft.project_title
+              ? <>Visibility is controlled on the parent project — <span className="font-medium text-foreground">{VIS_LABEL[inheritedVis]}</span>. Change it by editing the project.</>
+              : "No project selected, so this item is visible to everyone. Add it to a project to apply that project's visibility."}
+          </div>
+        )}
+
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Title" full><Input value={draft.title} onChange={(e) => set("title", e.target.value)} /></Field>
           <Field label="Type"><FieldSelect value={draft.type} onChange={(v) => set("type", v as ScheduleItemType)} options={TYPE_OPTS} /></Field>
           <Field label="Project"><ProjectPicker value={draft.project_title} options={projectOptions} onChange={(v) => set("project_title", v)} /></Field>
           <Field label="Phase"><Input value={draft.phase} onChange={(e) => set("phase", e.target.value)} /></Field>
           <Field label="Assignee"><Input list="pm-staff" value={draft.assignee} onChange={(e) => set("assignee", e.target.value)} placeholder="Choose a user by email" /></Field>
-          <Field label="Participants (comma-separated)" full><Input list="pm-staff" value={draft.participants} onChange={(e) => set("participants", e.target.value)} placeholder="user@email, user2@email" /></Field>
+          {!hideParticipants && (
+            <Field label="Participants (comma-separated)" full><Input list="pm-staff" value={draft.participants} onChange={(e) => set("participants", e.target.value)} placeholder="user@email, user2@email" /></Field>
+          )}
           <Field label="Start date"><DatePicker value={draft.start_date} onChange={(v) => set("start_date", v)} allowClear={false} /></Field>
           <Field label="End date"><DatePicker value={draft.end_date} onChange={(v) => set("end_date", v)} allowClear={false} /></Field>
           <Field label="Status"><FieldSelect value={draft.status} onChange={(v) => set("status", v as ScheduleStatus)} options={STATUS_OPTS} /></Field>
           <Field label="Priority"><FieldSelect value={draft.priority} onChange={(v) => set("priority", v as SchedulePriority)} options={PRIORITY_OPTS} /></Field>
-
-          {/* Visibility — project-level only; tasks/phases/milestones inherit. */}
-          <div className="sm:col-span-2">
-            {draft.type === "project" ? (
-              <div className="rounded-lg border border-border p-3">
-                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><Lock className="h-3.5 w-3.5" /> Visibility</label>
-                <FieldSelect value={draft.visibility} onChange={(v) => set("visibility", v as ItemVisibility)} options={VISIBILITY_OPTS} />
-                {draft.visibility === "roles" && (
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {VISIBILITY_ROLES.map((r) => {
-                      const on = draft.visible_roles.includes(r.value);
-                      return (
-                        <button key={r.value} type="button"
-                          onClick={() => set("visible_roles", on ? draft.visible_roles.filter((x) => x !== r.value) : [...draft.visible_roles, r.value])}
-                          className={cn("rounded-full border px-2.5 py-1 text-xs font-medium", on ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted")}>
-                          {r.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-                <p className="mt-1.5 text-[11px] text-muted-foreground">
-                  {draft.visibility === "team"
-                    ? "Visible to everyone with dashboard access."
-                    : draft.visibility === "private"
-                      ? "Private — only you (the creator) can see this project and its tasks. Hidden from everyone else, including admins."
-                      : "Only the selected roles (and you, the creator) can see this project and its tasks."}
-                </p>
-              </div>
-            ) : (
-              <p className="rounded-lg border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
-                Visibility is inherited from this item&apos;s project — set it on the parent project.
-              </p>
-            )}
-          </div>
-
           <Field label={`Progress: ${draft.progress}%`} full><input type="range" min={0} max={100} value={draft.progress} onChange={(e) => set("progress", Number(e.target.value))} className="w-full accent-primary" /></Field>
           <Field label="Description" full><Textarea className="min-h-[64px]" value={draft.description} onChange={(e) => set("description", e.target.value)} /></Field>
           <Field label="Internal notes" full><Textarea className="min-h-[56px]" value={draft.internal_notes} onChange={(e) => set("internal_notes", e.target.value)} /></Field>

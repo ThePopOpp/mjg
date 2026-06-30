@@ -8,33 +8,47 @@ function participantCount(value: string | null | undefined) {
   return String(value || "").split(",").map((s) => s.trim()).filter(Boolean).length;
 }
 
-export type PmViewer = { id: string; role: string };
+export type PmViewer = { id: string; role: string; email: string };
 
 function groupKeyOf(i: Pick<ProjectScheduleItem, "schedule_group_key" | "project_title" | "title" | "type">) {
   return i.schedule_group_key || i.project_title || (i.type === "project" ? i.title : "Ungrouped");
 }
+const splitEmails = (s?: string | null) => String(s || "").split(/[,\s]+/).map((x) => x.trim().toLowerCase()).filter(Boolean);
 
-// Visibility is a PROJECT-level concept; tasks/phases/milestones inherit their
-// project's rules. An item is visible if its (or its project's) visibility is
-// 'team', if the viewer is the creator, or — for 'roles' — the viewer's role is
-// listed. 'private' is strict (no super-admin override). Items with no project
-// (ungrouped) default to team.
+type VisRule = { visibility: string; visible_roles: string[]; created_by: string | null; emails: string[] };
+function ruleOf(i: ProjectScheduleItem): VisRule {
+  return {
+    visibility: i.visibility ?? "team",
+    visible_roles: i.visible_roles ?? [],
+    created_by: i.created_by ?? null,
+    emails: [...splitEmails(i.assignee), ...splitEmails(i.participants)],
+  };
+}
+
+// Visibility is controlled at the PROJECT level; tasks/phases/milestones inherit
+// their project's rule. An item is visible if (its project's) visibility is
+// 'team', the viewer is the creator, the viewer's role is listed ('roles'), or
+// the viewer's email is one of the project's assignee/participants ('roles' adds
+// this as a union; 'users' is email-only). 'private' is strict (creator only,
+// no super-admin override). Ungrouped items default to team.
 export function filterVisibleItems<T extends ProjectScheduleItem>(items: T[], viewer: PmViewer): T[] {
-  const projects = new Map<string, Pick<ProjectScheduleItem, "visibility" | "visible_roles" | "created_by">>();
+  const myEmail = (viewer.email || "").trim().toLowerCase();
+  const projects = new Map<string, VisRule>();
   for (const i of items) {
     if (i.type === "project") {
       const key = i.schedule_group_key || i.project_title || i.title;
-      if (key) projects.set(key, { visibility: i.visibility ?? "team", visible_roles: i.visible_roles ?? [], created_by: i.created_by ?? null });
+      if (key) projects.set(key, ruleOf(i));
     }
   }
   const canView = (i: ProjectScheduleItem) => {
-    const rule = i.type === "project"
-      ? { visibility: i.visibility ?? "team", visible_roles: i.visible_roles ?? [], created_by: i.created_by ?? null }
-      : projects.get(groupKeyOf(i)) ?? { visibility: "team" as const, visible_roles: [] as string[], created_by: null };
-    if (rule.visibility === "team") return true;
-    if (rule.created_by && rule.created_by === viewer.id) return true; // creator always sees their own
-    if (rule.visibility === "private") return false;
-    if (rule.visibility === "roles") return (rule.visible_roles ?? []).includes(viewer.role);
+    const r: VisRule = i.type === "project"
+      ? ruleOf(i)
+      : projects.get(groupKeyOf(i)) ?? { visibility: "team", visible_roles: [], created_by: null, emails: [] };
+    if (r.visibility === "team") return true;
+    if (r.created_by && r.created_by === viewer.id) return true; // creator always sees their own
+    if (r.visibility === "private") return false;
+    if (r.visibility === "roles") return r.visible_roles.includes(viewer.role) || (!!myEmail && r.emails.includes(myEmail));
+    if (r.visibility === "users") return !!myEmail && r.emails.includes(myEmail);
     return true;
   };
   return items.filter(canView);

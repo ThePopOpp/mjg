@@ -42,7 +42,7 @@ export type ProjectScheduleItem = {
   association_counts?: { participants: number };
 };
 
-export type ItemVisibility = "team" | "private" | "roles";
+export type ItemVisibility = "team" | "private" | "roles" | "users";
 
 export type ProjectScheduleDependency = {
   id: string;

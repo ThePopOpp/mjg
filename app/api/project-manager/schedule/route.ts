@@ -7,7 +7,7 @@ import type { ProjectScheduleItem } from "@/lib/project-manager/types";
 const statuses = new Set(["pending", "scheduled", "in_progress", "waiting", "delayed", "blocked", "needs_approval", "complete", "canceled"]);
 const priorities = new Set(["low", "normal", "high", "urgent", "critical", "blocking_closeout"]);
 const types = new Set(["project", "phase", "task", "milestone"]);
-const visibilities = new Set(["team", "private", "roles"]);
+const visibilities = new Set(["team", "private", "roles", "users"]);
 const validRoles = new Set(["super_admin", "admin", "team_member", "content_reviewer", "pastor_elder_reviewer"]);
 
 function errStatus(msg: string) {
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       .order("sort_order", { ascending: true });
     if (error) throw error;
     const items = decorateScheduleItems((data || []) as ProjectScheduleItem[]);
-    const visible = filterVisibleItems(items, { id: actor.id, role: actor.role });
+    const visible = filterVisibleItems(items, { id: actor.id, role: actor.role, email: actor.email ?? "" });
     return NextResponse.json({ items: visible });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Schedule items load failed";

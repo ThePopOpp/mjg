@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     ]);
     if (depsRes.error) throw depsRes.error;
     if (itemsRes.error) throw itemsRes.error;
-    const visibleIds = new Set(filterVisibleItems((itemsRes.data || []) as ProjectScheduleItem[], { id: actor.id, role: actor.role }).map((i) => i.id));
+    const visibleIds = new Set(filterVisibleItems((itemsRes.data || []) as ProjectScheduleItem[], { id: actor.id, role: actor.role, email: actor.email ?? "" }).map((i) => i.id));
     const dependencies = ((depsRes.data || []) as ProjectScheduleDependency[]).filter((d) => visibleIds.has(d.source_item_id) && visibleIds.has(d.target_item_id));
     return NextResponse.json({ dependencies });
   } catch (error) {
