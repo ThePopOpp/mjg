@@ -247,6 +247,14 @@ export function ProjectManagerClient({
     await send("/api/project-manager/dependencies", "POST", { source_item_id: sourceId, target_item_id: targetId, dependency_type, lag_days, auto_shift });
     await reload();
   }
+
+  // Gantt drag-to-connect: drawing from source → target creates a finish-to-start
+  // dependency (target waits on source).
+  async function connectItems(sourceId: string, targetId: string) {
+    setError(null);
+    try { await addDependency(targetId, sourceId, "finish_to_start", 0, true); }
+    catch (err) { setError(err instanceof Error ? err.message : "Couldn't connect those items (it may already be linked)."); }
+  }
   async function removeDependency(id: string) {
     await send(`/api/project-manager/dependencies/${id}`, "DELETE", {});
     await reload();
@@ -329,7 +337,7 @@ export function ProjectManagerClient({
           items={visible} deps={deps}
           onEdit={(i) => setEditing(toDraft(i))} onMove={moveItem}
           onDuplicate={duplicateItem} onPatch={quickPatch} onDelete={deleteItem}
-          onAttach={pickAndUpload}
+          onAttach={pickAndUpload} onConnect={connectItems}
         />
       )}
       {view === "calendar" && <CalendarView items={visible} onEdit={(i) => setEditing(toDraft(i))} />}
@@ -623,7 +631,7 @@ function exportGanttProject(item: ProjectScheduleItem, all: ProjectScheduleItem[
 }
 
 function GanttView({
-  items, deps, onEdit, onMove, onDuplicate, onPatch, onDelete, onAttach,
+  items, deps, onEdit, onMove, onDuplicate, onPatch, onDelete, onAttach, onConnect,
 }: {
   items: ProjectScheduleItem[];
   deps: ProjectScheduleDependency[];
@@ -633,6 +641,7 @@ function GanttView({
   onPatch: (i: ProjectScheduleItem, patch: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
   onAttach: (itemId: string, kind: "photo" | "audio" | "file") => void;
+  onConnect: (sourceId: string, targetId: string) => void;
 }) {
   const [zoom, setZoom] = React.useState<GanttZoom>("day");
   const drag = React.useRef<DragState | null>(null);
@@ -640,6 +649,12 @@ function GanttView({
   const [preview, setPreview] = React.useState<Record<string, { s: number; e: number }>>({});
   const [tip, setTip] = React.useState<null | { x: number; y: number; mode: string; s: number; e: number; delta: number }>(null);
   const [fab, setFab] = React.useState<null | { item: ProjectScheduleItem; x: number; y: number }>(null);
+  // Drag-to-connect: dot-drag draws a live line (connectRef/connectLine); the FAB
+  // "Connect task" starts click-to-connect (connectMode = source id).
+  const bodyRef = React.useRef<HTMLDivElement>(null);
+  const connectRef = React.useRef<{ sourceId: string } | null>(null);
+  const [connectLine, setConnectLine] = React.useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
+  const [connectMode, setConnectMode] = React.useState<string | null>(null);
 
   // "Hide" (FAB) drops an item from the Gantt only.
   const visibleItems = React.useMemo(() => items.filter((i) => i.visible_on_gantt !== false), [items]);
@@ -713,7 +728,55 @@ function GanttView({
     return d.toLocaleDateString([], { month: "long", year: "numeric", timeZone: "UTC" });
   }
 
+  // Connect coordinates relative to the timeline body (rect moves with scroll).
+  function relPoint(clientX: number, clientY: number) {
+    const rect = bodyRef.current?.getBoundingClientRect();
+    return rect ? { x: clientX - rect.left, y: clientY - rect.top } : { x: 0, y: 0 };
+  }
+  function startConnectDrag(e: React.MouseEvent, it: ProjectScheduleItem) {
+    e.preventDefault(); e.stopPropagation();
+    setFab(null); setConnectMode(null);
+    const g = geom(it); const row = rowIndex.get(it.id) ?? 0;
+    connectRef.current = { sourceId: it.id };
+    const p = relPoint(e.clientX, e.clientY);
+    setConnectLine({ x1: g.right, y1: row * GANTT_ROW_H + GANTT_ROW_H / 2, x2: p.x, y2: p.y });
+    window.addEventListener("mousemove", onConnectMove);
+    window.addEventListener("mouseup", onConnectUp);
+  }
+  function onConnectMove(ev: MouseEvent) {
+    if (!connectRef.current) return;
+    const p = relPoint(ev.clientX, ev.clientY);
+    setConnectLine((l) => (l ? { ...l, x2: p.x, y2: p.y } : l));
+  }
+  function onConnectUp(ev: MouseEvent) {
+    window.removeEventListener("mousemove", onConnectMove);
+    window.removeEventListener("mouseup", onConnectUp);
+    const src = connectRef.current?.sourceId; connectRef.current = null;
+    setConnectLine(null);
+    if (!src) return;
+    const el = document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement | null;
+    const targetId = el?.closest<HTMLElement>("[data-gantt-item]")?.getAttribute("data-gantt-item");
+    if (targetId && targetId !== src) onConnect(src, targetId);
+  }
+  React.useEffect(() => () => {
+    window.removeEventListener("mousemove", onConnectMove);
+    window.removeEventListener("mouseup", onConnectUp);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  React.useEffect(() => {
+    if (!connectMode) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setConnectMode(null); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [connectMode]);
+
   function onDown(e: React.MouseEvent, it: ProjectScheduleItem, mode: DragState["mode"]) {
+    // In click-to-connect mode, clicking a bar links it to the source instead of dragging.
+    if (connectMode) {
+      e.preventDefault(); e.stopPropagation();
+      if (it.id !== connectMode) onConnect(connectMode, it.id);
+      setConnectMode(null);
+      return;
+    }
     e.preventDefault(); e.stopPropagation();
     lastClick.current = { x: e.clientX, y: e.clientY };
     setFab(null);
@@ -783,13 +846,21 @@ function GanttView({
     <div className="overflow-hidden rounded-xl border border-border">
       {/* toolbar: hint + zoom levels */}
       <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/30 px-3 py-1.5">
-        <span className="text-[11px] text-muted-foreground">Drag a bar to move · drag edges to resize · click a bar for actions</span>
+        <span className="text-[11px] text-muted-foreground">Drag a bar to move · drag edges to resize · drag the dot to connect · click a bar for actions</span>
         <div className="ml-auto flex items-center rounded-lg border border-border bg-card p-0.5 text-xs">
           {(Object.keys(ZOOM) as GanttZoom[]).map((z) => (
             <button key={z} onClick={() => setZoom(z)} className={cn("rounded-md px-2.5 py-1 font-medium", zoom === z ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground")}>{ZOOM[z].label}</button>
           ))}
         </div>
       </div>
+
+      {connectMode && (
+        <div className="flex items-center gap-2 border-b border-primary/30 bg-primary/10 px-3 py-1.5 text-xs text-primary">
+          <Link2 className="h-3.5 w-3.5 shrink-0" />
+          <span>Connecting from “{items.find((i) => i.id === connectMode)?.title ?? "task"}” — click another task to link it, or press Esc.</span>
+          <button onClick={() => setConnectMode(null)} className="ml-auto font-medium underline">Cancel</button>
+        </div>
+      )}
 
       <div className="flex">
         {/* Left label column */}
@@ -834,7 +905,7 @@ function GanttView({
             </div>
 
             {/* Body: shading + grid + arrows + bars (FAB closes via its own backdrop, not here) */}
-            <div className="relative" style={{ height: bodyH }}>
+            <div ref={bodyRef} className="relative" style={{ height: bodyH }}>
               {dayShade.map((t) => { const c = clip(t.ms, t.next); return c.width <= 0 ? null : <div key={t.ms} className="absolute top-0 bg-muted/25" style={{ left: c.left, width: c.width, height: bodyH }} />; })}
               {rows.map((r, idx) => (
                 <div key={`sep:${r.key}`} className={cn("absolute left-0 right-0 border-b border-border/60", r.kind === "group" && "bg-muted/20")} style={{ top: idx * GANTT_ROW_H, height: GANTT_ROW_H }} />
@@ -848,23 +919,41 @@ function GanttView({
                 {arrows.map((a, k) => <path key={k} d={a.d} fill="none" className="gantt-line" strokeWidth={1.5} markerEnd="url(#gantt-arrow)" />)}
               </svg>
 
+              {/* Live connect line while dragging the connector dot. */}
+              {connectLine && (
+                <svg className="pointer-events-none absolute inset-0 z-40 overflow-visible" width={totalW} height={bodyH}>
+                  <path d={`M ${connectLine.x1} ${connectLine.y1} C ${connectLine.x1 + 30} ${connectLine.y1}, ${connectLine.x2 - 30} ${connectLine.y2}, ${connectLine.x2} ${connectLine.y2}`} fill="none" className="gantt-line" strokeWidth={2} strokeDasharray="4 3" />
+                  <circle cx={connectLine.x2} cy={connectLine.y2} r={3.5} className="fill-primary" />
+                </svg>
+              )}
+
               {rows.map((r, idx) => {
                 if (r.kind !== "item") return null;
                 const it = r.item;
                 if (!it.start_date || !it.end_date) return null;
                 const g = geom(it);
+                const isConnectTarget = connectMode && connectMode !== it.id;
                 return (
-                  <div key={`bar:${it.id}`} className="absolute z-30" style={{ left: g.left, width: g.w, top: idx * GANTT_ROW_H + 6, height: GANTT_ROW_H - 12 }}>
+                  <div key={`bar:${it.id}`} data-gantt-item={it.id} className={cn("group absolute z-30", isConnectTarget && "cursor-crosshair")} style={{ left: g.left, width: g.w, top: idx * GANTT_ROW_H + 6, height: GANTT_ROW_H - 12 }}>
                     <div
                       onMouseDown={(e) => onDown(e, it, "move")}
                       title={`${it.title} · ${fmtMs(g.s)} → ${fmtMs(g.e)}`}
-                      className={cn("gantt-bar group relative flex h-full cursor-grab items-center overflow-hidden rounded-md border shadow-sm active:cursor-grabbing", it.status === "canceled" && "line-through opacity-70")}
+                      className={cn("gantt-bar relative flex h-full items-center overflow-hidden rounded-md border shadow-sm", connectMode ? "cursor-crosshair" : "cursor-grab active:cursor-grabbing", it.status === "canceled" && "line-through opacity-70", connectMode === it.id && "ring-2 ring-primary")}
                     >
                       {it.progress > 0 && <div className="gantt-bar-fill absolute inset-y-0 left-0" style={{ width: `${Math.min(100, it.progress)}%` }} />}
                       <span className="relative truncate px-2.5 text-[11px] font-medium">{it.title}</span>
-                      <span onMouseDown={(e) => onDown(e, it, "l")} className="absolute inset-y-0 left-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
-                      <span onMouseDown={(e) => onDown(e, it, "r")} className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />
+                      {!connectMode && <span onMouseDown={(e) => onDown(e, it, "l")} className="absolute inset-y-0 left-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />}
+                      {!connectMode && <span onMouseDown={(e) => onDown(e, it, "r")} className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize opacity-0 hover:bg-foreground/20 group-hover:opacity-100" />}
                     </div>
+                    {/* Connector dot — hover to reveal, drag onto another bar to link. */}
+                    {!connectMode && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => startConnectDrag(e, it)}
+                        title="Drag to connect this task to another"
+                        className="absolute top-1/2 -right-2 z-50 hidden h-3.5 w-3.5 -translate-y-1/2 cursor-crosshair rounded-full border-2 border-card bg-primary shadow-sm group-hover:block"
+                      />
+                    )}
                   </div>
                 );
               })}
@@ -889,6 +978,7 @@ function GanttView({
         <GanttFab
           fab={fab} items={items} onClose={() => setFab(null)}
           onEdit={onEdit} onDuplicate={onDuplicate} onPatch={onPatch} onDelete={onDelete} onAttach={onAttach}
+          onConnectStart={(it) => setConnectMode(it.id)}
         />
       )}
     </div>
@@ -899,7 +989,7 @@ function GanttView({
 // laid out as a 4×4 grid. Photo/Audio upload directly; people actions open the
 // editor's People & associations section; the rest are direct quick actions.
 function GanttFab({
-  fab, items, onClose, onEdit, onDuplicate, onPatch, onDelete, onAttach,
+  fab, items, onClose, onEdit, onDuplicate, onPatch, onDelete, onAttach, onConnectStart,
 }: {
   fab: { item: ProjectScheduleItem; x: number; y: number };
   items: ProjectScheduleItem[];
@@ -909,6 +999,7 @@ function GanttFab({
   onPatch: (i: ProjectScheduleItem, patch: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
   onAttach: (itemId: string, kind: "photo" | "audio" | "file") => void;
+  onConnectStart: (i: ProjectScheduleItem) => void;
 }) {
   const it = fab.item;
   const run = (fn: () => void) => { fn(); onClose(); };
@@ -925,7 +1016,7 @@ function GanttFab({
     { icon: Contact, label: "Add contact", on: () => onEdit(it) },
     { icon: UsersRound, label: "Add team", on: () => onEdit(it) },
     // Row 2 — connect & attach
-    { icon: Link2, label: "Connect task", on: () => onEdit(it) },
+    { icon: Link2, label: "Connect task", on: () => onConnectStart(it) },
     { icon: StickyNote, label: "Add notes", on: () => onEdit(it) },
     { icon: Camera, label: "Add photo", on: () => onAttach(it.id, "photo") },
     { icon: Mic, label: "Add audio", on: () => onAttach(it.id, "audio") },
