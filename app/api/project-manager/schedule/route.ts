@@ -14,6 +14,17 @@ function errStatus(msg: string) {
   return /authentication/i.test(msg) ? 401 : /permission|required/i.test(msg) ? 403 : 500;
 }
 
+// Supabase/Postgres errors are plain objects (not Error instances), so surface
+// their `.message` (e.g. "column ... does not exist") instead of a generic string.
+function msgOf(e: unknown, fallback: string) {
+  if (e instanceof Error && e.message) return e.message;
+  if (e && typeof e === "object") {
+    const m = (e as { message?: unknown }).message;
+    if (typeof m === "string" && m) return m;
+  }
+  return fallback;
+}
+
 function normalizeItem(body: Record<string, unknown>) {
   const title = String(body.title || "").trim();
   const start = String(body.start_date || body.start || "").trim();
@@ -83,7 +94,7 @@ export async function GET(request: NextRequest) {
     const visible = filterVisibleItems(items, { id: actor.id, role: actor.role, email: actor.email ?? "" });
     return NextResponse.json({ items: visible });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Schedule items load failed";
+    const msg = msgOf(error, "Schedule items load failed");
     return NextResponse.json({ message: msg }, { status: errStatus(msg) });
   }
 }
@@ -98,7 +109,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ item: data });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Schedule item create failed";
+    const msg = msgOf(error, "Schedule item create failed");
     return NextResponse.json({ message: msg }, { status: errStatus(msg) });
   }
 }

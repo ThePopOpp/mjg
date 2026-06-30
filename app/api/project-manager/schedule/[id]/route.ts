@@ -6,6 +6,15 @@ function errStatus(msg: string) {
   return /authentication/i.test(msg) ? 401 : /permission|required/i.test(msg) ? 403 : 500;
 }
 
+function msgOf(e: unknown, fallback: string) {
+  if (e instanceof Error && e.message) return e.message;
+  if (e && typeof e === "object") {
+    const m = (e as { message?: unknown }).message;
+    if (typeof m === "string" && m) return m;
+  }
+  return fallback;
+}
+
 // Strip non-column / read-only fields a client might echo back.
 function cleanPatch(body: Record<string, unknown>) {
   const { actionToken, id, association_counts, created_at, ...patch } = body;
@@ -37,7 +46,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (error) throw error;
     return NextResponse.json({ item: data });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Schedule item update failed";
+    const msg = msgOf(error, "Schedule item update failed");
     return NextResponse.json({ message: msg }, { status: errStatus(msg) });
   }
 }
@@ -52,7 +61,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     if (error) throw error;
     return NextResponse.json({ ok: true });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Schedule item delete failed";
+    const msg = msgOf(error, "Schedule item delete failed");
     return NextResponse.json({ message: msg }, { status: errStatus(msg) });
   }
 }
