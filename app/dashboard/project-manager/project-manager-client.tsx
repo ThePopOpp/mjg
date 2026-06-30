@@ -84,12 +84,15 @@ function toDraft(item?: ProjectScheduleItem): ItemDraft {
   };
 }
 
+type StaffOption = { name: string; email: string };
+
 export function ProjectManagerClient({
-  initialData, staffOptions, currentUserName, linkOptions,
+  initialData, staffOptions, currentUserName, currentUserEmail, linkOptions,
 }: {
   initialData: ProjectManagerData;
-  staffOptions: string[];
+  staffOptions: StaffOption[];
   currentUserName: string;
+  currentUserEmail: string;
   linkOptions: ProjectLinkOptions;
 }) {
   const token = useDashboardActionToken();
@@ -267,9 +270,13 @@ export function ProjectManagerClient({
 
   const myItems = React.useMemo(() => {
     const me = currentUserName.trim().toLowerCase();
-    if (!me) return [];
-    return items.filter((i) => `${i.assignee ?? ""} ${i.participants ?? ""}`.toLowerCase().includes(me));
-  }, [items, currentUserName]);
+    const myEmail = currentUserEmail.trim().toLowerCase();
+    if (!me && !myEmail) return [];
+    return items.filter((i) => {
+      const hay = `${i.assignee ?? ""} ${i.participants ?? ""}`.toLowerCase();
+      return (me && hay.includes(me)) || (myEmail && hay.includes(myEmail));
+    });
+  }, [items, currentUserName, currentUserEmail]);
 
   const incomingDeps = (itemId: string) => deps.filter((d) => d.target_item_id === itemId);
 
@@ -983,7 +990,7 @@ function ItemEditor({
   attachments, links, linkOptions, onUpload, onRemoveAttachment, onAddLink, onRemoveLink,
 }: {
   draft: ItemDraft; setDraft: React.Dispatch<React.SetStateAction<ItemDraft | null>>;
-  onSave: (d: ItemDraft) => void; onClose: () => void; busy: boolean; staffOptions: string[];
+  onSave: (d: ItemDraft) => void; onClose: () => void; busy: boolean; staffOptions: { name: string; email: string }[];
   allItems: ProjectScheduleItem[]; projectOptions: string[]; incoming: ProjectScheduleDependency[]; itemsById: Record<string, ProjectScheduleItem>;
   onAddDep: (targetId: string, sourceId: string, t: DependencyType, lag: number, auto: boolean) => Promise<void>;
   onRemoveDep: (id: string) => Promise<void>;
@@ -1022,8 +1029,8 @@ function ItemEditor({
           <Field label="Type"><FieldSelect value={draft.type} onChange={(v) => set("type", v as ScheduleItemType)} options={TYPE_OPTS} /></Field>
           <Field label="Project"><ProjectPicker value={draft.project_title} options={projectOptions} onChange={(v) => set("project_title", v)} /></Field>
           <Field label="Phase"><Input value={draft.phase} onChange={(e) => set("phase", e.target.value)} /></Field>
-          <Field label="Assignee"><Input list="pm-staff" value={draft.assignee} onChange={(e) => set("assignee", e.target.value)} /></Field>
-          <Field label="Participants (comma-separated)" full><Input list="pm-staff" value={draft.participants} onChange={(e) => set("participants", e.target.value)} /></Field>
+          <Field label="Assignee"><Input list="pm-staff" value={draft.assignee} onChange={(e) => set("assignee", e.target.value)} placeholder="Choose a user by email" /></Field>
+          <Field label="Participants (comma-separated)" full><Input list="pm-staff" value={draft.participants} onChange={(e) => set("participants", e.target.value)} placeholder="user@email, user2@email" /></Field>
           <Field label="Start date"><DatePicker value={draft.start_date} onChange={(v) => set("start_date", v)} allowClear={false} /></Field>
           <Field label="End date"><DatePicker value={draft.end_date} onChange={(v) => set("end_date", v)} allowClear={false} /></Field>
           <Field label="Status"><FieldSelect value={draft.status} onChange={(v) => set("status", v as ScheduleStatus)} options={STATUS_OPTS} /></Field>
@@ -1038,7 +1045,7 @@ function ItemEditor({
           </div>
           {draft.is_blocked && <Field label="Blocker reason" full><Input value={draft.blocker_reason} onChange={(e) => set("blocker_reason", e.target.value)} /></Field>}
         </div>
-        <datalist id="pm-staff">{staffOptions.map((s) => <option key={s} value={s} />)}</datalist>
+        <datalist id="pm-staff">{staffOptions.map((s) => <option key={s.email} value={s.email}>{s.name}</option>)}</datalist>
 
         {/* Dependencies (only for saved items) */}
         {draft.id && (

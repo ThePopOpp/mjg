@@ -1,6 +1,5 @@
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { loadProjectManagerData, loadProjectLinkOptions } from "@/lib/project-manager/data";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { ProjectManagerClient } from "./project-manager-client";
 
@@ -12,14 +11,17 @@ export default async function ProjectManagerPage() {
     loadProjectManagerData("default"), getCurrentProfile(), loadProjectLinkOptions(),
   ]);
 
-  const supabase = createSupabaseAdminClient();
-  const { data: staff } = await supabase
-    .from("profiles")
-    .select("full_name")
-    .in("status", ["active", "invited"])
-    .order("full_name");
-  const staffOptions = (staff ?? []).map((s) => s.full_name).filter((n): n is string => Boolean(n));
+  // Assignee / participant suggestions: real MJG users by email, deduped (so
+  // same-named profiles don't collapse into indistinguishable duplicates).
+  const staffOptions = Array.from(
+    new Map(
+      linkOptions.users
+        .filter((u) => u.email)
+        .map((u) => [u.email!.toLowerCase(), { name: u.name, email: u.email as string }]),
+    ).values(),
+  );
   const currentUserName = profile ? `${profile.firstName} ${profile.lastName}`.trim() : "";
+  const currentUserEmail = profile?.email ?? "";
 
   return (
     <div className="space-y-6">
@@ -28,7 +30,13 @@ export default async function ProjectManagerPage() {
         title="Project Manager"
         description="Plan stewardship and operations work across projects, phases, tasks, and milestones — with templates, dependencies, and multiple views."
       />
-      <ProjectManagerClient initialData={data} staffOptions={staffOptions} currentUserName={currentUserName} linkOptions={linkOptions} />
+      <ProjectManagerClient
+        initialData={data}
+        staffOptions={staffOptions}
+        currentUserName={currentUserName}
+        currentUserEmail={currentUserEmail}
+        linkOptions={linkOptions}
+      />
     </div>
   );
 }
