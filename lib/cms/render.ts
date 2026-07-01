@@ -6,7 +6,7 @@ import {
   publicSiteUrl, renderFaviconLinks, renderFonts, renderNavScript, renderNavStyles,
   renderSiteHeader, renderThemeScript,
 } from "@/lib/public-site/static-pages";
-import { escHtml as esc, mdToHtml } from "./md";
+import { escHtml as esc, mdToHtml, sanitizeHtml, videoEmbedSrc } from "./md";
 import { blockPad, type CmsBlock } from "./types";
 
 function band(b: CmsBlock, innerHtml: string): string {
@@ -43,6 +43,29 @@ export function renderCmsBlock(b: CmsBlock): string {
       return band(b, `<hr style="border:none;border-top:1px solid ${esc(b.textColor || "var(--line,#e4ded2)")};margin:0" />`);
     case "spacer":
       return `<div style="height:${b.height ?? 40}px"></div>`;
+    case "cta": {
+      const btn = (label?: string, url?: string, primary = true) => (label && url)
+        ? `<a href="${esc(url)}" style="display:inline-block;margin:6px;background:${primary ? esc(b.buttonColor || "var(--green,#315f43)") : "transparent"};color:${primary ? "#fff" : esc(b.textColor || "var(--green,#315f43)")};border:${primary ? "none" : "2px solid var(--green,#315f43)"};padding:13px 26px;border-radius:${b.radius ?? 6}px;font-weight:700;text-decoration:none">${esc(label)}</a>` : "";
+      return band(b, `${b.eyebrow ? `<div style="color:var(--gold,#c9a46e);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:13px;margin-bottom:12px">${esc(b.eyebrow)}</div>` : ""}<h2 style="font-family:var(--font-display);${fs(b, "clamp(28px,4vw,44px)")};line-height:1.1;margin:0 0 12px">${esc(b.text || "")}</h2>${b.subtext ? `<p style="font-size:18px;line-height:1.6;color:var(--muted,#5f6d66);margin:0 0 20px">${esc(b.subtext)}</p>` : ""}<div>${btn(b.label, b.url, true)}${btn(b.label2, b.url2, false)}</div>`);
+    }
+    case "quote":
+      return band(b, `<blockquote style="font-family:var(--font-display);${fs(b, "clamp(22px,3vw,32px)")};line-height:1.35;margin:0">“${esc(b.text || "")}”</blockquote>${(b.author || b.role) ? `<div style="margin-top:16px;font-size:15px;color:var(--muted,#5f6d66)">${esc(b.author || "")}${b.role ? `<span style="opacity:.8"> · ${esc(b.role)}</span>` : ""}</div>` : ""}`);
+    case "cardgrid": {
+      const cols = Math.max(1, Math.min(4, b.columns || 3));
+      const cards = (b.items || []).map((it) => `<div style="background:var(--card,#fff);border:1px solid var(--line,#e4ded2);border-radius:12px;overflow:hidden;text-align:left">${it.imageUrl ? `<img src="${esc(it.imageUrl)}" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block" />` : ""}<div style="padding:18px">${it.title ? `<div style="font-family:var(--font-display);font-size:20px;margin-bottom:6px">${esc(it.title)}</div>` : ""}${it.body ? `<p style="font-size:15px;line-height:1.6;color:var(--muted,#5f6d66);margin:0">${esc(it.body)}</p>` : ""}${it.url ? `<a href="${esc(it.url)}" style="display:inline-block;margin-top:12px;color:var(--green,#315f43);font-weight:700;text-decoration:none">Learn more →</a>` : ""}</div></div>`).join("");
+      return band(b, `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:16px">${cards}</div>`);
+    }
+    case "accordion":
+      return band(b, (b.items || []).map((it) => `<details style="border:1px solid var(--line,#e4ded2);border-radius:10px;margin-bottom:8px;background:var(--card,#fff)"><summary style="cursor:pointer;padding:14px 16px;font-weight:600;list-style:none">${esc(it.q || "")}</summary><div style="padding:0 16px 16px;color:var(--muted,#5f6d66);line-height:1.6">${esc(it.a || "")}</div></details>`).join(""));
+    case "video": {
+      const src = b.url ? videoEmbedSrc(b.url) : "";
+      if (!src) return "";
+      const [aw, ah] = (b.aspect || "16/9").split("/").map(Number);
+      const pb = ah && aw ? (ah / aw) * 100 : 56.25;
+      return band(b, `<div style="position:relative;width:100%;padding-bottom:${pb}%;border-radius:${b.radius ?? 10}px;overflow:hidden"><iframe src="${esc(src)}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allowfullscreen loading="lazy"></iframe></div>`);
+    }
+    case "html":
+      return band(b, sanitizeHtml(b.html || ""));
     default:
       return "";
   }

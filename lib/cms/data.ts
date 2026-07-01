@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import type { CmsPage, CmsPageType } from "./types";
+import type { CmsBlock, CmsPage, CmsPageType } from "./types";
 
 // Service-role data layer. ONLY call from super-admin-guarded routes/pages
 // (requireSuperAdmin) — RLS (is_super_admin) is the defense-in-depth backstop.
@@ -91,6 +91,20 @@ export async function getCmsPageWithDraft(id: string): Promise<(CmsPage & { draf
   const { data, error } = await sb.from("cms_pages").select("*").eq("id", id).maybeSingle();
   if (error) throw new Error(error.message);
   return (data ?? null) as unknown as (CmsPage & { draft_content: unknown }) | null;
+}
+
+// Create a new page AND seed its draft block tree in one step. Always lands as a
+// DRAFT (createCmsPage forces status:"draft") — used by Steward AI authoring.
+export async function createCmsDraftPage(input: {
+  title: string; slug?: string; page_type?: string; description?: string | null;
+  blocks: CmsBlock[]; actorUserId?: string;
+}): Promise<CmsPage> {
+  const page = await createCmsPage({
+    title: input.title, slug: input.slug, page_type: input.page_type,
+    description: input.description ?? null, actorUserId: input.actorUserId,
+  });
+  await saveCmsDraft(page.id, { version: 1, blocks: Array.isArray(input.blocks) ? input.blocks : [] }, input.actorUserId);
+  return page;
 }
 
 export async function saveCmsDraft(id: string, content: unknown, actorUserId?: string): Promise<void> {

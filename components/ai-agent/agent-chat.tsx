@@ -34,6 +34,9 @@ export type AgentChatProps = {
   heightClassName?: string;
   emptyTitle?: string;
   emptyHint?: string;
+  // Optional reference text (e.g. an uploaded JSON/CSV/document) attached to the
+  // FIRST user message so the agent can build from it.
+  extraContext?: string;
 };
 
 function friendlyToolName(name: string) {
@@ -49,6 +52,7 @@ export function AgentChat({
   heightClassName = "h-[calc(100vh-220px)] min-h-[480px]",
   emptyTitle = "How can I help?",
   emptyHint = "I can read pilot data and, with your approval, send SMS and email.",
+  extraContext,
 }: AgentChatProps = {}) {
   const actionToken = useDashboardActionToken();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -108,11 +112,17 @@ export function AgentChat({
   const send = useCallback((text: string) => {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
-    const next: ChatMessage[] = [...messages, { role: "user", content: trimmed }];
+    // Attach uploaded reference content to the first message only.
+    const isFirst = !messages.some((m) => m.role === "user");
+    const ref = (extraContext ?? "").trim();
+    const content = isFirst && ref
+      ? `${trimmed}\n\n--- Attached reference content (use this to build the page) ---\n${ref}`
+      : trimmed;
+    const next: ChatMessage[] = [...messages, { role: "user", content }];
     setMessages(next);
     setInput("");
     void post(next);
-  }, [loading, messages, post]);
+  }, [loading, messages, post, extraContext]);
 
   // Read new assistant replies aloud when the speaker is on.
   useEffect(() => {

@@ -20,16 +20,29 @@ export type CmsPage = {
   updated_at?: string;
 };
 
-// ── Blocks (Phase 2: a flat, ordered list; layout containers come in Phase 4) ──
-export type CmsBlockType = "heading" | "subheading" | "paragraph" | "richtext" | "image" | "button" | "divider" | "spacer";
+// ── Blocks (flat, ordered list; nested layout containers come later) ──
+export type CmsBlockType =
+  | "heading" | "subheading" | "paragraph" | "richtext" | "image" | "button" | "divider" | "spacer"
+  | "cta" | "quote" | "cardgrid" | "accordion" | "video" | "html";
+
+export type CmsBlockItem = { title?: string; body?: string; imageUrl?: string; url?: string; q?: string; a?: string };
 
 export type CmsBlock = {
   id: string;
   type: CmsBlockType;
-  text?: string;        // heading/subheading/paragraph/richtext
-  url?: string;         // image src / button href
+  text?: string;        // heading/subheading/paragraph/richtext/quote/cta-heading
+  url?: string;         // image src / button href / video url
   alt?: string;         // image alt
-  label?: string;       // button label
+  label?: string;       // button label / cta primary label
+  // structured content (new blocks)
+  eyebrow?: string;     // cta small label
+  subtext?: string;     // cta subheading
+  label2?: string; url2?: string; // cta secondary button
+  author?: string; role?: string; // quote author + role
+  items?: CmsBlockItem[]; // cardgrid / accordion
+  columns?: number;     // cardgrid columns (2-4)
+  html?: string;        // html block
+  aspect?: string;      // video aspect ("16/9" | "4/3" | "1/1")
   // design
   align?: "left" | "center" | "right";
   textColor?: string;   // "" = inherit
@@ -65,6 +78,8 @@ export function draftBlocks(draft: unknown): CmsBlock[] {
 export const CMS_BLOCK_LABELS: Record<CmsBlockType, string> = {
   heading: "Heading", subheading: "Subheading", paragraph: "Paragraph", richtext: "Rich text",
   image: "Image", button: "Button", divider: "Divider", spacer: "Spacer",
+  cta: "CTA section", quote: "Quote", cardgrid: "Card grid", accordion: "Accordion / FAQ",
+  video: "Video", html: "HTML",
 };
 
 export const CMS_PAGE_TYPES: { value: CmsPageType; label: string }[] = [

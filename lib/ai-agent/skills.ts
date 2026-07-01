@@ -58,6 +58,17 @@ export const AGENT_SKILLS: AgentSkill[] = [
     ],
   },
   {
+    name: "CMS Page Authoring",
+    whenToUse: "Building or editing public website pages in the CMS (landing pages, stewardship pages, resource pages, informational pages) — usually triggered from the CMS 'Steward AI' button.",
+    playbook: [
+      "CMS authoring is Super-Admin only, and everything you create is ALWAYS a DRAFT — you have NO ability to publish. A Super Admin reviews your draft in the CMS editor and publishes it. Say so: tell the user their page was saved as a draft for review.",
+      "Design a page as an ORDERED array of blocks. Block types & fields: heading{text}; subheading{text}; paragraph{text}; richtext{text: markdown}; image{url,alt}; button{label,url}; cta{eyebrow,text(heading),subtext,label,url,label2,url2}; quote{text,author,role}; cardgrid{columns 2-4, items:[{title,body,imageUrl?,url?}]}; accordion{items:[{q,a}]}; video{url,aspect}; divider{}; spacer{height}; html{html}. Any block also takes align/bgColor/textColor/padTop/padBottom/marginTop/marginBottom/maxWidth.",
+      "A strong page usually opens with a heading or cta hero, then alternates paragraph/richtext with cardgrid/quote/accordion sections, and closes with a cta. Give sections breathing room (padTop/padBottom ~48-64) and occasionally tint a band (bgColor) to break up the page.",
+      "Keep the voice warm, faith-centered, and on-brand (call get_brand_kit for palette/voice if you add colors). Don't invent image URLs — leave image/imageUrl empty or use ones the user provided; the Super Admin can add images in the editor.",
+      "New page → create_cms_draft_page (title + blocks). Editing an existing page → list_cms_pages to get its id, then update_cms_draft_page with the FULL new block list (it replaces the draft). If the user uploaded reference content (JSON/CSV/text), turn it into appropriate blocks (e.g. a CSV of items → a cardgrid; an FAQ list → an accordion).",
+    ],
+  },
+  {
     name: "Records (Contacts & Participants)",
     whenToUse: "Adding or updating contacts or participants.",
     playbook: [

@@ -3,9 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  ArrowLeft, Check, Columns2, Copy, ExternalLink, Eye, EyeOff, GripVertical, Heading1, Heading2,
-  Image as ImageIcon, Loader2, Menu, Minus, MousePointerClick, Monitor, Save, Smartphone, Square,
-  Tablet, Trash2, Type, Upload,
+  ArrowLeft, Check, ChevronsUpDown, Code, Columns2, Copy, ExternalLink, Eye, EyeOff, GripVertical,
+  Heading1, Heading2, Image as ImageIcon, LayoutGrid, Loader2, Megaphone, Menu, Minus, MousePointerClick,
+  Monitor, Plus, Quote as QuoteIcon, Save, Smartphone, Square, Tablet, Trash2, Type, Upload, Video,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { FieldSelect } from "@/components/ui/field-select";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
-import { mdToHtml } from "@/lib/cms/md";
-import { blockPad, CMS_BLOCK_LABELS, type CmsBlock, type CmsBlockType } from "@/lib/cms/types";
+import { mdToHtml, sanitizeHtml, videoEmbedSrc } from "@/lib/cms/md";
+import { blockPad, CMS_BLOCK_LABELS, type CmsBlock, type CmsBlockItem, type CmsBlockType } from "@/lib/cms/types";
 
 let _uid = 0;
 const uid = () => `b${Date.now().toString(36)}${(_uid++).toString(36)}`;
@@ -23,6 +23,9 @@ const PALETTE: { type: CmsBlockType; icon: React.ElementType }[] = [
   { type: "heading", icon: Heading1 }, { type: "subheading", icon: Heading2 },
   { type: "paragraph", icon: Type }, { type: "richtext", icon: Columns2 },
   { type: "image", icon: ImageIcon }, { type: "button", icon: MousePointerClick },
+  { type: "cta", icon: Megaphone }, { type: "quote", icon: QuoteIcon },
+  { type: "cardgrid", icon: LayoutGrid }, { type: "accordion", icon: ChevronsUpDown },
+  { type: "video", icon: Video }, { type: "html", icon: Code },
   { type: "divider", icon: Minus }, { type: "spacer", icon: Square },
 ];
 
@@ -35,6 +38,12 @@ function defaultBlock(type: CmsBlockType): CmsBlock {
     case "richtext": return { ...base, text: "Rich text supports **bold**, *italic*, [links](https://example.com), and\n- bullet lists", padTop: 12, padBottom: 12 };
     case "image": return { ...base, url: "", alt: "", align: "center" };
     case "button": return { ...base, label: "Learn more", url: "" };
+    case "cta": return { ...base, align: "center", padTop: 56, padBottom: 56, bgColor: "#f1ede3", eyebrow: "Get started", text: "Ready to take the next step?", subtext: "A short line that motivates the click.", label: "Get started", url: "https://", label2: "", url2: "" };
+    case "quote": return { ...base, align: "center", padTop: 48, padBottom: 48, text: "A short, memorable line worth quoting.", author: "Name", role: "Title" };
+    case "cardgrid": return { ...base, padTop: 32, padBottom: 32, columns: 3, items: [{ title: "Card one", body: "A short description." }, { title: "Card two", body: "A short description." }, { title: "Card three", body: "A short description." }] };
+    case "accordion": return { ...base, padTop: 24, padBottom: 24, maxWidth: 820, items: [{ q: "First question?", a: "The answer to the first question." }, { q: "Second question?", a: "The answer to the second question." }] };
+    case "video": return { ...base, padTop: 24, padBottom: 24, maxWidth: 900, url: "", aspect: "16/9" };
+    case "html": return { ...base, padTop: 16, padBottom: 16, html: "<!-- Your custom HTML here -->" };
     case "divider": return { ...base, padTop: 8, padBottom: 8 };
     case "spacer": return { id: uid(), type, height: 40 };
     default: return base;
@@ -99,7 +108,7 @@ export function CmsEditor({ page, initialBlocks }: {
     finally { setBusy(false); }
   }
 
-  function uploadImage(id: string) {
+  function pickUpload(onDone: (url: string) => void) {
     const input = document.createElement("input");
     input.type = "file"; input.accept = "image/*";
     input.onchange = async () => {
@@ -110,7 +119,7 @@ export function CmsEditor({ page, initialBlocks }: {
         const up = await fetch("/api/admin/uploads", { method: "POST", headers: { "x-mjg-action-token": token }, body: fd });
         const uj = await up.json().catch(() => ({}));
         if (!up.ok) throw new Error(uj.error || "Upload failed.");
-        update(id, { url: uj.url });
+        onDone(uj.url);
       } catch (e) { setError(e instanceof Error ? e.message : "Upload failed."); }
       finally { setBusy(false); }
     };
@@ -204,7 +213,7 @@ export function CmsEditor({ page, initialBlocks }: {
         <div className="min-h-0 overflow-y-auto rounded-xl border border-border bg-card p-3">
           <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Block settings</div>
           {!selected ? <p className="text-xs text-muted-foreground">Select a block to edit it.</p> : (
-            <Inspector block={selected} update={(p) => update(selected.id, p)} onUpload={() => uploadImage(selected.id)} />
+            <Inspector block={selected} update={(p) => update(selected.id, p)} upload={pickUpload} />
           )}
         </div>
       </div>
@@ -272,6 +281,39 @@ function BlockView({ block: b, selected, onSelect }: { block: CmsBlock; selected
     case "button": return wrap(<span style={{ display: "inline-block", background: b.buttonColor || "var(--green)", color: b.textColor || "#fff", padding: "14px 26px", borderRadius: b.radius ?? 6, fontSize: fs || 16, fontWeight: 700 }}>{b.label || "Learn more"}</span>);
     case "divider": return wrap(<hr style={{ border: "none", borderTop: `1px solid ${b.textColor || "var(--line)"}`, margin: 0 }} />);
     case "spacer": return <div data-cms-block={b.id} onClick={onSelect} style={{ height: b.height ?? 40, cursor: "pointer", outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2 }} />;
+    case "cta": {
+      const btn = (label: string | undefined, primary = true) => (label ? <span key={primary ? "p" : "s"} style={{ display: "inline-block", margin: 6, background: primary ? (b.buttonColor || "var(--green)") : "transparent", color: primary ? "#fff" : (b.textColor || "var(--green)"), border: primary ? "none" : "2px solid var(--green)", padding: "13px 26px", borderRadius: b.radius ?? 6, fontWeight: 700 }}>{label}</span> : null);
+      return wrap(<>{b.eyebrow && <div style={{ color: "var(--gold)", fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase", fontSize: 13, marginBottom: 12 }}>{b.eyebrow}</div>}<h2 style={{ fontFamily: "var(--font-display)", fontSize: fs || "clamp(28px,4vw,44px)", lineHeight: 1.1, margin: "0 0 12px" }}>{b.text}</h2>{b.subtext && <p style={{ fontSize: 18, lineHeight: 1.6, color: "var(--muted)", margin: "0 0 20px" }}>{b.subtext}</p>}<div>{btn(b.label, true)}{btn(b.label2, false)}</div></>);
+    }
+    case "quote":
+      return wrap(<><blockquote style={{ fontFamily: "var(--font-display)", fontSize: fs || "clamp(22px,3vw,32px)", lineHeight: 1.35, margin: 0 }}>“{b.text}”</blockquote>{(b.author || b.role) && <div style={{ marginTop: 16, fontSize: 15, color: "var(--muted)" }}>{b.author}{b.role ? ` · ${b.role}` : ""}</div>}</>);
+    case "cardgrid": {
+      const cols = Math.max(1, Math.min(4, b.columns || 3));
+      return wrap(<div style={{ display: "grid", gridTemplateColumns: `repeat(${cols},1fr)`, gap: 16 }}>{(b.items || []).map((it, i) => (
+        <div key={i} style={{ background: "var(--card,#fff)", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden", textAlign: "left" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {it.imageUrl && <img src={it.imageUrl} alt="" style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", display: "block" }} />}
+          <div style={{ padding: 18 }}>{it.title && <div style={{ fontFamily: "var(--font-display)", fontSize: 20, marginBottom: 6 }}>{it.title}</div>}{it.body && <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--muted)", margin: 0 }}>{it.body}</p>}{it.url && <span style={{ display: "inline-block", marginTop: 12, color: "var(--green)", fontWeight: 700 }}>Learn more →</span>}</div>
+        </div>
+      ))}</div>);
+    }
+    case "accordion":
+      return wrap(<div>{(b.items || []).map((it, i) => (
+        <details key={i} style={{ border: "1px solid var(--line)", borderRadius: 10, marginBottom: 8, background: "var(--card,#fff)" }}>
+          <summary style={{ cursor: "pointer", padding: "14px 16px", fontWeight: 600 }}>{it.q}</summary>
+          <div style={{ padding: "0 16px 16px", color: "var(--muted)", lineHeight: 1.6 }}>{it.a}</div>
+        </details>
+      ))}</div>);
+    case "video": {
+      const src = b.url ? videoEmbedSrc(b.url) : "";
+      const [aw, ah] = (b.aspect || "16/9").split("/").map(Number);
+      const pb = ah && aw ? (ah / aw) * 100 : 56.25;
+      return wrap(src
+        ? <div style={{ position: "relative", width: "100%", paddingBottom: `${pb}%`, borderRadius: b.radius ?? 10, overflow: "hidden" }}><iframe title="video" src={src} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} allowFullScreen /></div>
+        : <span style={{ display: "inline-block", padding: "28px 40px", border: "1px dashed #c9b98f", borderRadius: 8, color: "#8a7b52", fontSize: 13 }}>Paste a YouTube / Vimeo / video URL →</span>);
+    }
+    case "html":
+      return wrap(<div dangerouslySetInnerHTML={{ __html: sanitizeHtml(b.html || "") || '<span style="color:#8a7b52">Empty HTML block</span>' }} />);
     default: return null;
   }
 }
@@ -297,8 +339,11 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
   );
 }
 
-function Inspector({ block, update, onUpload }: { block: CmsBlock; update: (p: Partial<CmsBlock>) => void; onUpload: () => void }) {
+function Inspector({ block, update, upload }: { block: CmsBlock; update: (p: Partial<CmsBlock>) => void; upload: (onDone: (url: string) => void) => void }) {
   const isText = block.type === "heading" || block.type === "subheading" || block.type === "paragraph" || block.type === "richtext";
+  const setItem = (i: number, patch: Partial<CmsBlockItem>) => update({ items: (block.items ?? []).map((it, k) => (k === i ? { ...it, ...patch } : it)) });
+  const addItem = (blank: CmsBlockItem) => update({ items: [...(block.items ?? []), blank] });
+  const removeItem = (i: number) => update({ items: (block.items ?? []).filter((_, k) => k !== i) });
   return (
     <div className="space-y-3">
       <div className="text-xs font-semibold capitalize">{CMS_BLOCK_LABELS[block.type]}</div>
@@ -311,9 +356,71 @@ function Inspector({ block, update, onUpload }: { block: CmsBlock; update: (p: P
         </div>
       )}
 
+      {block.type === "cta" && (
+        <div className="space-y-2">
+          <div><L>Eyebrow</L><Input value={block.eyebrow ?? ""} onChange={(e) => update({ eyebrow: e.target.value })} placeholder="optional small label" /></div>
+          <div><L>Heading</L><Input value={block.text ?? ""} onChange={(e) => update({ text: e.target.value })} /></div>
+          <div><L>Subheading</L><Textarea className="min-h-[52px]" value={block.subtext ?? ""} onChange={(e) => update({ subtext: e.target.value })} /></div>
+          <div className="grid grid-cols-2 gap-2"><div><L>Button label</L><Input value={block.label ?? ""} onChange={(e) => update({ label: e.target.value })} /></div><div><L>Button URL</L><Input value={block.url ?? ""} onChange={(e) => update({ url: e.target.value })} /></div></div>
+          <div className="grid grid-cols-2 gap-2"><div><L>2nd label</L><Input value={block.label2 ?? ""} onChange={(e) => update({ label2: e.target.value })} placeholder="optional" /></div><div><L>2nd URL</L><Input value={block.url2 ?? ""} onChange={(e) => update({ url2: e.target.value })} /></div></div>
+          <ColorField label="Button color" value={block.buttonColor ?? ""} onChange={(v) => update({ buttonColor: v })} />
+        </div>
+      )}
+
+      {block.type === "quote" && (
+        <div className="space-y-2">
+          <div><L>Quote</L><Textarea className="min-h-[70px]" value={block.text ?? ""} onChange={(e) => update({ text: e.target.value })} /></div>
+          <div className="grid grid-cols-2 gap-2"><div><L>Author</L><Input value={block.author ?? ""} onChange={(e) => update({ author: e.target.value })} /></div><div><L>Role</L><Input value={block.role ?? ""} onChange={(e) => update({ role: e.target.value })} /></div></div>
+        </div>
+      )}
+
+      {block.type === "cardgrid" && (
+        <div className="space-y-2">
+          <div><L>Columns</L><FieldSelect value={String(block.columns ?? 3)} onChange={(v) => update({ columns: Number(v) })} options={[{ value: "2", label: "2" }, { value: "3", label: "3" }, { value: "4", label: "4" }]} className="h-8" /></div>
+          {(block.items ?? []).map((it, i) => (
+            <div key={i} className="rounded-lg border border-border p-2">
+              <div className="mb-1 flex items-center justify-between"><span className="text-[11px] font-medium text-muted-foreground">Card {i + 1}</span><button onClick={() => removeItem(i)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button></div>
+              <Input className="mb-1 h-8" value={it.title ?? ""} onChange={(e) => setItem(i, { title: e.target.value })} placeholder="Title" />
+              <Textarea className="mb-1 min-h-[44px]" value={it.body ?? ""} onChange={(e) => setItem(i, { body: e.target.value })} placeholder="Body" />
+              <div className="mb-1 flex gap-1"><Input className="h-8" value={it.imageUrl ?? ""} onChange={(e) => setItem(i, { imageUrl: e.target.value })} placeholder="Image URL" /><Button type="button" variant="outline" size="sm" className="h-8 shrink-0 px-2" onClick={() => upload((url) => setItem(i, { imageUrl: url }))}><Upload className="h-3.5 w-3.5" /></Button></div>
+              <Input className="h-8" value={it.url ?? ""} onChange={(e) => setItem(i, { url: e.target.value })} placeholder="Link URL (optional)" />
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={() => addItem({ title: "New card", body: "" })}><Plus className="h-3.5 w-3.5" /> Add card</Button>
+        </div>
+      )}
+
+      {block.type === "accordion" && (
+        <div className="space-y-2">
+          {(block.items ?? []).map((it, i) => (
+            <div key={i} className="rounded-lg border border-border p-2">
+              <div className="mb-1 flex items-center justify-between"><span className="text-[11px] font-medium text-muted-foreground">Item {i + 1}</span><button onClick={() => removeItem(i)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button></div>
+              <Input className="mb-1 h-8" value={it.q ?? ""} onChange={(e) => setItem(i, { q: e.target.value })} placeholder="Question / title" />
+              <Textarea className="min-h-[52px]" value={it.a ?? ""} onChange={(e) => setItem(i, { a: e.target.value })} placeholder="Answer / body" />
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={() => addItem({ q: "New question?", a: "" })}><Plus className="h-3.5 w-3.5" /> Add item</Button>
+        </div>
+      )}
+
+      {block.type === "video" && (
+        <div className="space-y-2">
+          <div><L>Video URL (YouTube / Vimeo / MP4)</L><Input value={block.url ?? ""} onChange={(e) => update({ url: e.target.value })} placeholder="https://youtube.com/watch?v=…" /></div>
+          <div><L>Aspect ratio</L><FieldSelect value={block.aspect ?? "16/9"} onChange={(v) => update({ aspect: v })} options={[{ value: "16/9", label: "16:9" }, { value: "4/3", label: "4:3" }, { value: "1/1", label: "1:1" }]} className="h-8" /></div>
+        </div>
+      )}
+
+      {block.type === "html" && (
+        <div className="space-y-1">
+          <L>HTML</L>
+          <Textarea value={block.html ?? ""} onChange={(e) => update({ html: e.target.value })} className="min-h-[140px] font-mono text-xs" />
+          <p className="text-[10px] text-amber-600 dark:text-amber-400">Super-Admin only. Scripts and inline event handlers are stripped for safety.</p>
+        </div>
+      )}
+
       {block.type === "image" && (
         <div className="space-y-2">
-          <div><L>Image URL</L><div className="flex gap-2"><Input value={block.url ?? ""} onChange={(e) => update({ url: e.target.value })} placeholder="https://…" /><Button type="button" variant="outline" size="sm" className="shrink-0" onClick={onUpload}><Upload className="h-3.5 w-3.5" /></Button></div></div>
+          <div><L>Image URL</L><div className="flex gap-2"><Input value={block.url ?? ""} onChange={(e) => update({ url: e.target.value })} placeholder="https://…" /><Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => upload((url) => update({ url }))}><Upload className="h-3.5 w-3.5" /></Button></div></div>
           <div><L>Alt text</L><Input value={block.alt ?? ""} onChange={(e) => update({ alt: e.target.value })} /></div>
           <div className="grid grid-cols-3 gap-2">
             <Num label="Max width" value={block.maxWidth} onChange={(v) => update({ maxWidth: v })} placeholder="full" />

@@ -10,6 +10,7 @@ import { FieldSelect } from "@/components/ui/field-select";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { CMS_PAGE_TYPES, type CmsPage, type CmsPageType } from "@/lib/cms/types";
+import { AskStewardCms } from "@/components/cms/ask-steward-cms";
 
 const TYPE_OPTS = CMS_PAGE_TYPES.map((t) => ({ value: t.value, label: t.label }));
 const typeLabel = (t: string) => CMS_PAGE_TYPES.find((x) => x.value === t)?.label ?? t;
@@ -71,7 +72,10 @@ export function CmsPagesList({ initialPages }: { initialPages: CmsPage[] }) {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{pages.length} page{pages.length === 1 ? "" : "s"}</p>
-        <Button size="sm" onClick={() => setEditing(blankDraft())}><Plus className="h-3.5 w-3.5" /> New page</Button>
+        <div className="flex items-center gap-2">
+          <AskStewardCms onClose={reload} />
+          <Button size="sm" variant="outline" onClick={() => setEditing(blankDraft())}><Plus className="h-3.5 w-3.5" /> New page</Button>
+        </div>
       </div>
 
       {error && <div className="mb-3 flex items-center justify-between rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"><span>{error}</span><button onClick={() => setError(null)}><X className="h-3.5 w-3.5" /></button></div>}

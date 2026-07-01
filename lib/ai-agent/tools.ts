@@ -24,6 +24,8 @@ import {
 } from "@/lib/social-media/data";
 import { SOCIAL_EVENT_KEYS } from "@/lib/social-media/constants";
 import { loadProjectManagerData } from "@/lib/project-manager/data";
+import { listCmsPages, createCmsDraftPage, saveCmsDraft, getCmsPage } from "@/lib/cms/data";
+import type { CmsBlock } from "@/lib/cms/types";
 
 const SOCIAL_EVENT_OPTIONS = SOCIAL_EVENT_KEYS.map((e) => e.key);
 
@@ -1266,6 +1268,114 @@ const updateProjectItem: AgentTool = {
   },
 };
 
+// ──────────────────────────────────────────────────────────────────────────────
+// CMS authoring (Super-Admin only; Steward can only ever produce DRAFTS)
+// ──────────────────────────────────────────────────────────────────────────────
+
+// CMS is Super-Admin-only at every layer. The chat route admits any admin+, so
+// these tools re-check the actor's role and refuse for anyone below super_admin.
+async function assertSuperAdmin(ctx: AgentContext): Promise<void> {
+  const sb = createSupabaseAdminClient();
+  const { data } = await sb.from("profiles").select("role").eq("id", ctx.actorId).maybeSingle();
+  if ((data?.role as string) !== "super_admin") {
+    throw new Error("CMS authoring is restricted to Super Admins.");
+  }
+}
+
+const CMS_BLOCK_SCHEMA_DOC =
+  "Each block is an object { type, ...fields }. Types & their fields: " +
+  "heading{text}; subheading{text}; paragraph{text}; richtext{text: markdown — **bold**, *italic*, [links](url), \"- \" bullet lists}; " +
+  "image{url, alt}; button{label, url}; " +
+  "cta{eyebrow, text(=heading), subtext, label, url, label2, url2}; " +
+  "quote{text, author, role}; " +
+  "cardgrid{columns(2-4), items:[{title, body, imageUrl?, url?}]}; " +
+  "accordion{items:[{q, a}]}; video{url, aspect('16/9'|'4/3'|'1/1')}; divider{}; spacer{height}; html{html}. " +
+  "Any block also accepts optional design fields: align('left'|'center'|'right'), bgColor, textColor, padTop, padBottom, marginTop, marginBottom, maxWidth. " +
+  "Build a page as an ordered array of these blocks — typically a heading/cta hero, some paragraph/richtext/cardgrid/quote sections, and a closing cta.";
+
+let cmsBlockSeq = 0;
+function normalizeCmsBlock(raw: unknown): CmsBlock {
+  const b = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  cmsBlockSeq += 1;
+  const id = `s${Date.now().toString(36)}${cmsBlockSeq}`;
+  const type = String(b.type || "paragraph") as CmsBlock["type"];
+  return { ...(b as Partial<CmsBlock>), id, type } as CmsBlock;
+}
+
+const listCmsPagesTool: AgentTool = {
+  name: "list_cms_pages",
+  description: "List CMS pages (id, title, slug, status, type). Super Admin only. Use to find a page id before updating its draft.",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute(_args, ctx) {
+    await assertSuperAdmin(ctx);
+    const pages = await listCmsPages();
+    return { pages: pages.map((p) => ({ id: p.id, title: p.title, slug: p.slug, status: p.status, type: p.page_type })) };
+  },
+};
+
+const createCmsDraftPageTool: AgentTool = {
+  name: "create_cms_draft_page",
+  description:
+    "Create a NEW CMS page as a DRAFT (never published — a Super Admin reviews and publishes it later). Provide a title and an ordered array of content blocks. " +
+    CMS_BLOCK_SCHEMA_DOC,
+  parameters: {
+    type: "object",
+    properties: {
+      title: { type: "string", description: "Page title." },
+      slug: { type: "string", description: "Optional URL slug (auto-generated from the title if omitted)." },
+      pageType: { type: "string", enum: ["page", "landing", "stewardship", "experience", "resource", "informational"], description: "Default page." },
+      description: { type: "string", description: "Optional internal description / SEO summary." },
+      blocks: {
+        type: "array",
+        description: "Ordered content blocks. See the block schema in the tool description.",
+        items: { type: "object", properties: { type: { type: "string" } }, required: ["type"] },
+      },
+    },
+    required: ["title", "blocks"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Create DRAFT CMS page “${a.title}” with ${Array.isArray(a.blocks) ? a.blocks.length : 0} block(s)`,
+  async execute(args, ctx) {
+    await assertSuperAdmin(ctx);
+    const blocks = (Array.isArray(args.blocks) ? args.blocks : []).map(normalizeCmsBlock);
+    const page = await createCmsDraftPage({
+      title: String(args.title), slug: args.slug ? String(args.slug) : undefined,
+      page_type: args.pageType ? String(args.pageType) : undefined,
+      description: args.description ? String(args.description) : null,
+      blocks, actorUserId: ctx.actorId,
+    });
+    await logUserActivity({ userId: ctx.actorId, action: "ai_agent_create_cms_draft", entityType: "cms_pages", entityId: page.id, metadata: { title: page.title, blocks: blocks.length } }).catch(() => {});
+    return { id: page.id, title: page.title, slug: page.slug, status: page.status, blocks: blocks.length, editUrl: `/dashboard/cms/pages/${page.id}` };
+  },
+};
+
+const updateCmsDraftPageTool: AgentTool = {
+  name: "update_cms_draft_page",
+  description:
+    "Replace the DRAFT block content of an existing CMS page (by id, from list_cms_pages). The page stays a draft. Pass the full new array of blocks. " +
+    CMS_BLOCK_SCHEMA_DOC,
+  parameters: {
+    type: "object",
+    properties: {
+      pageId: { type: "string", description: "The CMS page id to update." },
+      blocks: { type: "array", description: "The complete new ordered block list.", items: { type: "object", properties: { type: { type: "string" } }, required: ["type"] } },
+    },
+    required: ["pageId", "blocks"],
+  },
+  requiresConfirmation: true,
+  summarize: (a) => `Replace draft content of CMS page ${a.pageId} with ${Array.isArray(a.blocks) ? a.blocks.length : 0} block(s)`,
+  async execute(args, ctx) {
+    await assertSuperAdmin(ctx);
+    const page = await getCmsPage(String(args.pageId));
+    if (!page) throw new Error("CMS page not found.");
+    const blocks = (Array.isArray(args.blocks) ? args.blocks : []).map(normalizeCmsBlock);
+    await saveCmsDraft(page.id, { version: 1, blocks }, ctx.actorId);
+    await logUserActivity({ userId: ctx.actorId, action: "ai_agent_update_cms_draft", entityType: "cms_pages", entityId: page.id, metadata: { blocks: blocks.length } }).catch(() => {});
+    return { ok: true, pageId: page.id, title: page.title, blocks: blocks.length, editUrl: `/dashboard/cms/pages/${page.id}` };
+  },
+};
+
 export const AGENT_TOOLS: AgentTool[] = [
   // Reads
   searchParticipants,
@@ -1288,6 +1398,7 @@ export const AGENT_TOOLS: AgentTool[] = [
   listSocialInboxTool,
   listProjectItems,
   listProjectTemplates,
+  listCmsPagesTool,
   // Actions (confirmation-gated)
   sendSmsAction,
   sendEmailAction,
@@ -1314,6 +1425,8 @@ export const AGENT_TOOLS: AgentTool[] = [
   createProjectItem,
   connectProjectItems,
   updateProjectItem,
+  createCmsDraftPageTool,
+  updateCmsDraftPageTool,
   // Memory (internal, no confirmation)
   rememberTool,
   forgetTool,
