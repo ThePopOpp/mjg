@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { getParticipantDetail, updateParticipantTags } from "@/lib/dashboard/pilot-data";
+import { getParticipantDetail, updateParticipantTags, getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
+import { loadBookingManagerData } from "@/lib/booking/data";
 import { sendSms, getOrCreateConversation } from "@/lib/twilio/sms";
 import { sendSmtpEmail } from "@/lib/email/smtp";
 import { logUserActivity } from "@/lib/user-management/repository";
@@ -208,6 +209,175 @@ const listSmsConversations: AgentTool = {
       .limit(limit);
     if (error) throw new Error(error.message);
     return { count: data?.length ?? 0, conversations: data ?? [] };
+  },
+};
+
+// ── Dashboard USERS (profiles) — distinct from participants and contacts ──
+
+const searchUsers: AgentTool = {
+  name: "search_users",
+  description:
+    "Search DASHBOARD USERS — the admin/team accounts in the 'profiles' table who log into the dashboard. These are NOT pilot participants and NOT CRM contacts. Match by name, email, or role. Returns id, name, email, role, status, and any linked participant. Use this for any question about 'users', team members, admins, staff, or accounts.",
+  parameters: {
+    type: "object",
+    properties: {
+      query: { type: "string", description: "Name, email, or role fragment to search for." },
+      limit: { type: "number", description: "Max results (default 25, max 100)." },
+    },
+    required: ["query"],
+  },
+  requiresConfirmation: false,
+  async execute(args) {
+    const supabase = createSupabaseAdminClient();
+    const q = String(args.query ?? "").trim();
+    const limit = Math.min(Number(args.limit) || 25, 100);
+    const like = `%${q}%`;
+    const { data, error, count } = await supabase
+      .from("profiles")
+      .select("id, full_name, first_name, last_name, email, role, status, related_participant_id, created_at", { count: "exact" })
+      .or(`full_name.ilike.${like},first_name.ilike.${like},last_name.ilike.${like},email.ilike.${like},role.ilike.${like}`)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error) throw new Error(error.message);
+    return { total: count ?? data?.length ?? 0, returned: data?.length ?? 0, users: data ?? [] };
+  },
+};
+
+const listUsers: AgentTool = {
+  name: "list_users",
+  description:
+    "List dashboard users (profiles), optionally filtered by exact role or status. Use for 'how many users', 'list all admins/super admins', or a team roster. Returns a total count plus rows. Distinct from participants (pilot members) and contacts (CRM leads).",
+  parameters: {
+    type: "object",
+    properties: {
+      role: { type: "string", description: "Optional exact role filter (e.g. super_admin, admin, leader, viewer)." },
+      status: { type: "string", description: "Optional status filter: active | invited | inactive | suspended." },
+      limit: { type: "number", description: "Max rows returned (default 50, max 200). The total count is exact regardless." },
+    },
+  },
+  requiresConfirmation: false,
+  async execute(args) {
+    const supabase = createSupabaseAdminClient();
+    const limit = Math.min(Number(args.limit) || 50, 200);
+    let query = supabase
+      .from("profiles")
+      .select("id, full_name, email, role, status, related_participant_id, created_at", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (args.role) query = query.eq("role", String(args.role));
+    if (args.status) query = query.eq("status", String(args.status));
+    const { data, error, count } = await query;
+    if (error) throw new Error(error.message);
+    return { total: count ?? data?.length ?? 0, returned: data?.length ?? 0, users: data ?? [] };
+  },
+};
+
+const getUser: AgentTool = {
+  name: "get_user",
+  description: "Get full detail for one dashboard user (profile) by id: role, status, contact info, the participant they're linked to (if any), and their most recent activity-log entries.",
+  parameters: { type: "object", properties: { id: { type: "string", description: "Profile id (uuid)." } }, required: ["id"] },
+  requiresConfirmation: false,
+  async execute(args) {
+    const supabase = createSupabaseAdminClient();
+    const id = String(args.id);
+    const { data: user, error } = await supabase
+      .from("profiles")
+      .select("*, participant:related_participant_id(id,first_name,last_name,email,wave,participant_type)")
+      .eq("id", id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!user) throw new Error("User not found.");
+    const { data: activity } = await supabase
+      .from("user_activity_logs")
+      .select("action, entity_type, entity_id, created_at")
+      .eq("user_id", id)
+      .order("created_at", { ascending: false })
+      .limit(15);
+    return { user, recentActivity: activity ?? [] };
+  },
+};
+
+// ── Reports / bookings / form submissions (previously blind sections) ──
+
+const getPilotMetricsTool: AgentTool = {
+  name: "get_pilot_metrics",
+  description:
+    "Get the pilot FUNNEL / report metrics (the Reports page numbers): invited, opted-in, check-ins completed, average stewardship score, journey started, surveys completed, inner-circle accepted, follow-up permission granted, and pastor/elder responses. Use for funnel, conversion, and progress questions.",
+  parameters: { type: "object", properties: {} },
+  requiresConfirmation: false,
+  async execute() {
+    const data = await getPilotDashboardData();
+    if (data.error) throw new Error(data.error);
+    return getPilotMetrics(data);
+  },
+};
+
+const listBookings: AgentTool = {
+  name: "list_bookings",
+  description:
+    "List Bookings & Events data: booking types, upcoming/recent bookings, events, event registrations, and summary stats (active types, upcoming & pending bookings, published events, total registrations).",
+  parameters: { type: "object", properties: { limit: { type: "number", description: "Max bookings & registrations to include (default 25, max 100)." } } },
+  requiresConfirmation: false,
+  async execute(args) {
+    const limit = Math.min(Number(args.limit) || 25, 100);
+    const data = await loadBookingManagerData();
+    return {
+      stats: data.stats,
+      bookingTypes: data.bookingTypes,
+      events: data.events,
+      bookings: data.bookings.slice(0, limit),
+      registrations: data.registrations.slice(0, limit),
+    };
+  },
+};
+
+const listFormSubmissions: AgentTool = {
+  name: "list_form_submissions",
+  description: "List website form submissions (contact forms, CMS forms, lead captures) with their form/source, submitted fields, and timestamp.",
+  parameters: { type: "object", properties: { limit: { type: "number", description: "Max submissions (default 20, max 100)." } } },
+  requiresConfirmation: false,
+  async execute(args) {
+    const supabase = createSupabaseAdminClient();
+    const limit = Math.min(Number(args.limit) || 20, 100);
+    const { data, error } = await supabase.from("form_submissions").select("*").order("created_at", { ascending: false }).limit(limit);
+    if (error) throw new Error(error.message);
+    return { count: data?.length ?? 0, submissions: data ?? [] };
+  },
+};
+
+// ── Read-only SQL (Super Admin) — for the long tail of ad-hoc questions ──
+
+const SQL_TABLE_HINTS =
+  "participants, profiles (dashboard users), contacts, tags, participant_tags, check_in_results, survey_responses, inner_circle_responses, " +
+  "calls, sms_conversations, email_templates, email_journey_events, blog_posts, media_assets, brand_assets, booking_types, bookings, events, " +
+  "event_registrations, form_submissions, project_schedule_items, cms_pages, social_posts, social_accounts, notifications, user_activity_logs, user_invitations";
+
+const runSqlQuery: AgentTool = {
+  name: "run_sql_query",
+  description:
+    "Run a READ-ONLY SQL SELECT against the dashboard's Postgres database and return the rows. Super Admin only. Use ONLY when no dedicated tool answers the question — ad-hoc counts, joins, or tables that lack a tool (e.g. waves, inner_circle_responses, survey_responses details, settings). " +
+    "Rules enforced by the database: a SINGLE SELECT (or WITH … SELECT) statement; NO INSERT/UPDATE/DELETE/DDL; the transaction is read-only; results are capped at 200 rows. Always prefer a dedicated read tool when one exists (search_users, get_pilot_metrics, list_bookings, etc.). " +
+    "Common tables: " + SQL_TABLE_HINTS + ".",
+  parameters: {
+    type: "object",
+    properties: { query: { type: "string", description: "A single read-only SQL SELECT statement (no trailing semicolon needed)." } },
+    required: ["query"],
+  },
+  requiresConfirmation: false,
+  async execute(args, ctx) {
+    await assertSuperAdmin(ctx, "Ad-hoc database queries are restricted to Super Admins.");
+    const query = String(args.query ?? "").trim();
+    if (!/^\s*(select|with)\b/i.test(query)) throw new Error("Only SELECT / WITH queries are allowed.");
+    if (/\b(insert|update|delete|drop|alter|truncate|create|grant|revoke|comment|copy|vacuum|merge|call|do|refresh|reindex|cluster|lock|set|reset)\b/i.test(query)) {
+      throw new Error("Only read-only SELECT queries are allowed (no writes or DDL).");
+    }
+    if (/;/.test(query.replace(/;+\s*$/, ""))) throw new Error("Only a single statement is allowed.");
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.rpc("steward_readonly_query", { query_text: query });
+    if (error) throw new Error(error.message);
+    const rows = Array.isArray(data) ? data : data == null ? [] : [data];
+    await logUserActivity({ userId: ctx.actorId, action: "ai_agent_sql_query", entityType: "database", metadata: { query: query.slice(0, 500), rows: rows.length } }).catch(() => {});
+    return { rowCount: rows.length, rows, truncated: rows.length >= 200 };
   },
 };
 
@@ -1274,11 +1444,11 @@ const updateProjectItem: AgentTool = {
 
 // CMS is Super-Admin-only at every layer. The chat route admits any admin+, so
 // these tools re-check the actor's role and refuse for anyone below super_admin.
-async function assertSuperAdmin(ctx: AgentContext): Promise<void> {
+async function assertSuperAdmin(ctx: AgentContext, message = "CMS authoring is restricted to Super Admins."): Promise<void> {
   const sb = createSupabaseAdminClient();
   const { data } = await sb.from("profiles").select("role").eq("id", ctx.actorId).maybeSingle();
   if ((data?.role as string) !== "super_admin") {
-    throw new Error("CMS authoring is restricted to Super Admins.");
+    throw new Error(message);
   }
 }
 
@@ -1406,6 +1576,14 @@ export const AGENT_TOOLS: AgentTool[] = [
   listProjectItems,
   listProjectTemplates,
   listCmsPagesTool,
+  // Dashboard users + previously-blind read sections
+  searchUsers,
+  listUsers,
+  getUser,
+  getPilotMetricsTool,
+  listBookings,
+  listFormSubmissions,
+  runSqlQuery,
   // Actions (confirmation-gated)
   sendSmsAction,
   sendEmailAction,

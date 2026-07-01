@@ -19,6 +19,26 @@ export const AGENT_SKILLS: AgentSkill[] = [
     ],
   },
   {
+    name: "Dashboard Map & Connections",
+    whenToUse: "Any 'what / where / how many' question about the dashboard, a specific section, or how records relate — especially anything about users, or a question that spans multiple areas.",
+    playbook: [
+      "Each dashboard section maps to a tool (and underlying table): Overview & Reports → get_pilot_metrics / get_pilot_overview (participants, check_in_results, survey_responses, inner_circle_responses); Participants → search_participants / get_participant (participants, tags); Users / team / admins → search_users / list_users / get_user (profiles); Contacts → list_contacts (contacts); Emails → list_email_templates + the template/automation/journey tools (email_templates, email_journey_events); SMS → list_sms_conversations (sms_conversations); Dialer → list_recent_calls (calls); Social → list_social_* (social_posts/accounts); Blog → list_blog_posts (blog_posts); Media → list_media_assets (media_assets); Brand → get_brand_kit; Project Manager → list_project_items (project_schedule_items); Bookings & Events → list_bookings (booking_types/bookings/events/event_registrations); Form submissions → list_form_submissions (form_submissions); CMS → list_cms_pages (cms_pages).",
+      "PEOPLE live in three SEPARATE tables — choose the one matching the user's word: profiles = dashboard USERS (accounts + roles), participants = pilot members, contacts = CRM leads. A user may be linked to a participant via profiles.related_participant_id (get_user returns that link).",
+      "Key relationships: a participant fans out to its check_in_results, survey_responses, inner_circle_responses, calls, sms_conversations, email_journey_events, and tags (via participant_tags). A booking type has many bookings; an event has many event_registrations; a blog post / CMS page has an author (a user).",
+      "Map the section or entity the user named to the correct tool BEFORE answering — never answer about participants when the question was about users. If a section has no dedicated tool (waves, settings, impact/scoring, detailed survey/check-in answers), fall back to run_sql_query on the underlying table.",
+    ],
+  },
+  {
+    name: "Database Queries (Super Admin)",
+    whenToUse: "Ad-hoc counts, cross-table joins, or reading tables/columns that no dedicated tool exposes.",
+    playbook: [
+      "Prefer a dedicated read tool whenever one fits; run_sql_query is the fallback for the long tail.",
+      "Write ONE read-only SELECT (or WITH … SELECT). No INSERT/UPDATE/DELETE/DDL — the database enforces read-only and caps results at 200 rows.",
+      "Use real table names (see the Dashboard Map). Add explicit WHERE filters, and for 'how many' use COUNT(*) so you return an exact number instead of eyeballing rows.",
+      "Super-Admin only — if you get a permission error, tell the user this needs a Super Admin.",
+    ],
+  },
+  {
     name: "Outreach (SMS & Email)",
     whenToUse: "Drafting or sending a message to a participant or contact.",
     playbook: [
