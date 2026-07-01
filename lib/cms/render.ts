@@ -6,9 +6,22 @@ import {
   publicSiteUrl, renderFaviconLinks, renderFonts, renderNavScript, renderNavStyles,
   renderSiteHeader, renderThemeScript,
 } from "@/lib/public-site/static-pages";
+import { readFileSync } from "fs";
+import { join } from "path";
 import { escHtml as esc, mdToHtml, sanitizeHtml, styleToCss, typoStyle, videoEmbedSrc } from "./md";
 import { fontLinksHtml } from "./fonts";
+import { wrapIcon, DEFAULT_ICON, type IconBodies, type IconStyle } from "./icons";
 import { blockPad, type CmsBlock } from "./types";
+
+// Solar icon bodies (public/cms/solar-icons.json) — read once, server-side only.
+let _iconData: IconBodies | null = null;
+function iconBody(id: string, style: IconStyle): string | undefined {
+  if (!_iconData) {
+    try { _iconData = JSON.parse(readFileSync(join(process.cwd(), "public", "cms", "solar-icons.json"), "utf8")) as IconBodies; }
+    catch { _iconData = {}; }
+  }
+  return _iconData[id]?.[style] ?? _iconData[DEFAULT_ICON]?.[style];
+}
 
 // Extra typography CSS (font family/weight/style/transform/spacing/shadow) appended
 // LAST so an author's font choice wins over the block's default font-family.
@@ -151,9 +164,120 @@ export function renderCmsBlock(b: CmsBlock): string {
     }
     case "html":
       return band(b, sanitizeHtml(b.html || ""));
+    case "audio":
+      return band(b, audioPlayerHtml(b));
+    case "icon":
+      return band(b, iconBlockHtml(b));
     default:
       return "";
   }
+}
+
+function hexRgba(hex: string, a: number): string | null {
+  if (!hex || hex[0] !== "#") return null;
+  const h = hex.replace("#", "");
+  const s = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  if (!/^[0-9a-fA-F]{6}$/.test(s)) return null;
+  const n = parseInt(s, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
+// Icon block — a single glyph in an optional square/circle container, with an
+// optional label + caption. Style (line/solid/broken/duotone) + colors are editable.
+function iconBlockHtml(b: CmsBlock): string {
+  const gs = Math.max(12, b.iconSize || 30);
+  const rawColor = b.accent || b.buttonColor || "#315f43";
+  const style = (b.variant as IconStyle) || "line";
+  const salt = String(b.id || "").replace(/[^a-zA-Z0-9_-]/g, "") || "i";
+  const svg = wrapIcon(iconBody(b.icon || DEFAULT_ICON, style), { color: esc(rawColor), size: gs, salt });
+  const shape = b.iconShape || "circle";
+  const pad = Math.round(gs * 0.62);
+  const box = shape === "none"
+    ? `display:inline-flex;align-items:center;justify-content:center;line-height:0`
+    : `display:inline-flex;align-items:center;justify-content:center;line-height:0;width:${gs + pad * 2}px;height:${gs + pad * 2}px;background:${b.iconBg ? esc(b.iconBg) : "transparent"};border-radius:${shape === "circle" ? "999px" : `${b.radius ?? 16}px`}${b.iconOutline ? `;border:2px solid ${esc(b.iconOutline)}` : ""}`;
+  const label = b.text ? `<div style="font-family:var(--font-display);${fs(b, "20px")};margin-top:14px${ts(b)}">${esc(b.text)}</div>` : "";
+  const caption = b.subtext ? `<p style="font-size:15px;line-height:1.6;color:var(--muted,#5f6d66);margin:6px 0 0">${esc(b.subtext)}</p>` : "";
+  return `<div><span style="${box}">${svg}</span>${label}${caption}</div>`;
+}
+
+// Audio player — self-contained player + inline controller script keyed by block id.
+function audioPlayerHtml(b: CmsBlock): string {
+  const rid = "au-" + (String(b.id || "").replace(/[^a-zA-Z0-9_-]/g, "") || "x");
+  const accent = b.accent || b.buttonColor || "#c9a46e";
+  const bar = b.barColor || "#1b1a17";
+  const track = "rgba(120,110,90,.22)";
+  const titleColor = b.textColor || "#6a7a6f";
+  const glow = hexRgba(accent, 0.28);
+  const ea = esc(accent);
+  const src = b.url ? esc(b.url) : "";
+
+  const btn = "background:transparent;border:none;color:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:9px;border-radius:50%;transition:opacity .15s";
+  const deco = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h9"/><circle cx="4" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.3" fill="currentColor" stroke="none"/></svg>`;
+  const back = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4 7 8l4 4"/><path d="M7 8h6a6 6 0 1 1-6 6"/><text x="12" y="16.4" font-size="6.6" fill="currentColor" stroke="none" text-anchor="middle" font-family="sans-serif" font-weight="700">10</text></svg>`;
+  const fwd = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4l4 4-4 4"/><path d="M17 8h-6a6 6 0 1 0 6 6"/><text x="12" y="16.4" font-size="6.6" fill="currentColor" stroke="none" text-anchor="middle" font-family="sans-serif" font-weight="700">10</text></svg>`;
+  const restart = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5v5h5"/><path d="M4.4 10a8 8 0 1 1-.3 4.4"/></svg>`;
+  const playI = `<svg data-i="play" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+  const pauseI = `<svg data-i="pause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M7 5h3.4v14H7zM13.6 5H17v14h-3.4z"/></svg>`;
+  const volLow = `<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 4V5L8 9z"/></svg>`;
+  const volHigh = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor" stroke="none"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>`;
+
+  const style = `<style>
+    #${rid} .cms-au-range{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;outline:none;cursor:pointer;background:linear-gradient(to right,${ea} 0%,${ea} var(--pct,0%),${track} var(--pct,0%),${track} 100%)}
+    #${rid} .cms-au-range::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:${ea};box-shadow:0 1px 4px rgba(0,0,0,.35);cursor:pointer}
+    #${rid} .cms-au-range::-moz-range-thumb{width:15px;height:15px;border:none;border-radius:50%;background:${ea};cursor:pointer}
+    #${rid} .cms-au-btn:hover{opacity:.7}
+    #${rid} .cms-au-play{width:56px;height:56px;padding:0;background:${ea};color:#fff;border-radius:50%;box-shadow:${glow ? `0 0 0 10px ${glow},` : ""}0 8px 20px rgba(0,0,0,.28)}
+    #${rid} .cms-au-play:hover{opacity:.92}
+  </style>`;
+
+  const body = src
+    ? `<div style="display:flex;align-items:center;gap:12px;margin:16px auto 20px;max-width:560px;font-size:13px;color:var(--muted,#5f6d66)">
+        <span data-a="cur">0:00</span>
+        <input type="range" class="cms-au-range" data-a="seek" min="0" max="0" value="0" step="0.1" style="flex:1" aria-label="Seek" />
+        <span data-a="dur">0:00</span>
+      </div>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;gap:6px;background:${esc(bar)};border-radius:999px;padding:10px 16px;max-width:440px;margin:0 auto;color:#ece8df">
+        <span style="opacity:.55;padding:9px;display:inline-flex" aria-hidden="true">${deco}</span>
+        <button type="button" class="cms-au-btn" data-a="back" style="${btn}" title="Back 10s" aria-label="Back 10 seconds">${back}</button>
+        <button type="button" class="cms-au-btn cms-au-play" data-a="play" style="border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Play / pause" aria-label="Play or pause">${playI}${pauseI}</button>
+        <button type="button" class="cms-au-btn" data-a="fwd" style="${btn}" title="Forward 10s" aria-label="Forward 10 seconds">${fwd}</button>
+        <button type="button" class="cms-au-btn" data-a="restart" style="${btn}" title="Restart" aria-label="Restart">${restart}</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:18px auto 0;max-width:560px;color:var(--muted,#5f6d66)">
+        <span style="display:inline-flex" aria-hidden="true">${volLow}</span>
+        <input type="range" class="cms-au-range" data-a="vol" min="0" max="1" step="0.01" value="0.8" style="width:120px;--pct:80%" aria-label="Volume" />
+        <span style="display:inline-flex" aria-hidden="true">${volHigh}</span>
+      </div>
+      <audio data-a="audio" src="${src}" preload="metadata"></audio>`
+    : `<div style="padding:28px;border:1px dashed #c9b98f;border-radius:14px;color:#8a7b52;font-size:14px">Add an audio file URL to enable the player.</div>`;
+
+  const byline = (b.author || b.role)
+    ? `<div style="margin-top:22px;font-size:15px;color:var(--muted,#5f6d66)">${b.author ? `By ${esc(b.author)}` : ""}${b.author && b.role ? ` <span style="color:${ea}">•</span> ` : ""}${b.role ? esc(b.role) : ""}</div>`
+    : "";
+
+  const script = src ? `<script>(function(){
+    var r=document.getElementById(${JSON.stringify(rid)});if(!r)return;var a=r.querySelector('[data-a=audio]');
+    var seek=r.querySelector('[data-a=seek]'),vol=r.querySelector('[data-a=vol]'),cur=r.querySelector('[data-a=cur]'),dur=r.querySelector('[data-a=dur]');
+    var iP=r.querySelector('[data-i=play]'),iPa=r.querySelector('[data-i=pause]');
+    function f(t){t=Math.max(0,t|0);var m=(t/60)|0,s=t%60;return m+':'+(s<10?'0':'')+s;}
+    function pct(el,v){el.style.setProperty('--pct',(v*100)+'%');}
+    function paint(){var p=a.paused;if(iP)iP.style.display=p?'':'none';if(iPa)iPa.style.display=p?'none':'';}
+    a.addEventListener('loadedmetadata',function(){seek.max=a.duration||0;dur.textContent=f(a.duration);});
+    a.addEventListener('timeupdate',function(){if(document.activeElement!==seek){seek.value=a.currentTime;}cur.textContent=f(a.currentTime);pct(seek,a.duration?a.currentTime/a.duration:0);});
+    a.addEventListener('play',paint);a.addEventListener('pause',paint);a.addEventListener('ended',paint);
+    r.querySelector('[data-a=play]').addEventListener('click',function(){a.paused?a.play():a.pause();});
+    seek.addEventListener('input',function(){a.currentTime=+seek.value;pct(seek,a.duration?seek.value/a.duration:0);});
+    vol.addEventListener('input',function(){a.volume=+vol.value;pct(vol,+vol.value);});
+    r.querySelector('[data-a=back]').addEventListener('click',function(){a.currentTime=Math.max(0,a.currentTime-10);});
+    r.querySelector('[data-a=fwd]').addEventListener('click',function(){a.currentTime=Math.min(a.duration||0,a.currentTime+10);});
+    r.querySelector('[data-a=restart]').addEventListener('click',function(){a.currentTime=0;a.play();});
+    a.volume=+vol.value;paint();
+  })();</script>` : "";
+
+  return `${style}<div id="${rid}" style="max-width:660px;margin:0 auto">
+    ${b.text ? `<div style="font-family:var(--font-display);${fs(b, "22px")};font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${esc(titleColor)}${ts(b)}">${esc(b.text)}</div>` : ""}
+    ${body}${byline}
+  </div>${script}`;
 }
 
 function buttonHtml(b: CmsBlock, label: string | undefined, url: string | undefined, primary: boolean): string {

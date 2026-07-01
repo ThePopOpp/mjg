@@ -5,9 +5,9 @@ import Link from "next/link";
 import {
   AlignCenter, AlignLeft, AlignRight, ArrowLeft, Bold, Bot, Check, ChevronsUpDown, Code, Columns2, Copy,
   CaseUpper, Download, ExternalLink, Eye, EyeOff, GripVertical, Heading1, Heading2, Image as ImageIcon,
-  Italic, LayoutGrid, Layers, ListChecks, Loader2, Megaphone, Menu, Minus, MousePointerClick, Monitor,
-  Plus, Quote as QuoteIcon, Save, Settings2, Smartphone, Sparkles, Square, Star, Tablet, Trash2, Type,
-  Upload, Video, X,
+  Italic, LayoutGrid, Layers, ListChecks, ListMusic, Loader2, Megaphone, Menu, Minus, MousePointerClick, Monitor,
+  Music, Pause, Play, Plus, Quote as QuoteIcon, RotateCcw, RotateCw, Save, Search, Settings2, Shapes,
+  Smartphone, Sparkles, Square, Star, Tablet, Trash2, Type, Upload, Video, Volume2, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,15 +21,45 @@ import { mdToHtml, sanitizeHtml, typoStyle, videoEmbedSrc } from "@/lib/cms/md";
 import { blockPad, CMS_BLOCK_LABELS, type CmsBlock, type CmsBlockItem, type CmsBlockType } from "@/lib/cms/types";
 import { FONT_OPTIONS, fontWeights, fontHasItalic, CMS_FONTS, fontHref } from "@/lib/cms/fonts";
 import { BLOCK_CATEGORIES, BLOCK_PRESETS, type CmsPreset } from "@/lib/cms/presets";
+import { CMS_ICONS, ICON_STYLES, wrapIcon, DEFAULT_ICON, ICON_BODIES_URL, type IconBodies, type IconStyle } from "@/lib/cms/icons";
 
 let _uid = 0;
 const uid = () => `b${Date.now().toString(36)}${(_uid++).toString(36)}`;
+
+// Solar icon bodies are a static asset (kept out of the JS bundle) — fetch once,
+// cache at module scope, and notify subscribed components when they arrive.
+let _iconBodies: IconBodies | null = null;
+let _iconLoading = false;
+const _iconSubs = new Set<() => void>();
+function ensureIconBodies() {
+  if (_iconBodies || _iconLoading) return;
+  _iconLoading = true;
+  fetch(ICON_BODIES_URL).then((r) => r.json()).then((d: IconBodies) => { _iconBodies = d; _iconSubs.forEach((f) => f()); }).catch(() => { _iconLoading = false; });
+}
+function useIconBodies(): IconBodies | null {
+  const [, force] = React.useReducer((x) => x + 1, 0);
+  React.useEffect(() => {
+    if (_iconBodies) return;
+    _iconSubs.add(force); ensureIconBodies();
+    return () => { _iconSubs.delete(force); };
+  }, []);
+  return _iconBodies;
+}
+
+// Renders a single Solar glyph (loads bodies lazily; shows a sized placeholder until ready).
+function IconGlyph({ id, style, color, size, salt }: { id?: string; style: IconStyle; color?: string; size: number; salt?: string }) {
+  const bodies = useIconBodies();
+  const body = bodies?.[id || DEFAULT_ICON]?.[style] ?? bodies?.[DEFAULT_ICON]?.[style];
+  if (!body) return <span style={{ display: "inline-block", width: size, height: size }} aria-hidden="true" />;
+  return <span style={{ display: "inline-flex", lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: wrapIcon(body, { color, size, salt }) }} />;
+}
 
 const ICONS: Partial<Record<CmsBlockType, React.ElementType>> = {
   heading: Heading1, subheading: Heading2, paragraph: Type, richtext: Columns2, list: ListChecks, quote: QuoteIcon,
   scripture: Star, image: ImageIcon, video: Video, gallery: LayoutGrid, embed: Code, hero: Layers, cta: Megaphone,
   cardgrid: LayoutGrid, statgrid: Columns2, divider: Minus, spacer: Square, accordion: ChevronsUpDown,
   form: ListChecks, alert: Sparkles, resource: Download, button: MousePointerClick, html: Code,
+  audio: Music, icon: Shapes,
 };
 
 function defaultBlock(type: CmsBlockType): CmsBlock {
@@ -55,6 +85,8 @@ function defaultBlock(type: CmsBlockType): CmsBlock {
     case "alert": return { ...base, variant: "info", text: "Heads up", subtext: "This is an informational message.", padTop: 16, padBottom: 16, radius: 10 };
     case "resource": return { ...base, padTop: 32, padBottom: 32, role: "PDF", text: "Resource title", subtext: "Short description.", label: "Download", url: "" };
     case "button": return { ...base, label: "Learn more", url: "" };
+    case "audio": return { ...base, align: "center", padTop: 48, padBottom: 48, url: "", text: "The Stewardship Blueprint", author: "Michael J. Gauthier", role: "Life Design · Stewardship · Faith", accent: "#c9a46e", barColor: "#1b1a17", textColor: "#6a7a6f" };
+    case "icon": return { ...base, align: "center", padTop: 32, padBottom: 32, icon: "star", variant: "line", iconShape: "circle", iconBg: "#f1ede3", iconOutline: "", accent: "#315f43", iconSize: 30, text: "", subtext: "" };
     case "html": return { ...base, padTop: 16, padBottom: 16, html: "<!-- Your custom HTML here -->" };
     case "divider": return { ...base, padTop: 8, padBottom: 8 };
     case "spacer": return { id: uid(), type, height: 40 };
@@ -114,6 +146,7 @@ export function CmsEditor({ page, initialBlocks }: {
   const mutate = (fn: (prev: CmsBlock[]) => CmsBlock[]) => { setBlocks(fn); setDirty(true); };
   const update = (id: string, patch: Partial<CmsBlock>) => mutate((prev) => prev.map((b) => (b.id === id ? { ...b, ...patch } : b)));
   const add = (type: CmsBlockType) => { const b = defaultBlock(type); mutate((prev) => [...prev, b]); setSelectedId(b.id); };
+  const addIcon = (iconId: string) => { const b = { ...defaultBlock("icon"), icon: iconId }; mutate((prev) => [...prev, b]); setSelectedId(b.id); };
   const remove = (id: string) => mutate((prev) => prev.filter((b) => b.id !== id));
   const duplicate = (b: CmsBlock) => { const c = { ...b, id: uid() }; mutate((prev) => { const i = prev.findIndex((x) => x.id === b.id); const n = [...prev]; n.splice(i + 1, 0, c); return n; }); setSelectedId(c.id); };
   const insertBlocks = (presets: (CmsPreset | CmsBlock)[]) => {
@@ -178,9 +211,9 @@ export function CmsEditor({ page, initialBlocks }: {
     finally { setBusy(false); }
   }
 
-  function pickUpload(onDone: (url: string) => void) {
+  function pickUpload(onDone: (url: string) => void, accept = "image/*") {
     const input = document.createElement("input");
-    input.type = "file"; input.accept = "image/*";
+    input.type = "file"; input.accept = accept;
     input.onchange = async () => {
       const file = input.files?.[0]; if (!file) return;
       setBusy(true); setError(null);
@@ -234,22 +267,34 @@ export function CmsEditor({ page, initialBlocks }: {
             <div className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Add block</div>
             <Accordion type="multiple" defaultValue={["Text", "Layout"]} className="px-1 pb-1">
               {BLOCK_CATEGORIES.map((cat) => (
-                <AccordionItem key={cat.label} value={cat.label} className="border-b-0">
-                  <AccordionTrigger className="px-2 py-2 text-xs hover:no-underline">{cat.label}</AccordionTrigger>
-                  <AccordionContent className="pb-2">
-                    <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${paletteCols},minmax(0,1fr))` }}>
-                      {cat.types.map((t) => {
-                        const Icon = ICONS[t] ?? Square;
-                        return (
-                          <button key={t} onClick={() => add(t)} title={`Add ${CMS_BLOCK_LABELS[t]}`}
-                            className="flex min-h-[2rem] items-center gap-2 rounded-lg border border-border/60 bg-background px-2.5 py-2 text-left text-xs transition-colors hover:border-primary/50 hover:bg-muted">
-                            <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> <span className="truncate">{CMS_BLOCK_LABELS[t]}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+                <React.Fragment key={cat.label}>
+                  <AccordionItem value={cat.label} className="border-b-0">
+                    <AccordionTrigger className="px-2 py-2 text-xs hover:no-underline">{cat.label}</AccordionTrigger>
+                    <AccordionContent className="pb-2">
+                      <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${paletteCols},minmax(0,1fr))` }}>
+                        {cat.types.map((t) => {
+                          const Icon = ICONS[t] ?? Square;
+                          return (
+                            <button key={t} onClick={() => add(t)} title={`Add ${CMS_BLOCK_LABELS[t]}`}
+                              className="flex min-h-[2rem] items-center gap-2 rounded-lg border border-border/60 bg-background px-2.5 py-2 text-left text-xs transition-colors hover:border-primary/50 hover:bg-muted">
+                              <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> <span className="truncate">{CMS_BLOCK_LABELS[t]}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  {cat.label === "Media" && (
+                    <AccordionItem value="Icons" className="border-b-0">
+                      <AccordionTrigger className="px-2 py-2 text-xs hover:no-underline">
+                        <span className="flex items-center gap-2"><Shapes className="h-3.5 w-3.5 text-muted-foreground" /> Icons</span>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-2">
+                        <PaletteIconGrid onPick={addIcon} />
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                </React.Fragment>
               ))}
               <AccordionItem value="Templates" className="border-b-0">
                 <AccordionTrigger className="px-2 py-2 text-xs hover:no-underline">Templates & components</AccordionTrigger>
@@ -536,11 +581,127 @@ function BlockView({ block: b, selected, onSelect }: { block: CmsBlock; selected
         : <span style={{ display: "inline-block", padding: "28px 40px", border: "1px dashed #c9b98f", borderRadius: 8, color: "#8a7b52", fontSize: 13 }}>Add an embed URL or code →</span>);
     case "html":
       return wrap(<div dangerouslySetInnerHTML={{ __html: sanitizeHtml(b.html || "") || '<span style="color:#8a7b52">Empty HTML block</span>' }} />);
+    case "audio":
+      return wrap(<AudioPlayer b={b} />);
+    case "icon": {
+      const gs = Math.max(12, b.iconSize || 30);
+      const shape = b.iconShape || "circle";
+      const pad = Math.round(gs * 0.62);
+      const box: React.CSSProperties = shape === "none"
+        ? { display: "inline-flex", lineHeight: 0 }
+        : { display: "inline-flex", alignItems: "center", justifyContent: "center", lineHeight: 0, width: gs + pad * 2, height: gs + pad * 2, background: b.iconBg || undefined, borderRadius: shape === "circle" ? 999 : (b.radius ?? 16), border: b.iconOutline ? `2px solid ${b.iconOutline}` : undefined };
+      return wrap(<div>
+        <span style={box}><IconGlyph id={b.icon} style={(b.variant as IconStyle) || "line"} color={b.accent || b.buttonColor || "#315f43"} size={gs} salt={b.id} /></span>
+        {b.text && <div style={{ fontFamily: "var(--font-display)", fontSize: b.fontSize || 20, marginTop: 14, ...T }}>{b.text}</div>}
+        {b.subtext && <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--muted)", margin: "6px 0 0" }}>{b.subtext}</p>}
+      </div>);
+    }
     default: return null;
   }
 }
 
 const fieldStyle: React.CSSProperties = { width: "100%", padding: "11px 13px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 15, background: "#fff" };
+
+// Live, interactive audio player for the canvas (mirrors audioPlayerHtml in render.ts).
+function AudioPlayer({ b }: { b: CmsBlock }) {
+  const accent = b.accent || b.buttonColor || "#c9a46e";
+  const bar = b.barColor || "#1b1a17";
+  const titleColor = b.textColor || "#6a7a6f";
+  const ref = React.useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = React.useState(false);
+  const [cur, setCur] = React.useState(0);
+  const [dur, setDur] = React.useState(0);
+  const [vol, setVol] = React.useState(0.8);
+  React.useEffect(() => { if (ref.current) ref.current.volume = vol; }, [vol]);
+  const fmt = (t: number) => { t = Math.max(0, Math.floor(t)); const m = Math.floor(t / 60), s = t % 60; return `${m}:${s < 10 ? "0" : ""}${s}`; };
+  const toggle = () => { const a = ref.current; if (!a) return; if (a.paused) a.play(); else a.pause(); };
+  const skip = (d: number) => { const a = ref.current; if (a) a.currentTime = Math.max(0, Math.min(a.duration || 0, a.currentTime + d)); };
+  const restart = () => { const a = ref.current; if (a) { a.currentTime = 0; a.play(); } };
+  const ctrl: React.CSSProperties = { background: "transparent", border: "none", color: "inherit", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", padding: 9, borderRadius: "50%" };
+  return (
+    <div style={{ maxWidth: 660, margin: "0 auto" }}>
+      {b.text && <div style={{ fontFamily: "var(--font-display)", fontSize: b.fontSize || 22, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: titleColor }}>{b.text}</div>}
+      {b.url ? (
+        <>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "16px auto 20px", maxWidth: 560, fontSize: 13, color: "var(--muted)" }}>
+            <span>{fmt(cur)}</span>
+            <input type="range" min={0} max={dur || 0} step={0.1} value={cur} onChange={(e) => { const v = +e.target.value; setCur(v); if (ref.current) ref.current.currentTime = v; }} style={{ flex: 1, accentColor: accent }} />
+            <span>{fmt(dur)}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: bar, borderRadius: 999, padding: "10px 16px", maxWidth: 440, margin: "0 auto", color: "#ece8df" }}>
+            <span style={{ opacity: 0.55, padding: 9, display: "inline-flex" }} aria-hidden="true"><ListMusic size={20} /></span>
+            <button type="button" onClick={() => skip(-10)} style={ctrl} title="Back 10s"><RotateCcw size={20} /></button>
+            <button type="button" onClick={toggle} style={{ border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 56, height: 56, borderRadius: "50%", color: "#fff", background: accent, boxShadow: "0 8px 20px rgba(0,0,0,.28)" }} title="Play / pause">{playing ? <Pause size={24} /> : <Play size={24} style={{ marginLeft: 2 }} />}</button>
+            <button type="button" onClick={() => skip(10)} style={ctrl} title="Forward 10s"><RotateCw size={20} /></button>
+            <button type="button" onClick={restart} style={ctrl} title="Restart"><RotateCcw size={18} /></button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, margin: "18px auto 0", maxWidth: 560, color: "var(--muted)" }}>
+            <Volume2 size={17} />
+            <input type="range" min={0} max={1} step={0.01} value={vol} onChange={(e) => setVol(+e.target.value)} style={{ width: 120, accentColor: accent }} />
+          </div>
+          <audio ref={ref} src={b.url} preload="metadata"
+            onLoadedMetadata={(e) => setDur(e.currentTarget.duration || 0)}
+            onTimeUpdate={(e) => setCur(e.currentTarget.currentTime)}
+            onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} />
+        </>
+      ) : (
+        <div style={{ padding: 28, border: "1px dashed #c9b98f", borderRadius: 14, color: "#8a7b52", fontSize: 14 }}>Add an audio file URL to enable the player.</div>
+      )}
+      {(b.author || b.role) && <div style={{ marginTop: 22, fontSize: 15, color: "var(--muted)" }}>{b.author ? `By ${b.author}` : ""}{b.author && b.role ? <span style={{ color: accent }}> • </span> : null}{b.role || ""}</div>}
+    </div>
+  );
+}
+
+// Dedicated "Icons" palette section — browse the Solar library and click to insert
+// an icon block pre-set to that glyph (restyle it afterward in the inspector).
+function PaletteIconGrid({ onPick }: { onPick: (id: string) => void }) {
+  const [q, setQ] = React.useState("");
+  const needle = q.trim().toLowerCase();
+  const list = CMS_ICONS.filter((i) => !needle || i.label.toLowerCase().includes(needle) || i.id.includes(needle));
+  return (
+    <div className="space-y-2 px-1">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Input className="h-8 pl-7" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search icons…" />
+      </div>
+      <div className="grid max-h-[300px] gap-1 overflow-y-auto pr-1" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(34px,1fr))" }}>
+        {list.map((ic) => (
+          <button key={ic.id} type="button" onClick={() => onPick(ic.id)} title={`Add ${ic.label}`}
+            className="flex aspect-square items-center justify-center rounded-md border border-border/60 bg-background text-foreground transition-colors hover:border-primary/50 hover:bg-muted">
+            <IconGlyph id={ic.id} style="line" size={20} salt={`pal-${ic.id}`} />
+          </button>
+        ))}
+        {list.length === 0 && <p className="col-span-full py-3 text-center text-[11px] text-muted-foreground">No icons match “{q}”.</p>}
+      </div>
+      <p className="text-[10px] text-muted-foreground">{CMS_ICONS.length} Solar icons · click to add, then set style &amp; colors in the inspector.</p>
+    </div>
+  );
+}
+
+// Searchable icon picker for the inspector (renders live SVG previews).
+function IconPicker({ value, onChange, style, color }: { value?: string; onChange: (id: string) => void; style: IconStyle; color: string }) {
+  const [q, setQ] = React.useState("");
+  const needle = q.trim().toLowerCase();
+  const list = CMS_ICONS.filter((i) => !needle || i.label.toLowerCase().includes(needle) || i.id.includes(needle));
+  return (
+    <div>
+      <L>Icon</L>
+      <div className="relative mb-2">
+        <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Input className="h-8 pl-7" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search icons…" />
+      </div>
+      <div className="grid max-h-[188px] grid-cols-6 gap-1.5 overflow-y-auto rounded-lg border border-border p-2">
+        {list.map((ic) => (
+          <button key={ic.id} type="button" onClick={() => onChange(ic.id)} title={ic.label}
+            className={cn("flex aspect-square items-center justify-center rounded-md border text-foreground", value === ic.id ? "border-primary bg-primary/10" : "border-transparent hover:bg-muted")}>
+            <IconGlyph id={ic.id} style={style} color={color} size={22} salt={`pick-${ic.id}`} />
+          </button>
+        ))}
+        {list.length === 0 && <p className="col-span-6 py-3 text-center text-[11px] text-muted-foreground">No icons match “{q}”.</p>}
+      </div>
+    </div>
+  );
+}
 
 // ── Canvas FAB (floating quick-style toolbar anchored to the selected block) ───
 function CanvasFab({ block, update, upload, canvasRef, scrollRef, blocksSig, onSaveTemplate }: {
@@ -693,7 +854,7 @@ function EffectsFields({ block, update, upload }: { block: CmsBlock; update: (p:
 }
 
 // ── Right inspector (content + full styling) ──────────────────────────────────
-function Inspector({ block, update, upload }: { block: CmsBlock; update: (p: Partial<CmsBlock>) => void; upload: (onDone: (url: string) => void) => void }) {
+function Inspector({ block, update, upload }: { block: CmsBlock; update: (p: Partial<CmsBlock>) => void; upload: (onDone: (url: string) => void, accept?: string) => void }) {
   const isText = block.type === "heading" || block.type === "subheading" || block.type === "paragraph" || block.type === "richtext";
   const setItem = (i: number, patch: Partial<CmsBlockItem>) => update({ items: (block.items ?? []).map((it, k) => (k === i ? { ...it, ...patch } : it)) });
   const addItem = (blank: CmsBlockItem) => update({ items: [...(block.items ?? []), blank] });
@@ -835,6 +996,39 @@ function Inspector({ block, update, upload }: { block: CmsBlock; update: (p: Par
         </div>
       )}
 
+      {block.type === "audio" && (
+        <div className="space-y-2">
+          <div><L>Audio file (MP3 / M4A / WAV)</L><div className="flex gap-2"><Input value={block.url ?? ""} onChange={(e) => update({ url: e.target.value })} placeholder="https://….mp3" /><Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => upload((url) => update({ url }), "audio/*")}><Upload className="h-3.5 w-3.5" /></Button></div></div>
+          <div><L>Title</L><Input value={block.text ?? ""} onChange={(e) => update({ text: e.target.value })} placeholder="The Stewardship Blueprint" /></div>
+          <div className="grid grid-cols-2 gap-2">
+            <div><L>Byline</L><Input value={block.author ?? ""} onChange={(e) => update({ author: e.target.value })} placeholder="Michael J. Gauthier" /></div>
+            <div><L>Tags / subtitle</L><Input value={block.role ?? ""} onChange={(e) => update({ role: e.target.value })} placeholder="Faith · Stewardship" /></div>
+          </div>
+          <ColorField label="Accent color" value={block.accent ?? ""} onChange={(v) => update({ accent: v })} />
+          <ColorField label="Control bar color" value={block.barColor ?? ""} onChange={(v) => update({ barColor: v })} />
+          <ColorField label="Title color" value={block.textColor ?? ""} onChange={(v) => update({ textColor: v })} />
+        </div>
+      )}
+
+      {block.type === "icon" && (
+        <div className="space-y-2">
+          <IconPicker value={block.icon} onChange={(id) => update({ icon: id })} style={(block.variant as IconStyle) || "line"} color={block.accent || block.buttonColor || "#315f43"} />
+          <div className="grid grid-cols-2 gap-2">
+            <div><L>Style</L><FieldSelect value={block.variant ?? "line"} onChange={(v) => update({ variant: v })} options={ICON_STYLES.map((s) => ({ value: s.value, label: s.label }))} className="h-8" /></div>
+            <div><L>Container</L><FieldSelect value={block.iconShape ?? "circle"} onChange={(v) => update({ iconShape: v as CmsBlock["iconShape"] })} options={[{ value: "none", label: "None" }, { value: "square", label: "Square" }, { value: "circle", label: "Circle" }]} className="h-8" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Num label="Icon size (px)" value={block.iconSize} onChange={(v) => update({ iconSize: v })} placeholder="30" />
+            {block.iconShape === "square" && <Num label="Corner radius" value={block.radius} onChange={(v) => update({ radius: v })} placeholder="16" />}
+          </div>
+          <ColorField label="Icon color" value={block.accent ?? ""} onChange={(v) => update({ accent: v })} />
+          <ColorField label="Container fill" value={block.iconBg ?? ""} onChange={(v) => update({ iconBg: v })} />
+          <ColorField label="Outline color" value={block.iconOutline ?? ""} onChange={(v) => update({ iconOutline: v })} />
+          <div><L>Label (optional)</L><Input value={block.text ?? ""} onChange={(e) => update({ text: e.target.value })} placeholder="Short label" /></div>
+          <div><L>Caption (optional)</L><Textarea className="min-h-[44px]" value={block.subtext ?? ""} onChange={(e) => update({ subtext: e.target.value })} /></div>
+        </div>
+      )}
+
       {block.type === "html" && (
         <div className="space-y-1">
           <L>HTML</L>
@@ -871,7 +1065,7 @@ function Inspector({ block, update, upload }: { block: CmsBlock; update: (p: Par
       )}
       {block.type === "divider" && <ColorField label="Line color" value={block.borderColor ?? block.textColor ?? ""} onChange={(v) => update({ borderColor: v })} />}
 
-      {(block.type === "image" || block.type === "button" || block.type === "video") && (
+      {(block.type === "image" || block.type === "button" || block.type === "video" || block.type === "audio" || block.type === "icon") && (
         <div><L>Alignment</L><FieldSelect value={block.align ?? "left"} onChange={(v) => update({ align: v as CmsBlock["align"] })} options={ALIGN_OPTS} className="h-8" /></div>
       )}
 

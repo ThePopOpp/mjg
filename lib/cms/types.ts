@@ -24,7 +24,8 @@ export type CmsPage = {
 export type CmsBlockType =
   | "heading" | "subheading" | "paragraph" | "richtext" | "image" | "button" | "divider" | "spacer"
   | "cta" | "quote" | "cardgrid" | "accordion" | "video" | "html"
-  | "hero" | "alert" | "list" | "statgrid" | "gallery" | "embed" | "scripture" | "resource" | "form";
+  | "hero" | "alert" | "list" | "statgrid" | "gallery" | "embed" | "scripture" | "resource" | "form"
+  | "audio" | "icon";
 
 export type CmsBlockItem = {
   title?: string; body?: string; imageUrl?: string; url?: string; q?: string; a?: string;
@@ -59,6 +60,15 @@ export type CmsBlock = {
   overlayOpacity?: number; // 0-100
   minHeight?: number;   // hero/section min height (px)
   newTab?: boolean;     // links open in new tab
+  // audio player
+  barColor?: string;    // audio: control-bar background (dark pill)
+  accent?: string;      // audio/icon: accent color (play button, seek/volume fill, glyph)
+  // icon library
+  icon?: string;        // icon: glyph id from lib/cms/icons
+  iconShape?: "none" | "square" | "circle"; // icon: background container shape
+  iconBg?: string;      // icon: container fill ("" = transparent)
+  iconOutline?: string; // icon: container outline color ("" = none)
+  iconSize?: number;    // icon: glyph size (px)
   // typography
   fontFamily?: string;  // Google font name (see lib/cms/fonts)
   fontWeight?: number;  // 100-900
@@ -111,6 +121,7 @@ export const CMS_BLOCK_LABELS: Record<CmsBlockType, string> = {
   video: "Video", html: "HTML",
   hero: "Hero", alert: "Alert / Notice", list: "List / Checklist", statgrid: "Stats",
   gallery: "Gallery", embed: "Embed", scripture: "Scripture", resource: "Resource / Download", form: "Form",
+  audio: "Audio player", icon: "Icon",
 };
 
 export const CMS_PAGE_TYPES: { value: CmsPageType; label: string }[] = [

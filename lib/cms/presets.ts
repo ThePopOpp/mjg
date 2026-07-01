@@ -7,7 +7,7 @@ export type CmsPreset = Omit<CmsBlock, "id">;
 
 export const BLOCK_CATEGORIES: { label: string; types: CmsBlockType[] }[] = [
   { label: "Text", types: ["heading", "subheading", "paragraph", "richtext", "list", "quote", "scripture"] },
-  { label: "Media", types: ["image", "video", "gallery", "embed"] },
+  { label: "Media", types: ["image", "video", "audio", "gallery", "embed"] },
   { label: "Layout", types: ["hero", "cta", "cardgrid", "statgrid", "divider", "spacer"] },
   { label: "Interactive", types: ["accordion", "form", "alert", "resource", "button"] },
   { label: "Advanced", types: ["html"] },
@@ -91,6 +91,20 @@ export const BLOCK_PRESETS: { name: string; description: string; blocks: CmsPres
     description: "Downloadable file callout.",
     blocks: [
       { type: "resource", role: "PDF · 2.4 MB", text: "Stewardship starter guide", subtext: "A printable worksheet to begin your plan.", label: "Download", url: "#", padTop: 32, padBottom: 32 },
+    ],
+  },
+  {
+    name: "Audio episode",
+    description: "Podcast-style audio player with title and byline.",
+    blocks: [
+      { type: "audio", align: "center", text: "The Stewardship Blueprint", author: "Michael J. Gauthier", role: "Life Design · Stewardship · Faith", accent: "#c9a46e", barColor: "#1b1a17", textColor: "#6a7a6f", url: "", padTop: 48, padBottom: 48 },
+    ],
+  },
+  {
+    name: "Icon badge",
+    description: "Accent icon in a circle with a label.",
+    blocks: [
+      { type: "icon", align: "center", icon: "shield-check", variant: "line", iconShape: "circle", iconBg: "#f1ede3", iconOutline: "", accent: "#315f43", iconSize: 30, text: "Trusted guidance", subtext: "A short supporting line.", padTop: 32, padBottom: 32 },
     ],
   },
 ];
