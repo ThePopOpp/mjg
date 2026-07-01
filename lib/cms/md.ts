@@ -1,6 +1,30 @@
 // Shared, client-safe helpers (no node deps) used by both the server renderer
 // and the live editor canvas so they stay consistent.
 
+import { fontStack } from "./fonts";
+import type { CmsBlock } from "./types";
+
+// Typography style object (React-CSSProperties-shaped) built from a block's
+// typography fields. The editor uses it directly; the server stringifies it.
+export function typoStyle(b: CmsBlock): Record<string, string | number> {
+  const s: Record<string, string | number> = {};
+  if (b.fontFamily) s.fontFamily = fontStack(b.fontFamily);
+  if (b.fontWeight) s.fontWeight = b.fontWeight;
+  if (b.fontStyle && b.fontStyle !== "normal") s.fontStyle = b.fontStyle;
+  if (b.textTransform && b.textTransform !== "none") s.textTransform = b.textTransform;
+  if (typeof b.letterSpacing === "number") s.letterSpacing = `${b.letterSpacing}px`;
+  if (typeof b.lineHeight === "number") s.lineHeight = b.lineHeight;
+  if (b.textShadow) s.textShadow = b.textShadow;
+  return s;
+}
+
+// camelCase style object → inline CSS string (for the server renderer).
+export function styleToCss(s: Record<string, string | number>): string {
+  return Object.entries(s)
+    .map(([k, v]) => `${k.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase())}:${v}`)
+    .join(";");
+}
+
 export function escHtml(value: string) {
   return String(value ?? "")
     .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")

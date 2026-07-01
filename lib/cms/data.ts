@@ -114,3 +114,31 @@ export async function saveCmsDraft(id: string, content: unknown, actorUserId?: s
     .eq("id", id);
   if (error) throw new Error(error.message);
 }
+
+// ── Saved block/component templates ───────────────────────────────────────────
+export type CmsBlockTemplate = { id: string; name: string; kind: string; content: CmsBlock[]; created_at?: string };
+
+export async function listBlockTemplates(): Promise<CmsBlockTemplate[]> {
+  const sb = createSupabaseAdminClient();
+  const { data, error } = await sb.from("cms_block_templates").select("id, name, kind, content, created_at").order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((r) => ({ ...r, content: Array.isArray(r.content) ? (r.content as CmsBlock[]) : [] })) as CmsBlockTemplate[];
+}
+
+export async function createBlockTemplate(input: { name: string; kind?: string; content: CmsBlock[]; actorUserId?: string }): Promise<CmsBlockTemplate> {
+  const sb = createSupabaseAdminClient();
+  const name = String(input.name || "").trim();
+  if (!name) throw new Error("A template name is required.");
+  const kind = ["block", "section", "group"].includes(String(input.kind)) ? String(input.kind) : (Array.isArray(input.content) && input.content.length > 1 ? "group" : "block");
+  const { data, error } = await sb.from("cms_block_templates")
+    .insert({ name, kind, content: Array.isArray(input.content) ? input.content : [], created_by: input.actorUserId ?? null })
+    .select("id, name, kind, content, created_at").single();
+  if (error) throw new Error(error.message);
+  return { ...data, content: Array.isArray(data.content) ? (data.content as CmsBlock[]) : [] } as CmsBlockTemplate;
+}
+
+export async function deleteBlockTemplate(id: string): Promise<void> {
+  const sb = createSupabaseAdminClient();
+  const { error } = await sb.from("cms_block_templates").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}

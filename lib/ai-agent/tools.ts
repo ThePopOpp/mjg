@@ -1285,13 +1285,20 @@ async function assertSuperAdmin(ctx: AgentContext): Promise<void> {
 const CMS_BLOCK_SCHEMA_DOC =
   "Each block is an object { type, ...fields }. Types & their fields: " +
   "heading{text}; subheading{text}; paragraph{text}; richtext{text: markdown — **bold**, *italic*, [links](url), \"- \" bullet lists}; " +
-  "image{url, alt}; button{label, url}; " +
+  "list{variant('check'|'bullet'|'number'), items:[{title}]}; " +
+  "image{url, alt}; button{label, url}; gallery{columns(2-4), items:[{imageUrl, title?}]}; " +
+  "hero{eyebrow, text(=headline), subtext, label, url, label2, url2, bgImage?, bgColor?, overlay?, overlayOpacity?, minHeight?}; " +
   "cta{eyebrow, text(=heading), subtext, label, url, label2, url2}; " +
-  "quote{text, author, role}; " +
   "cardgrid{columns(2-4), items:[{title, body, imageUrl?, url?}]}; " +
-  "accordion{items:[{q, a}]}; video{url, aspect('16/9'|'4/3'|'1/1')}; divider{}; spacer{height}; html{html}. " +
-  "Any block also accepts optional design fields: align('left'|'center'|'right'), bgColor, textColor, padTop, padBottom, marginTop, marginBottom, maxWidth. " +
-  "Build a page as an ordered array of these blocks — typically a heading/cta hero, some paragraph/richtext/cardgrid/quote sections, and a closing cta.";
+  "statgrid{columns(2-4), items:[{title(=number), body(=label)}]}; " +
+  "quote{text, author, role}; scripture{text(=verse), author(=reference), role(=version), subtext(=reflection)}; " +
+  "alert{variant('info'|'success'|'warning'|'error'), text(=title), subtext(=message)}; " +
+  "resource{text(=title), subtext, label(=button), url(=file), role(=filetype label)}; " +
+  "accordion{items:[{q, a}]}; form{text(=title), eyebrow(=description), label(=submit), items:[{title(=label), fieldType('text'|'email'|'phone'|'number'|'date'|'textarea'|'select'|'checkbox'), placeholder?, options?(comma-separated for select), required?}]}; " +
+  "video{url, aspect('16/9'|'4/3'|'1/1')}; embed{url, height} or embed{html}; divider{}; spacer{height}; html{html}. " +
+  "Any block also accepts optional design fields: align('left'|'center'|'right'), bgColor, textColor, padTop, padBottom, marginTop, marginBottom, maxWidth, " +
+  "and typography: fontFamily(a Google font name like 'Poppins'|'Playfair Display'|'Inter'), fontWeight(100-900), fontStyle('italic'), textTransform('uppercase'|'capitalize'), letterSpacing, lineHeight, textShadow, plus border/effects borderWidth, borderColor, radius, boxShadow. " +
+  "Build a page as an ordered array — usually a hero, some paragraph/richtext/cardgrid/statgrid/quote/accordion sections, and a closing cta.";
 
 let cmsBlockSeq = 0;
 function normalizeCmsBlock(raw: unknown): CmsBlock {

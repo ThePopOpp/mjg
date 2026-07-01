@@ -23,26 +23,50 @@ export type CmsPage = {
 // ── Blocks (flat, ordered list; nested layout containers come later) ──
 export type CmsBlockType =
   | "heading" | "subheading" | "paragraph" | "richtext" | "image" | "button" | "divider" | "spacer"
-  | "cta" | "quote" | "cardgrid" | "accordion" | "video" | "html";
+  | "cta" | "quote" | "cardgrid" | "accordion" | "video" | "html"
+  | "hero" | "alert" | "list" | "statgrid" | "gallery" | "embed" | "scripture" | "resource" | "form";
 
-export type CmsBlockItem = { title?: string; body?: string; imageUrl?: string; url?: string; q?: string; a?: string };
+export type CmsBlockItem = {
+  title?: string; body?: string; imageUrl?: string; url?: string; q?: string; a?: string;
+  // form fields / stats / gallery extras
+  fieldType?: string;   // form field: text|email|phone|textarea|number|date|select|checkbox
+  placeholder?: string; // form field placeholder
+  options?: string;     // select/radio options (comma-separated)
+  required?: boolean;   // form field required
+  icon?: string;        // optional icon/emoji for list/stat items
+};
 
 export type CmsBlock = {
   id: string;
   type: CmsBlockType;
-  text?: string;        // heading/subheading/paragraph/richtext/quote/cta-heading
-  url?: string;         // image src / button href / video url
+  text?: string;        // heading/subheading/paragraph/richtext/quote/cta-heading/alert-title
+  url?: string;         // image src / button href / video url / resource file
   alt?: string;         // image alt
-  label?: string;       // button label / cta primary label
-  // structured content (new blocks)
-  eyebrow?: string;     // cta small label
-  subtext?: string;     // cta subheading
-  label2?: string; url2?: string; // cta secondary button
-  author?: string; role?: string; // quote author + role
-  items?: CmsBlockItem[]; // cardgrid / accordion
-  columns?: number;     // cardgrid columns (2-4)
-  html?: string;        // html block
+  label?: string;       // button label / cta primary label / form submit / resource button
+  // structured content
+  eyebrow?: string;     // cta/hero small label
+  subtext?: string;     // cta/hero subheading / alert message / scripture reflection / form success
+  label2?: string; url2?: string; // cta/hero secondary button
+  author?: string; role?: string; // quote author + role / scripture ref + version / resource filetype
+  items?: CmsBlockItem[]; // cardgrid / accordion / list / statgrid / gallery / form fields
+  columns?: number;     // grid columns (2-4)
+  gap?: number;         // grid gap (px)
+  html?: string;        // html / embed code
   aspect?: string;      // video aspect ("16/9" | "4/3" | "1/1")
+  variant?: string;     // alert kind (info|success|warning|error) / button style / list style
+  bgImage?: string;     // hero/section background image url
+  overlay?: string;     // hero overlay color
+  overlayOpacity?: number; // 0-100
+  minHeight?: number;   // hero/section min height (px)
+  newTab?: boolean;     // links open in new tab
+  // typography
+  fontFamily?: string;  // Google font name (see lib/cms/fonts)
+  fontWeight?: number;  // 100-900
+  fontStyle?: "normal" | "italic";
+  textTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
+  letterSpacing?: number; // px (can be negative)
+  lineHeight?: number;    // unitless multiplier
+  textShadow?: string;    // css text-shadow value
   // design
   align?: "left" | "center" | "right";
   textColor?: string;   // "" = inherit
@@ -56,7 +80,12 @@ export type CmsBlock = {
   padX?: number;        // section horizontal padding (px)
   maxWidth?: number;    // content max width (px); 0 = container default
   height?: number;      // spacer height / image max-height (px)
-  radius?: number;      // image/button corner radius (px)
+  radius?: number;      // corner radius (px)
+  // border + effects
+  borderWidth?: number; // px
+  borderColor?: string;
+  borderStyle?: "solid" | "dashed" | "dotted";
+  boxShadow?: string;   // css box-shadow value
   hidden?: boolean;
   padY?: number;        // legacy — used as padTop/padBottom fallback
 };
@@ -80,6 +109,8 @@ export const CMS_BLOCK_LABELS: Record<CmsBlockType, string> = {
   image: "Image", button: "Button", divider: "Divider", spacer: "Spacer",
   cta: "CTA section", quote: "Quote", cardgrid: "Card grid", accordion: "Accordion / FAQ",
   video: "Video", html: "HTML",
+  hero: "Hero", alert: "Alert / Notice", list: "List / Checklist", statgrid: "Stats",
+  gallery: "Gallery", embed: "Embed", scripture: "Scripture", resource: "Resource / Download", form: "Form",
 };
 
 export const CMS_PAGE_TYPES: { value: CmsPageType; label: string }[] = [

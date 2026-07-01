@@ -37,7 +37,8 @@ with checks(migration, present) as (
                                                    and to_regclass('public.cms_blocks') is not null),
     ('027 CMS draft_content column',             exists (select 1 from information_schema.columns
                                                           where table_schema = 'public' and table_name = 'cms_pages'
-                                                            and column_name = 'draft_content'))
+                                                            and column_name = 'draft_content')),
+    ('028 CMS block templates',                  to_regclass('public.cms_block_templates') is not null)
 )
 select migration,
        case when present then '✅ applied' else '❌ MISSING — run this file' end as status
