@@ -34,11 +34,25 @@ export type CmsBlock = {
   align?: "left" | "center" | "right";
   textColor?: string;   // "" = inherit
   bgColor?: string;     // "" = none (transparent band)
-  padY?: number;        // section vertical padding (px)
+  buttonColor?: string; // button background
+  fontSize?: number;    // px override for text/button
+  marginTop?: number;   // space above the section (px)
+  marginBottom?: number;// space below the section (px)
+  padTop?: number;      // section padding top (px)
+  padBottom?: number;   // section padding bottom (px)
+  padX?: number;        // section horizontal padding (px)
   maxWidth?: number;    // content max width (px); 0 = container default
   height?: number;      // spacer height / image max-height (px)
+  radius?: number;      // image/button corner radius (px)
   hidden?: boolean;
+  padY?: number;        // legacy — used as padTop/padBottom fallback
 };
+
+// Resolve padding/margin with legacy padY fallback (shared by both renderers).
+export function blockPad(b: CmsBlock, side: "top" | "bottom"): number {
+  const specific = side === "top" ? b.padTop : b.padBottom;
+  return specific ?? b.padY ?? 24;
+}
 
 export type CmsDraft = { version: 1; blocks: CmsBlock[] };
 

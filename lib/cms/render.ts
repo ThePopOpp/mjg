@@ -6,36 +6,15 @@ import {
   publicSiteUrl, renderFaviconLinks, renderFonts, renderNavScript, renderNavStyles,
   renderSiteHeader, renderThemeScript,
 } from "@/lib/public-site/static-pages";
-import type { CmsBlock } from "./types";
-
-function esc(value: string) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
-}
-
-// Lightweight, safe rich text: escape first, then a small Markdown subset
-// (**bold**, *italic*, [text](url), - lists, blank-line paragraphs, line breaks).
-function mdToHtml(src: string): string {
-  const inline = (s: string) =>
-    esc(s)
-      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-      .replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>")
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2">$1</a>');
-  const blocks = String(src ?? "").split(/\n{2,}/);
-  return blocks.map((block) => {
-    const lines = block.split("\n");
-    if (lines.every((l) => /^\s*-\s+/.test(l))) {
-      return `<ul>${lines.map((l) => `<li>${inline(l.replace(/^\s*-\s+/, ""))}</li>`).join("")}</ul>`;
-    }
-    return `<p>${lines.map(inline).join("<br/>")}</p>`;
-  }).join("");
-}
+import { escHtml as esc, mdToHtml } from "./md";
+import { blockPad, type CmsBlock } from "./types";
 
 function band(b: CmsBlock, innerHtml: string): string {
   const sec: string[] = [];
   if (b.bgColor) sec.push(`background:${esc(b.bgColor)}`);
-  sec.push(`padding:${b.padY ?? 24}px 20px`);
+  sec.push(`padding:${blockPad(b, "top")}px ${b.padX ?? 20}px ${blockPad(b, "bottom")}px`);
+  if (b.marginTop) sec.push(`margin-top:${b.marginTop}px`);
+  if (b.marginBottom) sec.push(`margin-bottom:${b.marginBottom}px`);
   const inner: string[] = ["width:min(1180px,calc(100% - 40px))", "margin:0 auto"];
   if (b.maxWidth && b.maxWidth > 0) inner.push(`max-width:${b.maxWidth}px`);
   if (b.align) inner.push(`text-align:${b.align}`);
@@ -43,23 +22,25 @@ function band(b: CmsBlock, innerHtml: string): string {
   return `<section style="${sec.join(";")}"><div style="${inner.join(";")}">${innerHtml}</div></section>`;
 }
 
+const fs = (b: CmsBlock, fallback: string) => (b.fontSize ? `font-size:${b.fontSize}px` : `font-size:${fallback}`);
+
 export function renderCmsBlock(b: CmsBlock): string {
   if (b.hidden) return "";
   switch (b.type) {
     case "heading":
-      return band(b, `<h1 style="font-family:var(--font-display);font-size:clamp(36px,6vw,64px);line-height:1.05;margin:0">${esc(b.text || "")}</h1>`);
+      return band(b, `<h1 style="font-family:var(--font-display);${fs(b, "clamp(36px,6vw,64px)")};line-height:1.05;margin:0">${esc(b.text || "")}</h1>`);
     case "subheading":
-      return band(b, `<h2 style="font-family:var(--font-display);font-size:clamp(22px,3.5vw,34px);line-height:1.15;margin:0">${esc(b.text || "")}</h2>`);
+      return band(b, `<h2 style="font-family:var(--font-display);${fs(b, "clamp(22px,3.5vw,34px)")};line-height:1.15;margin:0">${esc(b.text || "")}</h2>`);
     case "paragraph":
-      return band(b, `<p style="font-size:18px;line-height:1.7;margin:0">${esc(b.text || "").replace(/\n/g, "<br/>")}</p>`);
+      return band(b, `<p style="${fs(b, "18px")};line-height:1.7;margin:0">${esc(b.text || "").replace(/\n/g, "<br/>")}</p>`);
     case "richtext":
-      return band(b, `<div style="font-size:18px;line-height:1.75" class="cms-rt">${mdToHtml(b.text || "")}</div>`);
+      return band(b, `<div style="${fs(b, "18px")};line-height:1.75" class="cms-rt">${mdToHtml(b.text || "")}</div>`);
     case "image":
-      return b.url ? band(b, `<img src="${esc(b.url)}" alt="${esc(b.alt || "")}" style="max-width:100%;${b.maxWidth ? `max-width:${b.maxWidth}px;` : ""}${b.height ? `max-height:${b.height}px;` : ""}border-radius:8px;display:inline-block" />`) : "";
+      return b.url ? band(b, `<img src="${esc(b.url)}" alt="${esc(b.alt || "")}" style="max-width:100%;${b.maxWidth ? `max-width:${b.maxWidth}px;` : ""}${b.height ? `max-height:${b.height}px;` : ""}border-radius:${b.radius ?? 8}px;display:inline-block" />`) : "";
     case "button":
-      return b.url ? band(b, `<a href="${esc(b.url)}" style="display:inline-block;background:var(--green,#315f43);color:#fff;padding:14px 26px;border-radius:6px;font-weight:700;text-decoration:none">${esc(b.label || "Learn more")}</a>`) : "";
+      return b.url ? band(b, `<a href="${esc(b.url)}" style="display:inline-block;background:${esc(b.buttonColor || "var(--green,#315f43)")};color:${esc(b.textColor || "#ffffff")};padding:14px 26px;border-radius:${b.radius ?? 6}px;${fs(b, "16px")};font-weight:700;text-decoration:none">${esc(b.label || "Learn more")}</a>`) : "";
     case "divider":
-      return band(b, `<hr style="border:none;border-top:1px solid var(--line,#e4ded2);margin:0" />`);
+      return band(b, `<hr style="border:none;border-top:1px solid ${esc(b.textColor || "var(--line,#e4ded2)")};margin:0" />`);
     case "spacer":
       return `<div style="height:${b.height ?? 40}px"></div>`;
     default:
