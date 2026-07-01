@@ -8,7 +8,7 @@ export type CmsPreset = Omit<CmsBlock, "id">;
 export const BLOCK_CATEGORIES: { label: string; types: CmsBlockType[] }[] = [
   { label: "Text", types: ["heading", "subheading", "paragraph", "richtext", "list", "quote", "scripture"] },
   { label: "Media", types: ["image", "video", "audio", "gallery", "embed"] },
-  { label: "Layout", types: ["hero", "cta", "cardgrid", "statgrid", "divider", "spacer"] },
+  { label: "Layout", types: ["row", "hero", "cta", "cardgrid", "statgrid", "divider", "spacer"] },
   { label: "Interactive", types: ["accordion", "form", "alert", "resource", "button"] },
   { label: "Advanced", types: ["html"] },
 ];
@@ -91,6 +91,22 @@ export const BLOCK_PRESETS: { name: string; description: string; blocks: CmsPres
     description: "Downloadable file callout.",
     blocks: [
       { type: "resource", role: "PDF · 2.4 MB", text: "Stewardship starter guide", subtext: "A printable worksheet to begin your plan.", label: "Download", url: "#", padTop: 32, padBottom: 32 },
+    ],
+  },
+  {
+    name: "Two columns",
+    description: "A 2-column row — add any blocks into each column.",
+    blocks: [
+      { type: "row", gap: 28, valign: "stretch", stackMobile: true, padTop: 32, padBottom: 32, cols: [
+        { id: "c1", blocks: [
+          { id: "l1", type: "subheading", align: "left", text: "Left column", padTop: 4, padBottom: 8 },
+          { id: "l2", type: "paragraph", align: "left", text: "Add content to this column — text, an image, a button, or anything else.", padTop: 0, padBottom: 4 },
+        ] },
+        { id: "c2", blocks: [
+          { id: "r1", type: "subheading", align: "left", text: "Right column", padTop: 4, padBottom: 8 },
+          { id: "r2", type: "paragraph", align: "left", text: "Columns stack on mobile automatically. Set widths and gap in Row settings.", padTop: 0, padBottom: 4 },
+        ] },
+      ] },
     ],
   },
   {

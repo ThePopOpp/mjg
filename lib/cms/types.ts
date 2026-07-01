@@ -25,7 +25,10 @@ export type CmsBlockType =
   | "heading" | "subheading" | "paragraph" | "richtext" | "image" | "button" | "divider" | "spacer"
   | "cta" | "quote" | "cardgrid" | "accordion" | "video" | "html"
   | "hero" | "alert" | "list" | "statgrid" | "gallery" | "embed" | "scripture" | "resource" | "form"
-  | "audio" | "icon";
+  | "audio" | "icon" | "row";
+
+// A column inside a "row" block. Holds its own ordered list of nested blocks.
+export type CmsColumn = { id: string; span?: number; blocks: CmsBlock[] };
 
 export type CmsBlockItem = {
   title?: string; body?: string; imageUrl?: string; url?: string; q?: string; a?: string;
@@ -52,6 +55,10 @@ export type CmsBlock = {
   items?: CmsBlockItem[]; // cardgrid / accordion / list / statgrid / gallery / form fields
   columns?: number;     // grid columns (2-4)
   gap?: number;         // grid gap (px)
+  // layout container (row)
+  cols?: CmsColumn[];   // row: ordered columns, each with its own nested blocks
+  valign?: "top" | "center" | "bottom" | "stretch"; // row: column vertical alignment
+  stackMobile?: boolean; // row: stack columns on narrow screens (default true)
   html?: string;        // html / embed code
   aspect?: string;      // video aspect ("16/9" | "4/3" | "1/1")
   variant?: string;     // alert kind (info|success|warning|error) / button style / list style
@@ -122,7 +129,90 @@ export const CMS_BLOCK_LABELS: Record<CmsBlockType, string> = {
   hero: "Hero", alert: "Alert / Notice", list: "List / Checklist", statgrid: "Stats",
   gallery: "Gallery", embed: "Embed", scripture: "Scripture", resource: "Resource / Download", form: "Form",
   audio: "Audio player", icon: "Icon",
+  row: "Row / Columns",
 };
+
+// ── Block-tree helpers (blocks may nest inside row → column → blocks) ──
+// All are pure: they return new arrays and recurse through row columns.
+
+export function findBlock(blocks: CmsBlock[], id: string): CmsBlock | undefined {
+  for (const b of blocks) {
+    if (b.id === id) return b;
+    if (b.cols) for (const c of b.cols) { const f = findBlock(c.blocks, id); if (f) return f; }
+  }
+  return undefined;
+}
+
+export function patchBlock(blocks: CmsBlock[], id: string, patch: Partial<CmsBlock>): CmsBlock[] {
+  return blocks.map((b) => {
+    if (b.id === id) return { ...b, ...patch };
+    if (b.cols) return { ...b, cols: b.cols.map((c) => ({ ...c, blocks: patchBlock(c.blocks, id, patch) })) };
+    return b;
+  });
+}
+
+export function dropBlock(blocks: CmsBlock[], id: string): CmsBlock[] {
+  return blocks.filter((b) => b.id !== id).map((b) =>
+    b.cols ? { ...b, cols: b.cols.map((c) => ({ ...c, blocks: dropBlock(c.blocks, id) })) } : b);
+}
+
+// Deep-clone a block (fresh ids for it and any nested column blocks).
+export function cloneBlock(b: CmsBlock, newId: () => string): CmsBlock {
+  const c: CmsBlock = { ...b, id: newId() };
+  if (b.cols) c.cols = b.cols.map((col) => ({ id: newId(), span: col.span, blocks: col.blocks.map((x) => cloneBlock(x, newId)) }));
+  return c;
+}
+
+// Duplicate a block in place (right after itself, at whatever depth it lives).
+export function duplicateBlock(blocks: CmsBlock[], id: string, newId: () => string): { blocks: CmsBlock[]; newId?: string } {
+  let created: string | undefined;
+  const walk = (arr: CmsBlock[]): CmsBlock[] => {
+    const out: CmsBlock[] = [];
+    for (const b of arr) {
+      out.push(b.cols ? { ...b, cols: b.cols.map((c) => ({ ...c, blocks: walk(c.blocks) })) } : b);
+      if (b.id === id) { const clone = cloneBlock(b, newId); created = clone.id; out.push(clone); }
+    }
+    return out;
+  };
+  return { blocks: walk(blocks), newId: created };
+}
+
+// Append a block to a specific column.
+export function insertInColumn(blocks: CmsBlock[], rowId: string, colId: string, block: CmsBlock): CmsBlock[] {
+  return blocks.map((b) => {
+    if (b.cols) {
+      const cols = b.cols.map((c) =>
+        b.id === rowId && c.id === colId ? { ...c, blocks: [...c.blocks, block] } : { ...c, blocks: insertInColumn(c.blocks, rowId, colId, block) });
+      return { ...b, cols };
+    }
+    return b;
+  });
+}
+
+// Move a block up/down within its own sibling list (top-level or inside a column).
+export function moveBlock(blocks: CmsBlock[], id: string, dir: -1 | 1): CmsBlock[] {
+  const i = blocks.findIndex((b) => b.id === id);
+  if (i >= 0) {
+    const j = i + dir;
+    if (j < 0 || j >= blocks.length) return blocks;
+    const n = [...blocks]; [n[i], n[j]] = [n[j], n[i]]; return n;
+  }
+  return blocks.map((b) => (b.cols ? { ...b, cols: b.cols.map((c) => ({ ...c, blocks: moveBlock(c.blocks, id, dir) })) } : b));
+}
+
+// Resize a row's column list to `count`, preserving existing blocks (extras fold
+// into the last kept column). Needs a fresh-id generator for any new columns.
+export function setColumnCount(row: CmsBlock, count: number, newId: () => string): CmsColumn[] {
+  const cur = row.cols ?? [];
+  if (count >= cur.length) {
+    const extra = Array.from({ length: count - cur.length }, () => ({ id: newId(), blocks: [] as CmsBlock[] }));
+    return [...cur, ...extra];
+  }
+  const kept = cur.slice(0, count);
+  const folded = cur.slice(count).flatMap((c) => c.blocks);
+  const last = kept[kept.length - 1];
+  return kept.map((c) => (c.id === last.id ? { ...c, blocks: [...c.blocks, ...folded] } : c));
+}
 
 export const CMS_PAGE_TYPES: { value: CmsPageType; label: string }[] = [
   { value: "page", label: "Page" },

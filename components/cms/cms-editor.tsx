@@ -6,7 +6,7 @@ import {
   AlignCenter, AlignLeft, AlignRight, ArrowLeft, Bold, Bot, Check, ChevronsUpDown, Code, Columns2, Copy,
   CaseUpper, Download, ExternalLink, Eye, EyeOff, GripVertical, Heading1, Heading2, Image as ImageIcon,
   Italic, LayoutGrid, Layers, ListChecks, ListMusic, Loader2, Megaphone, Menu, Minus, MousePointerClick, Monitor,
-  Music, Pause, Play, Plus, Quote as QuoteIcon, RotateCcw, RotateCw, Save, Search, Settings2, Shapes,
+  Music, Pause, Play, Plus, Quote as QuoteIcon, RotateCcw, RotateCw, Rows3, Save, Search, Settings2, Shapes,
   Smartphone, Sparkles, Square, Star, Tablet, Trash2, Type, Upload, Video, Volume2, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,10 @@ import { AgentChat } from "@/components/ai-agent/agent-chat";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { mdToHtml, sanitizeHtml, typoStyle, videoEmbedSrc } from "@/lib/cms/md";
-import { blockPad, CMS_BLOCK_LABELS, type CmsBlock, type CmsBlockItem, type CmsBlockType } from "@/lib/cms/types";
+import {
+  blockPad, CMS_BLOCK_LABELS, cloneBlock, dropBlock, duplicateBlock, findBlock, insertInColumn,
+  moveBlock, patchBlock, setColumnCount, type CmsBlock, type CmsBlockItem, type CmsBlockType, type CmsColumn,
+} from "@/lib/cms/types";
 import { FONT_OPTIONS, fontWeights, fontHasItalic, CMS_FONTS, fontHref } from "@/lib/cms/fonts";
 import { BLOCK_CATEGORIES, BLOCK_PRESETS, type CmsPreset } from "@/lib/cms/presets";
 import { CMS_ICONS, ICON_STYLES, wrapIcon, DEFAULT_ICON, ICON_BODIES_URL, type IconBodies, type IconStyle } from "@/lib/cms/icons";
@@ -59,7 +62,7 @@ const ICONS: Partial<Record<CmsBlockType, React.ElementType>> = {
   scripture: Star, image: ImageIcon, video: Video, gallery: LayoutGrid, embed: Code, hero: Layers, cta: Megaphone,
   cardgrid: LayoutGrid, statgrid: Columns2, divider: Minus, spacer: Square, accordion: ChevronsUpDown,
   form: ListChecks, alert: Sparkles, resource: Download, button: MousePointerClick, html: Code,
-  audio: Music, icon: Shapes,
+  audio: Music, icon: Shapes, row: Rows3,
 };
 
 function defaultBlock(type: CmsBlockType): CmsBlock {
@@ -90,6 +93,7 @@ function defaultBlock(type: CmsBlockType): CmsBlock {
     case "html": return { ...base, padTop: 16, padBottom: 16, html: "<!-- Your custom HTML here -->" };
     case "divider": return { ...base, padTop: 8, padBottom: 8 };
     case "spacer": return { id: uid(), type, height: 40 };
+    case "row": return { ...base, padTop: 24, padBottom: 24, gap: 24, valign: "stretch", stackMobile: true, cols: [{ id: uid(), blocks: [] }, { id: uid(), blocks: [] }] };
     default: return base;
   }
 }
@@ -142,24 +146,60 @@ export function CmsEditor({ page, initialBlocks }: {
   const canvasRef = React.useRef<HTMLDivElement>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  const selected = blocks.find((b) => b.id === selectedId) ?? null;
+  const selected = findBlock(blocks, selectedId ?? "") ?? null;
   const mutate = (fn: (prev: CmsBlock[]) => CmsBlock[]) => { setBlocks(fn); setDirty(true); };
-  const update = (id: string, patch: Partial<CmsBlock>) => mutate((prev) => prev.map((b) => (b.id === id ? { ...b, ...patch } : b)));
+  const update = (id: string, patch: Partial<CmsBlock>) => mutate((prev) => patchBlock(prev, id, patch));
   const add = (type: CmsBlockType) => { const b = defaultBlock(type); mutate((prev) => [...prev, b]); setSelectedId(b.id); };
   const addIcon = (iconId: string) => { const b = { ...defaultBlock("icon"), icon: iconId }; mutate((prev) => [...prev, b]); setSelectedId(b.id); };
-  const remove = (id: string) => mutate((prev) => prev.filter((b) => b.id !== id));
-  const duplicate = (b: CmsBlock) => { const c = { ...b, id: uid() }; mutate((prev) => { const i = prev.findIndex((x) => x.id === b.id); const n = [...prev]; n.splice(i + 1, 0, c); return n; }); setSelectedId(c.id); };
+  const addToColumn = (rowId: string, colId: string, type: CmsBlockType) => { const b = defaultBlock(type); mutate((prev) => insertInColumn(prev, rowId, colId, b)); setSelectedId(b.id); };
+  const remove = (id: string) => { mutate((prev) => dropBlock(prev, id)); setSelectedId((cur) => (cur === id ? null : cur)); };
+  const moveNested = (id: string, dir: -1 | 1) => mutate((prev) => moveBlock(prev, id, dir));
+  const duplicate = (b: CmsBlock) => {
+    let created: string | undefined;
+    mutate((prev) => { const r = duplicateBlock(prev, b.id, uid); created = r.newId; return r.blocks; });
+    if (created) setSelectedId(created);
+  };
   const insertBlocks = (presets: (CmsPreset | CmsBlock)[]) => {
-    const withIds = presets.map((p) => ({ ...p, id: uid() } as CmsBlock));
+    const withIds = presets.map((p) => cloneBlock(p as CmsBlock, uid));
     mutate((prev) => [...prev, ...withIds]);
     setSelectedId(withIds[0]?.id ?? null);
   };
 
+  // Drag-reorder is top-level only (nested blocks reorder via the row inspector).
   function onDrop(targetId: string) {
     const from = dragId.current; dragId.current = null;
     if (!from || from === targetId) return;
     mutate((prev) => { const arr = [...prev]; const fi = arr.findIndex((b) => b.id === from), ti = arr.findIndex((b) => b.id === targetId); if (fi < 0 || ti < 0) return prev; const [m] = arr.splice(fi, 1); arr.splice(ti, 0, m); return arr; });
   }
+
+  // Recursive "Page blocks" tree (rows expand to show columns → nested blocks).
+  const renderTree = (list: CmsBlock[], depth: number): React.ReactNode =>
+    list.map((b) => (
+      <div key={b.id}>
+        <div draggable={depth === 0} onDragStart={depth === 0 ? () => (dragId.current = b.id) : undefined}
+          onDragOver={depth === 0 ? (e) => e.preventDefault() : undefined} onDrop={depth === 0 ? () => onDrop(b.id) : undefined}
+          onClick={(e) => { e.stopPropagation(); setSelectedId(b.id); }} style={{ marginLeft: depth * 10 }}
+          className={cn("group flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs", selectedId === b.id ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted", b.hidden && "opacity-50")}>
+          {depth === 0 ? <GripVertical className="h-3.5 w-3.5 shrink-0 cursor-grab text-muted-foreground" /> : (b.type === "row" ? <Rows3 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : <span className="w-3.5 shrink-0" />)}
+          <span className="min-w-0 flex-1 truncate">{CMS_BLOCK_LABELS[b.type]}{b.text ? <span className="text-muted-foreground"> · {b.text.slice(0, 16)}</span> : null}</span>
+          <button onClick={(e) => { e.stopPropagation(); update(b.id, { hidden: !b.hidden }); }} className="text-muted-foreground opacity-0 hover:text-foreground group-hover:opacity-100" title={b.hidden ? "Show" : "Hide"}>{b.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}</button>
+          <button onClick={(e) => { e.stopPropagation(); duplicate(b); }} className="text-muted-foreground opacity-0 hover:text-primary group-hover:opacity-100" title="Duplicate"><Copy className="h-3.5 w-3.5" /></button>
+          <button onClick={(e) => { e.stopPropagation(); remove(b.id); }} className="text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100" title="Delete"><Trash2 className="h-3.5 w-3.5" /></button>
+        </div>
+        {b.type === "row" && b.cols && (
+          <div className="mt-1 space-y-1">
+            {b.cols.map((c, ci) => (
+              <div key={c.id}>
+                <div style={{ marginLeft: (depth + 1) * 10 }} className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/80">Column {ci + 1}</div>
+                {c.blocks.length === 0
+                  ? <div style={{ marginLeft: (depth + 2) * 10 }} className="px-2 py-1 text-[10px] italic text-muted-foreground/60">empty — add blocks in Row settings</div>
+                  : renderTree(c.blocks, depth + 2)}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    ));
 
   // Resizable left panel.
   function startResize(e: React.MouseEvent) {
@@ -330,17 +370,7 @@ export function CmsEditor({ page, initialBlocks }: {
             <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Page blocks</div>
             {blocks.length === 0 && <p className="px-2 py-2 text-xs text-muted-foreground">No blocks yet.</p>}
             <div className="space-y-1">
-              {blocks.map((b) => (
-                <div key={b.id} draggable onDragStart={() => (dragId.current = b.id)} onDragOver={(e) => e.preventDefault()} onDrop={() => onDrop(b.id)}
-                  onClick={() => setSelectedId(b.id)}
-                  className={cn("group flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs", selectedId === b.id ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted", b.hidden && "opacity-50")}>
-                  <GripVertical className="h-3.5 w-3.5 shrink-0 cursor-grab text-muted-foreground" />
-                  <span className="min-w-0 flex-1 truncate">{CMS_BLOCK_LABELS[b.type]}{b.text ? <span className="text-muted-foreground"> · {b.text.slice(0, 16)}</span> : null}</span>
-                  <button onClick={(e) => { e.stopPropagation(); update(b.id, { hidden: !b.hidden }); }} className="text-muted-foreground opacity-0 hover:text-foreground group-hover:opacity-100" title={b.hidden ? "Show" : "Hide"}>{b.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}</button>
-                  <button onClick={(e) => { e.stopPropagation(); duplicate(b); }} className="text-muted-foreground opacity-0 hover:text-primary group-hover:opacity-100" title="Duplicate"><Copy className="h-3.5 w-3.5" /></button>
-                  <button onClick={(e) => { e.stopPropagation(); remove(b.id); }} className="text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100" title="Delete"><Trash2 className="h-3.5 w-3.5" /></button>
-                </div>
-              ))}
+              {renderTree(blocks, 0)}
             </div>
           </div>
         </div>
@@ -366,7 +396,7 @@ export function CmsEditor({ page, initialBlocks }: {
               {blocks.length === 0 ? (
                 <div style={{ padding: "80px 20px", textAlign: "center", color: "var(--muted)" }}>This page has no content blocks yet. Add one from the left.</div>
               ) : (
-                blocks.map((b) => <BlockView key={b.id} block={b} selected={b.id === selectedId} onSelect={() => setSelectedId(b.id)} />)
+                blocks.map((b) => <BlockView key={b.id} block={b} selectedId={selectedId} onSelect={setSelectedId} />)
               )}
             </div>
             {selected && (
@@ -383,7 +413,8 @@ export function CmsEditor({ page, initialBlocks }: {
             {selected && <button onClick={saveAsTemplate} className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary" title="Save as reusable component"><Star className="h-3 w-3" /> Save</button>}
           </div>
           {!selected ? <p className="text-xs text-muted-foreground">Select a block to edit it.</p> : (
-            <Inspector block={selected} update={(p) => update(selected.id, p)} upload={pickUpload} />
+            <Inspector block={selected} update={(p) => update(selected.id, p)} upload={pickUpload}
+              onAddToColumn={addToColumn} onMove={moveNested} onRemove={remove} onSelect={setSelectedId} />
           )}
         </div>
       </div>
@@ -446,12 +477,12 @@ function overlayRgba(b: CmsBlock): string {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }
 
-function sectionStyle(b: CmsBlock): React.CSSProperties {
+function sectionStyle(b: CmsBlock, nested = false): React.CSSProperties {
   return {
     background: b.bgColor || undefined,
     backgroundImage: b.bgImage ? `url('${b.bgImage}')` : undefined, backgroundSize: b.bgImage ? "cover" : undefined, backgroundPosition: b.bgImage ? "center" : undefined,
     paddingTop: blockPad(b, "top"), paddingBottom: blockPad(b, "bottom"),
-    paddingLeft: b.padX ?? 20, paddingRight: b.padX ?? 20,
+    paddingLeft: b.padX ?? (nested ? 0 : 20), paddingRight: b.padX ?? (nested ? 0 : 20),
     marginTop: b.marginTop || undefined, marginBottom: b.marginBottom || undefined,
     minHeight: b.minHeight || undefined,
     border: b.borderWidth ? `${b.borderWidth}px ${b.borderStyle || "solid"} ${b.borderColor || "#e4ded2"}` : undefined,
@@ -460,19 +491,21 @@ function sectionStyle(b: CmsBlock): React.CSSProperties {
     cursor: "pointer",
   };
 }
-function innerStyle(b: CmsBlock): React.CSSProperties {
+function innerStyle(b: CmsBlock, nested = false): React.CSSProperties {
   return {
-    width: "min(1180px, calc(100% - 40px))", margin: "0 auto",
+    width: nested ? "100%" : "min(1180px, calc(100% - 40px))", margin: nested ? undefined : "0 auto",
     maxWidth: b.maxWidth && b.maxWidth > 0 ? b.maxWidth : undefined,
     textAlign: b.align, color: b.textColor || undefined,
   };
 }
 
-function BlockView({ block: b, selected, onSelect }: { block: CmsBlock; selected: boolean; onSelect: () => void }) {
+function BlockView({ block: b, selectedId, onSelect, nested = false }: { block: CmsBlock; selectedId: string | null; onSelect: (id: string) => void; nested?: boolean }) {
   if (b.hidden) return null;
+  const selected = b.id === selectedId;
+  const pick = (e: React.MouseEvent) => { e.stopPropagation(); onSelect(b.id); };
   const wrap = (children: React.ReactNode) => (
-    <section data-cms-block={b.id} onClick={onSelect} style={{ ...sectionStyle(b), outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2 }}>
-      <div style={innerStyle(b)}>{children}</div>
+    <section data-cms-block={b.id} onClick={pick} style={{ ...sectionStyle(b, nested), outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2 }}>
+      <div style={innerStyle(b, nested)}>{children}</div>
     </section>
   );
   const fs = b.fontSize ? `${b.fontSize}px` : undefined;
@@ -495,7 +528,7 @@ function BlockView({ block: b, selected, onSelect }: { block: CmsBlock; selected
       : <span style={{ display: "inline-block", padding: "28px 40px", border: "1px dashed #c9b98f", borderRadius: 8, color: "#8a7b52", fontSize: 13 }}>Add an image URL →</span>);
     case "button": return wrap(<span style={{ display: "inline-block", background: b.buttonColor || "var(--green)", color: b.textColor || "#fff", padding: "14px 26px", borderRadius: b.radius ?? 6, fontSize: fs || 16, fontWeight: 700 }}>{b.label || "Learn more"}</span>);
     case "divider": return wrap(<hr style={{ border: "none", borderTop: `${b.borderWidth ?? 1}px ${b.borderStyle || "solid"} ${b.borderColor || b.textColor || "var(--line)"}`, margin: 0 }} />);
-    case "spacer": return <div data-cms-block={b.id} onClick={onSelect} style={{ height: b.height ?? 40, cursor: "pointer", outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2 }} />;
+    case "spacer": return <div data-cms-block={b.id} onClick={pick} style={{ height: b.height ?? 40, cursor: "pointer", outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2 }} />;
     case "cta":
       return wrap(<>{b.eyebrow && <div style={{ color: "var(--gold)", fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase", fontSize: 13, marginBottom: 12 }}>{b.eyebrow}</div>}<h2 style={{ fontFamily: "var(--font-display)", fontSize: fs || "clamp(28px,4vw,44px)", lineHeight: 1.1, margin: "0 0 12px", ...T }}>{b.text}</h2>{b.subtext && <p style={{ fontSize: 18, lineHeight: 1.6, color: "var(--muted)", margin: "0 0 20px" }}>{b.subtext}</p>}<div>{btn(b.label, true)}{btn(b.label2, false)}</div></>);
     case "hero": {
@@ -504,7 +537,7 @@ function BlockView({ block: b, selected, onSelect }: { block: CmsBlock; selected
         ? { backgroundImage: `linear-gradient(${overlayRgba(b)},${overlayRgba(b)}),url('${b.bgImage}')`, backgroundSize: "cover", backgroundPosition: "center" }
         : { background: b.bgColor || "var(--green)" };
       return (
-        <section data-cms-block={b.id} onClick={onSelect} style={{ ...bgLayer, padding: `${blockPad(b, "top")}px 20px ${blockPad(b, "bottom")}px`, minHeight: b.minHeight ?? 420, display: "flex", alignItems: "center", marginTop: b.marginTop || undefined, marginBottom: b.marginBottom || undefined, outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2, cursor: "pointer" }}>
+        <section data-cms-block={b.id} onClick={pick} style={{ ...bgLayer, padding: `${blockPad(b, "top")}px 20px ${blockPad(b, "bottom")}px`, minHeight: b.minHeight ?? 420, display: "flex", alignItems: "center", marginTop: b.marginTop || undefined, marginBottom: b.marginBottom || undefined, outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2, cursor: "pointer" }}>
           <div style={{ width: "min(1180px, calc(100% - 40px))", margin: "0 auto", color: fg, textAlign: b.align || "center", maxWidth: b.maxWidth && b.maxWidth > 0 ? b.maxWidth : undefined }}>
             {b.eyebrow && <div style={{ fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase", fontSize: 13, marginBottom: 16, opacity: 0.9 }}>{b.eyebrow}</div>}
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: fs || "clamp(38px,6vw,72px)", lineHeight: 1.03, margin: "0 0 16px", ...T }}>{b.text}</h1>
@@ -595,6 +628,22 @@ function BlockView({ block: b, selected, onSelect }: { block: CmsBlock; selected
         {b.text && <div style={{ fontFamily: "var(--font-display)", fontSize: b.fontSize || 20, marginTop: 14, ...T }}>{b.text}</div>}
         {b.subtext && <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--muted)", margin: "6px 0 0" }}>{b.subtext}</p>}
       </div>);
+    }
+    case "row": {
+      const cols = b.cols ?? [];
+      const tmpl = cols.map((c) => (c.span && c.span > 0 ? `${c.span}fr` : "1fr")).join(" ");
+      const valign = b.valign === "center" ? "center" : b.valign === "bottom" ? "end" : b.valign === "top" ? "start" : "stretch";
+      return wrap(
+        <div style={{ display: "grid", gridTemplateColumns: tmpl || "1fr", gap: b.gap ?? 24, alignItems: valign }}>
+          {cols.map((c) => (
+            <div key={c.id} style={{ minWidth: 0 }} onClick={pick}>
+              {c.blocks.length === 0
+                ? <div style={{ minHeight: 60, border: "1px dashed #c9b98f", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#8a7b52", fontSize: 12, padding: 12, textAlign: "center" }}>Empty column · add blocks in Row settings</div>
+                : c.blocks.map((child) => <BlockView key={child.id} block={child} selectedId={selectedId} onSelect={onSelect} nested />)}
+            </div>
+          ))}
+        </div>,
+      );
     }
     default: return null;
   }
@@ -854,7 +903,62 @@ function EffectsFields({ block, update, upload }: { block: CmsBlock; update: (p:
 }
 
 // ── Right inspector (content + full styling) ──────────────────────────────────
-function Inspector({ block, update, upload }: { block: CmsBlock; update: (p: Partial<CmsBlock>) => void; upload: (onDone: (url: string) => void, accept?: string) => void }) {
+// Block types that can be inserted into a row column (everything except a row).
+const ROW_ADD_TYPES: CmsBlockType[] = [
+  "heading", "subheading", "paragraph", "richtext", "list", "quote", "scripture",
+  "image", "video", "audio", "icon", "gallery", "button", "cta", "cardgrid", "statgrid",
+  "alert", "accordion", "form", "resource", "divider", "spacer", "embed", "html",
+];
+
+// Row / Columns settings — column count, gap, alignment, and per-column contents.
+function RowInspector({ block, update, onAddToColumn, onMove, onRemove, onSelect }: {
+  block: CmsBlock; update: (p: Partial<CmsBlock>) => void;
+  onAddToColumn?: (rowId: string, colId: string, type: CmsBlockType) => void;
+  onMove?: (id: string, dir: -1 | 1) => void; onRemove?: (id: string) => void; onSelect?: (id: string) => void;
+}) {
+  const cols = block.cols ?? [];
+  const setSpan = (colId: string, span: number | undefined) => update({ cols: cols.map((c) => (c.id === colId ? { ...c, span } : c)) });
+  return (
+    <div className="space-y-2 rounded-lg border border-border p-2">
+      <div className="grid grid-cols-2 gap-2">
+        <div><L>Columns</L><FieldSelect value={String(cols.length || 2)} onChange={(v) => update({ cols: setColumnCount(block, Number(v), uid) })} options={[{ value: "1", label: "1" }, { value: "2", label: "2" }, { value: "3", label: "3" }, { value: "4", label: "4" }]} className="h-8" /></div>
+        <Num label="Gap (px)" value={block.gap} onChange={(v) => update({ gap: v })} placeholder="24" />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div><L>Vertical align</L><FieldSelect value={block.valign ?? "stretch"} onChange={(v) => update({ valign: v as CmsBlock["valign"] })} options={[{ value: "stretch", label: "Stretch" }, { value: "top", label: "Top" }, { value: "center", label: "Center" }, { value: "bottom", label: "Bottom" }]} className="h-8" /></div>
+        <label className="flex items-end gap-1.5 pb-1.5 text-[11px] text-muted-foreground"><input type="checkbox" checked={block.stackMobile !== false} onChange={(e) => update({ stackMobile: e.target.checked })} /> Stack on mobile</label>
+      </div>
+      {cols.map((c, ci) => (
+        <div key={c.id} className="rounded-lg border border-border/70 bg-muted/30 p-2">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-muted-foreground">Column {ci + 1}</span>
+            <div className="flex items-center gap-1"><span className="text-[10px] text-muted-foreground">width</span>
+              <Input type="number" value={c.span ?? ""} onChange={(e) => setSpan(c.id, e.target.value === "" ? undefined : Number(e.target.value))} placeholder="1" className="h-7 w-12" /></div>
+          </div>
+          <div className="space-y-1">
+            {c.blocks.length === 0 && <p className="px-1 text-[10px] italic text-muted-foreground/70">No blocks yet.</p>}
+            {c.blocks.map((child, bi) => (
+              <div key={child.id} className="flex items-center gap-1 rounded-md border border-border bg-background px-1.5 py-1 text-[11px]">
+                <button className="min-w-0 flex-1 truncate text-left hover:text-primary" onClick={() => onSelect?.(child.id)}>{CMS_BLOCK_LABELS[child.type]}{child.text ? <span className="text-muted-foreground"> · {child.text.slice(0, 14)}</span> : null}</button>
+                <button className="text-muted-foreground hover:text-foreground disabled:opacity-30" disabled={bi === 0} onClick={() => onMove?.(child.id, -1)} title="Move up">↑</button>
+                <button className="text-muted-foreground hover:text-foreground disabled:opacity-30" disabled={bi === c.blocks.length - 1} onClick={() => onMove?.(child.id, 1)} title="Move down">↓</button>
+                <button className="text-muted-foreground hover:text-destructive" onClick={() => onRemove?.(child.id)} title="Delete"><Trash2 className="h-3 w-3" /></button>
+              </div>
+            ))}
+          </div>
+          <FieldSelect value="" onChange={(v) => v && onAddToColumn?.(block.id, c.id, v as CmsBlockType)} options={[{ value: "", label: "+ Add block…" }, ...ROW_ADD_TYPES.map((t) => ({ value: t, label: CMS_BLOCK_LABELS[t] }))]} className="mt-1.5 h-8" />
+        </div>
+      ))}
+      <p className="text-[10px] text-muted-foreground">Add blocks into each column, then click a block to style it.</p>
+    </div>
+  );
+}
+
+function Inspector({ block, update, upload, onAddToColumn, onMove, onRemove, onSelect }: {
+  block: CmsBlock; update: (p: Partial<CmsBlock>) => void; upload: (onDone: (url: string) => void, accept?: string) => void;
+  onAddToColumn?: (rowId: string, colId: string, type: CmsBlockType) => void; onMove?: (id: string, dir: -1 | 1) => void;
+  onRemove?: (id: string) => void; onSelect?: (id: string) => void;
+}) {
   const isText = block.type === "heading" || block.type === "subheading" || block.type === "paragraph" || block.type === "richtext";
   const setItem = (i: number, patch: Partial<CmsBlockItem>) => update({ items: (block.items ?? []).map((it, k) => (k === i ? { ...it, ...patch } : it)) });
   const addItem = (blank: CmsBlockItem) => update({ items: [...(block.items ?? []), blank] });
@@ -863,6 +967,10 @@ function Inspector({ block, update, upload }: { block: CmsBlock; update: (p: Par
   return (
     <div className="space-y-3">
       <div className="text-xs font-semibold capitalize">{CMS_BLOCK_LABELS[block.type]}</div>
+
+      {block.type === "row" && (
+        <RowInspector block={block} update={update} onAddToColumn={onAddToColumn} onMove={onMove} onRemove={onRemove} onSelect={onSelect} />
+      )}
 
       {isText && (
         <div>

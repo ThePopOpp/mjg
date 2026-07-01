@@ -30,23 +30,41 @@ function ts(b: CmsBlock): string {
   return css ? `;${css}` : "";
 }
 
+// Nesting depth while rendering row columns — nested blocks fill their column
+// (no 1180px centering / default 20px gutter) so they don't look doubly inset.
+let _nestDepth = 0;
+
 function band(b: CmsBlock, innerHtml: string): string {
+  const nested = _nestDepth > 0;
   const sec: string[] = [];
   if (b.bgColor) sec.push(`background:${esc(b.bgColor)}`);
   if (b.bgImage) sec.push(`background-image:url('${esc(b.bgImage)}')`, "background-size:cover", "background-position:center");
-  sec.push(`padding:${blockPad(b, "top")}px ${b.padX ?? 20}px ${blockPad(b, "bottom")}px`);
+  sec.push(`padding:${blockPad(b, "top")}px ${b.padX ?? (nested ? 0 : 20)}px ${blockPad(b, "bottom")}px`);
   if (b.marginTop) sec.push(`margin-top:${b.marginTop}px`);
   if (b.marginBottom) sec.push(`margin-bottom:${b.marginBottom}px`);
   if (b.minHeight) sec.push(`min-height:${b.minHeight}px`, "display:flex", "align-items:center");
   if (b.borderWidth) sec.push(`border:${b.borderWidth}px ${b.borderStyle || "solid"} ${esc(b.borderColor || "#e4ded2")}`);
   if (b.boxShadow) sec.push(`box-shadow:${esc(b.boxShadow)}`);
   if ((b.borderWidth || b.boxShadow) && b.radius) sec.push(`border-radius:${b.radius}px`);
-  const inner: string[] = ["width:min(1180px,calc(100% - 40px))", "margin:0 auto"];
+  const inner: string[] = nested ? ["width:100%"] : ["width:min(1180px,calc(100% - 40px))", "margin:0 auto"];
   if (b.minHeight) inner.push("width:100%");
   if (b.maxWidth && b.maxWidth > 0) inner.push(`max-width:${b.maxWidth}px`);
   if (b.align) inner.push(`text-align:${b.align}`);
   if (b.textColor) inner.push(`color:${esc(b.textColor)}`);
   return `<section style="${sec.join(";")}"><div style="${inner.join(";")}">${innerHtml}</div></section>`;
+}
+
+function rowHtml(b: CmsBlock): string {
+  const cols = b.cols ?? [];
+  if (!cols.length) return "";
+  const rid = "row-" + (String(b.id || "").replace(/[^a-zA-Z0-9_-]/g, "") || "x");
+  const tmpl = cols.map((c) => (c.span && c.span > 0 ? `${c.span}fr` : "1fr")).join(" ");
+  const valign = b.valign === "center" ? "center" : b.valign === "bottom" ? "end" : b.valign === "top" ? "start" : "stretch";
+  _nestDepth++;
+  const colsHtml = cols.map((c) => `<div style="min-width:0">${c.blocks.map((x) => renderCmsBlock(x)).join("")}</div>`).join("");
+  _nestDepth--;
+  const stackCss = b.stackMobile === false ? "" : `<style>@media(max-width:640px){#${rid}{grid-template-columns:1fr !important}}</style>`;
+  return `${stackCss}<div id="${rid}" style="display:grid;grid-template-columns:${tmpl};gap:${b.gap ?? 24}px;align-items:${valign}">${colsHtml}</div>`;
 }
 
 const fs = (b: CmsBlock, fallback: string) => (b.fontSize ? `font-size:${b.fontSize}px` : `font-size:${fallback}`);
@@ -168,6 +186,8 @@ export function renderCmsBlock(b: CmsBlock): string {
       return band(b, audioPlayerHtml(b));
     case "icon":
       return band(b, iconBlockHtml(b));
+    case "row":
+      return band(b, rowHtml(b));
     default:
       return "";
   }
