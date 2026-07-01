@@ -19,8 +19,9 @@ import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { mdToHtml, sanitizeHtml, typoStyle, videoEmbedSrc } from "@/lib/cms/md";
 import {
-  blockPad, CMS_BLOCK_LABELS, cloneBlock, dropBlock, duplicateBlock, findBlock, insertInColumn,
-  moveBlock, patchBlock, setColumnCount, type CmsBlock, type CmsBlockItem, type CmsBlockType, type CmsColumn,
+  blockPad, CMS_BLOCK_LABELS, cloneBlock, containsId, dropBlock, duplicateBlock, extractBlock, findBlock,
+  insertInColumn, insertRelative, moveBlock, patchBlock, setColumnCount,
+  type CmsBlock, type CmsBlockItem, type CmsBlockType, type CmsColumn,
 } from "@/lib/cms/types";
 import { FONT_OPTIONS, fontWeights, fontHasItalic, CMS_FONTS, fontHref } from "@/lib/cms/fonts";
 import { BLOCK_CATEGORIES, BLOCK_PRESETS, type CmsPreset } from "@/lib/cms/presets";
@@ -126,6 +127,20 @@ function useEditorFonts() {
   }, []);
 }
 
+// Where a dragged block should land: relative to another block, or into a column.
+type DropTarget = { kind: "block"; id: string; pos: "before" | "after" } | { kind: "column"; rowId: string; colId: string };
+
+// Canvas drag-and-drop wiring passed down to BlockView (mirrors the tree DnD).
+type CanvasDnd = {
+  hint: DropTarget | null;
+  start: (id: string) => void;
+  overBlock: (e: React.DragEvent, id: string) => void;
+  dropBlock: (e: React.DragEvent, id: string) => void;
+  overCol: (e: React.DragEvent, rowId: string, colId: string) => void;
+  dropCol: (e: React.DragEvent, rowId: string, colId: string) => void;
+  end: () => void;
+};
+
 export function CmsEditor({ page, initialBlocks }: {
   page: { id: string; title: string; slug: string; status: string };
   initialBlocks: CmsBlock[];
@@ -143,6 +158,7 @@ export function CmsEditor({ page, initialBlocks }: {
   const [templates, setTemplates] = React.useState<{ id: string; name: string; content: CmsBlock[] }[]>([]);
   const [stewardOpen, setStewardOpen] = React.useState(false);
   const dragId = React.useRef<string | null>(null);
+  const [dropHint, setDropHint] = React.useState<DropTarget | null>(null);
   const canvasRef = React.useRef<HTMLDivElement>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
@@ -165,41 +181,85 @@ export function CmsEditor({ page, initialBlocks }: {
     setSelectedId(withIds[0]?.id ?? null);
   };
 
-  // Drag-reorder is top-level only (nested blocks reorder via the row inspector).
-  function onDrop(targetId: string) {
-    const from = dragId.current; dragId.current = null;
-    if (!from || from === targetId) return;
-    mutate((prev) => { const arr = [...prev]; const fi = arr.findIndex((b) => b.id === from), ti = arr.findIndex((b) => b.id === targetId); if (fi < 0 || ti < 0) return prev; const [m] = arr.splice(fi, 1); arr.splice(ti, 0, m); return arr; });
-  }
+  // Drag any block to anywhere: before/after another block, or into a column.
+  const moveTo = (drag: string, target: DropTarget) => {
+    if (target.kind === "block" && target.id === drag) return;
+    mutate((prev) => {
+      const dragged = findBlock(prev, drag);
+      if (!dragged) return prev;
+      if (target.kind === "block" && containsId(dragged, target.id)) return prev; // no drop into own subtree
+      if (target.kind === "column" && (dragged.id === target.rowId || containsId(dragged, target.rowId) || containsId(dragged, target.colId))) return prev;
+      const { block, blocks: pruned } = extractBlock(prev, drag);
+      if (!block) return prev;
+      return target.kind === "block"
+        ? insertRelative(pruned, target.id, block, target.pos)
+        : insertInColumn(pruned, target.rowId, target.colId, block);
+    });
+  };
+  const endDrag = () => { dragId.current = null; setDropHint(null); };
+  const dropOnBlock = (e: React.DragEvent, id: string) => {
+    e.preventDefault(); e.stopPropagation();
+    const r = e.currentTarget.getBoundingClientRect();
+    const pos = e.clientY - r.top < r.height / 2 ? "before" : "after";
+    if (dragId.current) moveTo(dragId.current, { kind: "block", id, pos });
+    endDrag();
+  };
+  const dropInColumn = (e: React.DragEvent, rowId: string, colId: string) => {
+    e.preventDefault(); e.stopPropagation();
+    if (dragId.current) moveTo(dragId.current, { kind: "column", rowId, colId });
+    endDrag();
+  };
+  const canvasDnd: CanvasDnd = {
+    hint: dropHint,
+    start: (id) => { dragId.current = id; },
+    overBlock: (e, id) => { e.preventDefault(); e.stopPropagation(); const r = e.currentTarget.getBoundingClientRect(); setDropHint({ kind: "block", id, pos: e.clientY - r.top < r.height / 2 ? "before" : "after" }); },
+    dropBlock: dropOnBlock,
+    overCol: (e, rowId, colId) => { e.preventDefault(); e.stopPropagation(); setDropHint({ kind: "column", rowId, colId }); },
+    dropCol: dropInColumn,
+    end: endDrag,
+  };
 
-  // Recursive "Page blocks" tree (rows expand to show columns → nested blocks).
+  // Recursive, drag-and-droppable "Page blocks" tree. Any block can be dragged
+  // before/after any other block, or into any column (including empty columns).
   const renderTree = (list: CmsBlock[], depth: number): React.ReactNode =>
-    list.map((b) => (
-      <div key={b.id}>
-        <div draggable={depth === 0} onDragStart={depth === 0 ? () => (dragId.current = b.id) : undefined}
-          onDragOver={depth === 0 ? (e) => e.preventDefault() : undefined} onDrop={depth === 0 ? () => onDrop(b.id) : undefined}
-          onClick={(e) => { e.stopPropagation(); setSelectedId(b.id); }} style={{ marginLeft: depth * 10 }}
-          className={cn("group flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs", selectedId === b.id ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted", b.hidden && "opacity-50")}>
-          {depth === 0 ? <GripVertical className="h-3.5 w-3.5 shrink-0 cursor-grab text-muted-foreground" /> : (b.type === "row" ? <Rows3 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : <span className="w-3.5 shrink-0" />)}
-          <span className="min-w-0 flex-1 truncate">{CMS_BLOCK_LABELS[b.type]}{b.text ? <span className="text-muted-foreground"> · {b.text.slice(0, 16)}</span> : null}</span>
-          <button onClick={(e) => { e.stopPropagation(); update(b.id, { hidden: !b.hidden }); }} className="text-muted-foreground opacity-0 hover:text-foreground group-hover:opacity-100" title={b.hidden ? "Show" : "Hide"}>{b.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}</button>
-          <button onClick={(e) => { e.stopPropagation(); duplicate(b); }} className="text-muted-foreground opacity-0 hover:text-primary group-hover:opacity-100" title="Duplicate"><Copy className="h-3.5 w-3.5" /></button>
-          <button onClick={(e) => { e.stopPropagation(); remove(b.id); }} className="text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100" title="Delete"><Trash2 className="h-3.5 w-3.5" /></button>
-        </div>
-        {b.type === "row" && b.cols && (
-          <div className="mt-1 space-y-1">
-            {b.cols.map((c, ci) => (
-              <div key={c.id}>
-                <div style={{ marginLeft: (depth + 1) * 10 }} className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/80">Column {ci + 1}</div>
-                {c.blocks.length === 0
-                  ? <div style={{ marginLeft: (depth + 2) * 10 }} className="px-2 py-1 text-[10px] italic text-muted-foreground/60">empty — add blocks in Row settings</div>
-                  : renderTree(c.blocks, depth + 2)}
-              </div>
-            ))}
+    list.map((b) => {
+      const hintB = dropHint?.kind === "block" && dropHint.id === b.id ? dropHint.pos : null;
+      return (
+        <div key={b.id}>
+          <div draggable onDragStart={(e) => { e.stopPropagation(); dragId.current = b.id; e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", b.id); } catch { /* ignore */ } }}
+            onDragEnd={endDrag}
+            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); const r = e.currentTarget.getBoundingClientRect(); setDropHint({ kind: "block", id: b.id, pos: e.clientY - r.top < r.height / 2 ? "before" : "after" }); }}
+            onDrop={(e) => dropOnBlock(e, b.id)}
+            onClick={(e) => { e.stopPropagation(); setSelectedId(b.id); }} style={{ marginLeft: depth * 10 }}
+            className={cn("group flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs", selectedId === b.id ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted", b.hidden && "opacity-50", hintB === "before" && "shadow-[inset_0_2px_0_0_#c9a46e]", hintB === "after" && "shadow-[inset_0_-2px_0_0_#c9a46e]")}>
+            <GripVertical className="h-3.5 w-3.5 shrink-0 cursor-grab text-muted-foreground" />
+            {b.type === "row" && <Rows3 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+            <span className="min-w-0 flex-1 truncate">{CMS_BLOCK_LABELS[b.type]}{b.text ? <span className="text-muted-foreground"> · {b.text.slice(0, 16)}</span> : null}</span>
+            <button onClick={(e) => { e.stopPropagation(); update(b.id, { hidden: !b.hidden }); }} className="text-muted-foreground opacity-0 hover:text-foreground group-hover:opacity-100" title={b.hidden ? "Show" : "Hide"}>{b.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}</button>
+            <button onClick={(e) => { e.stopPropagation(); duplicate(b); }} className="text-muted-foreground opacity-0 hover:text-primary group-hover:opacity-100" title="Duplicate"><Copy className="h-3.5 w-3.5" /></button>
+            <button onClick={(e) => { e.stopPropagation(); remove(b.id); }} className="text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100" title="Delete"><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
-        )}
-      </div>
-    ));
+          {b.type === "row" && b.cols && (
+            <div className="mt-1 space-y-1">
+              {b.cols.map((c, ci) => {
+                const colActive = dropHint?.kind === "column" && dropHint.colId === c.id;
+                return (
+                  <div key={c.id} style={{ marginLeft: (depth + 1) * 10 }}
+                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDropHint({ kind: "column", rowId: b.id, colId: c.id }); }}
+                    onDrop={(e) => dropInColumn(e, b.id, c.id)}
+                    className={cn("rounded-md border border-transparent", colActive && "border-dashed border-primary bg-primary/5")}>
+                    <div className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/80">Column {ci + 1}</div>
+                    {c.blocks.length === 0
+                      ? <div className="mx-1 mb-1 rounded border border-dashed border-border px-2 py-1.5 text-[10px] italic text-muted-foreground/60">drop blocks here</div>
+                      : renderTree(c.blocks, depth + 2)}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    });
 
   // Resizable left panel.
   function startResize(e: React.MouseEvent) {
@@ -396,7 +456,7 @@ export function CmsEditor({ page, initialBlocks }: {
               {blocks.length === 0 ? (
                 <div style={{ padding: "80px 20px", textAlign: "center", color: "var(--muted)" }}>This page has no content blocks yet. Add one from the left.</div>
               ) : (
-                blocks.map((b) => <BlockView key={b.id} block={b} selectedId={selectedId} onSelect={setSelectedId} />)
+                blocks.map((b) => <BlockView key={b.id} block={b} selectedId={selectedId} onSelect={setSelectedId} dnd={canvasDnd} />)
               )}
             </div>
             {selected && (
@@ -499,15 +559,27 @@ function innerStyle(b: CmsBlock, nested = false): React.CSSProperties {
   };
 }
 
-function BlockView({ block: b, selectedId, onSelect, nested = false }: { block: CmsBlock; selectedId: string | null; onSelect: (id: string) => void; nested?: boolean }) {
+function BlockView({ block: b, selectedId, onSelect, nested = false, dnd }: { block: CmsBlock; selectedId: string | null; onSelect: (id: string) => void; nested?: boolean; dnd: CanvasDnd }) {
   if (b.hidden) return null;
   const selected = b.id === selectedId;
   const pick = (e: React.MouseEvent) => { e.stopPropagation(); onSelect(b.id); };
-  const wrap = (children: React.ReactNode) => (
-    <section data-cms-block={b.id} onClick={pick} style={{ ...sectionStyle(b, nested), outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2 }}>
-      <div style={innerStyle(b, nested)}>{children}</div>
-    </section>
-  );
+  // Drag any block on the canvas; a drag starting on an interactive control (a
+  // slider, input, link…) is cancelled so those keep working in the preview.
+  const dragStart = (e: React.DragEvent) => {
+    if ((e.target as HTMLElement).closest('input,textarea,select,button,a,[contenteditable="true"]')) { e.preventDefault(); return; }
+    e.stopPropagation(); dnd.start(b.id); e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", b.id); } catch { /* ignore */ }
+  };
+  const hintPos = dnd.hint?.kind === "block" && dnd.hint.id === b.id ? dnd.hint.pos : null;
+  const dropShadow = hintPos === "before" ? "inset 0 3px 0 0 #c9a46e" : hintPos === "after" ? "inset 0 -3px 0 0 #c9a46e" : undefined;
+  const dragProps = { draggable: true, onDragStart: dragStart, onDragEnd: dnd.end, onDragOver: (e: React.DragEvent) => dnd.overBlock(e, b.id), onDrop: (e: React.DragEvent) => dnd.dropBlock(e, b.id) };
+  const wrap = (children: React.ReactNode) => {
+    const ss = sectionStyle(b, nested);
+    return (
+      <section data-cms-block={b.id} {...dragProps} onClick={pick} style={{ ...ss, outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2, boxShadow: dropShadow || ss.boxShadow }}>
+        <div style={innerStyle(b, nested)}>{children}</div>
+      </section>
+    );
+  };
   const fs = b.fontSize ? `${b.fontSize}px` : undefined;
   const T = typoStyle(b) as React.CSSProperties;
   const btn = (label: string | undefined, primary = true) => (label ? <span key={primary ? "p" : "s"} style={{ display: "inline-block", margin: 6, background: primary ? (b.buttonColor || "var(--green)") : "transparent", color: primary ? "#fff" : "currentColor", border: primary ? "none" : "2px solid currentColor", padding: "13px 26px", borderRadius: b.radius ?? 6, fontWeight: 700 }}>{label}</span> : null);
@@ -528,7 +600,7 @@ function BlockView({ block: b, selectedId, onSelect, nested = false }: { block: 
       : <span style={{ display: "inline-block", padding: "28px 40px", border: "1px dashed #c9b98f", borderRadius: 8, color: "#8a7b52", fontSize: 13 }}>Add an image URL →</span>);
     case "button": return wrap(<span style={{ display: "inline-block", background: b.buttonColor || "var(--green)", color: b.textColor || "#fff", padding: "14px 26px", borderRadius: b.radius ?? 6, fontSize: fs || 16, fontWeight: 700 }}>{b.label || "Learn more"}</span>);
     case "divider": return wrap(<hr style={{ border: "none", borderTop: `${b.borderWidth ?? 1}px ${b.borderStyle || "solid"} ${b.borderColor || b.textColor || "var(--line)"}`, margin: 0 }} />);
-    case "spacer": return <div data-cms-block={b.id} onClick={pick} style={{ height: b.height ?? 40, cursor: "pointer", outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2 }} />;
+    case "spacer": return <div data-cms-block={b.id} {...dragProps} onClick={pick} style={{ height: b.height ?? 40, cursor: "pointer", outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2, boxShadow: dropShadow }} />;
     case "cta":
       return wrap(<>{b.eyebrow && <div style={{ color: "var(--gold)", fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase", fontSize: 13, marginBottom: 12 }}>{b.eyebrow}</div>}<h2 style={{ fontFamily: "var(--font-display)", fontSize: fs || "clamp(28px,4vw,44px)", lineHeight: 1.1, margin: "0 0 12px", ...T }}>{b.text}</h2>{b.subtext && <p style={{ fontSize: 18, lineHeight: 1.6, color: "var(--muted)", margin: "0 0 20px" }}>{b.subtext}</p>}<div>{btn(b.label, true)}{btn(b.label2, false)}</div></>);
     case "hero": {
@@ -537,7 +609,7 @@ function BlockView({ block: b, selectedId, onSelect, nested = false }: { block: 
         ? { backgroundImage: `linear-gradient(${overlayRgba(b)},${overlayRgba(b)}),url('${b.bgImage}')`, backgroundSize: "cover", backgroundPosition: "center" }
         : { background: b.bgColor || "var(--green)" };
       return (
-        <section data-cms-block={b.id} onClick={pick} style={{ ...bgLayer, padding: `${blockPad(b, "top")}px 20px ${blockPad(b, "bottom")}px`, minHeight: b.minHeight ?? 420, display: "flex", alignItems: "center", marginTop: b.marginTop || undefined, marginBottom: b.marginBottom || undefined, outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2, cursor: "pointer" }}>
+        <section data-cms-block={b.id} {...dragProps} onClick={pick} style={{ ...bgLayer, padding: `${blockPad(b, "top")}px 20px ${blockPad(b, "bottom")}px`, minHeight: b.minHeight ?? 420, display: "flex", alignItems: "center", marginTop: b.marginTop || undefined, marginBottom: b.marginBottom || undefined, outline: selected ? "2px solid #c9a46e" : "none", outlineOffset: -2, cursor: "pointer", boxShadow: dropShadow }}>
           <div style={{ width: "min(1180px, calc(100% - 40px))", margin: "0 auto", color: fg, textAlign: b.align || "center", maxWidth: b.maxWidth && b.maxWidth > 0 ? b.maxWidth : undefined }}>
             {b.eyebrow && <div style={{ fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase", fontSize: 13, marginBottom: 16, opacity: 0.9 }}>{b.eyebrow}</div>}
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: fs || "clamp(38px,6vw,72px)", lineHeight: 1.03, margin: "0 0 16px", ...T }}>{b.text}</h1>
@@ -635,13 +707,17 @@ function BlockView({ block: b, selectedId, onSelect, nested = false }: { block: 
       const valign = b.valign === "center" ? "center" : b.valign === "bottom" ? "end" : b.valign === "top" ? "start" : "stretch";
       return wrap(
         <div style={{ display: "grid", gridTemplateColumns: tmpl || "1fr", gap: b.gap ?? 24, alignItems: valign }}>
-          {cols.map((c) => (
-            <div key={c.id} style={{ minWidth: 0 }} onClick={pick}>
-              {c.blocks.length === 0
-                ? <div style={{ minHeight: 60, border: "1px dashed #c9b98f", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#8a7b52", fontSize: 12, padding: 12, textAlign: "center" }}>Empty column · add blocks in Row settings</div>
-                : c.blocks.map((child) => <BlockView key={child.id} block={child} selectedId={selectedId} onSelect={onSelect} nested />)}
-            </div>
-          ))}
+          {cols.map((c) => {
+            const colActive = dnd.hint?.kind === "column" && dnd.hint.colId === c.id;
+            return (
+              <div key={c.id} style={{ minWidth: 0, outline: colActive ? "2px dashed #c9a46e" : "none", outlineOffset: 2, borderRadius: 6 }} onClick={pick}
+                onDragOver={(e) => dnd.overCol(e, b.id, c.id)} onDrop={(e) => dnd.dropCol(e, b.id, c.id)}>
+                {c.blocks.length === 0
+                  ? <div style={{ minHeight: 60, border: "1px dashed #c9b98f", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#8a7b52", fontSize: 12, padding: 12, textAlign: "center" }}>Empty column · drop blocks here</div>
+                  : c.blocks.map((child) => <BlockView key={child.id} block={child} selectedId={selectedId} onSelect={onSelect} nested dnd={dnd} />)}
+              </div>
+            );
+          })}
         </div>,
       );
     }

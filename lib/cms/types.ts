@@ -189,6 +189,39 @@ export function insertInColumn(blocks: CmsBlock[], rowId: string, colId: string,
   });
 }
 
+// Remove a block by id anywhere in the tree, returning it + the pruned tree.
+export function extractBlock(blocks: CmsBlock[], id: string): { block?: CmsBlock; blocks: CmsBlock[] } {
+  let found: CmsBlock | undefined;
+  const walk = (arr: CmsBlock[]): CmsBlock[] => {
+    const out: CmsBlock[] = [];
+    for (const b of arr) {
+      if (b.id === id) { found = b; continue; }
+      out.push(b.cols ? { ...b, cols: b.cols.map((c) => ({ ...c, blocks: walk(c.blocks) })) } : b);
+    }
+    return out;
+  };
+  const pruned = walk(blocks);
+  return { block: found, blocks: pruned };
+}
+
+// True if `ancestor` contains the given block-id or column-id anywhere below it
+// (used to block dropping a row into one of its own columns → cycle).
+export function containsId(ancestor: CmsBlock, id: string): boolean {
+  if (!ancestor.cols) return false;
+  for (const c of ancestor.cols) {
+    if (c.id === id) return true;
+    for (const b of c.blocks) { if (b.id === id || containsId(b, id)) return true; }
+  }
+  return false;
+}
+
+// Insert `block` before/after an existing block, at whatever container it lives in.
+export function insertRelative(blocks: CmsBlock[], targetId: string, block: CmsBlock, pos: "before" | "after"): CmsBlock[] {
+  const i = blocks.findIndex((b) => b.id === targetId);
+  if (i >= 0) { const n = [...blocks]; n.splice(pos === "before" ? i : i + 1, 0, block); return n; }
+  return blocks.map((b) => (b.cols ? { ...b, cols: b.cols.map((c) => ({ ...c, blocks: insertRelative(c.blocks, targetId, block, pos) })) } : b));
+}
+
 // Move a block up/down within its own sibling list (top-level or inside a column).
 export function moveBlock(blocks: CmsBlock[], id: string, dir: -1 | 1): CmsBlock[] {
   const i = blocks.findIndex((b) => b.id === id);
