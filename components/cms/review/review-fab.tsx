@@ -41,10 +41,10 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
   const [note, setNote] = React.useState("");
   const [type, setType] = React.useState("edit");
   const [priority, setPriority] = React.useState("medium");
-  const [recipients, setRecipients] = React.useState<string[]>([]);
-  const [shareOpen, setShareOpen] = React.useState(false);
+  const [recipient, setRecipient] = React.useState("");
   const [shot, setShot] = React.useState<string | null>(null);
   const [editing, setEditing] = React.useState(false);
+  const [capturing, setCapturing] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -65,12 +65,12 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
   React.useEffect(() => { if (open) load(); }, [open, load]);
 
   async function takeShot(withTools: boolean) {
-    setError(null); setOpen(false);
+    setError(null); setCapturing(true); setOpen(false);
     // let the panel close before capturing so it isn't in the shot
-    await new Promise((r) => setTimeout(r, 150));
+    await new Promise((r) => setTimeout(r, 180));
     try { const d = await capturePage(); setShot(d); if (withTools) setEditing(true); }
-    catch { setError("Couldn’t capture the page. Try again."); }
-    finally { setOpen(true); }
+    catch (e) { setError(`Couldn’t capture the page: ${e instanceof Error ? e.message : "unknown error"}`); }
+    finally { setCapturing(false); setOpen(true); }
   }
 
   async function submit() {
@@ -86,10 +86,10 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
       }
       const res = await fetch("/api/dashboard-notes", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action: "create", actionToken: token, payload: { route: pathname, pageTitle: pageTitle(pathname), note: note.trim(), type, priority, recipientEmails: recipients, screenshotUrl } }),
+        body: JSON.stringify({ action: "create", actionToken: token, payload: { route: pathname, pageTitle: pageTitle(pathname), note: note.trim(), type, priority, recipientEmails: recipient ? [recipient] : [], screenshotUrl } }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Save failed.");
-      setNote(""); setShot(null); setRecipients([]); setSaved(true); setTimeout(() => setSaved(false), 1800);
+      setNote(""); setShot(null); setRecipient(""); setSaved(true); setTimeout(() => setSaved(false), 1800);
       await load(); setTab("requests");
     } catch (e) { setError(e instanceof Error ? e.message : "Save failed."); }
     finally { setBusy(false); }
@@ -127,22 +127,11 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
                 <div><label className="mb-1 block text-[11px] text-muted-foreground">Type</label><FieldSelect value={type} onChange={setType} options={TYPES} className="h-8" /></div>
                 <div><label className="mb-1 block text-[11px] text-muted-foreground">Priority</label><FieldSelect value={priority} onChange={setPriority} options={PRIORITIES} className="h-8" /></div>
               </div>
-              {/* Share with */}
-              <div className="relative">
-                <button onClick={() => setShareOpen((s) => !s)} className="flex w-full items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-left text-xs hover:bg-muted">
-                  <Users className="h-3.5 w-3.5 text-muted-foreground" /> <span className="flex-1">{recipients.length ? `Shared with ${recipients.length}` : "Share with (optional)"}</span>
-                </button>
-                {shareOpen && (
-                  <div className="absolute bottom-full z-10 mb-1 max-h-40 w-full overflow-y-auto rounded-lg border border-border bg-card p-1 shadow-lg">
-                    {people.filter((p) => p.email !== me.email).length === 0 && <p className="px-2 py-1 text-[11px] text-muted-foreground">No other super-admins.</p>}
-                    {people.filter((p) => p.email !== me.email).map((p) => (
-                      <label key={p.email} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs hover:bg-muted">
-                        <input type="checkbox" checked={recipients.includes(p.email)} onChange={(e) => setRecipients((r) => e.target.checked ? [...r, p.email] : r.filter((x) => x !== p.email))} />
-                        <span className="truncate">{p.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
+              {/* Share with (single recipient) */}
+              <div>
+                <label className="mb-1 flex items-center gap-1.5 text-[11px] text-muted-foreground"><Users className="h-3.5 w-3.5" /> Share with (optional)</label>
+                <FieldSelect value={recipient} onChange={setRecipient}
+                  options={[{ value: "", label: "No one" }, ...people.filter((p) => p.email !== me.email).map((p) => ({ value: p.email, label: p.name }))]} className="h-8" />
               </div>
               {/* Screenshot */}
               {shot ? (
@@ -156,8 +145,8 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" size="sm" onClick={() => takeShot(false)}><Camera className="h-4 w-4" /> Screenshot</Button>
-                  <Button variant="outline" size="sm" onClick={() => takeShot(true)}><PenSquare className="h-4 w-4" /> Screenshot &amp; Tools</Button>
+                  <Button variant="outline" size="sm" onClick={() => takeShot(false)} disabled={capturing}>{capturing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />} Screenshot</Button>
+                  <Button variant="outline" size="sm" onClick={() => takeShot(true)} disabled={capturing}>{capturing ? <Loader2 className="h-4 w-4 animate-spin" /> : <PenSquare className="h-4 w-4" />} Screenshot &amp; Tools</Button>
                 </div>
               )}
               <Button size="sm" className="w-full" onClick={submit} disabled={busy || !note.trim()}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <Check className="h-4 w-4" /> : null} {saved ? "Sent" : "Send request"}</Button>

@@ -13,7 +13,8 @@ export type ElementDescriptor = {
   bounding_box: { x: number; y: number; width: number; height: number } | null;
 };
 export type SelectionMode =
-  | "auto" | "sections" | "containers" | "rows" | "columns" | "cards" | "components" | "headings";
+  | "auto" | "sections" | "containers" | "rows" | "columns" | "cards" | "components" | "headings"
+  | "icons" | "content" | "eyebrows" | "buttons" | "links" | "images";
 export type OutlineItem = { element_ref: string; type: string; label: string; level: number | null };
 
 export type OverlayHandlers = {
@@ -27,13 +28,14 @@ export type OverlayHandlers = {
 export type OverlayController = {
   setMode: (m: SelectionMode) => void;
   setActive: (a: boolean) => void;
+  setInsertMode: (on: boolean) => void;
   selectByRef: (ref: string) => ElementDescriptor | null;
   clearSelection: () => void;
   scanOutline: () => void;
   destroy: () => void;
 };
 
-const MEANINGFUL = ["section", "container", "row", "column", "card", "component", "form"];
+const MEANINGFUL = ["section", "container", "row", "column", "card", "component", "form", "button", "link", "icon", "image", "content", "eyebrow"];
 const getClass = (el: Element) => (typeof (el as HTMLElement).className === "string" ? (el as HTMLElement).className.toLowerCase() : "");
 
 // ── Tuned for the MJG public site + CMS renderer markup ─────────────────────
@@ -41,16 +43,21 @@ function classify(el: Element): string {
   const tag = el.tagName.toLowerCase();
   if (/^h[1-6]$/.test(tag)) return tag;
   const cls = getClass(el);
+  if (tag === "svg" || (tag === "i" && /\b(icon|fa-|bi-|lucide)\b/.test(cls)) || el.getAttribute("role") === "img" && tag !== "img") return "icon";
+  if (tag === "img" || tag === "picture") return "image";
   if (["section", "header", "footer", "main"].includes(tag) || /\bsection\b/.test(cls)) return "section";
   if (tag === "form") return "form";
   if (tag === "nav") return "component";
   const role = el.getAttribute("role");
-  if (tag === "button" || (tag === "a" && (role === "button" || /\bbtn\b|button/.test(cls)))) return "component";
+  if (tag === "button" || (tag === "a" && (role === "button" || /\bbtn\b|\bbutton\b/.test(cls)))) return "button";
+  if (tag === "a") return "link";
+  if (/\beyebrow\b|\boverline\b|\bkicker\b/.test(cls)) return "eyebrow";
   if (/container|wrapper|\bmx-auto\b/.test(cls)) return "container";
   if (/\brow\b|\bgrid\b|grid-cols|\bflex\b/.test(cls)) return "row";
   if (/\bcol(-|\b)|col-span/.test(cls)) return "column";
   if (/\bcard\b/.test(cls)) return "card";
-  if (/\bbtn\b|button/.test(cls)) return "component";
+  if (tag === "p" || /\bprose\b|\bbody-copy\b/.test(cls)) return "content";
+  if (/\bbtn\b|\bbutton\b/.test(cls)) return "button";
   return tag;
 }
 // ────────────────────────────────────────────────────────────────────────────
@@ -67,6 +74,12 @@ function matchesMode(el: Element, mode: SelectionMode): boolean {
     case "columns": return t === "column";
     case "cards": return t === "card";
     case "components": return t === "component" || t === "form";
+    case "icons": return t === "icon";
+    case "images": return t === "image";
+    case "buttons": return t === "button";
+    case "links": return t === "link";
+    case "eyebrows": return t === "eyebrow";
+    case "content": return t === "content" || /^h[1-6]$/.test(t);
     default: return isMeaningful(el); // auto
   }
 }
@@ -191,7 +204,46 @@ export function installOverlay(doc: Document, win: Window, handlers: OverlayHand
     const c = candidateFor(t); if (!c) return;
     const d = buildDescriptor(c); selectedEl = c as HTMLElement; place(selBox, c); handlers.onSelect(d);
   }
-  function reposition() { if (selectedEl && doc.body.contains(selectedEl)) place(selBox, selectedEl); else selBox.style.display = "none"; }
+  // ── Insert markers ("+ Add content here" between top-level sections) ──
+  let insertMode = false;
+  const markers: { btn: HTMLElement; sec: Element; edge: "before" | "after" }[] = [];
+  const topSections = () => Array.from(doc.querySelectorAll("section")).filter((s) => !s.parentElement || !s.parentElement.closest("section"));
+  function clearMarkers() { markers.forEach((m) => m.btn.remove()); markers.length = 0; }
+  function placeMarker(m: { btn: HTMLElement; sec: Element; edge: "before" | "after" }) {
+    const r = m.sec.getBoundingClientRect();
+    m.btn.style.top = `${(m.edge === "before" ? r.top : r.bottom) + win.scrollY - 15}px`;
+    m.btn.style.left = `${r.left + win.scrollX + r.width / 2 - 84}px`;
+  }
+  function insertDescriptor(index: number, prev: Element | null, next: Element | null): ElementDescriptor {
+    const prevLabel = prev ? sectionLabel(prev) : null, nextLabel = next ? sectionLabel(next) : null;
+    const label = prevLabel && nextLabel ? `Insert between “${prevLabel}” and “${nextLabel}”`
+      : nextLabel ? `Insert before “${nextLabel}”` : prevLabel ? `Insert after “${prevLabel}”` : "Insert content";
+    return {
+      element_ref: `${handlers.slug}::section_insert::${index}`, element_type: "section_insert", element_label: label,
+      heading_text: null, heading_level: null, section_order: index, parent_section_label: prevLabel || nextLabel,
+      dom_selector: null, dom_path: null, css_classes: null, component_name: null, content_summary: null, bounding_box: null,
+    };
+  }
+  function renderMarkers() {
+    clearMarkers();
+    if (!insertMode) return;
+    const secs = topSections();
+    const add = (index: number, sec: Element, edge: "before" | "after", prev: Element | null, next: Element | null) => {
+      const btn = doc.createElement("button");
+      btn.textContent = "+ Add content here";
+      btn.style.cssText = "position:absolute;z-index:2147483645;background:#c9a46e;color:#111;font:700 11px/1 system-ui,sans-serif;border:none;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.28);pointer-events:auto;white-space:nowrap;";
+      btn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); handlers.onSelect(insertDescriptor(index, prev, next)); });
+      doc.body.appendChild(btn);
+      const m = { btn, sec, edge }; markers.push(m); placeMarker(m);
+    };
+    secs.forEach((sec, i) => add(i, sec, "before", secs[i - 1] ?? null, sec));
+    if (secs.length) add(secs.length, secs[secs.length - 1], "after", secs[secs.length - 1], null);
+  }
+
+  function reposition() {
+    if (selectedEl && doc.body.contains(selectedEl)) place(selBox, selectedEl); else selBox.style.display = "none";
+    markers.forEach(placeMarker);
+  }
 
   doc.addEventListener("mousemove", onMove, true);
   doc.addEventListener("click", onClick, true);
@@ -201,6 +253,7 @@ export function installOverlay(doc: Document, win: Window, handlers: OverlayHand
   return {
     setMode(m) { mode = m; hoverBox.style.display = "none"; },
     setActive(a) { active = a; if (!a) hoverBox.style.display = "none"; },
+    setInsertMode(on) { insertMode = on; renderMarkers(); },
     selectByRef(ref) {
       const el = refMap.get(ref); if (!el || !doc.body.contains(el)) return null;
       const d = buildDescriptor(el); selectedEl = el; place(selBox, el);
@@ -221,7 +274,7 @@ export function installOverlay(doc: Document, win: Window, handlers: OverlayHand
       doc.removeEventListener("click", onClick, true);
       win.removeEventListener("scroll", reposition, true);
       win.removeEventListener("resize", reposition);
-      hoverBox.remove(); selBox.remove(); refMap.clear();
+      clearMarkers(); hoverBox.remove(); selBox.remove(); refMap.clear();
     },
   };
 }

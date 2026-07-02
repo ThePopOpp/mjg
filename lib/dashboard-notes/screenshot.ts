@@ -1,6 +1,17 @@
 // Screenshot capture for the Dashboard Review FAB. Uses html-to-image (NOT
 // html2canvas — it can't parse oklch/color-mix used by modern themes). See
 // docs/features/dashboard-review-fab-portable.md §5.
+//
+// Robustness notes (why this config): capturing the whole dashboard often pulls
+// in CROSS-ORIGIN images (logo/avatars/media from other domains) and web fonts.
+// - `imagePlaceholder` makes a failed cross-origin image render as a transparent
+//   pixel instead of throwing / tainting the canvas ("Couldn't capture").
+// - `skipFonts` avoids reading cross-origin @font-face rules (a common throw).
+// - `cacheBust: false` — cache-busting appends ?t=… which turns cached images
+//   into fresh cross-origin requests that fail CORS.
+
+const TRANSPARENT_PX =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
@@ -16,16 +27,28 @@ async function clampDataUrl(dataUrl: string, maxEdge: number): Promise<string> {
   return c.toDataURL("image/jpeg", 0.9);
 }
 
-export async function capturePage(): Promise<string> {
-  const { toJpeg } = await import("html-to-image"); // dynamic → client only
+export async function capturePage(target?: HTMLElement): Promise<string> {
+  const mod = await import("html-to-image"); // dynamic → client only
+  const el = target || document.body;
   const bg = getComputedStyle(document.body).backgroundColor || "#ffffff";
-  const raw = await toJpeg(document.body, {
-    quality: 0.9,
+  const opts = {
+    quality: 0.92,
     backgroundColor: bg,
     pixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
-    filter: (n) => !(n instanceof HTMLElement && typeof n.hasAttribute === "function" && n.hasAttribute("data-fab-ignore")),
-    cacheBust: true,
-  });
+    cacheBust: false,
+    skipFonts: true,
+    imagePlaceholder: TRANSPARENT_PX,
+    filter: (n: Node) => !(n instanceof HTMLElement && typeof n.hasAttribute === "function" && n.hasAttribute("data-fab-ignore")),
+  };
+  let raw: string;
+  try {
+    raw = await mod.toJpeg(el, opts);
+  } catch {
+    // A second pass sometimes succeeds once images have been fetched/cached, and
+    // PNG avoids a couple of JPEG-only edge cases.
+    raw = await mod.toPng(el, opts);
+  }
+  if (!raw || raw.length < 1000) throw new Error("The capture came back empty — try again.");
   return clampDataUrl(raw, 1600);
 }
 
