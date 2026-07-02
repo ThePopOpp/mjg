@@ -53,6 +53,8 @@ export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: Fronte
   const [stewardOpen, setStewardOpen] = React.useState(false);
   React.useEffect(() => { setOrigin(window.location.origin); }, []);
   const [page, setPage] = React.useState<FrontendPage | null>(pages[0] ?? null);
+  const [customPages, setCustomPages] = React.useState<FrontendPage[]>([]);
+  const [urlInput, setUrlInput] = React.useState("");
   const [device, setDevice] = React.useState("desktop");
   const [mode, setMode] = React.useState<SelectionMode>("auto");
   const [selecting, setSelecting] = React.useState(true);
@@ -172,6 +174,30 @@ export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: Fronte
   }, [notes]);
 
   const fullUrl = page ? `${origin}${page.url}` : "";
+  const allPages = React.useMemo(() => [...pages, ...customPages], [pages, customPages]);
+  // Keep the URL field in sync with the current page (unless the user is editing it).
+  React.useEffect(() => { if (page) setUrlInput(`${origin}${page.url}`); }, [page, origin]);
+
+  // Load any SAME-ORIGIN URL/path typed into the address field into the editor.
+  function loadUrl(raw: string) {
+    const s = raw.trim(); if (!s) return;
+    let path = s;
+    try {
+      if (/^https?:\/\//i.test(s)) {
+        const u = new URL(s);
+        if (origin && u.origin !== origin) { setError(`That URL is on a different origin (${u.origin}). The editor can only inspect same-origin pages (${origin}).`); return; }
+        path = u.pathname + u.search;
+      } else if (!s.startsWith("/")) { path = `/${s}`; }
+    } catch { setError("That doesn’t look like a valid URL."); return; }
+    const clean = path.replace(/[?#].*$/, "").replace(/\/$/, "") || "/";
+    const slug = (clean.replace(/^\//, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "") || "home").toLowerCase();
+    const seg = clean.split("/").filter(Boolean).pop() || "home";
+    const label = seg.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const existing = allPages.find((p) => p.url === path || p.slug === slug);
+    const fp = existing ?? { slug, label: `${label} (custom)`, url: path };
+    if (!existing) setCustomPages((prev) => [...prev, fp]);
+    setError(null); setSelected(null); setOutline([]); setPage(fp); setNonce((n) => n + 1);
+  }
 
   // Export this page's edit requests as a Markdown brief (hand off to a dev / AI).
   function exportNotes() {
@@ -206,10 +232,12 @@ export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: Fronte
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-2">
         {onBack && <Button variant="outline" size="sm" onClick={onBack}><ArrowLeft className="h-4 w-4" /> Back to CMS</Button>}
-        <FieldSelect value={page.slug} onChange={(v) => { const p = pages.find((x) => x.slug === v); if (p) { setPage(p); setSelected(null); setOutline([]); } }}
-          options={pages.map((p) => ({ value: p.slug, label: p.label }))} className="h-9 w-48" />
+        <FieldSelect value={page.slug} onChange={(v) => { const p = allPages.find((x) => x.slug === v); if (p) { setPage(p); setSelected(null); setOutline([]); } }}
+          options={allPages.map((p) => ({ value: p.slug, label: p.label }))} className="h-9 w-44" />
         <span className="text-muted-foreground">/</span>
-        <Input readOnly value={fullUrl} className="h-9 w-64 bg-muted/40 text-xs text-muted-foreground" onFocus={(e) => e.currentTarget.select()} title={fullUrl} />
+        <Input value={urlInput} onChange={(e) => setUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") loadUrl(urlInput); }}
+          placeholder="Paste a same-origin URL or /path…" className="h-9 w-72 text-xs" title="Enter any same-origin URL and press Enter (or Go) to load it" />
+        <Button variant="outline" size="sm" onClick={() => loadUrl(urlInput)} title="Load this URL">Go</Button>
         <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
           {DEVICES.map((d) => (
             <button key={d.key} onClick={() => setDevice(d.key)} title={d.label} className={cn("rounded-md p-1.5", device === d.key ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground")}><d.icon className="h-4 w-4" /></button>
