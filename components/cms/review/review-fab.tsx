@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { MessageSquarePlus, Camera, X, Bot, Inbox, Loader2, Check, Users, ImageIcon } from "lucide-react";
+import { MessageSquarePlus, Camera, X, Bot, Inbox, Loader2, Check, Users, ImageIcon, PenSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldSelect } from "@/components/ui/field-select";
@@ -18,9 +18,16 @@ const TYPES = ["edit", "bug", "idea", "question", "remove", "other"].map((v) => 
 const PRIORITIES = ["low", "medium", "high", "urgent"].map((v) => ({ value: v, label: v[0].toUpperCase() + v.slice(1) }));
 const STATUS_COLOR: Record<string, string> = { open: "bg-amber-500", in_progress: "bg-blue-500", done: "bg-emerald-500", archived: "bg-muted-foreground" };
 
-function pageTitle() {
-  if (typeof document === "undefined") return "";
-  return (document.title || "").replace(/\s*[|–—-]\s*MJG.*$/i, "").trim();
+// Human-readable page name from the dashboard route, e.g.
+//   /dashboard            → "MJG Dashboard"
+//   /dashboard/assets     → "MJG Dashboard / Assets"
+//   /dashboard/emails/logs → "MJG Dashboard / Emails / Logs"
+function pageTitle(pathname: string) {
+  const segs = (pathname || "").split("/").filter(Boolean);
+  const rest = segs[0] === "dashboard" ? segs.slice(1) : segs;
+  const titleCase = (s: string) => s.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const label = rest.map(titleCase).join(" / ");
+  return label ? `MJG Dashboard / ${label}` : "MJG Dashboard";
 }
 
 export function ReviewFab({ me }: { me: { email: string; name: string } }) {
@@ -57,11 +64,11 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
   React.useEffect(() => { load(); }, [load]);
   React.useEffect(() => { if (open) load(); }, [open, load]);
 
-  async function takeShot() {
+  async function takeShot(withTools: boolean) {
     setError(null); setOpen(false);
     // let the panel close before capturing so it isn't in the shot
-    await new Promise((r) => setTimeout(r, 120));
-    try { const d = await capturePage(); setShot(d); setEditing(true); }
+    await new Promise((r) => setTimeout(r, 150));
+    try { const d = await capturePage(); setShot(d); if (withTools) setEditing(true); }
     catch { setError("Couldn’t capture the page. Try again."); }
     finally { setOpen(true); }
   }
@@ -79,7 +86,7 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
       }
       const res = await fetch("/api/dashboard-notes", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action: "create", actionToken: token, payload: { route: pathname, pageTitle: pageTitle(), note: note.trim(), type, priority, recipientEmails: recipients, screenshotUrl } }),
+        body: JSON.stringify({ action: "create", actionToken: token, payload: { route: pathname, pageTitle: pageTitle(pathname), note: note.trim(), type, priority, recipientEmails: recipients, screenshotUrl } }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Save failed.");
       setNote(""); setShot(null); setRecipients([]); setSaved(true); setTimeout(() => setSaved(false), 1800);
@@ -88,7 +95,8 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
     finally { setBusy(false); }
   }
 
-  const agentContext = `You are helping review the dashboard page at "${pathname}" ("${pageTitle()}"). Answer with real data via your tools and only DRAFT changes — never publish or make destructive edits.`;
+  const pageName = pageTitle(pathname);
+  const agentContext = `You are helping review the dashboard page at "${pathname}" ("${pageName}"). Answer with real data via your tools and only DRAFT changes — never publish or make destructive edits.`;
 
   return (
     <>
@@ -113,7 +121,7 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
 
           {tab === "note" ? (
             <div className="space-y-2 overflow-y-auto p-3">
-              <div className="text-[11px] text-muted-foreground">On <span className="font-medium text-foreground">{pageTitle() || pathname}</span></div>
+              <div className="text-[11px] text-muted-foreground">On <span className="font-medium text-foreground">{pageName}</span> — captured automatically.</div>
               <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Describe the edit / bug / idea…" className="min-h-[84px]" />
               <div className="grid grid-cols-2 gap-2">
                 <div><label className="mb-1 block text-[11px] text-muted-foreground">Type</label><FieldSelect value={type} onChange={setType} options={TYPES} className="h-8" /></div>
@@ -126,8 +134,8 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
                 </button>
                 {shareOpen && (
                   <div className="absolute bottom-full z-10 mb-1 max-h-40 w-full overflow-y-auto rounded-lg border border-border bg-card p-1 shadow-lg">
-                    {people.length === 0 && <p className="px-2 py-1 text-[11px] text-muted-foreground">No other super-admins.</p>}
-                    {people.map((p) => (
+                    {people.filter((p) => p.email !== me.email).length === 0 && <p className="px-2 py-1 text-[11px] text-muted-foreground">No other super-admins.</p>}
+                    {people.filter((p) => p.email !== me.email).map((p) => (
                       <label key={p.email} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs hover:bg-muted">
                         <input type="checkbox" checked={recipients.includes(p.email)} onChange={(e) => setRecipients((r) => e.target.checked ? [...r, p.email] : r.filter((x) => x !== p.email))} />
                         <span className="truncate">{p.name}</span>
@@ -141,10 +149,16 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
                 <div className="relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={shot} alt="screenshot" onClick={() => setEditing(true)} className="max-h-28 w-full cursor-pointer rounded-lg border border-border object-cover" />
-                  <button onClick={() => setShot(null)} className="absolute right-1 top-1 rounded-full bg-background/90 p-1 shadow"><X className="h-3 w-3" /></button>
+                  <div className="absolute right-1 top-1 flex gap-1">
+                    <button onClick={() => setEditing(true)} className="rounded-full bg-background/90 p-1 shadow" title="Edit / annotate"><PenSquare className="h-3 w-3" /></button>
+                    <button onClick={() => setShot(null)} className="rounded-full bg-background/90 p-1 shadow" title="Remove"><X className="h-3 w-3" /></button>
+                  </div>
                 </div>
               ) : (
-                <Button variant="outline" size="sm" className="w-full" onClick={takeShot}><Camera className="h-4 w-4" /> Screenshot this page</Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" size="sm" onClick={() => takeShot(false)}><Camera className="h-4 w-4" /> Screenshot</Button>
+                  <Button variant="outline" size="sm" onClick={() => takeShot(true)}><PenSquare className="h-4 w-4" /> Screenshot &amp; Tools</Button>
+                </div>
               )}
               <Button size="sm" className="w-full" onClick={submit} disabled={busy || !note.trim()}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <Check className="h-4 w-4" /> : null} {saved ? "Sent" : "Send request"}</Button>
             </div>
@@ -179,7 +193,7 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setAgentOpen(false)} />
           <div className="relative z-10 w-full max-w-2xl">
             <button onClick={() => setAgentOpen(false)} className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"><X className="h-4 w-4" /></button>
-            <AgentChat title="Steward AI" subtitle={`Reviewing ${pageTitle() || pathname}`} audio extraContext={agentContext}
+            <AgentChat title="Steward AI" subtitle={`Reviewing ${pageName}`} audio extraContext={agentContext}
               placeholder="Ask Steward about this page…" heightClassName="h-[68vh] min-h-[420px]"
               emptyTitle="Ask about this page" emptyHint="I can look things up and draft changes for review — I won't publish or delete anything." />
           </div>

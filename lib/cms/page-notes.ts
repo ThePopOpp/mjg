@@ -95,6 +95,18 @@ export async function updatePageNote(
   return data as PageNote;
 }
 
+export async function reassignPageNote(id: string, email: string): Promise<PageNote> {
+  const sb = createSupabaseAdminClient();
+  const e = email.trim().toLowerCase();
+  const { data: prof } = await sb.from("profiles").select("id").eq("email", e).maybeSingle();
+  const { data, error } = await sb
+    .from("cms_page_notes")
+    .update({ created_by: (prof?.id as string) ?? null, created_by_email: e, updated_at: new Date().toISOString() })
+    .eq("id", id).select(COLUMNS).single();
+  if (error) throw new Error(error.message);
+  return data as PageNote;
+}
+
 export async function deletePageNote(id: string): Promise<void> {
   const sb = createSupabaseAdminClient();
   const { error } = await sb.from("cms_page_notes").delete().eq("id", id);

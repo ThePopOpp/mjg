@@ -113,6 +113,23 @@ export async function addComment(id: string, author: { email: string; name?: str
   return data as DashboardNoteComment;
 }
 
+export async function reassignNote(id: string, email: string): Promise<DashboardNote> {
+  const sb = createSupabaseAdminClient();
+  const e = lc(email);
+  const { data: prof } = await sb.from("profiles").select("id, full_name").eq("email", e).maybeSingle();
+  const { data, error } = await sb.from("dashboard_notes")
+    .update({ created_by: (prof?.id as string) ?? null, created_by_email: e, created_by_name: (prof?.full_name as string) ?? null, updated_at: new Date().toISOString() })
+    .eq("id", id).select("*").single();
+  if (error) throw new Error(error.message);
+  return data as DashboardNote;
+}
+
+export async function deleteNote(id: string): Promise<void> {
+  const sb = createSupabaseAdminClient();
+  const { error } = await sb.from("dashboard_notes").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 export async function listShareRecipients(): Promise<{ email: string; name: string }[]> {
   const sb = createSupabaseAdminClient();
   const { data } = await sb.from("profiles").select("email, full_name, role, status").eq("role", "super_admin").eq("status", "active").order("full_name");

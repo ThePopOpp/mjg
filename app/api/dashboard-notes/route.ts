@@ -3,7 +3,7 @@ import { requireSuperAdmin } from "@/lib/user-management/auth";
 import { sendSmtpEmail } from "@/lib/email/smtp";
 import {
   listNotes, unreadCount, createNote, updateStatus, markRead, getNote, addComment, listShareRecipients,
-  type DashboardNote,
+  reassignNote, deleteNote, type DashboardNote,
 } from "@/lib/dashboard-notes/data";
 
 function errStatus(m: string) { return /authentication/i.test(m) ? 401 : /permission|required|super/i.test(m) ? 403 : 500; }
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     const scope = (url.searchParams.get("scope") as "inbox" | "shared" | "all") || "inbox";
     const me = (actor.email ?? "").toLowerCase();
     const [notes, unread, recipients] = await Promise.all([listNotes(scope, me), unreadCount(me), listShareRecipients()]);
-    return NextResponse.json({ notes, unread, me, recipients: recipients.filter((r) => r.email !== me) });
+    return NextResponse.json({ notes, unread, me, recipients });
   } catch (error) {
     const m = error instanceof Error ? error.message : "Failed to load notes.";
     return NextResponse.json({ error: m }, { status: errStatus(m) });
@@ -59,6 +59,10 @@ export async function POST(request: Request) {
       }
       case "update_status":
         return NextResponse.json({ note: await updateStatus(String(body.id), String(body.status)) });
+      case "reassign":
+        return NextResponse.json({ note: await reassignNote(String(body.id), String(body.email)) });
+      case "delete":
+        await deleteNote(String(body.id)); return NextResponse.json({ ok: true });
       case "mark_read":
         await markRead(String(body.id), me); return NextResponse.json({ ok: true });
       case "get_note":

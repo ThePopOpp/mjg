@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireSuperAdmin } from "@/lib/user-management/auth";
 import { logUserActivity } from "@/lib/user-management/repository";
-import { listPageNotes, createPageNote, updatePageNote, deletePageNote } from "@/lib/cms/page-notes";
+import { listPageNotes, createPageNote, updatePageNote, deletePageNote, reassignPageNote } from "@/lib/cms/page-notes";
+import { listShareRecipients } from "@/lib/dashboard-notes/data";
 
 function errStatus(m: string) { return /authentication/i.test(m) ? 401 : /permission|required|super/i.test(m) ? 403 : 500; }
 
@@ -10,7 +11,8 @@ export async function GET(request: Request) {
     await requireSuperAdmin(request);
     const url = new URL(request.url);
     const pageSlug = url.searchParams.get("page") || undefined;
-    return NextResponse.json({ notes: await listPageNotes(pageSlug) });
+    const [notes, recipients] = await Promise.all([listPageNotes(pageSlug), listShareRecipients()]);
+    return NextResponse.json({ notes, recipients });
   } catch (error) {
     const m = error instanceof Error ? error.message : "Failed to load page notes.";
     return NextResponse.json({ error: m }, { status: errStatus(m) });
@@ -44,6 +46,9 @@ export async function PATCH(request: Request) {
   try {
     const body = await request.json();
     await requireSuperAdmin(request, body?.actionToken);
+    if (body.action === "reassign") {
+      return NextResponse.json({ note: await reassignPageNote(String(body.id), String(body.email)) });
+    }
     const note = await updatePageNote(String(body.id), {
       note: body.note, change_type: body.changeType, priority: body.priority, status: body.status,
     });
