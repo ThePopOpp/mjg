@@ -3,12 +3,15 @@
 import * as React from "react";
 import {
   Monitor, Tablet, Smartphone, RefreshCw, MousePointerClick, Crosshair, ListTree, Trash2, Loader2, Check, X, Plus,
+  ArrowLeft, Download, Bot, Bookmark,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldSelect } from "@/components/ui/field-select";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { AgentChat } from "@/components/ai-agent/agent-chat";
 import { installOverlay, type ElementDescriptor, type OverlayController, type OutlineItem, type SelectionMode } from "@/components/cms/frontend-overlay";
 import type { PageNote } from "@/lib/cms/page-notes";
 
@@ -44,8 +47,11 @@ const PRIORITY_COLOR: Record<string, string> = {
   low: "text-muted-foreground", medium: "text-foreground", high: "text-amber-600 dark:text-amber-400", urgent: "text-destructive",
 };
 
-export function FrontendEdits({ pages }: { pages: FrontendPage[] }) {
+export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: FrontendPage[]; onBack?: () => void; onOpenRequests?: () => void }) {
   const token = useDashboardActionToken();
+  const [origin, setOrigin] = React.useState("");
+  const [stewardOpen, setStewardOpen] = React.useState(false);
+  React.useEffect(() => { setOrigin(window.location.origin); }, []);
   const [page, setPage] = React.useState<FrontendPage | null>(pages[0] ?? null);
   const [device, setDevice] = React.useState("desktop");
   const [mode, setMode] = React.useState<SelectionMode>("auto");
@@ -165,31 +171,61 @@ export function FrontendEdits({ pages }: { pages: FrontendPage[] }) {
     return m;
   }, [notes]);
 
+  const fullUrl = page ? `${origin}${page.url}` : "";
+
+  // Export this page's edit requests as a Markdown brief (hand off to a dev / AI).
+  function exportNotes() {
+    if (!page) return;
+    const lines = [`# Edit requests — ${page.label}`, `Page: ${fullUrl}`, `Generated: ${new Date().toLocaleString()}`, "", `${notes.length} request(s).`, ""];
+    for (const n of notes) {
+      lines.push(`## ${n.element_label || n.element_ref}  \`${n.element_type}\``);
+      lines.push(`- Change: ${n.change_type} · Priority: ${n.priority} · Status: ${n.status}`);
+      if (n.dom_selector) lines.push(`- Selector: \`${n.dom_selector}\``);
+      lines.push(`- Ref: \`${n.element_ref}\``);
+      lines.push("", n.note, "");
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = `edit-requests-${page.slug}.md`; a.click(); URL.revokeObjectURL(a.href);
+  }
+
+  const stewardContext = page
+    ? `You are reviewing the public page "${page.label}" (${fullUrl}). Its ${notes.length} saved edit request(s):\n${notes.map((n) => `- [${n.change_type}/${n.priority}/${n.status}] ${n.element_label} (${n.element_type}): ${n.note}`).join("\n") || "(none yet)"}\nHelp draft the changes as CMS drafts — never publish or edit the live site.`
+    : "";
+
   if (!page) return <p className="text-sm text-muted-foreground">No frontend pages available to review yet.</p>;
 
   return (
-    <div className="flex h-[calc(100vh-190px)] min-h-[560px] flex-col gap-3">
+    <div className="flex h-[calc(100vh-120px)] min-h-[560px] flex-col gap-2">
+      {/* Breadcrumb */}
+      <div className="text-[11px] text-muted-foreground">
+        <button onClick={onBack} className="hover:text-foreground hover:underline">CMS</button>
+        <span className="mx-1.5 opacity-50">|</span>
+        <span className="text-foreground">Frontend Live Page Editor &amp; Element Inspector</span>
+      </div>
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-2">
+        {onBack && <Button variant="outline" size="sm" onClick={onBack}><ArrowLeft className="h-4 w-4" /> Back to CMS</Button>}
         <FieldSelect value={page.slug} onChange={(v) => { const p = pages.find((x) => x.slug === v); if (p) { setPage(p); setSelected(null); setOutline([]); } }}
-          options={pages.map((p) => ({ value: p.slug, label: p.label }))} className="h-9 w-56" />
-        <span className="hidden truncate text-xs text-muted-foreground sm:inline">{page.url}</span>
+          options={pages.map((p) => ({ value: p.slug, label: p.label }))} className="h-9 w-48" />
+        <span className="text-muted-foreground">/</span>
+        <Input readOnly value={fullUrl} className="h-9 w-64 bg-muted/40 text-xs text-muted-foreground" onFocus={(e) => e.currentTarget.select()} title={fullUrl} />
+        <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
+          {DEVICES.map((d) => (
+            <button key={d.key} onClick={() => setDevice(d.key)} title={d.label} className={cn("rounded-md p-1.5", device === d.key ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground")}><d.icon className="h-4 w-4" /></button>
+          ))}
+        </div>
+        <FieldSelect value={mode} onChange={(v) => setMode(v as SelectionMode)} options={MODES} className="h-9 w-36" />
+        <Button variant={selecting ? "default" : "outline"} size="sm" onClick={() => setSelecting((s) => !s)} title="Toggle click-to-select">
+          {selecting ? <Crosshair className="h-4 w-4" /> : <MousePointerClick className="h-4 w-4" />} {selecting ? "Selecting" : "Browse"}
+        </Button>
+        <Button variant={insertMode ? "default" : "outline"} size="sm" onClick={() => { setInsertMode((v) => !v); setSelected(null); }} title="Insert content between sections">
+          <Plus className="h-4 w-4" /> Insert Section
+        </Button>
         <div className="ml-auto flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] text-muted-foreground">Select:</span>
-            <FieldSelect value={mode} onChange={(v) => setMode(v as SelectionMode)} options={MODES} className="h-9 w-40" />
-          </div>
-          <Button variant={selecting ? "default" : "outline"} size="sm" onClick={() => setSelecting((s) => !s)} title="Toggle click-to-select">
-            {selecting ? <Crosshair className="h-4 w-4" /> : <MousePointerClick className="h-4 w-4" />} {selecting ? "Selecting" : "Browse"}
-          </Button>
-          <Button variant={insertMode ? "default" : "outline"} size="sm" onClick={() => { setInsertMode((v) => !v); setSelected(null); }} title="Insert content between sections">
-            <Plus className="h-4 w-4" /> Insert Section
-          </Button>
-          <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
-            {DEVICES.map((d) => (
-              <button key={d.key} onClick={() => setDevice(d.key)} title={d.label} className={cn("rounded-md p-1.5", device === d.key ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground")}><d.icon className="h-4 w-4" /></button>
-            ))}
-          </div>
+          {onOpenRequests && <Button variant="outline" size="sm" onClick={onOpenRequests} title="Saved edit requests"><Bookmark className="h-4 w-4" /> Saved Reviews</Button>}
+          <Button variant="outline" size="sm" onClick={exportNotes} disabled={notes.length === 0} title="Export this page's requests as Markdown"><Download className="h-4 w-4" /> Export</Button>
+          <Button variant="outline" size="sm" onClick={() => setStewardOpen(true)} title="Ask Steward to draft the changes"><Bot className="h-4 w-4" /> Send to Steward AI</Button>
           <Button variant="outline" size="sm" onClick={() => { setNonce((n) => n + 1); }} title="Reload preview"><RefreshCw className="h-4 w-4" /></Button>
         </div>
       </div>
@@ -302,6 +338,18 @@ export function FrontendEdits({ pages }: { pages: FrontendPage[] }) {
           ))}
         </div>
       </div>
+
+      {stewardOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setStewardOpen(false)} />
+          <div className="relative z-10 w-full max-w-2xl">
+            <button onClick={() => setStewardOpen(false)} className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"><X className="h-4 w-4" /></button>
+            <AgentChat title="Steward AI" subtitle={`Drafting edits for ${page.label}`} audio extraContext={stewardContext}
+              placeholder="Ask Steward to draft these edit requests…" heightClassName="h-[68vh] min-h-[420px]"
+              emptyTitle="Draft these edits with Steward" emptyHint="I can turn this page's saved edit requests into CMS draft changes for review — I won't publish or touch the live site." />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

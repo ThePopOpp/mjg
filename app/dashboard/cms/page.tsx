@@ -1,4 +1,3 @@
-import { SectionHeader } from "@/components/dashboard/section-header";
 import { listCmsPages } from "@/lib/cms/data";
 import { CmsWorkspace } from "@/components/cms/cms-workspace";
 import type { FrontendPage } from "@/components/cms/frontend-edits";
@@ -27,14 +26,5 @@ export default async function CmsPage() {
     .map((p) => ({ slug: `p-${p.slug}`, label: `${p.title} (CMS)`, url: `/p/${p.slug}` }));
   const frontendPages = [...PUBLIC_PAGES, ...cmsPublic];
 
-  return (
-    <div className="space-y-6">
-      <SectionHeader
-        eyebrow="Super Admin"
-        title="CMS"
-        description="Build frontend pages, and capture edit requests for both the public site (Frontend Edits) and the dashboard (Dashboard Edits). Super Admin only."
-      />
-      <CmsWorkspace initialPages={pages} frontendPages={frontendPages} />
-    </div>
-  );
+  return <CmsWorkspace initialPages={pages} frontendPages={frontendPages} />;
 }

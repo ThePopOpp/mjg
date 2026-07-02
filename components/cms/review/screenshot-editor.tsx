@@ -21,6 +21,7 @@ const hexA = (hex: string, a: number) => {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 };
 function drawShape(ctx: CanvasRenderingContext2D, s: Shape) {
+  if (!s || !s.tool) return;
   ctx.lineJoin = ctx.lineCap = "round";
   switch (s.tool) {
     case "pen": case "highlight": {
@@ -99,7 +100,11 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
     redraw();
   }
   function up() {
-    if (tool !== "crop" && draft.current) { setShapes((s) => [...s, draft.current as Shape]); draft.current = null; }
+    // Capture the finished shape in a local BEFORE nulling the ref, so the async
+    // setShapes updater can never read a null draft (which crashed redraw on .tool).
+    const d = draft.current;
+    draft.current = null;
+    if (tool !== "crop" && d) setShapes((s) => [...s, d]);
   }
   function applyCrop() {
     if (!img || !crop.current) return;

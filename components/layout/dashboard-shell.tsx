@@ -142,7 +142,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
 
       <div className={`transition-all duration-200 ${collapsed ? "lg:pl-16" : "lg:pl-72"}`}>
         <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
-          <div className="mx-auto flex h-16 w-full max-w-[112rem] items-center gap-3 px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 w-full items-center gap-3 px-4 sm:px-6 lg:px-8">
             {/* Mobile: open drawer */}
             <Button
               variant="ghost"
@@ -188,7 +188,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
         </header>
 
         <DashboardActionTokenProvider token={actionToken}>
-          <main className="mx-auto w-full max-w-[112rem] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+          <main className="w-full px-4 py-6 sm:px-6 lg:px-8">{children}</main>
         </DashboardActionTokenProvider>
       </div>
     </div>
