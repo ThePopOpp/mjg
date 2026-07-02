@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FieldSelect } from "@/components/ui/field-select";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type { PageNote } from "@/lib/cms/page-notes";
 import type { DashboardNote, DashboardNoteComment } from "@/lib/dashboard-notes/data";
@@ -45,21 +44,11 @@ function normDashboard(n: DashboardNote): Req {
     authorEmail: n.created_by_email || "", authorName: n.created_by_name || n.created_by_email || "—", screenshotUrl: n.screenshot_url, elementLabel: null, elementType: null, createdAt: n.created_at, raw: n };
 }
 
-export function EditRequests() {
-  return (
-    <Tabs defaultValue="frontend" className="w-full">
-      <TabsList>
-        <TabsTrigger value="frontend">Frontend Edits</TabsTrigger>
-        <TabsTrigger value="dashboard">Dashboard Edits</TabsTrigger>
-      </TabsList>
-      <TabsContent value="frontend" className="mt-4"><RequestBrowser kind="frontend" /></TabsContent>
-      <TabsContent value="dashboard" className="mt-4"><RequestBrowser kind="dashboard" /></TabsContent>
-    </Tabs>
-  );
-}
+const KINDS: { key: Kind; label: string }[] = [{ key: "frontend", label: "Frontend Edits" }, { key: "dashboard", label: "Dashboard Edits" }];
 
-function RequestBrowser({ kind }: { kind: Kind }) {
+export function EditRequests() {
   const token = useDashboardActionToken();
+  const [kind, setKind] = React.useState<Kind>("frontend");
   const [items, setItems] = React.useState<Req[]>([]);
   const [people, setPeople] = React.useState<Person[]>([]);
   const [view, setView] = React.useState("cards");
@@ -83,9 +72,15 @@ function RequestBrowser({ kind }: { kind: Kind }) {
   const shown = items.filter((i) => (statusFilter === "all" ? true : statusFilter === "active" ? i.status !== "archived" : i.status === statusFilter));
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <FieldSelect value={statusFilter} onChange={setStatusFilter} options={[{ value: "active", label: "Active" }, ...STATUSES, { value: "all", label: "All" }]} className="h-9 w-40" />
+    <div className="space-y-4">
+      {/* Single control row: sub-tabs · status filter · count · view toggles · refresh */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
+          {KINDS.map((k) => (
+            <button key={k.key} onClick={() => setKind(k.key)} className={cn("rounded-md px-3 py-1.5 text-xs font-medium transition-colors", kind === k.key ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground")}>{k.label}</button>
+          ))}
+        </div>
+        <FieldSelect value={statusFilter} onChange={setStatusFilter} options={[{ value: "active", label: "Active" }, ...STATUSES, { value: "all", label: "All" }]} className="h-9 w-36" />
         <span className="text-xs text-muted-foreground">{shown.length} request{shown.length === 1 ? "" : "s"}</span>
         <div className="ml-auto flex items-center gap-2">
           <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
