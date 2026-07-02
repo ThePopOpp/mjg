@@ -231,12 +231,12 @@ export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: Fronte
       </div>
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-2">
-        {onBack && <Button variant="outline" size="sm" onClick={onBack}><ArrowLeft className="h-4 w-4" /> Back to CMS</Button>}
+        {onBack && <Button variant="outline" size="sm" onClick={onBack}><ArrowLeft className="h-4 w-4" /> Back</Button>}
         <FieldSelect value={page.slug} onChange={(v) => { const p = allPages.find((x) => x.slug === v); if (p) { setPage(p); setSelected(null); setOutline([]); } }}
           options={allPages.map((p) => ({ value: p.slug, label: p.label }))} className="h-9 w-44" />
         <span className="text-muted-foreground">/</span>
         <Input value={urlInput} onChange={(e) => setUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") loadUrl(urlInput); }}
-          placeholder="Paste a same-origin URL or /path…" className="h-9 w-72 text-xs" title="Enter any same-origin URL and press Enter (or Go) to load it" />
+          placeholder="Paste a same-origin URL or /path…" className="h-9 w-56 text-xs" title="Enter any same-origin URL and press Enter (or Go) to load it" />
         <Button variant="outline" size="sm" onClick={() => loadUrl(urlInput)} title="Load this URL">Go</Button>
         <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
           {DEVICES.map((d) => (
@@ -251,9 +251,9 @@ export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: Fronte
           <Plus className="h-4 w-4" /> Insert Section
         </Button>
         <div className="ml-auto flex items-center gap-2">
-          {onOpenRequests && <Button variant="outline" size="sm" onClick={onOpenRequests} title="Saved edit requests"><Bookmark className="h-4 w-4" /> Saved Reviews</Button>}
+          {onOpenRequests && <Button variant="outline" size="sm" onClick={onOpenRequests} title="Saved edit requests"><Bookmark className="h-4 w-4" /> Reviews</Button>}
           <Button variant="outline" size="sm" onClick={exportNotes} disabled={notes.length === 0} title="Export this page's requests as Markdown"><Download className="h-4 w-4" /> Export</Button>
-          <Button variant="outline" size="sm" onClick={() => setStewardOpen(true)} title="Ask Steward to draft the changes"><Bot className="h-4 w-4" /> Send to Steward AI</Button>
+          <Button variant="outline" size="sm" onClick={() => setStewardOpen(true)} title="Ask Steward to draft the changes"><Bot className="h-4 w-4" /> Send to Steward</Button>
           <Button variant="outline" size="sm" onClick={() => { setNonce((n) => n + 1); }} title="Reload preview"><RefreshCw className="h-4 w-4" /></Button>
         </div>
       </div>
