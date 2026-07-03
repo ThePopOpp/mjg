@@ -74,6 +74,16 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
   const [cropDims, setCropDims] = React.useState<{ w: number; h: number } | null>(null);
   const [textDraft, setTextDraft] = React.useState<{ x: number; y: number; dispX: number; dispY: number; scale: number; value: string } | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const textRef = React.useRef<HTMLInputElement>(null);
+
+  // Focus the text caret whenever a new one is placed (autoFocus alone can lose
+  // out to the pointer sequence that created it).
+  React.useEffect(() => {
+    if (!textDraft) return;
+    const id = requestAnimationFrame(() => textRef.current?.focus());
+    return () => cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [textDraft?.dispX, textDraft?.dispY]);
 
   function commitText() {
     if (textDraft && textDraft.value.trim()) setShapes((s) => [...s, { tool: "text", color, size, x: textDraft.x, y: textDraft.y, text: textDraft.value }]);
@@ -103,6 +113,8 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
   function down(e: React.PointerEvent) {
     if (tool === "text") {
       // Place a text caret where clicked (commit any in-progress text first).
+      // preventDefault stops the pointerdown from stealing focus from the input.
+      e.preventDefault();
       const c = canvasRef.current!; const r = c.getBoundingClientRect(); const p = toCanvas(e);
       commitText();
       setTextDraft({ x: p.x, y: p.y, dispX: e.clientX - r.left, dispY: e.clientY - r.top, scale: r.width / c.width, value: "" });
@@ -167,12 +179,12 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
             className={cn("block max-w-full rounded-md border border-border shadow-lg", tool === "text" ? "cursor-text" : "cursor-crosshair")}
             style={{ touchAction: "none", height: "auto" }} />
           {textDraft && (
-            <input autoFocus value={textDraft.value}
+            <input ref={textRef} autoFocus value={textDraft.value}
               onChange={(e) => setTextDraft((t) => (t ? { ...t, value: e.target.value } : t))}
               onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); commitText(); } else if (e.key === "Escape") setTextDraft(null); }}
               onBlur={commitText}
-              placeholder="Type…"
-              style={{ position: "absolute", left: textDraft.dispX, top: textDraft.dispY, color, font: `600 ${textPx(size) * textDraft.scale}px system-ui, sans-serif`, lineHeight: 1.2, border: `1px dashed ${color}`, background: "rgba(255,255,255,.9)", borderRadius: 3, padding: "0 3px", outline: "none", minWidth: 60, maxWidth: "60%" }} />
+              placeholder="Type, then Enter"
+              style={{ position: "absolute", left: textDraft.dispX, top: textDraft.dispY, color, caretColor: color, font: `600 ${Math.max(13, textPx(size) * textDraft.scale)}px system-ui, sans-serif`, lineHeight: 1.3, border: `2px solid ${color}`, background: "#ffffff", borderRadius: 4, padding: "1px 4px", outline: "none", minWidth: 80, maxWidth: "70%", boxShadow: "0 2px 8px rgba(0,0,0,.2)" }} />
           )}
         </div>
       </div>
