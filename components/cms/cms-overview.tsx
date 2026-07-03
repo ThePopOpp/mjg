@@ -9,7 +9,7 @@
 import * as React from "react";
 import {
   MousePointerClick, ClipboardList, PanelsTopLeft, Bot, Plus, FileText, CheckCircle2, Clock,
-  CalendarDays, Users, Bell, HelpCircle, ArrowRight, RefreshCw, CircleDot,
+  CalendarDays, Users, Bell, HelpCircle, ArrowRight, RefreshCw, CircleDot, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,7 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
   const [reqs, setReqs] = React.useState<UReq[]>([]);
   const [unread, setUnread] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
+  const [activityOpen, setActivityOpen] = React.useState(false);
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -100,6 +101,22 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
     { label: "Questions", value: s.questions, sub: "flagged to users", icon: HelpCircle, onClick: nav.requests },
   ];
   const tone = (t?: string) => t === "amber" ? "text-amber-600 dark:text-amber-400" : t === "blue" ? "text-blue-600 dark:text-blue-400" : t === "emerald" ? "text-emerald-600 dark:text-emerald-400" : t === "red" ? "text-destructive" : "text-primary";
+  const activityCount = s.perDay.reduce((a, d) => a + d.submitted + d.completed, 0);
+
+  const activityTable = (
+    <div>
+      <div className="flex items-center pb-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+        <span className="flex-1">Day</span><span className="w-20 text-right">Submitted</span><span className="w-20 text-right">Completed</span>
+      </div>
+      {s.perDay.map((d) => (
+        <div key={d.label} className="flex items-center border-t border-border/60 py-2 text-sm">
+          <span className="flex-1 text-muted-foreground">{d.label}</span>
+          <span className="w-20 text-right font-medium tabular-nums">{d.submitted}</span>
+          <span className={cn("w-20 text-right font-medium tabular-nums", d.completed ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}>{d.completed}</span>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="space-y-5">
@@ -121,6 +138,13 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
       <div className="flex items-center gap-2">
         <h2 className="text-sm font-semibold text-muted-foreground">At a glance</h2>
         <div className="ml-auto flex items-center gap-2">
+          <button onClick={() => setActivityOpen(true)} title="Activity — last 7 days"
+            className="relative inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#315f43] px-3 text-sm font-medium text-white shadow-sm transition hover:opacity-90 dark:bg-[#c9a46e]">
+            <CalendarDays className="h-4 w-4" /> Activity Last 7 Days
+            {activityCount > 0 && (
+              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-[#315f43] shadow ring-1 ring-black/5 dark:text-[#8a6d3b]">{activityCount}</span>
+            )}
+          </button>
           <Button variant="outline" size="sm" onClick={nav.pages}><Plus className="h-4 w-4" /> New page</Button>
           <Button variant="outline" size="sm" onClick={load}><RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} /></Button>
         </div>
@@ -140,8 +164,8 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
         ))}
       </div>
 
-      {/* Recent activity + (activity by day, requesters) */}
-      <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
+      {/* Recent activity + requesters (Activity-by-day lives in the button's modal) */}
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="rounded-xl border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
             <span className="text-sm font-semibold">Recent edit requests</span>
@@ -163,40 +187,35 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
           </div>
         </div>
 
-        <div className="space-y-4">
-          {/* Activity by day */}
-          <div className="rounded-xl border border-border bg-card">
-            <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5 text-sm font-semibold"><CalendarDays className="h-4 w-4 text-muted-foreground" /> Activity · last 7 days</div>
-            <div className="px-4 py-1.5">
-              <div className="flex items-center pb-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                <span className="flex-1">Day</span><span className="w-16 text-right">Submitted</span><span className="w-16 text-right">Completed</span>
+        {/* Requesters */}
+        <div className="h-fit rounded-xl border border-border bg-card">
+          <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5 text-sm font-semibold"><Users className="h-4 w-4 text-muted-foreground" /> Requesters</div>
+          <div className="divide-y divide-border">
+            {s.requesters.length === 0 && <p className="px-4 py-8 text-center text-sm text-muted-foreground">No requesters yet.</p>}
+            {s.requesters.map((u) => (
+              <div key={u.name} className="flex items-center gap-2.5 px-4 py-2.5">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">{initials(u.name)}</span>
+                <span className="min-w-0 flex-1 truncate text-sm">{u.name}</span>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{u.count}</span>
               </div>
-              {s.perDay.map((d) => (
-                <div key={d.label} className="flex items-center border-t border-border/60 py-1.5 text-xs">
-                  <span className="flex-1 text-muted-foreground">{d.label}</span>
-                  <span className="w-16 text-right font-medium tabular-nums">{d.submitted}</span>
-                  <span className={cn("w-16 text-right font-medium tabular-nums", d.completed ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}>{d.completed}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Requesters */}
-          <div className="rounded-xl border border-border bg-card">
-            <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5 text-sm font-semibold"><Users className="h-4 w-4 text-muted-foreground" /> Requesters</div>
-            <div className="divide-y divide-border">
-              {s.requesters.length === 0 && <p className="px-4 py-8 text-center text-sm text-muted-foreground">No requesters yet.</p>}
-              {s.requesters.map((u) => (
-                <div key={u.name} className="flex items-center gap-2.5 px-4 py-2.5">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">{initials(u.name)}</span>
-                  <span className="min-w-0 flex-1 truncate text-sm">{u.name}</span>
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{u.count}</span>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </div>
+
+      {activityOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setActivityOpen(false)} />
+          <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-2xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-sm font-semibold"><CalendarDays className="h-4 w-4 text-primary" /> Activity · last 7 days</h2>
+              <button onClick={() => setActivityOpen(false)} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+            </div>
+            {activityTable}
+            <p className="mt-3 text-[11px] text-muted-foreground">Submitted = requests created that day. Completed = requests marked done that day.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

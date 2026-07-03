@@ -5,16 +5,18 @@
 // docs/features/dashboard-review-fab-portable.md §6.
 
 import * as React from "react";
-import { Crop, Pen, ArrowUpRight, Square as SquareIcon, Highlighter, Undo2, RotateCcw, Check, X } from "lucide-react";
+import { Crop, Pen, ArrowUpRight, Square as SquareIcon, Highlighter, Type as TypeIcon, Undo2, RotateCcw, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type Pt = { x: number; y: number };
-type Tool = "crop" | "pen" | "arrow" | "rect" | "highlight";
+type Tool = "crop" | "pen" | "arrow" | "rect" | "highlight" | "text";
 type FreeShape = { tool: "pen" | "highlight"; color: string; size: number; points: Pt[] };
 type LineShape = { tool: "arrow" | "rect"; color: string; size: number; a: Pt; b: Pt };
-type Shape = FreeShape | LineShape;
+type TextShape = { tool: "text"; color: string; size: number; x: number; y: number; text: string };
+type Shape = FreeShape | LineShape | TextShape;
 const isFree = (s: Shape): s is FreeShape => s.tool === "pen" || s.tool === "highlight";
+const textPx = (size: number) => 12 + size * 3; // baked font size (natural px)
 
 const hexA = (hex: string, a: number) => {
   const h = hex.replace("#", ""); const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
@@ -40,6 +42,13 @@ function drawShape(ctx: CanvasRenderingContext2D, s: Shape) {
       ctx.moveTo(l.b.x, l.b.y); ctx.lineTo(l.b.x - head * Math.cos(ang + Math.PI / 7), l.b.y - head * Math.sin(ang + Math.PI / 7));
       ctx.stroke(); break;
     }
+    case "text": {
+      const t = s as TextShape; const px = textPx(t.size);
+      ctx.fillStyle = t.color; ctx.textBaseline = "top";
+      ctx.font = `600 ${px}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+      t.text.split("\n").forEach((line, i) => ctx.fillText(line, t.x, t.y + i * px * 1.25));
+      break;
+    }
   }
 }
 function composite(img: HTMLImageElement, shapes: Shape[]): HTMLCanvasElement {
@@ -51,7 +60,7 @@ const COLORS = ["#ef4444", "#c9a46e", "#315f43", "#2563eb", "#111111", "#ffffff"
 const TOOLS: { key: Tool; icon: React.ElementType; label: string }[] = [
   { key: "crop", icon: Crop, label: "Crop" }, { key: "pen", icon: Pen, label: "Pen" },
   { key: "arrow", icon: ArrowUpRight, label: "Arrow" }, { key: "rect", icon: SquareIcon, label: "Box" },
-  { key: "highlight", icon: Highlighter, label: "Highlighter" },
+  { key: "highlight", icon: Highlighter, label: "Highlighter" }, { key: "text", icon: TypeIcon, label: "Text" },
 ];
 
 export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: string; onSave: (d: string) => void; onCancel: () => void }) {
@@ -60,10 +69,16 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
   const [tool, setTool] = React.useState<Tool>("pen");
   const [color, setColor] = React.useState("#ef4444");
   const [size, setSize] = React.useState(4);
-  const draft = React.useRef<Shape | null>(null);
+  const draft = React.useRef<FreeShape | LineShape | null>(null);
   const crop = React.useRef<{ a: Pt; b: Pt } | null>(null);
   const [cropDims, setCropDims] = React.useState<{ w: number; h: number } | null>(null);
+  const [textDraft, setTextDraft] = React.useState<{ x: number; y: number; dispX: number; dispY: number; scale: number; value: string } | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
+
+  function commitText() {
+    if (textDraft && textDraft.value.trim()) setShapes((s) => [...s, { tool: "text", color, size, x: textDraft.x, y: textDraft.y, text: textDraft.value }]);
+    setTextDraft(null);
+  }
 
   React.useEffect(() => { const i = new Image(); i.onload = () => setImg(i); i.src = dataUrl; }, [dataUrl]);
 
@@ -86,6 +101,13 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
     return { x: (e.clientX - r.left) * (c.width / r.width), y: (e.clientY - r.top) * (c.height / r.height) };
   }
   function down(e: React.PointerEvent) {
+    if (tool === "text") {
+      // Place a text caret where clicked (commit any in-progress text first).
+      const c = canvasRef.current!; const r = c.getBoundingClientRect(); const p = toCanvas(e);
+      commitText();
+      setTextDraft({ x: p.x, y: p.y, dispX: e.clientX - r.left, dispY: e.clientY - r.top, scale: r.width / c.width, value: "" });
+      return;
+    }
     e.preventDefault(); (e.target as HTMLElement).setPointerCapture(e.pointerId);
     const p = toCanvas(e);
     if (tool === "crop") { crop.current = { a: p, b: p }; setCropDims({ w: 0, h: 0 }); return; }
@@ -122,7 +144,7 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
       <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">
         <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5">
           {TOOLS.map((t) => (
-            <button key={t.key} onClick={() => { setTool(t.key); crop.current = null; setCropDims(null); redraw(); }} title={t.label}
+            <button key={t.key} onClick={() => { commitText(); setTool(t.key); crop.current = null; setCropDims(null); redraw(); }} title={t.label}
               className={cn("rounded-md p-1.5", tool === t.key ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground")}><t.icon className="h-4 w-4" /></button>
           ))}
         </div>
@@ -135,14 +157,24 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
         {tool === "crop" && cropDims && <span className="text-xs text-muted-foreground">{cropDims.w} × {cropDims.h}</span>}
         {tool === "crop" && <Button size="sm" variant="outline" onClick={applyCrop}><Crop className="h-3.5 w-3.5" /> Apply crop</Button>}
         <button onClick={() => setShapes((s) => s.slice(0, -1))} className="ml-auto flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs hover:bg-muted"><Undo2 className="h-3.5 w-3.5" /> Undo</button>
-        <button onClick={() => { setShapes([]); crop.current = null; setCropDims(null); redraw(); }} className="flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs hover:bg-muted"><RotateCcw className="h-3.5 w-3.5" /> Reset</button>
+        <button onClick={() => { setShapes([]); setTextDraft(null); crop.current = null; setCropDims(null); redraw(); }} className="flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs hover:bg-muted"><RotateCcw className="h-3.5 w-3.5" /> Reset</button>
         <Button size="sm" variant="ghost" onClick={onCancel}><X className="h-4 w-4" /> Cancel</Button>
         <Button size="sm" onClick={save}><Check className="h-4 w-4" /> Attach</Button>
       </div>
       <div className="flex-1 overflow-auto p-4">
-        <canvas ref={canvasRef} onPointerDown={down} onPointerMove={move} onPointerUp={up}
-          className="mx-auto block max-w-full cursor-crosshair rounded-md border border-border shadow-lg"
-          style={{ touchAction: "none", height: "auto" }} />
+        <div className="relative mx-auto w-fit">
+          <canvas ref={canvasRef} onPointerDown={down} onPointerMove={move} onPointerUp={up}
+            className={cn("block max-w-full rounded-md border border-border shadow-lg", tool === "text" ? "cursor-text" : "cursor-crosshair")}
+            style={{ touchAction: "none", height: "auto" }} />
+          {textDraft && (
+            <input autoFocus value={textDraft.value}
+              onChange={(e) => setTextDraft((t) => (t ? { ...t, value: e.target.value } : t))}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); commitText(); } else if (e.key === "Escape") setTextDraft(null); }}
+              onBlur={commitText}
+              placeholder="Type…"
+              style={{ position: "absolute", left: textDraft.dispX, top: textDraft.dispY, color, font: `600 ${textPx(size) * textDraft.scale}px system-ui, sans-serif`, lineHeight: 1.2, border: `1px dashed ${color}`, background: "rgba(255,255,255,.9)", borderRadius: 3, padding: "0 3px", outline: "none", minWidth: 60, maxWidth: "60%" }} />
+          )}
+        </div>
       </div>
     </div>
   );
