@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { InviteUserForm } from "@/components/user-management/invite-user-form";
 import { DeleteUserButton } from "@/components/user-management/delete-user-button";
-import { ROLE_LABELS, ROLES, isAppRole } from "@/lib/rbac/roles";
+import { ROLE_LABELS, ROLES, isAppRole, normalizeAppRole, type AppRole } from "@/lib/rbac/roles";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getUserManagementData } from "@/lib/user-management/repository";
 
@@ -14,9 +14,25 @@ export default async function UserManagementPage() {
   const currentUserId = profile?.id ?? null;
   const OWNER_EMAIL = "jw@michaeljgauthier.com";
 
+  // Count site-wide profiles assigned to each user role (admins/super-admins are
+  // intentionally not surfaced here — they're covered by the Profiles total).
+  const roleCount = (role: AppRole) => data.profiles.filter((p: any) => normalizeAppRole(p.role) === role).length;
+  const roleCards = [
+    { label: "Participants", value: roleCount(ROLES.PARTICIPANT) },
+    { label: "Pastor/Elders", value: roleCount(ROLES.PASTOR_ELDER_REVIEWER) },
+    { label: "Team Members (Team Leaders)", value: roleCount(ROLES.TEAM_MEMBER) },
+    { label: "Content Reviewers", value: roleCount(ROLES.CONTENT_REVIEWER) },
+  ];
+
   return (
     <div className="space-y-6">
       <SectionHeader title="User Management" description="Invite admins, team members, content reviewers, Pastor/Elder reviewers, and future participants." />
+
+      <div className="grid gap-4 md:grid-cols-4">
+        {roleCards.map((card) => (
+          <SummaryCard key={card.label} label={card.label} value={card.value} />
+        ))}
+      </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard label="Profiles" value={data.profiles.length} />
