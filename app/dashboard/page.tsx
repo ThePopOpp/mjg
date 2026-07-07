@@ -40,13 +40,12 @@ export default async function DashboardPage() {
         description="Track participant progress, stewardship check-ins, surveys, and follow-up interest from one admin workspace."
       />
 
-      <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
-        <div className="grid gap-4 sm:grid-cols-2 xl:auto-rows-min">
-          {metrics.map((metric) => (
-            <MetricCard key={metric.label} {...metric} />
-          ))}
-        </div>
-        <MyTasksCard tasks={myTasks} name={myName} />
+      <MyTasksCard tasks={myTasks} name={myName} />
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {metrics.map((metric) => (
+          <MetricCard key={metric.label} {...metric} />
+        ))}
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
