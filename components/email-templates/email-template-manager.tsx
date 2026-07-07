@@ -68,10 +68,16 @@ const STATUS_FILTERS: { key: StatusFilter; label: string }[] = [
 ];
 
 // Fixed-position menu anchored to a button — avoids table overflow clipping.
-type MenuPos = { top: number; right: number };
+// Flips upward when there isn't room below (rows near the bottom of the page).
+type MenuPos = { right: number; top?: number; bottom?: number };
+const MENU_EST_HEIGHT = 360;
 function anchorFrom(el: HTMLElement): MenuPos {
   const r = el.getBoundingClientRect();
-  return { top: r.bottom + 4, right: window.innerWidth - r.right };
+  const right = window.innerWidth - r.right;
+  if (window.innerHeight - r.bottom < MENU_EST_HEIGHT && r.top > MENU_EST_HEIGHT) {
+    return { right, bottom: window.innerHeight - r.top + 4 };
+  }
+  return { right, top: r.bottom + 4 };
 }
 
 export function EmailTemplateManager({ templates, mappings }: { templates: EmailTemplateRow[]; mappings: MappingRow[] }) {
@@ -81,7 +87,6 @@ export function EmailTemplateManager({ templates, mappings }: { templates: Email
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplateRow | null>(null);
   const [rowMenu, setRowMenu] = useState<{ template: EmailTemplateRow; pos: MenuPos } | null>(null);
-  const [fabMenu, setFabMenu] = useState(false);
   const [automationDialog, setAutomationDialog] = useState<{ presetTemplateId?: string } | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -311,7 +316,7 @@ export function EmailTemplateManager({ templates, mappings }: { templates: Email
                             </Link>
                           </Button>
                           <Button size="sm" type="button" variant="outline" aria-label="More actions"
-                            onClick={(e) => { setFabMenu(false); setRowMenu({ template: t, pos: anchorFrom(e.currentTarget) }); }}>
+                            onClick={(e) => setRowMenu({ template: t, pos: anchorFrom(e.currentTarget) })}>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </div>
@@ -344,26 +349,11 @@ export function EmailTemplateManager({ templates, mappings }: { templates: Email
             onClick={() => { saveWith(rowMenu.template, { isTest: !rowMenu.template.is_test }); setRowMenu(null); }} />
           <MenuItem icon={Archive} label="Archive" disabled={busy || rowMenu.template.status === "archived"}
             onClick={() => { saveWith(rowMenu.template, { status: "archived" }); setRowMenu(null); }} />
-          <div className="my-1 border-t" />
           <MenuItem icon={Trash2} label="Delete" danger disabled={busy}
             onClick={() => { deleteTemplate(rowMenu.template); setRowMenu(null); }} />
-        </MenuOverlay>
-      ) : null}
-
-      {/* Floating action button — bottom-center to avoid the Steward review FAB (bottom-right) */}
-      <button
-        type="button"
-        aria-label="Quick actions"
-        onClick={() => { setRowMenu(null); setFabMenu((v) => !v); }}
-        className="fixed bottom-6 left-1/2 z-40 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:brightness-110"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
-      {fabMenu ? (
-        <MenuOverlay center bottom={88} onClose={() => setFabMenu(false)}>
-          <MenuItem icon={Plus} label="Create template" href="/dashboard/emails/editor" onClick={() => setFabMenu(false)} />
-          <MenuItem icon={Workflow} label="Add to automation" onClick={() => { setAutomationDialog({}); setFabMenu(false); }} />
-          <MenuItem icon={Zap} label="Manage automations" href="/dashboard/emails/automations" onClick={() => setFabMenu(false)} />
+          <div className="my-1 border-t" />
+          <MenuItem icon={Plus} label="Create template" href="/dashboard/emails/editor" onClick={() => setRowMenu(null)} />
+          <MenuItem icon={Zap} label="Manage automations" href="/dashboard/emails/automations" onClick={() => setRowMenu(null)} />
         </MenuOverlay>
       ) : null}
 
@@ -410,18 +400,14 @@ function StatusPill({ status }: { status: EmailTemplateRow["status"] }) {
   return <span className={cn("inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize", styles[status])}>{status}</span>;
 }
 
-function MenuOverlay({
-  pos, bottom, center, onClose, children,
-}: { pos?: MenuPos; bottom?: number; center?: boolean; onClose: () => void; children: React.ReactNode }) {
-  const style: React.CSSProperties = center
-    ? { bottom, left: "50%", transform: "translateX(-50%)" }
-    : bottom !== undefined
-      ? { bottom, right: pos?.right }
-      : { top: pos?.top, right: pos?.right };
+function MenuOverlay({ pos, onClose, children }: { pos: MenuPos; onClose: () => void; children: React.ReactNode }) {
   return (
     <>
       <button type="button" aria-label="Close menu" className="fixed inset-0 z-40 cursor-default" onClick={onClose} />
-      <div className="fixed z-50 min-w-[13rem] rounded-md border bg-popover p-1 shadow-lg" style={style}>
+      <div
+        className="fixed z-50 min-w-[13rem] rounded-md border bg-popover p-1 shadow-lg"
+        style={{ right: pos.right, ...(pos.bottom !== undefined ? { bottom: pos.bottom } : { top: pos.top }) }}
+      >
         {children}
       </div>
     </>
