@@ -5,10 +5,17 @@ import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
+import { getCurrentProfile } from "@/lib/auth/server";
+import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
+import { MyTasksCard } from "@/components/dashboard/my-tasks-card";
 
 export default async function DashboardPage() {
-  const data = await getPilotDashboardData();
+  const [data, profile] = await Promise.all([getPilotDashboardData(), getCurrentProfile()]);
   const pilotMetrics = getPilotMetrics(data);
+  const myTasks = profile
+    ? await getMyOpenTasks({ id: profile.id, role: profile.role, email: profile.email })
+    : [];
+  const myName = profile ? [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim() : "";
   const metrics = [
     { label: "Total participants", value: String(data.participants.length), detail: "Created for More records", icon: UsersRound },
     { label: "Check-In completed", value: String(pilotMetrics.checkInCompleted), detail: `Average score ${pilotMetrics.averageScore || "-"}`, icon: CheckCircle2 },
@@ -33,10 +40,13 @@ export default async function DashboardPage() {
         description="Track participant progress, stewardship check-ins, surveys, and follow-up interest from one admin workspace."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {metrics.map((metric) => (
-          <MetricCard key={metric.label} {...metric} />
-        ))}
+      <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+        <div className="grid gap-4 sm:grid-cols-2 xl:auto-rows-min">
+          {metrics.map((metric) => (
+            <MetricCard key={metric.label} {...metric} />
+          ))}
+        </div>
+        <MyTasksCard tasks={myTasks} name={myName} />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
