@@ -42,10 +42,13 @@ export default async function DashboardPage() {
 
       <MyTasksCard tasks={myTasks} name={myName} />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {metrics.map((metric) => (
-          <MetricCard key={metric.label} {...metric} />
-        ))}
+      <div className="space-y-4 border-t pt-6">
+        <h2 className="text-lg font-semibold tracking-tight">Community</h2>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {metrics.map((metric) => (
+            <MetricCard key={metric.label} {...metric} />
+          ))}
+        </div>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
