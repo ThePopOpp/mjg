@@ -21,6 +21,7 @@ import {
   Settings,
   Share2,
   TrendingUp,
+  Users,
   UsersRound,
   UserCircle,
   Waves,
@@ -35,13 +36,17 @@ export type NavEntry = ({ kind: "item" } & NavLeaf) | NavGroup;
 // Sidebar navigation. Items render flat; a group renders as a collapsible accordion.
 export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard", label: "Dashboard", icon: Home },
-  { kind: "item", href: "/dashboard/participants", label: "Participants", icon: UsersRound },
-  { kind: "item", href: "/dashboard/contacts", label: "Contacts", icon: UserCircle },
-  { kind: "item", href: "/dashboard/waves", label: "Waves", icon: Waves },
-  { kind: "item", href: "/dashboard/check-in-results", label: "Check-In Results", icon: CheckSquare },
-  { kind: "item", href: "/dashboard/surveys", label: "Surveys", icon: MessageSquareText },
-  { kind: "item", href: "/dashboard/pastor-elder-review", label: "Pastor/Elder Review", icon: CircleUserRound },
-  { kind: "item", href: "/dashboard/inner-circle", label: "Inner Circle", icon: CalendarRange },
+  {
+    kind: "group", label: "Community", icon: Users, items: [
+      { href: "/dashboard/participants", label: "Participants", icon: UsersRound },
+      { href: "/dashboard/contacts", label: "Contacts", icon: UserCircle },
+      { href: "/dashboard/waves", label: "Waves", icon: Waves },
+      { href: "/dashboard/check-in-results", label: "Check-In Results", icon: CheckSquare },
+      { href: "/dashboard/surveys", label: "Surveys", icon: MessageSquareText },
+      { href: "/dashboard/pastor-elder-review", label: "Pastor/Elder Review", icon: CircleUserRound },
+      { href: "/dashboard/inner-circle", label: "Inner Circle", icon: CalendarRange },
+    ],
+  },
   { kind: "item", href: "/dashboard/blog-posts", label: "Blog Posts", icon: FileText, permission: PERMISSIONS.REVIEW_CONTENT },
   { kind: "item", href: "/dashboard/impact-score", label: "Impact Score", icon: TrendingUp, permission: PERMISSIONS.REVIEW_CONTENT },
   {
