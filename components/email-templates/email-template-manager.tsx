@@ -81,7 +81,7 @@ export function EmailTemplateManager({ templates, mappings }: { templates: Email
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplateRow | null>(null);
   const [rowMenu, setRowMenu] = useState<{ template: EmailTemplateRow; pos: MenuPos } | null>(null);
-  const [fabMenu, setFabMenu] = useState<MenuPos | null>(null);
+  const [fabMenu, setFabMenu] = useState(false);
   const [automationDialog, setAutomationDialog] = useState<{ presetTemplateId?: string } | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -311,7 +311,7 @@ export function EmailTemplateManager({ templates, mappings }: { templates: Email
                             </Link>
                           </Button>
                           <Button size="sm" type="button" variant="outline" aria-label="More actions"
-                            onClick={(e) => { setFabMenu(null); setRowMenu({ template: t, pos: anchorFrom(e.currentTarget) }); }}>
+                            onClick={(e) => { setFabMenu(false); setRowMenu({ template: t, pos: anchorFrom(e.currentTarget) }); }}>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </div>
@@ -350,20 +350,20 @@ export function EmailTemplateManager({ templates, mappings }: { templates: Email
         </MenuOverlay>
       ) : null}
 
-      {/* Floating action button */}
+      {/* Floating action button — bottom-center to avoid the Steward review FAB (bottom-right) */}
       <button
         type="button"
         aria-label="Quick actions"
-        onClick={(e) => { setRowMenu(null); setFabMenu(fabMenu ? null : anchorFrom(e.currentTarget)); }}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:brightness-110"
+        onClick={() => { setRowMenu(null); setFabMenu((v) => !v); }}
+        className="fixed bottom-6 left-1/2 z-40 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:brightness-110"
       >
         <Plus className="h-6 w-6" />
       </button>
       {fabMenu ? (
-        <MenuOverlay pos={{ top: 0, right: 24 }} bottom={88} onClose={() => setFabMenu(null)}>
-          <MenuItem icon={Plus} label="Create template" href="/dashboard/emails/editor" onClick={() => setFabMenu(null)} />
-          <MenuItem icon={Workflow} label="Add to automation" onClick={() => { setAutomationDialog({}); setFabMenu(null); }} />
-          <MenuItem icon={Zap} label="Manage automations" href="/dashboard/emails/automations" onClick={() => setFabMenu(null)} />
+        <MenuOverlay center bottom={88} onClose={() => setFabMenu(false)}>
+          <MenuItem icon={Plus} label="Create template" href="/dashboard/emails/editor" onClick={() => setFabMenu(false)} />
+          <MenuItem icon={Workflow} label="Add to automation" onClick={() => { setAutomationDialog({}); setFabMenu(false); }} />
+          <MenuItem icon={Zap} label="Manage automations" href="/dashboard/emails/automations" onClick={() => setFabMenu(false)} />
         </MenuOverlay>
       ) : null}
 
@@ -411,15 +411,17 @@ function StatusPill({ status }: { status: EmailTemplateRow["status"] }) {
 }
 
 function MenuOverlay({
-  pos, bottom, onClose, children,
-}: { pos: MenuPos; bottom?: number; onClose: () => void; children: React.ReactNode }) {
+  pos, bottom, center, onClose, children,
+}: { pos?: MenuPos; bottom?: number; center?: boolean; onClose: () => void; children: React.ReactNode }) {
+  const style: React.CSSProperties = center
+    ? { bottom, left: "50%", transform: "translateX(-50%)" }
+    : bottom !== undefined
+      ? { bottom, right: pos?.right }
+      : { top: pos?.top, right: pos?.right };
   return (
     <>
       <button type="button" aria-label="Close menu" className="fixed inset-0 z-40 cursor-default" onClick={onClose} />
-      <div
-        className="fixed z-50 min-w-[13rem] rounded-md border bg-popover p-1 shadow-lg"
-        style={bottom !== undefined ? { bottom, right: pos.right } : { top: pos.top, right: pos.right }}
-      >
+      <div className="fixed z-50 min-w-[13rem] rounded-md border bg-popover p-1 shadow-lg" style={style}>
         {children}
       </div>
     </>
