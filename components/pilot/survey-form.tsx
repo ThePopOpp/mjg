@@ -13,10 +13,11 @@ type SurveyField = {
   type: string;
   required?: boolean;
   options?: readonly string[];
+  help?: string;
 };
 
 type SurveyFormProps = {
-  surveyType: "general" | "pastor_elder";
+  surveyType: string;
   fields: readonly SurveyField[];
 };
 
@@ -63,6 +64,7 @@ export function SurveyForm({ surveyType, fields }: SurveyFormProps) {
         <Card key={field.name}>
           <CardContent className="space-y-2 p-4">
             <FieldLabel>{field.label}</FieldLabel>
+            {field.help ? <p className="text-xs text-muted-foreground">{field.help}</p> : null}
             {field.type === "textarea" ? (
               <Textarea name={field.name} required={field.required} />
             ) : field.type === "select" ? (
@@ -81,8 +83,17 @@ export function SurveyForm({ surveyType, fields }: SurveyFormProps) {
                   </label>
                 ))}
               </div>
+            ) : field.type === "radio" ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {field.options?.map((option) => (
+                  <label key={option} className="flex gap-2 rounded-md border bg-card/70 p-3 text-sm">
+                    <input name={field.name} type="radio" value={option} required={field.required} />
+                    {option}
+                  </label>
+                ))}
+              </div>
             ) : (
-              <Input name={field.name} type={field.type} required={field.required} />
+              <Input name={field.name} type={field.type === "phone" ? "tel" : field.type} required={field.required} />
             )}
           </CardContent>
         </Card>

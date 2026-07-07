@@ -42,7 +42,8 @@ with checks(migration, present) as (
     ('029 Steward read-only SQL RPC',            to_regprocedure('public.steward_readonly_query(text)') is not null),
     ('030 Frontend Edits (cms_page_notes)',      to_regclass('public.cms_page_notes') is not null),
     ('031 Dashboard Edits (dashboard_notes)',    to_regclass('public.dashboard_notes') is not null
-                                                   and to_regclass('public.dashboard_note_comments') is not null)
+                                                   and to_regclass('public.dashboard_note_comments') is not null),
+    ('032 Pilot form builders (pilot_forms)',    to_regclass('public.pilot_forms') is not null)
 )
 select migration,
        case when present then '✅ applied' else '❌ MISSING — run this file' end as status

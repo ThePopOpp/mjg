@@ -5,54 +5,39 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { CHECK_IN_SECTIONS, PARTICIPANT_TYPES, REFLECTION_PROMPTS, WAVE_SOURCE_VALUES, type CheckInSectionKey } from "@/lib/pilot/constants";
-import { scoreCheckIn, type CheckInScores } from "@/lib/scoring/check-in";
+import { PARTICIPANT_TYPES, WAVE_SOURCE_VALUES } from "@/lib/pilot/constants";
+import { scoreCheckInDef } from "@/lib/scoring/check-in";
+import type { CheckInDefinition } from "@/lib/pilot/form-types";
 import { FieldLabel, SelectField, Textarea } from "./field";
 
-const initialScores = Object.fromEntries(CHECK_IN_SECTIONS.map((section) => [section.key, Array(section.questions.length).fill(0)])) as CheckInScores;
-
-export function CheckInForm() {
+export function CheckInForm({ def }: { def: CheckInDefinition }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [scores, setScores] = useState<CheckInScores>(initialScores);
+  const scaleMax = def.scaleMax || 5;
+  const [scores, setScores] = useState<Record<string, number[]>>(
+    () => Object.fromEntries(def.sections.map((s) => [s.key, Array(s.questions.length).fill(0)])),
+  );
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const preview = useMemo(() => {
-    try {
-      return scoreCheckIn(scores);
-    } catch {
-      return null;
-    }
-  }, [scores]);
+  const preview = useMemo(() => { try { return scoreCheckInDef(def, scores); } catch { return null; } }, [def, scores]);
 
-  function updateScore(sectionKey: CheckInSectionKey, index: number, value: number) {
-    setScores((current) => ({
-      ...current,
-      [sectionKey]: current[sectionKey].map((score, scoreIndex) => (scoreIndex === index ? value : score)),
-    }));
+  function updateScore(sectionKey: string, index: number, value: number) {
+    setScores((current) => ({ ...current, [sectionKey]: current[sectionKey].map((score, i) => (i === index ? value : score)) }));
   }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError("");
-    setSubmitting(true);
-
+    setError(""); setSubmitting(true);
     const formData = new FormData(event.currentTarget);
-    const reflections = Object.fromEntries(REFLECTION_PROMPTS.map((prompt, index) => [`reflection_${index + 1}`, String(formData.get(`reflection_${index + 1}`) ?? "")]));
-
+    const reflections = Object.fromEntries(def.reflections.map((_, index) => [`reflection_${index + 1}`, String(formData.get(`reflection_${index + 1}`) ?? "")]));
     try {
-      const result = scoreCheckIn(scores);
+      const result = scoreCheckInDef(def, scores);
       const response = await fetch("/api/pilot/check-in", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contact: {
-            firstName: formData.get("firstName"),
-            lastName: formData.get("lastName"),
-            email: formData.get("email"),
-            phone: formData.get("phone"),
-            waveSource: formData.get("waveSource"),
-            relationshipCategory: formData.get("relationshipCategory"),
+            firstName: formData.get("firstName"), lastName: formData.get("lastName"), email: formData.get("email"),
+            phone: formData.get("phone"), waveSource: formData.get("waveSource"), relationshipCategory: formData.get("relationshipCategory"),
             participantType: formData.get("participantType"),
             consent: {
               emailJourneyOptIn: formData.get("emailJourneyOptIn") === "on",
@@ -62,62 +47,34 @@ export function CheckInForm() {
               followUpPermission: formData.get("storyInterviewPermission") === "on",
             },
           },
-          scores,
-          reflections,
+          scores, reflections,
         }),
       });
-
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "Submission failed.");
-
-      const params = new URLSearchParams({
-        score: String(result.totalScore),
-        lowest: result.lowestAreaLabel,
-        category: result.scoreRangeCategory,
-      });
+      const params = new URLSearchParams({ score: String(result.totalScore), lowest: result.lowestAreaLabel, category: result.scoreRangeCategory });
       router.push(`/check-in/thank-you?${params.toString()}`);
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : "Something went wrong.");
-    } finally {
-      setSubmitting(false);
-    }
+    } finally { setSubmitting(false); }
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Your information</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle>Your information</CardTitle></CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <FieldLabel>First name</FieldLabel>
-            <Input name="firstName" required />
-          </div>
-          <div className="space-y-2">
-            <FieldLabel>Last name</FieldLabel>
-            <Input name="lastName" required />
-          </div>
-          <div className="space-y-2">
-            <FieldLabel>Email</FieldLabel>
-            <Input name="email" type="email" required />
-          </div>
-          <div className="space-y-2">
-            <FieldLabel>Phone, optional</FieldLabel>
-            <Input name="phone" />
-          </div>
+          <div className="space-y-2"><FieldLabel>First name</FieldLabel><Input name="firstName" required /></div>
+          <div className="space-y-2"><FieldLabel>Last name</FieldLabel><Input name="lastName" required /></div>
+          <div className="space-y-2"><FieldLabel>Email</FieldLabel><Input name="email" type="email" required /></div>
+          <div className="space-y-2"><FieldLabel>Phone, optional</FieldLabel><Input name="phone" /></div>
           <div className="space-y-2">
             <FieldLabel>Wave/source</FieldLabel>
             <SelectField name="waveSource" defaultValue={searchParams.get("source") ?? searchParams.get("wave") ?? "direct_text"}>
-              {WAVE_SOURCE_VALUES.map((value) => (
-                <option key={value} value={value}>{value.replaceAll("_", " ")}</option>
-              ))}
+              {WAVE_SOURCE_VALUES.map((value) => (<option key={value} value={value}>{value.replaceAll("_", " ")}</option>))}
             </SelectField>
           </div>
-          <div className="space-y-2">
-            <FieldLabel>Relationship category</FieldLabel>
-            <Input name="relationshipCategory" placeholder="Friend, family, pastor, colleague..." />
-          </div>
+          <div className="space-y-2"><FieldLabel>Relationship category</FieldLabel><Input name="relationshipCategory" placeholder="Friend, family, pastor, colleague..." /></div>
           <div className="space-y-2 sm:col-span-2">
             <FieldLabel>Participant type</FieldLabel>
             <SelectField name="participantType" defaultValue={searchParams.get("type") === "pastor_elder" ? PARTICIPANT_TYPES.PASTOR_ELDER : PARTICIPANT_TYPES.GENERAL}>
@@ -128,17 +85,15 @@ export function CheckInForm() {
         </CardContent>
       </Card>
 
-      {CHECK_IN_SECTIONS.map((section) => (
-        <Card key={section.key}>
-          <CardHeader>
-            <CardTitle>{section.title}</CardTitle>
-          </CardHeader>
+      {def.sections.map((section) => (
+        <Card key={section.id}>
+          <CardHeader><CardTitle>{section.title}</CardTitle></CardHeader>
           <CardContent className="space-y-5">
             {section.questions.map((question, index) => (
-              <div key={question} className="space-y-2">
-                <FieldLabel>{question}</FieldLabel>
-                <div className="grid grid-cols-5 gap-2">
-                  {[1, 2, 3, 4, 5].map((value) => (
+              <div key={question.id} className="space-y-2">
+                <FieldLabel>{question.text}</FieldLabel>
+                <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${scaleMax},minmax(0,1fr))` }}>
+                  {Array.from({ length: scaleMax }, (_, i) => i + 1).map((value) => (
                     <label key={value} className="flex h-10 cursor-pointer items-center justify-center rounded-md border bg-card/70 text-sm font-semibold transition-colors has-[:checked]:border-[color:var(--brand-gold)] has-[:checked]:bg-[color:var(--brand-gold-2)] has-[:checked]:text-[color:var(--brand-ink)]">
                       <input className="sr-only" type="radio" name={`${section.key}_${index}`} required checked={scores[section.key][index] === value} onChange={() => updateScore(section.key, index, value)} />
                       {value}
@@ -151,19 +106,16 @@ export function CheckInForm() {
         </Card>
       ))}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Reflection</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {REFLECTION_PROMPTS.map((prompt, index) => (
-            <div key={prompt} className="space-y-2">
-              <FieldLabel>{prompt}</FieldLabel>
-              <Textarea name={`reflection_${index + 1}`} required />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      {def.reflections.length > 0 && (
+        <Card>
+          <CardHeader><CardTitle>Reflection</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            {def.reflections.map((prompt, index) => (
+              <div key={index} className="space-y-2"><FieldLabel>{prompt}</FieldLabel><Textarea name={`reflection_${index + 1}`} required /></div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardContent className="space-y-3 p-4">
@@ -171,7 +123,7 @@ export function CheckInForm() {
           <label className="flex gap-3 rounded-md border bg-card/70 p-3 text-sm"><input name="futureUpdatesOptIn" type="checkbox" /> Michael may send me future MJG / Stewardship Blueprint updates.</label>
           <label className="flex gap-3 rounded-md border bg-card/70 p-3 text-sm"><input name="anonymousFeedbackPermission" type="checkbox" /> Michael may use my anonymous feedback to improve the book and future resources.</label>
           <label className="flex gap-3 rounded-md border bg-card/70 p-3 text-sm"><input name="storyInterviewPermission" type="checkbox" /> Michael may contact me about a possible quote, story, or interview.</label>
-          {preview ? <p className="text-sm text-muted-foreground">Current score preview: {preview.totalScore} · {preview.scoreRangeCategory}</p> : null}
+          {preview ? <p className="text-sm text-muted-foreground">Current score preview: {preview.totalScore} / {preview.maxScore} · {preview.scoreRangeCategory}</p> : null}
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Complete the Check-In"}</Button>
         </CardContent>

@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
 import { saveSurvey } from "@/lib/pilot/repository";
+import { isSubmittableSurvey } from "@/lib/pilot/forms-data";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const surveyType = body.surveyType;
+    const surveyType = String(body.surveyType ?? "");
     const answers = body.answers ?? {};
     const name = String(answers.name ?? "").trim();
     const email = String(answers.email ?? "").trim().toLowerCase();
 
-    if (surveyType !== "general" && surveyType !== "pastor_elder") {
+    // Accept the two legacy surveys + any published builder survey (by its slug).
+    if (!(await isSubmittableSurvey(surveyType))) {
       return NextResponse.json({ error: "Invalid survey type." }, { status: 400 });
     }
 

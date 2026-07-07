@@ -60,12 +60,15 @@ export async function upsertParticipant(input: ContactInput) {
 
 export async function saveCheckIn(input: {
   contact: ContactInput;
-  scores: CheckInScores;
-  result: CheckInScoreResult;
+  scores: Record<string, number[]>;
+  result: { totalScore: number; scoreRangeCategory: string; lowestAreaKey: string; lowestAreaLabel: string; lowestAreaTag: string; sectionScores: Record<string, number> };
   reflections: Record<string, string>;
+  // The check-in section definition (falls back to the hardcoded constants).
+  sections?: { key: string; title: string; questions: readonly string[] }[];
 }) {
   const supabase = createSupabaseAdminClient();
   const participant = await upsertParticipant(input.contact);
+  const sections = input.sections ?? CHECK_IN_SECTIONS;
 
   const { data: checkIn, error: resultError } = await supabase
     .from("check_in_results")
@@ -84,7 +87,7 @@ export async function saveCheckIn(input: {
 
   if (resultError) throw resultError;
 
-  const answers = CHECK_IN_SECTIONS.flatMap((section) =>
+  const answers = sections.flatMap((section) =>
     section.questions.map((question, index) => ({
       check_in_result_id: checkIn.id,
       participant_id: participant.id,
@@ -148,7 +151,7 @@ export async function saveCheckIn(input: {
 }
 
 export async function saveSurvey(input: {
-  surveyType: "general" | "pastor_elder";
+  surveyType: string; // "general" | "pastor_elder" | a published builder survey slug
   name: string;
   email: string;
   answers: Record<string, unknown>;
