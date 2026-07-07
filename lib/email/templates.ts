@@ -52,6 +52,7 @@ export async function saveEmailTemplate(input: {
   textBody?: string;
   category?: string;
   status?: "draft" | "active" | "archived";
+  isTest?: boolean;
   actorUserId?: string;
 }) {
   if (!input.name || !input.subject || !input.htmlBody) {
@@ -74,6 +75,9 @@ export async function saveEmailTemplate(input: {
     updated_by: input.actorUserId ?? null,
     updated_at: new Date().toISOString(),
   };
+  // Only touch is_test when explicitly provided, so template saves keep working
+  // even before migration 033 adds the column.
+  if (typeof input.isTest === "boolean") (payload as Record<string, unknown>).is_test = input.isTest;
 
   const query = input.id
     ? supabase.from("email_templates").update(payload).eq("id", input.id)

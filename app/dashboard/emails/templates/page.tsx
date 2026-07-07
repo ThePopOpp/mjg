@@ -11,7 +11,7 @@ export default async function EmailTemplatesHubPage() {
       <SectionHeader title="Emails" description="Review and manage saved email templates." />
       <EmailTabs active="templates" />
 
-      <EmailTemplateManager templates={data.templates as any[]} />
+      <EmailTemplateManager templates={data.templates as any[]} mappings={data.mappings as any[]} />
 
       {data.error ? <p className="text-sm text-destructive">{data.error}</p> : null}
     </div>

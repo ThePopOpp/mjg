@@ -16,6 +16,7 @@ export async function POST(request: Request) {
       textBody: body.textBody,
       category: body.category,
       status: body.status,
+      isTest: typeof body.isTest === "boolean" ? body.isTest : undefined,
       actorUserId: actor.id,
     });
 

@@ -43,7 +43,10 @@ with checks(migration, present) as (
     ('030 Frontend Edits (cms_page_notes)',      to_regclass('public.cms_page_notes') is not null),
     ('031 Dashboard Edits (dashboard_notes)',    to_regclass('public.dashboard_notes') is not null
                                                    and to_regclass('public.dashboard_note_comments') is not null),
-    ('032 Pilot form builders (pilot_forms)',    to_regclass('public.pilot_forms') is not null)
+    ('032 Pilot form builders (pilot_forms)',    to_regclass('public.pilot_forms') is not null),
+    ('033 email_templates.is_test flag',         exists (select 1 from information_schema.columns
+                                                          where table_schema = 'public' and table_name = 'email_templates'
+                                                            and column_name = 'is_test'))
 )
 select migration,
        case when present then '✅ applied' else '❌ MISSING — run this file' end as status
