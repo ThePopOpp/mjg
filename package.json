@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "node scripts/apply-migrations.mjs",
+    "db:migrate:status": "node scripts/apply-migrations.mjs --status",
+    "db:migrate:check": "node scripts/apply-migrations.mjs --check"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -41,8 +44,10 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "autoprefixer": "^10.4.20",
+    "dotenv": "^17.4.2",
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.1.6",
+    "pg": "^8.22.0",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
