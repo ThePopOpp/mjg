@@ -64,9 +64,9 @@ export function CheckInForm({ def }: { def: CheckInDefinition }) {
       <Card>
         <CardHeader><CardTitle>Your information</CardTitle></CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2"><FieldLabel>First name</FieldLabel><Input name="firstName" required /></div>
-          <div className="space-y-2"><FieldLabel>Last name</FieldLabel><Input name="lastName" required /></div>
-          <div className="space-y-2"><FieldLabel>Email</FieldLabel><Input name="email" type="email" required /></div>
+          <div className="space-y-2"><FieldLabel>First name</FieldLabel><Input name="firstName" defaultValue={searchParams.get("firstName") ?? ""} required /></div>
+          <div className="space-y-2"><FieldLabel>Last name</FieldLabel><Input name="lastName" defaultValue={searchParams.get("lastName") ?? ""} required /></div>
+          <div className="space-y-2"><FieldLabel>Email</FieldLabel><Input name="email" type="email" defaultValue={searchParams.get("email") ?? ""} required /></div>
           <div className="space-y-2"><FieldLabel>Phone, optional</FieldLabel><Input name="phone" /></div>
           <div className="space-y-2">
             <FieldLabel>Wave/source</FieldLabel>

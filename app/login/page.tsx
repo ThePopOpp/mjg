@@ -5,6 +5,7 @@ import whiteLogo from "@/docs/mjg-logos/mjg_white.png";
 import { LoginForm } from "@/components/auth/login-form";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getCurrentProfile, isActiveDashboardProfile } from "@/lib/auth/server";
+import { ROLES } from "@/lib/rbac/roles";
 
 export const metadata = {
   title: "Login | MJG Dashboard",
@@ -15,6 +16,11 @@ export default async function LoginPage() {
 
   if (isActiveDashboardProfile(profile)) {
     redirect("/dashboard");
+  }
+
+  // Signed-in participants go to their portal, not the admin dashboard.
+  if (profile?.status === "active" && profile.role === ROLES.PARTICIPANT) {
+    redirect("/portal");
   }
 
   return (

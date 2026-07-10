@@ -16,6 +16,11 @@ export default async function DashboardLayout({
     redirect("/login?next=/dashboard");
   }
 
+  // Active participants have their own portal, not the admin dashboard.
+  if (profile.status === "active" && profile.role === ROLES.PARTICIPANT) {
+    redirect("/portal");
+  }
+
   if (!isActiveDashboardProfile(profile)) {
     redirect("/access-restricted");
   }
