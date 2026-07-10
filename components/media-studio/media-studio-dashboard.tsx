@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { SendToClaudeButton } from "@/components/dev-requests/send-to-claude-button";
+import { AskStewardButton } from "@/components/ai-agent/ask-steward-button";
 import { cn } from "@/lib/utils";
 
 type AssetType = "audio" | "video" | "photo" | "document";
@@ -173,6 +175,7 @@ export function MediaStudioDashboard({
           onViewModeChange={setViewMode}
           onPlay={active === "audio" ? setPlayerAsset : undefined}
           onEdit={active === "audio" ? handleEditAudio : active === "document" ? handleEditDocument : undefined}
+          isSuperAdmin={isSuperAdmin}
         />
       )}
 
@@ -1017,6 +1020,7 @@ function MediaLibrary({
   onViewModeChange,
   onPlay,
   onEdit,
+  isSuperAdmin = false,
 }: {
   active: AssetType;
   assets: any[];
@@ -1024,6 +1028,7 @@ function MediaLibrary({
   onViewModeChange: (mode: ViewMode) => void;
   onPlay?: (asset: any) => void;
   onEdit?: (asset: any) => void;
+  isSuperAdmin?: boolean;
 }) {
   const typeLabel = typeLabelFor(active);
 
@@ -1093,6 +1098,7 @@ function MediaLibrary({
                   key={asset.id}
                   asset={asset}
                   onEdit={onEdit ? () => onEdit(asset) : undefined}
+                  isSuperAdmin={isSuperAdmin}
                 />
               ) : (
                 <GenericMediaCard key={asset.id} asset={asset} />
@@ -1357,11 +1363,19 @@ function GenericMediaCard({ asset }: { asset: any }) {
 
 // ─── Resource (document) card ─────────────────────────────────────────────────
 
-function ResourceCard({ asset, onEdit }: { asset: any; onEdit?: () => void }) {
+function ResourceCard({ asset, onEdit, isSuperAdmin = false }: { asset: any; onEdit?: () => void; isSuperAdmin?: boolean }) {
   const resourceType = resourceTypes.find((r) => r.value === asset.metadata?.resource_type);
+  const resourceTypeLabel = resourceType?.label ?? "resource";
   const targets = Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : [];
   const sharedCount = Array.isArray(asset.metadata?.shared_with) ? asset.metadata.shared_with.length : 0;
   const fileLabel = asset.metadata?.original_filename || asset.file_url;
+  const stewardContext = [
+    `A team member submitted this resource in Media Studio for review.`,
+    `Title: ${asset.title}`,
+    `Type: ${resourceTypeLabel}`,
+    asset.description ? `Notes: ${asset.description}` : null,
+    asset.file_url ? `File: ${asset.file_url}` : null,
+  ].filter(Boolean).join("\n");
   return (
     <div className="flex flex-col gap-3 rounded-md border bg-card p-4 shadow-sm">
       <div className="flex items-start gap-3">
@@ -1419,6 +1433,31 @@ function ResourceCard({ asset, onEdit }: { asset: any; onEdit?: () => void }) {
           </Button>
         ) : null}
       </div>
+      {isSuperAdmin && asset.id ? (
+        <div className="flex flex-wrap gap-2 border-t pt-3">
+          <SendToClaudeButton
+            payload={{
+              sourceType: "media_resource",
+              sourceId: asset.id,
+              title: asset.title,
+              body: asset.description || null,
+              fileUrl: asset.file_url || null,
+              requestKind: asset.metadata?.resource_type || "resource",
+            }}
+          />
+          <AskStewardButton
+            subtitle="Media Studio resource"
+            extraContext={stewardContext}
+            suggestions={[
+              "Summarize this resource and what it's asking for.",
+              "If this is a feature request, outline how you'd implement it.",
+              "Add this to the dev request queue and mark it in progress.",
+            ]}
+            emptyTitle="Triage this resource"
+            emptyHint="I can read the attached resource details, summarize a feature request, and manage the dev request queue."
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

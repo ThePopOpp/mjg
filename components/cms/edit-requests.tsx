@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FieldSelect } from "@/components/ui/field-select";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { SendToClaudeButton } from "@/components/dev-requests/send-to-claude-button";
+import { AskStewardButton } from "@/components/ai-agent/ask-steward-button";
 import type { PageNote } from "@/lib/cms/page-notes";
 import type { DashboardNote, DashboardNoteComment } from "@/lib/dashboard-notes/data";
 
@@ -266,9 +268,39 @@ function RequestDetailModal({ req, people, onClose, onChanged }: { req: Req; peo
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2 border-t border-border px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-2.5">
           <Button variant="outline" size="sm" onClick={() => changeStatus("archived")} disabled={status === "archived"}><Archive className="h-3.5 w-3.5" /> Archive</Button>
           <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={del} disabled={busy}>{busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />} Delete</Button>
+          <SendToClaudeButton
+            payload={{
+              sourceType: req.kind === "frontend" ? "cms_frontend_edit" : "cms_dashboard_edit",
+              sourceId: req.id,
+              title: `${req.type} · ${req.page}`,
+              body: req.note,
+              pageTarget: req.route || null,
+              requestKind: req.type,
+              priority: (["low", "medium", "high", "urgent"].includes(req.priority) ? req.priority : "medium") as "low" | "medium" | "high" | "urgent",
+            }}
+          />
+          <AskStewardButton
+            subtitle={`${req.kind} edit request`}
+            extraContext={[
+              `A ${req.kind} edit request from the CMS.`,
+              `Page: ${req.page}${req.route ? ` (${req.route})` : ""}`,
+              `Type: ${req.type} · Priority: ${req.priority}`,
+              `Requested by: ${req.authorName || req.authorEmail || "—"}`,
+              ``,
+              `Request:`,
+              req.note,
+            ].join("\n")}
+            suggestions={[
+              "Summarize this edit request and what needs to change.",
+              "Outline how you'd implement this change.",
+              "Add this to the dev request queue and mark it in progress.",
+            ]}
+            emptyTitle="Triage this edit request"
+            emptyHint="I can read this request's page and details, summarize the change, and manage the dev request queue."
+          />
           <Button size="sm" className="ml-auto" onClick={onClose}>Done</Button>
         </div>
       </div>

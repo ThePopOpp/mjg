@@ -16,6 +16,7 @@ import { EMAIL_EVENT_KEYS } from "@/lib/email/constants";
 import { getBlogAdminData, getBlogPostById, saveBlogPost, updateBlogPostStatus, normalizePostTags } from "@/lib/content/blog";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { saveMediaAsset, getMediaStudioData } from "@/lib/content/media";
+import { listDevRequests, updateDevRequestStatus } from "@/lib/dev-requests/repository";
 import { BRAND_KIT, brandEmailButton, brandEmailHeader } from "@/lib/brand/assets";
 import { saveAgentMemory, deleteAgentMemory } from "@/lib/ai-agent/memory";
 import {
@@ -1553,6 +1554,78 @@ const updateCmsDraftPageTool: AgentTool = {
   },
 };
 
+// ─── Dev Request Queue (items flagged for Claude to implement) ────────────────
+
+const listDevRequestsTool: AgentTool = {
+  name: "list_dev_requests",
+  description:
+    "List items in the Dev Request Queue — feature/edit requests the team flagged for the dev agent (Claude) to implement, sent from Media Studio resources and CMS edit requests. Super Admin only. Use to triage what's pending, in progress, or done.",
+  parameters: {
+    type: "object",
+    properties: {
+      status: {
+        type: "string",
+        enum: ["active", "queued", "in_progress", "done", "archived", "all"],
+        description: "Filter by status. 'active' (default) = queued + in progress.",
+      },
+    },
+  },
+  requiresConfirmation: false,
+  async execute(args, ctx) {
+    await assertSuperAdmin(ctx, "The Dev Request Queue is restricted to Super Admins.");
+    const status = (typeof args.status === "string" ? args.status : "active") as never;
+    const requests = await listDevRequests({ status });
+    return {
+      count: requests.length,
+      requests: requests.map((r) => ({
+        id: r.id,
+        title: r.title,
+        source: r.source_type,
+        kind: r.request_kind,
+        priority: r.priority,
+        status: r.status,
+        page: r.page_target,
+        file_url: r.file_url,
+        body: r.body,
+        created_at: r.created_at,
+      })),
+    };
+  },
+};
+
+const updateDevRequestStatusTool: AgentTool = {
+  name: "update_dev_request_status",
+  description:
+    "Update the status of a Dev Request Queue item (queued → in_progress → done, or archived). Super Admin only. Optionally attach a short implementation brief.",
+  parameters: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "The dev request id." },
+      status: { type: "string", enum: ["queued", "in_progress", "done", "archived"] },
+      brief: { type: "string", description: "Optional short implementation brief / notes to store on the request." },
+    },
+    required: ["id", "status"],
+  },
+  requiresConfirmation: true,
+  summarize: (args) => `Set dev request ${String(args.id).slice(0, 8)} to "${args.status}"`,
+  async execute(args, ctx) {
+    await assertSuperAdmin(ctx, "The Dev Request Queue is restricted to Super Admins.");
+    const updated = await updateDevRequestStatus({
+      id: String(args.id),
+      status: args.status as never,
+      stewardBrief: typeof args.brief === "string" ? args.brief : undefined,
+    });
+    await logUserActivity({
+      userId: ctx.actorId,
+      action: "ai_agent_update_dev_request",
+      entityType: "dev_requests",
+      entityId: updated.id,
+      metadata: { status: updated.status },
+    }).catch(() => {});
+    return { ok: true, id: updated.id, status: updated.status, title: updated.title };
+  },
+};
+
 export const AGENT_TOOLS: AgentTool[] = [
   // Reads
   searchParticipants,
@@ -1576,6 +1649,7 @@ export const AGENT_TOOLS: AgentTool[] = [
   listProjectItems,
   listProjectTemplates,
   listCmsPagesTool,
+  listDevRequestsTool,
   // Dashboard users + previously-blind read sections
   searchUsers,
   listUsers,
@@ -1612,6 +1686,7 @@ export const AGENT_TOOLS: AgentTool[] = [
   updateProjectItem,
   createCmsDraftPageTool,
   updateCmsDraftPageTool,
+  updateDevRequestStatusTool,
   // Memory (internal, no confirmation)
   rememberTool,
   forgetTool,

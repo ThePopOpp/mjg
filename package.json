@@ -10,7 +10,8 @@
     "lint": "next lint",
     "db:migrate": "node scripts/apply-migrations.mjs",
     "db:migrate:status": "node scripts/apply-migrations.mjs --status",
-    "db:migrate:check": "node scripts/apply-migrations.mjs --check"
+    "db:migrate:check": "node scripts/apply-migrations.mjs --check",
+    "dev:requests": "node scripts/dev-requests.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
