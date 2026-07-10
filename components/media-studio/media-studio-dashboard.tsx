@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Copy, FileAudio, ImageIcon, LayoutGrid, LayoutList, LinkIcon, Mic,
+  Copy, Download, FileAudio, FileText, ImageIcon, LayoutGrid, LayoutList, LinkIcon, Mic,
   Pause, Pencil, Play, RotateCcw, Save, Square, Table, Upload, Video, X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { cn } from "@/lib/utils";
 
-type AssetType = "audio" | "video" | "photo";
+type AssetType = "audio" | "video" | "photo" | "document";
 type ViewMode = "card" | "list" | "table";
 type SubTab = "studio" | "files";
 type UploadedFile = { url: string; bucket: string; path: string; mimeType: string; fileSize: number };
@@ -24,7 +24,23 @@ const mediaTypes: { value: AssetType; label: string; icon: React.ElementType }[]
   { value: "audio", label: "Audio", icon: Mic },
   { value: "video", label: "Video", icon: Video },
   { value: "photo", label: "Photos", icon: ImageIcon },
+  { value: "document", label: "Resources", icon: FileText },
 ];
+
+const resourceTypes = [
+  { value: "feature_request", label: "Feature request" },
+  { value: "reference", label: "Reference / documentation" },
+  { value: "design", label: "Design / asset" },
+  { value: "other", label: "Other" },
+];
+
+function typeLabelFor(active: AssetType) {
+  return active === "audio" ? "Audio" : active === "video" ? "Video" : active === "photo" ? "Photo" : "Resource";
+}
+
+function typeIconFor(active: AssetType) {
+  return active === "audio" ? Mic : active === "video" ? Video : active === "document" ? FileText : ImageIcon;
+}
 
 const displayTargets = [
   { key: "frontend_home", label: "Frontend home" },
@@ -46,6 +62,7 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
   const [playerAsset, setPlayerAsset] = useState<any | null>(null);
   const editSeq = useRef(0);
   const [audioEditTrigger, setAudioEditTrigger] = useState<{ asset: any; seq: number } | null>(null);
+  const [documentEditTrigger, setDocumentEditTrigger] = useState<{ asset: any; seq: number } | null>(null);
 
   const visibleAssets = useMemo(() => assets.filter((a) => a.asset_type === active), [active, assets]);
 
@@ -60,7 +77,13 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
     setSubTab("studio");
   }
 
-  const typeLabel = active === "audio" ? "Audio" : active === "video" ? "Video" : "Photo";
+  function handleEditDocument(asset: any) {
+    editSeq.current += 1;
+    setDocumentEditTrigger({ asset, seq: editSeq.current });
+    setSubTab("studio");
+  }
+
+  const typeLabel = typeLabelFor(active);
 
   return (
     <div className="space-y-4">
@@ -117,8 +140,11 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
           onPlay={setPlayerAsset}
         />
       )}
-      {subTab === "studio" && active !== "audio" && (
-        <VideoPhotoStudio active={active as "video" | "photo"} actionToken={effectiveActionToken} />
+      {subTab === "studio" && active === "document" && (
+        <ResourceStudio actionToken={effectiveActionToken} editTrigger={documentEditTrigger} />
+      )}
+      {subTab === "studio" && (active === "video" || active === "photo") && (
+        <VideoPhotoStudio active={active} actionToken={effectiveActionToken} />
       )}
 
       {/* Files content */}
@@ -129,7 +155,7 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onPlay={active === "audio" ? setPlayerAsset : undefined}
-          onEdit={active === "audio" ? handleEditAudio : undefined}
+          onEdit={active === "audio" ? handleEditAudio : active === "document" ? handleEditDocument : undefined}
         />
       )}
 
@@ -642,6 +668,285 @@ function VideoPhotoStudio({ active, actionToken }: { active: "video" | "photo"; 
   );
 }
 
+// ─── Resource (document) Studio ───────────────────────────────────────────────
+
+function ResourceStudio({
+  actionToken,
+  editTrigger,
+}: {
+  actionToken: string;
+  editTrigger: { asset: any; seq: number } | null;
+}) {
+  const router = useRouter();
+  const [uploaded, setUploaded] = useState<UploadedFile | null>(null);
+  const [fileName, setFileName] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+  const [title, setTitle] = useState("");
+  const [resourceType, setResourceType] = useState("feature_request");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("published");
+  const [visibility, setVisibility] = useState("private");
+  const [targets, setTargets] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [editingAsset, setEditingAsset] = useState<any | null>(null);
+
+  const currentUrl = uploaded?.url || fileUrl.trim();
+
+  function editAsset(asset: any) {
+    setEditingAsset(asset);
+    setTitle(asset.title ?? "");
+    setResourceType(asset.metadata?.resource_type ?? "other");
+    setDescription(asset.description ?? "");
+    setFileUrl(asset.file_url ?? "");
+    setStatus(asset.status ?? "published");
+    setVisibility(asset.visibility ?? "private");
+    setTargets(Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : []);
+    setUploaded(null);
+    setFileName(asset.metadata?.original_filename ?? "");
+    setMessage("Editing resource. Save to update the existing card.");
+    setError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  const editAssetRef = useRef(editAsset);
+  editAssetRef.current = editAsset;
+
+  useEffect(() => {
+    if (editTrigger?.asset) editAssetRef.current(editTrigger.asset);
+  }, [editTrigger?.seq]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleUpload(file: File) {
+    setError(null);
+    setUploading(true);
+    try {
+      const upload = await uploadFile(file, "document", actionToken);
+      setUploaded(upload);
+      setFileName(file.name);
+      setFileUrl("");
+      if (!title) setTitle(file.name.replace(/\.[a-z0-9]+$/i, ""));
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function toggleTarget(key: string) {
+    setTargets((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  }
+
+  function resetForm() {
+    setEditingAsset(null);
+    setUploaded(null);
+    setFileName("");
+    setFileUrl("");
+    setTitle("");
+    setResourceType("feature_request");
+    setDescription("");
+    setStatus("published");
+    setVisibility("private");
+    setTargets([]);
+  }
+
+  async function save(nextStatus = status) {
+    setSaving(true);
+    setMessage(null);
+    setError(null);
+    try {
+      if (!actionToken) throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
+      if (!currentUrl) throw new Error("Upload a file or add a file URL first.");
+      const response = await fetch("/api/admin/media-assets", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+        body: JSON.stringify({
+          actionToken,
+          id: editingAsset?.id,
+          title,
+          assetType: "document",
+          sourceType: uploaded ? "upload" : editingAsset?.source_type || "external_url",
+          fileUrl: currentUrl,
+          storageBucket: uploaded?.bucket ?? editingAsset?.storage_bucket,
+          storagePath: uploaded?.path ?? editingAsset?.storage_path,
+          mimeType: uploaded?.mimeType ?? editingAsset?.mime_type,
+          fileSize: uploaded?.fileSize ?? editingAsset?.file_size,
+          description,
+          status: nextStatus,
+          visibility,
+          metadata: {
+            resource_type: resourceType,
+            original_filename: fileName || editingAsset?.metadata?.original_filename || null,
+            display_targets: targets,
+          },
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Resource save failed.");
+      resetForm();
+      setMessage(editingAsset ? "Resource updated." : nextStatus === "draft" ? "Resource saved as draft." : "Resource saved.");
+      router.refresh();
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Resource save failed.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{editingAsset ? "Edit resource" : "Add a resource"}</CardTitle>
+        <CardDescription>
+          Upload a PDF, image, or document (feature requests, references, assets), add its details, and choose who can see it.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]"
+          onSubmit={(e) => { e.preventDefault(); save(status); }}
+        >
+          <div className="space-y-5">
+            {/* Upload */}
+            <label className="space-y-2 block">
+              <span className="text-sm font-medium">Upload file</span>
+              <span className="flex min-h-28 cursor-pointer items-center justify-center rounded-md border border-dashed bg-muted/30 px-4 py-6 text-center transition-colors hover:bg-muted/50">
+                <span className="flex flex-col items-center gap-2 text-sm">
+                  <Upload className="h-6 w-6 text-primary" />
+                  <span className="font-medium">{uploading ? "Uploading..." : fileName || "Choose a file to upload"}</span>
+                  <span className="text-xs text-muted-foreground">PDF, JPEG, PNG, Word, text, or other document types</span>
+                </span>
+                <input
+                  className="sr-only"
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt,.md,.csv,.rtf,.ppt,.pptx,.xls,.xlsx,image/*,application/pdf"
+                  onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
+                />
+              </span>
+              {currentUrl ? (
+                <span className="inline-flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">
+                  <FileText className="h-4 w-4" />
+                  {fileName || currentUrl}
+                </span>
+              ) : null}
+            </label>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-sm font-medium">Title</span>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Resources tab feature request" />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-medium">Resource type</span>
+                <Select value={resourceType} onValueChange={setResourceType}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {resourceTypes.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </label>
+              <label className="space-y-2 lg:col-span-2">
+                <span className="text-sm font-medium">File URL</span>
+                <div className="relative">
+                  <LinkIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    className="pl-9"
+                    value={fileUrl}
+                    onChange={(e) => { setFileUrl(e.target.value); setUploaded(null); }}
+                    placeholder="https://... (optional — use instead of uploading)"
+                  />
+                </div>
+              </label>
+              <label className="space-y-2 lg:col-span-2">
+                <span className="text-sm font-medium">Description / notes</span>
+                <textarea
+                  className="min-h-[120px] w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe the resource. For feature requests, add as much detail as you like — this is read alongside the file."
+                />
+              </label>
+            </div>
+
+            {/* Visibility + sharing */}
+            <div className="rounded-md border p-4">
+              <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+                <label className="space-y-2">
+                  <span className="text-sm font-medium">Status</span>
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="hidden">Hidden</SelectItem>
+                      <SelectItem value="archived">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label className="space-y-2">
+                  <span className="text-sm font-medium">Visibility</span>
+                  <Select value={visibility} onValueChange={setVisibility}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="private">Private (team only)</SelectItem>
+                      <SelectItem value="public">Public</SelectItem>
+                      <SelectItem value="assigned">Assigned</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </label>
+              </div>
+              <p className="mt-4 text-sm font-medium">Share on</p>
+              <p className="mt-1 text-xs text-muted-foreground">Choose where this resource can appear once published.</p>
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                {displayTargets.map((t) => (
+                  <label key={t.key} className="flex items-center justify-between gap-3 rounded-md border bg-background p-3 text-sm">
+                    <span>{t.label}</span>
+                    <Switch checked={targets.includes(t.key)} onCheckedChange={() => toggleTarget(t.key)} />
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {message ? <p className="rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</p> : null}
+            {error ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
+
+            <div className="flex flex-wrap gap-3">
+              {editingAsset ? (
+                <Button type="button" variant="ghost" disabled={saving} onClick={resetForm}>Cancel edit</Button>
+              ) : null}
+              <Button type="button" variant="outline" disabled={saving || uploading || !title || !currentUrl} onClick={() => save("draft")}>
+                <Save className="h-4 w-4" />
+                Save as draft
+              </Button>
+              <Button type="submit" disabled={saving || uploading || !title || !currentUrl}>
+                <Save className="h-4 w-4" />
+                {saving ? "Saving..." : editingAsset ? "Update resource" : "Save resource"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Resource card preview</p>
+            <ResourceCard
+              asset={{
+                title: title || "Resource title",
+                description: description || "Description / notes",
+                file_url: currentUrl,
+                status,
+                visibility,
+                metadata: { resource_type: resourceType, original_filename: fileName, display_targets: targets },
+              }}
+            />
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Media Library (card / list / table) ─────────────────────────────────────
 
 function MediaLibrary({
@@ -659,7 +964,7 @@ function MediaLibrary({
   onPlay?: (asset: any) => void;
   onEdit?: (asset: any) => void;
 }) {
-  const typeLabel = active === "audio" ? "Audio" : active === "video" ? "Video" : "Photo";
+  const typeLabel = typeLabelFor(active);
 
   return (
     <Card>
@@ -710,7 +1015,7 @@ function MediaLibrary({
       <CardContent>
         {!assets.length ? (
           <p className="text-sm text-muted-foreground">
-            No {active} files yet. Create one in the {typeLabel} Studio tab.
+            No {typeLabel.toLowerCase()} files yet. Create one in the {typeLabel} Studio tab.
           </p>
         ) : viewMode === "card" ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -720,6 +1025,12 @@ function MediaLibrary({
                   key={asset.id}
                   asset={asset}
                   onPlay={() => onPlay?.(asset)}
+                  onEdit={onEdit ? () => onEdit(asset) : undefined}
+                />
+              ) : active === "document" ? (
+                <ResourceCard
+                  key={asset.id}
+                  asset={asset}
                   onEdit={onEdit ? () => onEdit(asset) : undefined}
                 />
               ) : (
@@ -769,7 +1080,7 @@ function AssetListRow({
           <img src={thumbnail} alt="" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-muted-foreground">
-            {active === "audio" ? <Mic className="h-5 w-5" /> : active === "video" ? <Video className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
+            {(() => { const Icon = typeIconFor(active); return <Icon className="h-5 w-5" />; })()}
           </div>
         )}
       </div>
@@ -845,7 +1156,7 @@ function AssetTable({
                       <img src={asset.metadata.thumbnail_url} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full items-center justify-center text-muted-foreground">
-                        {active === "audio" ? <Mic className="h-4 w-4" /> : active === "video" ? <Video className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
+                        {(() => { const Icon = typeIconFor(active); return <Icon className="h-4 w-4" />; })()}
                       </div>
                     )}
                   </div>
@@ -983,6 +1294,72 @@ function GenericMediaCard({ asset }: { asset: any }) {
   );
 }
 
+// ─── Resource (document) card ─────────────────────────────────────────────────
+
+function ResourceCard({ asset, onEdit }: { asset: any; onEdit?: () => void }) {
+  const resourceType = resourceTypes.find((r) => r.value === asset.metadata?.resource_type);
+  const targets = Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : [];
+  const fileLabel = asset.metadata?.original_filename || asset.file_url;
+  return (
+    <div className="flex flex-col gap-3 rounded-md border bg-card p-4 shadow-sm">
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+          <FileText className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-semibold leading-tight">{asset.title}</h3>
+          {fileLabel ? <p className="truncate text-xs text-muted-foreground">{fileLabel}</p> : null}
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {resourceType ? <Badge variant="secondary">{resourceType.label}</Badge> : null}
+        <Badge variant="secondary">{asset.status || "draft"}</Badge>
+        <Badge variant="outline">{asset.visibility || "private"}</Badge>
+      </div>
+      {asset.description ? (
+        <p
+          className="text-sm text-muted-foreground"
+          style={{ display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+        >
+          {asset.description}
+        </p>
+      ) : null}
+      {targets.length ? <p className="text-xs text-muted-foreground">Shared on: {targets.join(", ")}</p> : null}
+      <div className="mt-auto flex flex-wrap gap-2 pt-1">
+        {asset.file_url ? (
+          <a
+            href={asset.file_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-md border bg-background px-3 py-1.5 text-sm font-medium shadow-sm hover:bg-accent"
+          >
+            <Download className="h-4 w-4" />
+            Open file
+          </a>
+        ) : null}
+        {onEdit ? (
+          <Button type="button" size="sm" variant="outline" onClick={onEdit}>
+            <Pencil className="h-4 w-4" />
+            Edit
+          </Button>
+        ) : null}
+        {asset.file_url ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            title="Copy file URL"
+            onClick={() => navigator.clipboard?.writeText(asset.file_url)}
+          >
+            <Copy className="h-4 w-4" />
+            Copy link
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 // ─── Audio player sheet ───────────────────────────────────────────────────────
 
 function AudioPlayerSheet({ asset, onClose }: { asset: any | null; onClose: () => void }) {
@@ -1044,7 +1421,7 @@ function AudioPlayerSheet({ asset, onClose }: { asset: any | null; onClose: () =
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function uploadFile(file: File, intent: "audio" | "thumbnail", actionToken: string): Promise<UploadedFile> {
+async function uploadFile(file: File, intent: "audio" | "thumbnail" | "document", actionToken: string): Promise<UploadedFile> {
   if (!actionToken) throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try uploading.");
   const formData = new FormData();
   formData.append("file", file);

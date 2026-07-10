@@ -6,6 +6,10 @@ const BUCKET = "media-assets";
 const AUDIO_TYPES = new Set(["audio/webm", "audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/mp4"]);
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const VIDEO_TYPES = new Set(["video/mp4", "video/webm", "video/quicktime", "video/x-msvideo"]);
+// Documents (Resources tab) intentionally accept a broad range — PDFs, images,
+// office docs, text — so the team can drop any reference material. The bucket
+// allowlist below is widened with wildcards to match.
+const BUCKET_MIME = ["audio/*", "video/*", "image/*", "application/*", "text/*"];
 
 export async function POST(request: Request) {
   try {
@@ -31,11 +35,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Please upload a supported video file." }, { status: 400 });
     }
 
+    // Documents accept any file type (PDF, image, office doc, etc.), so no
+    // rejection here — the broad bucket allowlist handles storage acceptance.
+
     const supabase = createSupabaseAdminClient();
     await ensureBucket(supabase);
 
     const extension = extensionFromName(file.name, file.type);
-    const folder = intent === "thumbnail" ? "thumbnails" : intent === "video" ? "video" : "audio";
+    const folder =
+      intent === "thumbnail" ? "thumbnails"
+      : intent === "video" ? "video"
+      : intent === "document" ? "documents"
+      : "audio";
     const path = `${folder}/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}${extension}`;
     const bytes = Buffer.from(await file.arrayBuffer());
 
@@ -64,11 +75,19 @@ export async function POST(request: Request) {
 
 async function ensureBucket(supabase: ReturnType<typeof createSupabaseAdminClient>) {
   const { data: existing } = await supabase.storage.getBucket(BUCKET);
-  if (existing) return;
+  if (existing) {
+    // Widen the allowlist on buckets created before documents were supported.
+    await supabase.storage.updateBucket(BUCKET, {
+      public: true,
+      fileSizeLimit: 1024 * 1024 * 100,
+      allowedMimeTypes: BUCKET_MIME,
+    });
+    return;
+  }
   const { error } = await supabase.storage.createBucket(BUCKET, {
     public: true,
     fileSizeLimit: 1024 * 1024 * 100,
-    allowedMimeTypes: [...AUDIO_TYPES, ...IMAGE_TYPES, ...VIDEO_TYPES],
+    allowedMimeTypes: BUCKET_MIME,
   });
   if (error && !error.message.toLowerCase().includes("already exist")) {
     throw new Error(`Storage bucket setup failed: ${error.message}`);
@@ -87,5 +106,9 @@ function extensionFromName(name: string, type: string) {
   if (type === "video/mp4") return ".mp4";
   if (type === "video/webm") return ".webm";
   if (type === "video/quicktime") return ".mov";
-  return ".jpg";
+  if (type === "application/pdf") return ".pdf";
+  if (type === "text/plain") return ".txt";
+  if (type === "text/markdown") return ".md";
+  if (type === "text/csv") return ".csv";
+  return "";
 }

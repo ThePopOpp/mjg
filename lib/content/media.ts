@@ -4,7 +4,7 @@ export type MediaAssetInput = {
   id?: string;
   title: string;
   slug?: string;
-  assetType: "audio" | "video" | "photo" | "gallery";
+  assetType: "audio" | "video" | "photo" | "gallery" | "document";
   sourceType?: "upload" | "external_url" | "recording" | "embed";
   fileUrl?: string;
   embedUrl?: string;
