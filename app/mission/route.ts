@@ -33,19 +33,6 @@ function iconSvg(name: string) {
   return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 }
 
-function formatAmount(n: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
-
-function formatDate(raw: string) {
-  const d = new Date(raw + "T12:00:00Z");
-  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-}
-
 export async function GET() {
   const siteUrl = publicSiteUrl();
   const score = await getPublishedImpactScore();
@@ -53,8 +40,6 @@ export async function GET() {
   const headline = score?.headline ?? "Tracking Progress Towards";
   const goalLabel = score?.goal_label ?? "$1 Billion";
   const bodyText = score?.body_text ?? "Every dollar given, every investment made with purpose — it all counts. This is our running total of the real-world impact created by our community.";
-  const totalAmount = score?.total_amount ?? 0;
-  const scoreDate = score?.score_date ? formatDate(score.score_date) : "";
   const categories: Array<{ icon: string; title: string; description: string }> = score?.categories ?? [];
 
   const categoryCards = categories
@@ -189,35 +174,6 @@ export async function GET() {
       margin: 0 0 56px;
     }
 
-    .impact-score-box {
-      border: 1px solid rgba(201,164,110,.3);
-      border-radius: 12px;
-      padding: 36px 40px;
-      background: rgba(255,255,255,.04);
-      margin-bottom: 48px;
-      display: inline-block;
-      min-width: min(420px, 100%);
-    }
-    .impact-score-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: rgba(248,246,241,.5);
-      margin-bottom: 10px;
-    }
-    .impact-score-amount {
-      font-family: var(--font-display);
-      font-size: clamp(36px, 6vw, 64px);
-      color: #f8f6f1;
-      line-height: 1;
-      margin-bottom: 10px;
-    }
-    .impact-score-date {
-      font-size: 13px;
-      color: rgba(248,246,241,.45);
-    }
-
     .impact-categories {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -264,16 +220,6 @@ export async function GET() {
         <div class="impact-eyebrow">What Drives Us</div>
         <h2 class="impact-heading">${headline} <span class="impact-goal">${goalLabel}</span></h2>
         <p class="impact-body">${bodyText}</p>
-
-        ${
-          totalAmount > 0
-            ? `<div class="impact-score-box">
-          <div class="impact-score-label">Current Impact Score</div>
-          <div class="impact-score-amount">${formatAmount(totalAmount)}</div>
-          ${scoreDate ? `<div class="impact-score-date">As of ${scoreDate}</div>` : ""}
-        </div>`
-            : ""
-        }
 
         ${categoryCards ? `<div class="impact-categories">${categoryCards}</div>` : ""}
       </div>

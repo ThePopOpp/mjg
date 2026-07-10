@@ -21,7 +21,6 @@ import {
   Phone,
   Settings,
   Share2,
-  TrendingUp,
   Users,
   UsersRound,
   UserCircle,
@@ -49,7 +48,6 @@ export const dashboardNav: NavEntry[] = [
     ],
   },
   { kind: "item", href: "/dashboard/blog-posts", label: "Blog Posts", icon: FileText, permission: PERMISSIONS.REVIEW_CONTENT },
-  { kind: "item", href: "/dashboard/impact-score", label: "Impact Score", icon: TrendingUp, permission: PERMISSIONS.REVIEW_CONTENT },
   {
     kind: "group", label: "Communications", icon: MessagesSquare, items: [
       { href: "/dashboard/emails", label: "Emails", icon: MailCheck },
