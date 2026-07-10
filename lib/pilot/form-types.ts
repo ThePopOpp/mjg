@@ -16,7 +16,7 @@ export type SurveyField = { id: string; name: string; label: string; type: Surve
 export type SurveyDefinition = { version: 1; fields: SurveyField[] };
 
 export type CheckInQuestion = { id: string; text: string };
-export type CheckInSectionDef = { id: string; key: string; title: string; lowestTag: string; questions: CheckInQuestion[] };
+export type CheckInSectionDef = { id: string; key: string; title: string; lowestTag: string; coreQuestion?: string; questions: CheckInQuestion[] };
 export type ScoreRange = { label: string; minPct: number };
 export type CheckInDefinition = { version: 1; scaleMax: number; sections: CheckInSectionDef[]; reflections: string[]; ranges: ScoreRange[] };
 
@@ -37,10 +37,10 @@ export const newSectionId = () => gid("s");
 export const newQuestionId = () => gid("q");
 
 export const DEFAULT_RANGES: ScoreRange[] = [
-  { label: "Aligned and Intentional", minPct: 80 },
+  { label: "Aligned & Intentional", minPct: 80 },
   { label: "Aware but Stretched", minPct: 60 },
-  { label: "Drifting in Key Areas", minPct: 40 },
-  { label: "Time to Pause and Rebuild", minPct: 0 },
+  { label: "Drifting in Key Layers", minPct: 40 },
+  { label: "Time to Pause & Rebuild", minPct: 0 },
 ];
 
 type ConstField = { name: string; label: string; type: string; required?: boolean; options?: readonly string[] };
@@ -50,7 +50,7 @@ export function surveyDefFromConstants(fields: readonly ConstField[]): SurveyDef
 export function checkInDefFromConstants(): CheckInDefinition {
   return {
     version: 1, scaleMax: 5,
-    sections: CHECK_IN_SECTIONS.map((s, i) => ({ id: `s${i}`, key: s.key, title: s.title, lowestTag: s.lowestTag, questions: s.questions.map((q, j) => ({ id: `q${i}_${j}`, text: q })) })),
+    sections: CHECK_IN_SECTIONS.map((s, i) => ({ id: `s${i}`, key: s.key, title: s.title, lowestTag: s.lowestTag, coreQuestion: s.coreQuestion, questions: s.questions.map((q, j) => ({ id: `q${i}_${j}`, text: q })) })),
     reflections: [...REFLECTION_PROMPTS], ranges: DEFAULT_RANGES,
   };
 }
@@ -63,7 +63,7 @@ export function seedSurveyDef(slug: string): SurveyDefinition {
 export const SEED_FORMS: { kind: PilotFormKind; slug: string; title: string; description: string }[] = [
   { kind: "survey", slug: "general", title: "General Pilot Feedback", description: "Created for More 7-Day Stewardship Pilot feedback survey." },
   { kind: "survey", slug: "pastor-elder", title: "Pastor / Elder Review", description: "Pastor, elder, and church-leader review survey." },
-  { kind: "check_in", slug: "check-in", title: "Created for More Check-In", description: "The scored Purpose/Family/Fitness/Fun/Finances self-assessment." },
+  { kind: "check_in", slug: "check-in", title: "Created for More Check-In", description: "The scored 7-layer Stewardship Blueprint self-assessment (Bedrock → Legacy, out of 140)." },
 ];
 export function seedDefFor(kind: PilotFormKind, slug: string): SurveyDefinition | CheckInDefinition {
   return kind === "check_in" ? checkInDefFromConstants() : seedSurveyDef(slug);
