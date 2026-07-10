@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BookOpen,
   Bot,
   CalendarClock,
   CalendarRange,
@@ -65,6 +66,7 @@ export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/cms", label: "CMS", icon: PanelsTopLeft, permission: PERMISSIONS.MANAGE_CMS },
   { kind: "item", href: "/dashboard/reports", label: "Reports", icon: FileBarChart },
+  { kind: "item", href: "/dashboard/guide", label: "Team Guide", icon: BookOpen },
   { kind: "item", href: "/dashboard/settings", label: "Settings", icon: Settings, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/user-management", label: "User Management", icon: BarChart3, permission: PERMISSIONS.MANAGE_USERS },
 ];
