@@ -9,7 +9,7 @@
 import * as React from "react";
 import {
   MousePointerClick, ClipboardList, PanelsTopLeft, Bot, Plus, FileText, CheckCircle2, Clock,
-  CalendarDays, Users, Bell, HelpCircle, ArrowRight, RefreshCw, CircleDot, X,
+  CalendarDays, Users, Bell, HelpCircle, ArrowRight, RefreshCw, CircleDot, X, SendHorizonal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
   const token = useDashboardActionToken();
   const [reqs, setReqs] = React.useState<UReq[]>([]);
   const [unread, setUnread] = React.useState(0);
+  const [devQueue, setDevQueue] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [activityOpen, setActivityOpen] = React.useState(false);
 
@@ -39,13 +40,15 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
     setLoading(true);
     try {
       const h = { "x-mjg-action-token": token };
-      const [f, d] = await Promise.all([
+      const [f, d, dev] = await Promise.all([
         fetch("/api/admin/cms/page-notes", { headers: h }).then((r) => r.json()).catch(() => ({})),
         fetch("/api/dashboard-notes?scope=all", { headers: h }).then((r) => r.json()).catch(() => ({})),
+        fetch("/api/admin/dev-requests?status=active", { headers: h }).then((r) => r.json()).catch(() => ({})),
       ]);
       const fr: UReq[] = (f.notes ?? []).map((n: Record<string, string>) => ({ kind: "frontend", note: n.note, page: n.page_label || n.page_slug || "—", status: n.status, priority: n.priority, type: n.change_type, authorEmail: n.created_by_email || "", authorName: n.created_by_email || "—", createdAt: n.created_at, updatedAt: n.updated_at || n.created_at }));
       const da: UReq[] = (d.notes ?? []).map((n: Record<string, string>) => ({ kind: "dashboard", note: n.note, page: n.page_title || n.route || "—", status: n.status, priority: n.priority, type: n.type, authorEmail: n.created_by_email || "", authorName: n.created_by_name || n.created_by_email || "—", createdAt: n.created_at, updatedAt: n.updated_at || n.created_at }));
       setReqs([...fr, ...da]); setUnread(Number(d.unread) || 0);
+      setDevQueue(Array.isArray(dev.requests) ? dev.requests.length : 0);
     } finally { setLoading(false); }
   }, [token]);
   React.useEffect(() => { load(); }, [load]);
@@ -93,6 +96,7 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
   const stats = [
     { label: "Pages", value: s.pagesTotal, sub: `${s.pagesDraft} draft · ${s.pagesPublished} published`, icon: FileText, onClick: nav.pages },
     { label: "Open requests", value: s.open, sub: "awaiting action", icon: CircleDot, tone: "amber", onClick: nav.requests },
+    { label: "Dev Queue", value: devQueue, sub: "flagged for Claude", icon: SendHorizonal, tone: devQueue ? "blue" : undefined, onClick: nav.steward },
     { label: "In progress", value: s.inProgress, sub: "being worked", icon: Clock, tone: "blue", onClick: nav.requests },
     { label: "Completed", value: s.done, sub: "all time", icon: CheckCircle2, tone: "emerald", onClick: nav.requests },
     { label: "Submitted (7d)", value: s.submittedWeek, sub: "last 7 days", icon: CalendarDays, onClick: nav.requests },
