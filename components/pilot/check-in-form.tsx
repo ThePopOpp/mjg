@@ -52,7 +52,7 @@ export function CheckInForm({ def }: { def: CheckInDefinition }) {
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "Submission failed.");
-      const params = new URLSearchParams({ score: String(result.totalScore), lowest: result.lowestAreaLabel, category: result.scoreRangeCategory });
+      const params = new URLSearchParams({ score: String(result.totalScore), max: String(result.maxScore), lowest: result.lowestAreaLabel, lowestKey: result.lowestAreaKey, category: result.scoreRangeCategory });
       router.push(`/check-in/thank-you?${params.toString()}`);
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : "Something went wrong.");
@@ -87,7 +87,10 @@ export function CheckInForm({ def }: { def: CheckInDefinition }) {
 
       {def.sections.map((section) => (
         <Card key={section.id}>
-          <CardHeader><CardTitle>{section.title}</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>{section.title}</CardTitle>
+            {section.coreQuestion ? <p className="mt-1 text-sm italic text-muted-foreground">{section.coreQuestion}</p> : null}
+          </CardHeader>
           <CardContent className="space-y-5">
             {section.questions.map((question, index) => (
               <div key={question.id} className="space-y-2">
