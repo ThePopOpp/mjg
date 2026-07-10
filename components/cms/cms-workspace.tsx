@@ -1,26 +1,24 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboard, PanelsTopLeft, MousePointerClick, ClipboardList, Info, X } from "lucide-react";
+import { LayoutDashboard, PanelsTopLeft, MousePointerClick, ClipboardList, X } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CmsPagesList } from "@/components/cms/cms-pages-list";
 import { FrontendEdits, type FrontendPage } from "@/components/cms/frontend-edits";
 import { EditRequests } from "@/components/cms/edit-requests";
 import { CmsOverview, type CmsNav } from "@/components/cms/cms-overview";
 import { AgentChat } from "@/components/ai-agent/agent-chat";
+import { PageHelp } from "@/components/dashboard/page-help";
+import { CMS_HELP, CMS_HELP_INTRO, CMS_HELP_TITLE } from "@/lib/content/help-text";
 import type { CmsPage } from "@/lib/cms/types";
 
 type View = "overview" | "pages" | "editor" | "requests";
-
-const PAGE_INFO =
-  "Your control center for MJG's frontend and dashboard content. From here you can build and edit CMS pages (Block Builder), visually review and annotate live pages (Frontend Editor), capture and triage edit requests from both the public site and the dashboard, track status and who requested what, and hand work to Steward AI. Super Admin only.";
 
 const STEWARD_CONTEXT =
   "You are Steward helping with the MJG CMS. You can list, create, and update CMS DRAFT pages and answer questions about pages and edit requests. Everything you author is a draft for a Super Admin to review — never publish or edit the live site.";
 
 export function CmsWorkspace({ initialPages, frontendPages, displayName }: { initialPages: CmsPage[]; frontendPages: FrontendPage[]; displayName?: string }) {
   const [view, setView] = React.useState<View>("overview");
-  const [infoOpen, setInfoOpen] = React.useState(false);
   const [stewardOpen, setStewardOpen] = React.useState(false);
 
   const nav: CmsNav = {
@@ -41,10 +39,7 @@ export function CmsWorkspace({ initialPages, frontendPages, displayName }: { ini
         <p className="text-xs font-semibold uppercase text-primary">{displayName ? `${displayName} · Super Admin` : "Super Admin"}</p>
         <h1 className="mt-1 flex items-center gap-2 text-2xl font-semibold tracking-normal sm:text-3xl">
           CMS
-          <button onClick={() => setInfoOpen(true)} title="About this page" aria-label="About this page"
-            className="inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-            <Info className="h-4 w-4" />
-          </button>
+          <PageHelp title={CMS_HELP_TITLE} intro={CMS_HELP_INTRO} sections={CMS_HELP} />
         </h1>
       </div>
 
@@ -59,19 +54,6 @@ export function CmsWorkspace({ initialPages, frontendPages, displayName }: { ini
         <TabsContent value="pages" className="mt-5"><CmsPagesList initialPages={initialPages} /></TabsContent>
         <TabsContent value="requests" className="mt-5"><EditRequests /></TabsContent>
       </Tabs>
-
-      {infoOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setInfoOpen(false)} />
-          <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-2xl">
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-sm font-semibold"><Info className="h-4 w-4 text-primary" /> About CMS</h2>
-              <button onClick={() => setInfoOpen(false)} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
-            </div>
-            <p className="text-sm leading-6 text-muted-foreground">{PAGE_INFO}</p>
-          </div>
-        </div>
-      )}
 
       {stewardOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
