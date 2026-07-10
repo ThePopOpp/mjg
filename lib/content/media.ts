@@ -36,6 +36,25 @@ export async function getMediaStudioData() {
   };
 }
 
+export type ShareableAdmin = { id: string; name: string; email: string };
+
+/** Active Super Admins that a resource can be shared with / notify. */
+export async function getShareableSuperAdmins(): Promise<ShareableAdmin[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, first_name, last_name, email")
+    .eq("role", "super_admin")
+    .eq("status", "active")
+    .order("first_name", { ascending: true });
+
+  return (data ?? []).map((p) => ({
+    id: p.id as string,
+    name: [p.first_name, p.last_name].filter(Boolean).join(" ").trim() || (p.email as string),
+    email: p.email as string,
+  }));
+}
+
 export async function getPublishedAudioForTarget(target: string, limit = 6) {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase

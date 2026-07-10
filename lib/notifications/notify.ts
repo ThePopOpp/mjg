@@ -9,7 +9,8 @@ export type NotificationType =
   | "story_permission_granted"
   | "church_interest"
   | "form_submission_error"
-  | "email_journey_issue";
+  | "email_journey_issue"
+  | "resource_shared";
 
 export async function createDashboardNotification(input: {
   type: NotificationType;

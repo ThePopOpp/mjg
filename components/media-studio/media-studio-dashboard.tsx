@@ -53,7 +53,19 @@ const displayTargets = [
 const hours = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0"));
 const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
 
-export function MediaStudioDashboard({ actionToken, assets }: { actionToken: string; assets: any[] }) {
+type ShareableAdmin = { id: string; name: string; email: string };
+
+export function MediaStudioDashboard({
+  actionToken,
+  assets,
+  superAdmins = [],
+  isSuperAdmin = false,
+}: {
+  actionToken: string;
+  assets: any[];
+  superAdmins?: ShareableAdmin[];
+  isSuperAdmin?: boolean;
+}) {
   const dashboardActionToken = useDashboardActionToken();
   const effectiveActionToken = actionToken || dashboardActionToken;
   const [active, setActive] = useState<AssetType>("audio");
@@ -141,7 +153,12 @@ export function MediaStudioDashboard({ actionToken, assets }: { actionToken: str
         />
       )}
       {subTab === "studio" && active === "document" && (
-        <ResourceStudio actionToken={effectiveActionToken} editTrigger={documentEditTrigger} />
+        <ResourceStudio
+          actionToken={effectiveActionToken}
+          editTrigger={documentEditTrigger}
+          superAdmins={superAdmins}
+          isSuperAdmin={isSuperAdmin}
+        />
       )}
       {subTab === "studio" && (active === "video" || active === "photo") && (
         <VideoPhotoStudio active={active} actionToken={effectiveActionToken} />
@@ -673,9 +690,13 @@ function VideoPhotoStudio({ active, actionToken }: { active: "video" | "photo"; 
 function ResourceStudio({
   actionToken,
   editTrigger,
+  superAdmins,
+  isSuperAdmin,
 }: {
   actionToken: string;
   editTrigger: { asset: any; seq: number } | null;
+  superAdmins: ShareableAdmin[];
+  isSuperAdmin: boolean;
 }) {
   const router = useRouter();
   const [uploaded, setUploaded] = useState<UploadedFile | null>(null);
@@ -687,6 +708,7 @@ function ResourceStudio({
   const [status, setStatus] = useState("published");
   const [visibility, setVisibility] = useState("private");
   const [targets, setTargets] = useState<string[]>([]);
+  const [shareWith, setShareWith] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -704,6 +726,7 @@ function ResourceStudio({
     setStatus(asset.status ?? "published");
     setVisibility(asset.visibility ?? "private");
     setTargets(Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : []);
+    setShareWith(Array.isArray(asset.metadata?.shared_with) ? asset.metadata.shared_with : []);
     setUploaded(null);
     setFileName(asset.metadata?.original_filename ?? "");
     setMessage("Editing resource. Save to update the existing card.");
@@ -738,6 +761,10 @@ function ResourceStudio({
     setTargets((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   }
 
+  function toggleShareWith(id: string) {
+    setShareWith((prev) => (prev.includes(id) ? prev.filter((k) => k !== id) : [...prev, id]));
+  }
+
   function resetForm() {
     setEditingAsset(null);
     setUploaded(null);
@@ -749,6 +776,7 @@ function ResourceStudio({
     setStatus("published");
     setVisibility("private");
     setTargets([]);
+    setShareWith([]);
   }
 
   async function save(nextStatus = status) {
@@ -758,6 +786,10 @@ function ResourceStudio({
     try {
       if (!actionToken) throw new Error("Dashboard action token is missing. Refresh the page, sign in again, and try saving.");
       if (!currentUrl) throw new Error("Upload a file or add a file URL first.");
+      // Only notify Super Admins who weren't already on this resource, so
+      // editing an existing resource doesn't re-ping everyone.
+      const previouslyShared: string[] = Array.isArray(editingAsset?.metadata?.shared_with) ? editingAsset.metadata.shared_with : [];
+      const notifyRecipientIds = isSuperAdmin ? shareWith.filter((id) => !previouslyShared.includes(id)) : [];
       const response = await fetch("/api/admin/media-assets", {
         method: "POST",
         credentials: "same-origin",
@@ -765,6 +797,7 @@ function ResourceStudio({
         body: JSON.stringify({
           actionToken,
           id: editingAsset?.id,
+          notifyRecipientIds,
           title,
           assetType: "document",
           sourceType: uploaded ? "upload" : editingAsset?.source_type || "external_url",
@@ -780,6 +813,7 @@ function ResourceStudio({
             resource_type: resourceType,
             original_filename: fileName || editingAsset?.metadata?.original_filename || null,
             display_targets: targets,
+            shared_with: isSuperAdmin ? shareWith : editingAsset?.metadata?.shared_with ?? [],
           },
         }),
       });
@@ -907,6 +941,33 @@ function ResourceStudio({
                   </label>
                 ))}
               </div>
+
+              {isSuperAdmin ? (
+                <div className="mt-5 border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium">Share with & notify Super Admins</p>
+                    <Badge variant="secondary">Super Admin</Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Selected Super Admins are notified in the dashboard when this resource is saved.
+                  </p>
+                  {superAdmins.length ? (
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {superAdmins.map((admin) => (
+                        <label key={admin.id} className="flex items-center justify-between gap-3 rounded-md border bg-background p-3 text-sm">
+                          <span className="min-w-0">
+                            <span className="block truncate font-medium">{admin.name}</span>
+                            <span className="block truncate text-xs text-muted-foreground">{admin.email}</span>
+                          </span>
+                          <Switch checked={shareWith.includes(admin.id)} onCheckedChange={() => toggleShareWith(admin.id)} />
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-sm text-muted-foreground">No other active Super Admins to share with yet.</p>
+                  )}
+                </div>
+              ) : null}
             </div>
 
             {message ? <p className="rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</p> : null}
@@ -1299,6 +1360,7 @@ function GenericMediaCard({ asset }: { asset: any }) {
 function ResourceCard({ asset, onEdit }: { asset: any; onEdit?: () => void }) {
   const resourceType = resourceTypes.find((r) => r.value === asset.metadata?.resource_type);
   const targets = Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : [];
+  const sharedCount = Array.isArray(asset.metadata?.shared_with) ? asset.metadata.shared_with.length : 0;
   const fileLabel = asset.metadata?.original_filename || asset.file_url;
   return (
     <div className="flex flex-col gap-3 rounded-md border bg-card p-4 shadow-sm">
@@ -1325,6 +1387,7 @@ function ResourceCard({ asset, onEdit }: { asset: any; onEdit?: () => void }) {
         </p>
       ) : null}
       {targets.length ? <p className="text-xs text-muted-foreground">Shared on: {targets.join(", ")}</p> : null}
+      {sharedCount ? <p className="text-xs text-muted-foreground">Notified {sharedCount} Super Admin{sharedCount === 1 ? "" : "s"}</p> : null}
       <div className="mt-auto flex flex-wrap gap-2 pt-1">
         {asset.file_url ? (
           <a
