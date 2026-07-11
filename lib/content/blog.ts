@@ -153,7 +153,7 @@ export async function convertPostToEmailTemplate(input: { id: string; actorUserI
       <h1 style="font-family:Georgia,serif;font-size:36px;line-height:1.1;margin:8px 0 16px;">${escapeHtml(post.title)}</h1>
       ${post.excerpt ? `<p style="font-size:18px;color:#5f6d66;">${escapeHtml(post.excerpt)}</p>` : ""}
       <div>${post.content_html}</div>
-      <p style="margin-top:28px;"><a href="${postUrl}" style="display:inline-block;background:#315f43;color:#fff;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700;">Read the full post</a></p>
+      <p style="margin-top:28px;"><a href="${postUrl}" style="display:inline-block;background:#111111;color:#fff;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700;">Read the full post</a></p>
     </div>
   `;
 

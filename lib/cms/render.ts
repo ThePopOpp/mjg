@@ -111,7 +111,7 @@ export function renderCmsBlock(b: CmsBlock): string {
     case "hero": {
       const bg = b.bgImage
         ? `background-image:linear-gradient(${overlayRgba(b)},${overlayRgba(b)}),url('${esc(b.bgImage)}');background-size:cover;background-position:center`
-        : (b.bgColor ? `background:${esc(b.bgColor)}` : "background:var(--green,#315f43)");
+        : (b.bgColor ? `background:${esc(b.bgColor)}` : "background:var(--ink,#111111)");
       const fg = b.textColor || "#ffffff";
       const inner = [`width:min(1180px,calc(100% - 40px))`, "margin:0 auto", `color:${esc(fg)}`, `text-align:${b.align || "center"}`];
       if (b.maxWidth && b.maxWidth > 0) inner.push(`max-width:${b.maxWidth}px`);
@@ -129,14 +129,14 @@ export function renderCmsBlock(b: CmsBlock): string {
       const style = b.variant || "check";
       const tag = style === "number" ? "ol" : "ul";
       const items = (b.items || []).map((it) => {
-        const mark = style === "check" ? `<span style="color:var(--green,#315f43);margin-right:10px;font-weight:800">✓</span>` : "";
+        const mark = style === "check" ? `<span style="color:var(--gold,#c9a46e);margin-right:10px;font-weight:800">✓</span>` : "";
         return `<li style="${style === "check" ? "list-style:none;" : ""}margin:0 0 10px;line-height:1.6;${fs(b, "17px")}">${mark}${esc(it.title || "")}</li>`;
       }).join("");
       return band(b, `<${tag} style="margin:0;padding:${style === "check" ? "0" : "0 0 0 1.2em"}${ts(b)}">${items}</${tag}>`);
     }
     case "statgrid": {
       const cols = Math.max(1, Math.min(4, b.columns || 3));
-      const cells = (b.items || []).map((it) => `<div style="text-align:center"><div style="font-family:var(--font-display);font-size:clamp(32px,5vw,52px);line-height:1;color:${esc(b.textColor || "var(--green,#315f43)")}">${esc(it.title || "")}</div><div style="font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted,#5f6d66);margin-top:8px">${esc(it.body || "")}</div></div>`).join("");
+      const cells = (b.items || []).map((it) => `<div style="text-align:center"><div style="font-family:var(--font-display);font-size:clamp(32px,5vw,52px);line-height:1;color:${esc(b.textColor || "var(--gold,#c9a46e)")}">${esc(it.title || "")}</div><div style="font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted,#5f6d66);margin-top:8px">${esc(it.body || "")}</div></div>`).join("");
       return band(b, `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:${b.gap ?? 24}px">${cells}</div>`);
     }
     case "gallery": {
@@ -146,11 +146,11 @@ export function renderCmsBlock(b: CmsBlock): string {
     }
     case "cardgrid": {
       const cols = Math.max(1, Math.min(4, b.columns || 3));
-      const cards = (b.items || []).map((it) => `<div style="background:var(--card,#fff);border:1px solid var(--line,#e4ded2);border-radius:${b.radius ?? 12}px;overflow:hidden;text-align:left">${it.imageUrl ? `<img src="${esc(it.imageUrl)}" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block" />` : ""}<div style="padding:18px">${it.title ? `<div style="font-family:var(--font-display);font-size:20px;margin-bottom:6px">${esc(it.title)}</div>` : ""}${it.body ? `<p style="font-size:15px;line-height:1.6;color:var(--muted,#5f6d66);margin:0">${esc(it.body)}</p>` : ""}${it.url ? `<a href="${esc(it.url)}" style="display:inline-block;margin-top:12px;color:var(--green,#315f43);font-weight:700;text-decoration:none">Learn more →</a>` : ""}</div></div>`).join("");
+      const cards = (b.items || []).map((it) => `<div style="background:var(--card,#fff);border:1px solid var(--line,#e4ded2);border-radius:${b.radius ?? 12}px;overflow:hidden;text-align:left">${it.imageUrl ? `<img src="${esc(it.imageUrl)}" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block" />` : ""}<div style="padding:18px">${it.title ? `<div style="font-family:var(--font-display);font-size:20px;margin-bottom:6px">${esc(it.title)}</div>` : ""}${it.body ? `<p style="font-size:15px;line-height:1.6;color:var(--muted,#5f6d66);margin:0">${esc(it.body)}</p>` : ""}${it.url ? `<a href="${esc(it.url)}" style="display:inline-block;margin-top:12px;color:var(--gold,#c9a46e);font-weight:700;text-decoration:none">Learn more →</a>` : ""}</div></div>`).join("");
       return band(b, `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:${b.gap ?? 16}px">${cards}</div>`);
     }
     case "resource": {
-      return band(b, `<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--card,#fff);border:1px solid var(--line,#e4ded2);border-radius:${b.radius ?? 12}px;padding:20px;text-align:left"><div style="flex:1;min-width:220px">${b.role ? `<div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold,#c9a46e);margin-bottom:6px">${esc(b.role)}</div>` : ""}<div style="font-family:var(--font-display);font-size:22px;margin-bottom:4px">${esc(b.text || "")}</div>${b.subtext ? `<p style="font-size:14px;line-height:1.6;color:var(--muted,#5f6d66);margin:0">${esc(b.subtext)}</p>` : ""}</div>${b.url ? `<a href="${esc(b.url)}"${b.newTab ? ' target="_blank" rel="noopener"' : ""} style="display:inline-block;background:${esc(b.buttonColor || "var(--green,#315f43)")};color:#fff;padding:12px 22px;border-radius:6px;font-weight:700;text-decoration:none">${esc(b.label || "Download")}</a>` : ""}</div>`);
+      return band(b, `<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--card,#fff);border:1px solid var(--line,#e4ded2);border-radius:${b.radius ?? 12}px;padding:20px;text-align:left"><div style="flex:1;min-width:220px">${b.role ? `<div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold,#c9a46e);margin-bottom:6px">${esc(b.role)}</div>` : ""}<div style="font-family:var(--font-display);font-size:22px;margin-bottom:4px">${esc(b.text || "")}</div>${b.subtext ? `<p style="font-size:14px;line-height:1.6;color:var(--muted,#5f6d66);margin:0">${esc(b.subtext)}</p>` : ""}</div>${b.url ? `<a href="${esc(b.url)}"${b.newTab ? ' target="_blank" rel="noopener"' : ""} style="display:inline-block;background:${esc(b.buttonColor || "var(--ink,#111111)")};color:#fff;padding:12px 22px;border-radius:6px;font-weight:700;text-decoration:none">${esc(b.label || "Download")}</a>` : ""}</div>`);
     }
     case "accordion":
       return band(b, (b.items || []).map((it) => `<details style="border:1px solid var(--line,#e4ded2);border-radius:10px;margin-bottom:8px;background:var(--card,#fff)"><summary style="cursor:pointer;padding:14px 16px;font-weight:600;list-style:none">${esc(it.q || "")}</summary><div style="padding:0 16px 16px;color:var(--muted,#5f6d66);line-height:1.6">${esc(it.a || "")}</div></details>`).join(""));
@@ -166,7 +166,7 @@ export function renderCmsBlock(b: CmsBlock): string {
         else ctrl = `<input type="${t === "phone" ? "tel" : t}" placeholder="${esc(it.placeholder || "")}" style="${st}" />`;
         return `<div style="margin-bottom:16px">${t === "checkbox" ? "" : label}${ctrl}</div>`;
       }).join("");
-      return band(b, `<form onsubmit="return false" style="text-align:left;max-width:${b.maxWidth || 560}px;margin:0 auto">${b.text ? `<h2 style="font-family:var(--font-display);font-size:28px;margin:0 0 6px">${esc(b.text)}</h2>` : ""}${b.eyebrow ? `<p style="color:var(--muted,#5f6d66);margin:0 0 20px">${esc(b.eyebrow)}</p>` : ""}${fields}<button type="submit" style="background:${esc(b.buttonColor || "var(--green,#315f43)")};color:#fff;padding:13px 26px;border:none;border-radius:6px;font-weight:700;font-size:15px;cursor:pointer">${esc(b.label || "Submit")}</button></form>`);
+      return band(b, `<form onsubmit="return false" style="text-align:left;max-width:${b.maxWidth || 560}px;margin:0 auto">${b.text ? `<h2 style="font-family:var(--font-display);font-size:28px;margin:0 0 6px">${esc(b.text)}</h2>` : ""}${b.eyebrow ? `<p style="color:var(--muted,#5f6d66);margin:0 0 20px">${esc(b.eyebrow)}</p>` : ""}${fields}<button type="submit" style="background:${esc(b.buttonColor || "var(--ink,#111111)")};color:#fff;padding:13px 26px;border:none;border-radius:6px;font-weight:700;font-size:15px;cursor:pointer">${esc(b.label || "Submit")}</button></form>`);
     }
     case "video": {
       const src = b.url ? videoEmbedSrc(b.url) : "";
@@ -206,7 +206,7 @@ function hexRgba(hex: string, a: number): string | null {
 // optional label + caption. Style (line/solid/broken/duotone) + colors are editable.
 function iconBlockHtml(b: CmsBlock): string {
   const gs = Math.max(12, b.iconSize || 30);
-  const rawColor = b.accent || b.buttonColor || "#315f43";
+  const rawColor = b.accent || b.buttonColor || "#c9aa70";
   const style = (b.variant as IconStyle) || "line";
   const salt = String(b.id || "").replace(/[^a-zA-Z0-9_-]/g, "") || "i";
   const svg = wrapIcon(iconBody(b.icon || DEFAULT_ICON, style), { color: esc(rawColor), size: gs, salt });
@@ -302,8 +302,8 @@ function audioPlayerHtml(b: CmsBlock): string {
 
 function buttonHtml(b: CmsBlock, label: string | undefined, url: string | undefined, primary: boolean): string {
   if (!label) return "";
-  const bg = primary ? esc(b.buttonColor || "var(--green,#315f43)") : "transparent";
-  const fg = primary ? "#fff" : esc(b.textColor || "var(--green,#315f43)");
+  const bg = primary ? esc(b.buttonColor || "var(--ink,#111111)") : "transparent";
+  const fg = primary ? "#fff" : esc(b.textColor || "var(--ink,#111111)");
   const border = primary ? "none" : "2px solid currentColor";
   const style = `display:inline-block;margin:6px;background:${bg};color:${fg};border:${border};padding:13px 26px;border-radius:${b.radius ?? 6}px;${fs(b, "16px")};font-weight:700;text-decoration:none`;
   const attrs = `${b.newTab ? ' target="_blank" rel="noopener"' : ""}`;
@@ -333,10 +333,10 @@ ${fontLinksHtml(usedFonts(blocks))}
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     ${renderNavStyles()}
-    :root { --paper:#fbfaf7; --ink:#070807; --muted:#5f6d66; --line:#e4ded2; --green:#315f43; --gold:#c9a46e; --card:#fff; }
+    :root { --paper:#fbfaf7; --ink:#070807; --muted:#5f6d66; --line:#e4ded2; --gold:#c9a46e; --card:#fff; }
     [data-theme="dark"] { --paper:#10110f; --ink:#f8f6f1; --muted:#b6bcb6; --line:#2b2a25; --card:#151713; }
     body { background:var(--paper); color:var(--ink); font-family:var(--font-body); line-height:1.6; }
-    .cms-rt a { color:var(--green); }
+    .cms-rt a { color:var(--gold); }
     .cms-rt ul { padding-left:1.2em; margin:0; }
     .cms-rt p { margin:0 0 14px; }
     img { max-width:100%; }

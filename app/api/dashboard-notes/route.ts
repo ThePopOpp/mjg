@@ -17,7 +17,7 @@ async function notifyRecipients(note: DashboardNote, authorName: string) {
       <p><strong>${authorName || "A teammate"}</strong> shared a dashboard edit request with you.</p>
       <p style="margin:12px 0;padding:12px 14px;background:#f5f2ea;border-radius:8px;white-space:pre-wrap">${escapeHtml(note.note)}</p>
       <p style="font-size:13px;color:#5f6d66">Page: <strong>${escapeHtml(note.page_title || note.route || "—")}</strong> · ${note.type} · ${note.priority} priority</p>
-      ${note.route ? `<p><a href="${link}" style="display:inline-block;background:#315f43;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:700">Open the page</a></p>` : ""}
+      ${note.route ? `<p><a href="${link}" style="display:inline-block;background:#111111;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:700">Open the page</a></p>` : ""}
     </div>`;
   await Promise.allSettled(
     note.recipient_emails.map((to) => sendSmtpEmail({ to, subject: `Dashboard edit request: ${note.page_title || note.route || "review"}`, html })),

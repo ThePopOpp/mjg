@@ -56,7 +56,7 @@ function composite(img: HTMLImageElement, shapes: Shape[]): HTMLCanvasElement {
   const ctx = c.getContext("2d")!; ctx.drawImage(img, 0, 0); shapes.forEach((s) => drawShape(ctx, s)); return c;
 }
 
-const COLORS = ["#ef4444", "#c9a46e", "#315f43", "#2563eb", "#111111", "#ffffff"];
+const COLORS = ["#ef4444", "#c9a46e", "#b9975a", "#2563eb", "#111111", "#ffffff"];
 const TOOLS: { key: Tool; icon: React.ElementType; label: string }[] = [
   { key: "crop", icon: Crop, label: "Crop" }, { key: "pen", icon: Pen, label: "Pen" },
   { key: "arrow", icon: ArrowUpRight, label: "Arrow" }, { key: "rect", icon: SquareIcon, label: "Box" },
@@ -165,7 +165,7 @@ export function ScreenshotEditor({ dataUrl, onSave, onCancel }: { dataUrl: strin
             <button key={c} onClick={() => setColor(c)} title={c} className={cn("h-6 w-6 rounded-full border", color === c ? "ring-2 ring-primary ring-offset-1" : "border-border")} style={{ background: c }} />
           ))}
         </div>
-        <input type="range" min={2} max={12} value={size} onChange={(e) => setSize(Number(e.target.value))} className="w-24 accent-[#315f43]" title="Brush size" />
+        <input type="range" min={2} max={12} value={size} onChange={(e) => setSize(Number(e.target.value))} className="w-24 accent-[#c9aa70]" title="Brush size" />
         {tool === "crop" && cropDims && <span className="text-xs text-muted-foreground">{cropDims.w} × {cropDims.h}</span>}
         {tool === "crop" && <Button size="sm" variant="outline" onClick={applyCrop}><Crop className="h-3.5 w-3.5" /> Apply crop</Button>}
         <button onClick={() => setShapes((s) => s.slice(0, -1))} className="ml-auto flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs hover:bg-muted"><Undo2 className="h-3.5 w-3.5" /> Undo</button>

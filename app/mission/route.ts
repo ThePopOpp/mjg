@@ -72,7 +72,7 @@ export async function GET() {
       --ink: #070807;
       --muted: #5f6d66;
       --line: #e4ded2;
-      --green: #315f43;
+      --green:#c9aa70;
       --gold: #C9A46E;
       --card: #ffffff;
     }

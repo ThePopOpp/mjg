@@ -80,7 +80,7 @@ function defaultBlock(type: CmsBlockType): CmsBlock {
     case "video": return { ...base, padTop: 24, padBottom: 24, maxWidth: 900, url: "", aspect: "16/9" };
     case "gallery": return { ...base, columns: 3, padTop: 24, padBottom: 24, items: [{ imageUrl: "", title: "" }, { imageUrl: "", title: "" }, { imageUrl: "", title: "" }] };
     case "embed": return { ...base, padTop: 16, padBottom: 16, url: "", height: 480 };
-    case "hero": return { ...base, align: "center", padTop: 80, padBottom: 80, minHeight: 440, bgColor: "#315f43", overlay: "#0b1f14", overlayOpacity: 55, eyebrow: "Eyebrow", text: "Your hero headline", subtext: "A supporting sentence for the hero.", label: "Primary", url: "#", label2: "", url2: "" };
+    case "hero": return { ...base, align: "center", padTop: 80, padBottom: 80, minHeight: 440, bgColor: "#111111", overlay: "#0d0d0c", overlayOpacity: 55, eyebrow: "Eyebrow", text: "Your hero headline", subtext: "A supporting sentence for the hero.", label: "Primary", url: "#", label2: "", url2: "" };
     case "cta": return { ...base, align: "center", padTop: 56, padBottom: 56, bgColor: "#f1ede3", eyebrow: "Get started", text: "Ready to take the next step?", subtext: "A short line that motivates the click.", label: "Get started", url: "https://", label2: "", url2: "" };
     case "cardgrid": return { ...base, padTop: 32, padBottom: 32, columns: 3, items: [{ title: "Card one", body: "A short description." }, { title: "Card two", body: "A short description." }, { title: "Card three", body: "A short description." }] };
     case "statgrid": return { ...base, align: "center", columns: 3, padTop: 40, padBottom: 40, items: [{ title: "100+", body: "Label" }, { title: "24", body: "Label" }, { title: "98%", body: "Label" }] };
@@ -90,7 +90,7 @@ function defaultBlock(type: CmsBlockType): CmsBlock {
     case "resource": return { ...base, padTop: 32, padBottom: 32, role: "PDF", text: "Resource title", subtext: "Short description.", label: "Download", url: "" };
     case "button": return { ...base, label: "Learn more", url: "" };
     case "audio": return { ...base, align: "center", padTop: 48, padBottom: 48, url: "", text: "The Stewardship Blueprint", author: "Michael J. Gauthier", role: "Life Design · Stewardship · Faith", accent: "#c9a46e", barColor: "#1b1a17", textColor: "#6a7a6f" };
-    case "icon": return { ...base, align: "center", padTop: 32, padBottom: 32, icon: "star", variant: "line", iconShape: "circle", iconBg: "#f1ede3", iconOutline: "", accent: "#315f43", iconSize: 30, text: "", subtext: "" };
+    case "icon": return { ...base, align: "center", padTop: 32, padBottom: 32, icon: "star", variant: "line", iconShape: "circle", iconBg: "#f1ede3", iconOutline: "", accent: "#c9aa70", iconSize: 30, text: "", subtext: "" };
     case "html": return { ...base, padTop: 16, padBottom: 16, html: "<!-- Your custom HTML here -->" };
     case "divider": return { ...base, padTop: 8, padBottom: 8 };
     case "spacer": return { id: uid(), type, height: 40 };
@@ -100,7 +100,7 @@ function defaultBlock(type: CmsBlockType): CmsBlock {
 }
 
 const ALIGN_OPTS = [{ value: "left", label: "Left" }, { value: "center", label: "Center" }, { value: "right", label: "Right" }];
-const SWATCHES = ["", "#ffffff", "#fbfaf7", "#f1ede3", "#315f43", "#c9a46e", "#10110f", "#070807"];
+const SWATCHES = ["", "#ffffff", "#fbfaf7", "#f1ede3", "#e2ca9a", "#c9a46e", "#b9975a", "#10110f", "#070807"];
 const DEVICES: { key: string; icon: React.ElementType; w: number }[] = [
   { key: "desktop", icon: Monitor, w: 0 }, { key: "tablet", icon: Tablet, w: 768 }, { key: "mobile", icon: Smartphone, w: 390 },
 ];
@@ -109,7 +109,7 @@ const TEXT_SHADOWS = [{ value: "", label: "None" }, { value: "0 1px 2px rgba(0,0
 const CANVAS_VARS = {
   "--font-display": "'DM Serif Display', Georgia, serif",
   "--font-body": "'Roboto', system-ui, sans-serif",
-  "--green": "#315f43", "--line": "#e4ded2", "--gold": "#c9a46e", "--paper": "#fbfaf7", "--ink": "#070807", "--muted": "#5f6d66", "--card": "#ffffff",
+  "--line": "#e4ded2", "--gold": "#c9a46e", "--paper": "#fbfaf7", "--ink": "#070807", "--muted": "#5f6d66", "--card": "#ffffff",
 } as React.CSSProperties;
 
 const isTextType = (t: CmsBlockType) => t === "heading" || t === "subheading" || t === "paragraph" || t === "richtext" || t === "quote" || t === "scripture" || t === "list" || t === "cta" || t === "hero";
@@ -696,7 +696,7 @@ function BlockView({ block: b, selectedId, onSelect, nested = false, dnd }: { bl
         ? { display: "inline-flex", lineHeight: 0 }
         : { display: "inline-flex", alignItems: "center", justifyContent: "center", lineHeight: 0, width: gs + pad * 2, height: gs + pad * 2, background: b.iconBg || undefined, borderRadius: shape === "circle" ? 999 : (b.radius ?? 16), border: b.iconOutline ? `2px solid ${b.iconOutline}` : undefined };
       return wrap(<div>
-        <span style={box}><IconGlyph id={b.icon} style={(b.variant as IconStyle) || "line"} color={b.accent || b.buttonColor || "#315f43"} size={gs} salt={b.id} /></span>
+        <span style={box}><IconGlyph id={b.icon} style={(b.variant as IconStyle) || "line"} color={b.accent || b.buttonColor || "#c9aa70"} size={gs} salt={b.id} /></span>
         {b.text && <div style={{ fontFamily: "var(--font-display)", fontSize: b.fontSize || 20, marginTop: 14, ...T }}>{b.text}</div>}
         {b.subtext && <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--muted)", margin: "6px 0 0" }}>{b.subtext}</p>}
       </div>);
@@ -1196,7 +1196,7 @@ function Inspector({ block, update, upload, onAddToColumn, onMove, onRemove, onS
 
       {block.type === "icon" && (
         <div className="space-y-2">
-          <IconPicker value={block.icon} onChange={(id) => update({ icon: id })} style={(block.variant as IconStyle) || "line"} color={block.accent || block.buttonColor || "#315f43"} />
+          <IconPicker value={block.icon} onChange={(id) => update({ icon: id })} style={(block.variant as IconStyle) || "line"} color={block.accent || block.buttonColor || "#c9aa70"} />
           <div className="grid grid-cols-2 gap-2">
             <div><L>Style</L><FieldSelect value={block.variant ?? "line"} onChange={(v) => update({ variant: v })} options={ICON_STYLES.map((s) => ({ value: s.value, label: s.label }))} className="h-8" /></div>
             <div><L>Container</L><FieldSelect value={block.iconShape ?? "circle"} onChange={(v) => update({ iconShape: v as CmsBlock["iconShape"] })} options={[{ value: "none", label: "None" }, { value: "square", label: "Square" }, { value: "circle", label: "Circle" }]} className="h-8" /></div>

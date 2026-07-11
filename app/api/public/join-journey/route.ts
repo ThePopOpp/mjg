@@ -325,7 +325,7 @@ async function sendWelcomeAccessEmail(input: {
         <h1 style="margin:0 0 16px;">Welcome, ${escapeHtml(input.firstName)}</h1>
         <p>Thanks for joining The Journey with Michael J. Gauthier and The Stewardship Blueprint.</p>
         ${passwordBlock}
-        <p><a href="${siteUrl}/login" style="display:inline-block;background:#315f43;color:#fff;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700;">Sign in</a></p>
+        <p><a href="${siteUrl}/login" style="display:inline-block;background:#111111;color:#fff;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:700;">Sign in</a></p>
       </div>
     `,
     text: input.tempPassword

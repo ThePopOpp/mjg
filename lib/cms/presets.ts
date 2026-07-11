@@ -19,7 +19,7 @@ export const BLOCK_PRESETS: { name: string; description: string; blocks: CmsPres
     name: "Hero + CTA",
     description: "Full-bleed hero with headline and two buttons.",
     blocks: [
-      { type: "hero", align: "center", eyebrow: "Stewardship Blueprint", text: "Lead your life and legacy with intention", subtext: "A guided path to steward your time, talent, and treasure well.", label: "Get started", url: "#", label2: "Learn more", url2: "#", minHeight: 460, overlay: "#0b1f14", overlayOpacity: 55, bgColor: "#315f43", padTop: 80, padBottom: 80 },
+      { type: "hero", align: "center", eyebrow: "Stewardship Blueprint", text: "Lead your life and legacy with intention", subtext: "A guided path to steward your time, talent, and treasure well.", label: "Get started", url: "#", label2: "Learn more", url2: "#", minHeight: 460, overlay: "#0d0d0c", overlayOpacity: 55, bgColor: "#111111", padTop: 80, padBottom: 80 },
     ],
   },
   {
@@ -120,7 +120,7 @@ export const BLOCK_PRESETS: { name: string; description: string; blocks: CmsPres
     name: "Icon badge",
     description: "Accent icon in a circle with a label.",
     blocks: [
-      { type: "icon", align: "center", icon: "shield-check", variant: "line", iconShape: "circle", iconBg: "#f1ede3", iconOutline: "", accent: "#315f43", iconSize: 30, text: "Trusted guidance", subtext: "A short supporting line.", padTop: 32, padBottom: 32 },
+      { type: "icon", align: "center", icon: "shield-check", variant: "line", iconShape: "circle", iconBg: "#f1ede3", iconOutline: "", accent: "#c9aa70", iconSize: 30, text: "Trusted guidance", subtext: "A short supporting line.", padTop: 32, padBottom: 32 },
     ],
   },
 ];

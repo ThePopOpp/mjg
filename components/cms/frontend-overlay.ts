@@ -128,7 +128,7 @@ export function installOverlay(doc: Document, win: Window, handlers: OverlayHand
   const hoverBox = doc.createElement("div"), selBox = doc.createElement("div");
   const base = "position:absolute;pointer-events:none;z-index:2147483646;box-sizing:border-box;border-radius:2px;transition:all .04s linear;";
   hoverBox.style.cssText = base + "border:2px solid #c9a46e;background:rgba(201,164,110,.14);display:none;";
-  selBox.style.cssText = base + "border:2px solid #315f43;background:rgba(49,95,67,.12);display:none;";
+  selBox.style.cssText = base + "border:2px solid #c9aa70;background:rgba(201,170,112,.15);display:none;";
   const label = doc.createElement("div");
   label.style.cssText = "position:absolute;top:-18px;left:0;background:#c9a46e;color:#111;font:700 10px/16px system-ui,sans-serif;padding:0 6px;border-radius:3px;white-space:nowrap;letter-spacing:.04em;";
   hoverBox.appendChild(label);

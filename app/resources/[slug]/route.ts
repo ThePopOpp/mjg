@@ -28,7 +28,7 @@ function renderPost(post: any) {
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     ${renderNavStyles()}
     /* Page tokens */
-    :root { --paper:#fbfaf7; --ink:#070807; --muted:#5f6d66; --line:#e4ded2; --green:#315f43; --card:#fff; }
+    :root { --paper:#fbfaf7; --ink:#070807; --muted:#5f6d66; --line:#e4ded2; --green:#c9aa70; --card:#fff; }
     [data-theme="dark"] { --paper:#10110f; --ink:#f8f6f1; --muted:#b6bcb6; --line:#2b2a25; --card:#151713; }
     body { background:var(--paper); color:var(--ink); font-family:var(--font-body); line-height:1.6; }
     main { width:min(1180px, calc(100% - 40px)); margin:0 auto; }
