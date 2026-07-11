@@ -90,6 +90,19 @@ export async function requireSuperAdmin(request?: Request, actionToken?: string 
   return { ...profile, role };
 }
 
+// Any active profile (including participants) — used for Direct Messages, which
+// every invited user can access to read/reply to their own conversations.
+export async function requireActiveProfile(request?: Request, actionToken?: string | null) {
+  const { user } = await getAuthenticatedUser(request, actionToken);
+  const { profile, error } = await getProfileForAuthUser(user);
+  if (error) throw error;
+  const role = normalizeResolvedRole(profile, user.email);
+  if (!profile || profile.status !== "active") {
+    throw new Error("Active profile required.");
+  }
+  return { ...profile, role };
+}
+
 async function getAuthenticatedUser(request?: Request, actionToken?: string | null) {
   const supabase = await createClient();
 

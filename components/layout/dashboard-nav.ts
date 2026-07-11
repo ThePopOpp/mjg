@@ -51,6 +51,7 @@ export const dashboardNav: NavEntry[] = [
   {
     kind: "group", label: "Communications", icon: MessagesSquare, items: [
       { href: "/dashboard/emails", label: "Emails", icon: MailCheck },
+      { href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },
       { href: "/dashboard/sms", label: "SMS", icon: MessageSquare },
       { href: "/dashboard/dialer", label: "Dialer", icon: Phone },
       { href: "/dashboard/social-media", label: "Social Media", icon: Share2 },
