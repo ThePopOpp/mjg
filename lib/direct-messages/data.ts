@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { notifyDmRecipients } from "@/lib/direct-messages/notify";
 
 // Direct Messages data layer (service-role admin client; the API authorizes the
 // requester as a participant). 1:1 today, group-ready.
@@ -132,10 +133,10 @@ export async function getThread(userId: string, conversationId: string) {
   const op = pickProfile((otherRow as unknown as { profiles: EmbeddedProfile } | null)?.profiles ?? null);
   const other: DmPerson | null = op ? { id: op.id, name: personName(op), email: op.email ?? "" } : null;
 
-  // Mark read.
+  // Mark read; clearing last_notified_at so the next new message re-alerts.
   await supabase
     .from("dm_participants")
-    .update({ last_read_at: new Date().toISOString() })
+    .update({ last_read_at: new Date().toISOString(), last_notified_at: null })
     .eq("conversation_id", conversationId)
     .eq("user_id", userId);
 
@@ -177,6 +178,9 @@ export async function sendMessage(
     .eq("id", conversationId);
   // Sender has implicitly read their own message.
   await supabase.from("dm_participants").update({ last_read_at: message.created_at }).eq("conversation_id", conversationId).eq("user_id", userId);
+
+  // Alert the other participant(s) by email/SMS per their prefs (debounced).
+  await notifyDmRecipients(conversationId, userId, preview);
 
   return { id: message.id, created_at: message.created_at };
 }

@@ -1,6 +1,7 @@
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmailTestForm } from "@/components/settings/email-test-form";
+import { DmSettingsCard } from "@/components/direct-messages/dm-settings-card";
 import { getCurrentProfile } from "@/lib/auth/server";
 
 export default async function SettingsPage() {
@@ -9,6 +10,8 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader title="Settings" description="Manage dashboard preferences, Supabase-backed configuration, and admin defaults." />
+
+      <DmSettingsCard />
 
       <div className="grid gap-4 xl:grid-cols-[1fr_0.85fr]">
         <Card>
