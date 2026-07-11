@@ -26,11 +26,13 @@ export const BRAND_KIT = {
   // Hex values reflect the dashboard theme tokens (app/globals.css) and the
   // established email palette.
   colors: {
-    gold: { hex: "#c9aa70", label: "MJG gold (accent)" },
-    green: { hex: "#315f43", label: "Stewardship green (primary)" },
-    deepGreen: { hex: "#1f3d2b", label: "Deep green" },
-    cream: { hex: "#faf8f4", label: "Cream background" },
-    ink: { hex: "#111111", label: "Body text" },
+    gold: { hex: "#c9aa70", label: "MJG gold (primary accent)" },
+    lightGold: { hex: "#e2ca9a", label: "Light gold" },
+    darkGold: { hex: "#b9975a", label: "Dark gold" },
+    ink: { hex: "#111111", label: "Ink (primary / body text)" },
+    dark: { hex: "#10110f", label: "Dark background" },
+    cream: { hex: "#faf8f4", label: "Cream (light background)" },
+    white: { hex: "#ffffff", label: "White" },
     muted: { hex: "#5f6d66", label: "Muted text" },
   },
 
@@ -58,8 +60,8 @@ export const BRAND_KIT = {
 
 // A ready-to-use, on-brand email button (inline styles for email-client safety).
 export function brandEmailButton(href: string, label: string): string {
-  const { green } = BRAND_KIT.colors;
-  return `<a href="${href}" style="display:inline-block;background:${green.hex};color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:6px;font-family:${BRAND_KIT.fonts.emailSans};font-weight:700;">${label}</a>`;
+  const { ink } = BRAND_KIT.colors;
+  return `<a href="${href}" style="display:inline-block;background:${ink.hex};color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:6px;font-family:${BRAND_KIT.fonts.emailSans};font-weight:700;">${label}</a>`;
 }
 
 // An on-brand email header block (logo + wordmark eyebrow).

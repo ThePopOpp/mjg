@@ -54,7 +54,7 @@ export default function TeamGuidePage() {
   return (
     <div className="space-y-8 pb-10">
       {/* Hero band */}
-      <div className="overflow-hidden rounded-2xl border-b-[3px] border-accent bg-gradient-to-br from-[#1f3d2b] to-[#315f43] text-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border-b-[3px] border-[#c9aa70] bg-gradient-to-br from-[#1c1a16] to-[#2d2820] text-white shadow-sm">
         <div className="max-w-3xl px-6 py-10 sm:px-10 sm:py-12">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#e8cf9c]">Created for More</p>
           <h1 className="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight sm:text-[2.6rem]" style={serif}>

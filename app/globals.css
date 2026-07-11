@@ -5,49 +5,52 @@
 @tailwind utilities;
 
 @layer base {
+  /* MJG brand palette: warm cream/ink neutrals + gold accent (no green).
+     Mirrors the public frontend — ink primary buttons, gold as the signature
+     accent (rings, highlights), warm light/dark neutrals. */
   :root {
-    --background: 40 27% 98%;
-    --foreground: 160 16% 8%;
+    --background: 40 33% 98%;
+    --foreground: 30 9% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 160 16% 8%;
+    --card-foreground: 30 9% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 160 16% 8%;
-    --primary: 151 44% 24%;
-    --primary-foreground: 48 45% 96%;
-    --secondary: 42 32% 93%;
-    --secondary-foreground: 160 16% 14%;
-    --muted: 42 26% 94%;
-    --muted-foreground: 160 7% 42%;
-    --accent: 43 51% 84%;
-    --accent-foreground: 160 26% 14%;
+    --popover-foreground: 30 9% 11%;
+    --primary: 26 12% 12%;
+    --primary-foreground: 45 40% 97%;
+    --secondary: 40 30% 93%;
+    --secondary-foreground: 30 9% 14%;
+    --muted: 40 26% 94%;
+    --muted-foreground: 32 7% 40%;
+    --accent: 40 46% 86%;
+    --accent-foreground: 30 10% 14%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 42 20% 84%;
-    --input: 42 20% 84%;
-    --ring: 151 44% 28%;
+    --border: 40 22% 85%;
+    --input: 40 22% 85%;
+    --ring: 38 52% 50%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 162 26% 7%;
-    --foreground: 42 32% 93%;
-    --card: 160 24% 10%;
-    --card-foreground: 42 32% 93%;
-    --popover: 160 24% 10%;
-    --popover-foreground: 42 32% 93%;
-    --primary: 43 62% 72%;
-    --primary-foreground: 160 32% 8%;
-    --secondary: 160 17% 15%;
-    --secondary-foreground: 42 28% 91%;
-    --muted: 160 15% 16%;
-    --muted-foreground: 42 12% 68%;
-    --accent: 151 30% 21%;
-    --accent-foreground: 43 55% 82%;
+    --background: 30 9% 7%;
+    --foreground: 42 30% 92%;
+    --card: 30 9% 11%;
+    --card-foreground: 42 30% 92%;
+    --popover: 30 9% 11%;
+    --popover-foreground: 42 30% 92%;
+    --primary: 42 30% 92%;
+    --primary-foreground: 26 14% 10%;
+    --secondary: 30 8% 16%;
+    --secondary-foreground: 42 26% 90%;
+    --muted: 30 8% 16%;
+    --muted-foreground: 40 11% 66%;
+    --accent: 38 26% 22%;
+    --accent-foreground: 43 58% 80%;
     --destructive: 0 67% 43%;
     --destructive-foreground: 0 0% 98%;
-    --border: 160 16% 20%;
-    --input: 160 16% 20%;
-    --ring: 43 62% 72%;
+    --border: 30 8% 20%;
+    --input: 30 8% 20%;
+    --ring: 43 60% 68%;
   }
 
   * {

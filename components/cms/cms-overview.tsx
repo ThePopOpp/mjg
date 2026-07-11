@@ -143,10 +143,10 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
         <h2 className="text-sm font-semibold text-muted-foreground">At a glance</h2>
         <div className="ml-auto flex items-center gap-2">
           <button onClick={() => setActivityOpen(true)} title="Activity — last 7 days"
-            className="relative inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#315f43] px-3 text-sm font-medium text-white shadow-sm transition hover:opacity-90 dark:bg-[#c9a46e]">
+            className="relative inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground shadow-sm transition hover:opacity-90">
             <CalendarDays className="h-4 w-4" /> Activity Last 7 Days
             {activityCount > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-[#315f43] shadow ring-1 ring-black/5 dark:text-[#8a6d3b]">{activityCount}</span>
+              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-background px-1 text-[10px] font-bold text-foreground shadow ring-1 ring-black/5">{activityCount}</span>
             )}
           </button>
           <Button variant="outline" size="sm" onClick={nav.pages}><Plus className="h-4 w-4" /> New page</Button>
