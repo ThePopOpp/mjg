@@ -2,13 +2,15 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { MessageSquarePlus, Camera, X, Bot, Inbox, Loader2, Check, Users, ImageIcon, PenSquare } from "lucide-react";
+import { MessageSquarePlus, Camera, X, Bot, Inbox, Loader2, Check, Users, ImageIcon, PenSquare, MessageSquareText, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldSelect } from "@/components/ui/field-select";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { AgentChat } from "@/components/ai-agent/agent-chat";
+import { DmInbox } from "@/components/direct-messages/dm-inbox";
+import { useDmUnread } from "@/components/direct-messages/dm-unread";
 import { capturePage, dataUrlToFile } from "@/lib/dashboard-notes/screenshot";
 import { ScreenshotEditor } from "@/components/cms/review/screenshot-editor";
 import { NoteDetailModal } from "@/components/cms/review/note-detail-modal";
@@ -34,9 +36,23 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
   const token = useDashboardActionToken();
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
-  const [tab, setTab] = React.useState<"note" | "requests">("note");
+  const [tab, setTab] = React.useState<"note" | "requests" | "dm">("note");
+  const [expanded, setExpanded] = React.useState(false);
   const [agentOpen, setAgentOpen] = React.useState(false);
   const [detailId, setDetailId] = React.useState<string | null>(null);
+  const { unread: dmUnread } = useDmUnread();
+
+  function openMessages() {
+    setTab("dm");
+    setExpanded(true);
+  }
+  function toggleExpanded() {
+    setExpanded((e) => {
+      const next = !e;
+      if (!next && tab === "dm") setTab("requests");
+      return next;
+    });
+  }
 
   const [note, setNote] = React.useState("");
   const [type, setType] = React.useState("edit");
@@ -100,26 +116,39 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
 
   return (
     <>
-      {/* Launcher */}
-      <button data-fab-ignore onClick={() => setOpen((o) => !o)} aria-label="Review this page"
+      {/* Launcher — the numeric badge reflects unread Direct Messages */}
+      <button data-fab-ignore onClick={() => setOpen((o) => !o)} aria-label="Review & messages"
         className="fixed bottom-5 right-5 z-[100] flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition hover:scale-105 print:hidden">
         {open ? <X className="h-5 w-5" /> : <MessageSquarePlus className="h-5 w-5" />}
-        {!open && unread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-white">{unread}</span>}
+        {!open && dmUnread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{dmUnread > 99 ? "99+" : dmUnread}</span>}
       </button>
 
+      {open && expanded && <div data-fab-ignore className="fixed inset-0 z-[99] bg-background/70 backdrop-blur-sm print:hidden" onClick={() => setExpanded(false)} />}
+
       {open && (
-        <div data-fab-ignore className="fixed bottom-20 right-5 z-[100] flex max-h-[76vh] w-[360px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl print:hidden">
+        <div data-fab-ignore className={cn(
+          "fixed z-[100] flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl print:hidden",
+          expanded ? "inset-3 sm:inset-6" : "bottom-20 right-5 max-h-[80vh] w-[400px]",
+        )}>
           <div className="flex items-center gap-1 border-b border-border p-1">
             <button onClick={() => setTab("note")} className={cn("flex-1 rounded-lg px-3 py-1.5 text-xs font-medium", tab === "note" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted")}>New request</button>
             <button onClick={() => setTab("requests")} className={cn("flex-1 rounded-lg px-3 py-1.5 text-xs font-medium", tab === "requests" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted")}>
-              <span className="inline-flex items-center gap-1"><Inbox className="h-3.5 w-3.5" /> Requests{unread > 0 && <span className="rounded-full bg-destructive px-1.5 text-[9px] font-bold text-white">{unread}</span>}</span>
+              <span className="inline-flex items-center gap-1"><Inbox className="h-3.5 w-3.5" /> Requests{unread > 0 && <span className="rounded-full bg-destructive px-1.5 text-[9px] font-bold text-destructive-foreground">{unread}</span>}</span>
+            </button>
+            <button onClick={openMessages} className={cn("flex-1 rounded-lg px-3 py-1.5 text-xs font-medium", tab === "dm" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted")}>
+              <span className="inline-flex items-center gap-1"><MessageSquareText className="h-3.5 w-3.5" /> Messages{dmUnread > 0 && <span className="rounded-full bg-destructive px-1.5 text-[9px] font-bold text-destructive-foreground">{dmUnread}</span>}</span>
             </button>
             <Button size="sm" variant="outline" className="h-7 px-2" onClick={() => setAgentOpen(true)} title="Ask Steward"><Bot className="h-3.5 w-3.5" /></Button>
+            <Button size="sm" variant="outline" className="h-7 px-2" onClick={toggleExpanded} title={expanded ? "Collapse" : "Expand to full page"}>{expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}</Button>
           </div>
 
           {error && <div className="border-b border-destructive/30 bg-destructive/10 px-3 py-1.5 text-[11px] text-destructive">{error}</div>}
 
-          {tab === "note" ? (
+          {tab === "dm" ? (
+            <div className="min-h-0 flex-1 p-2">
+              <DmInbox canStart className="h-full" />
+            </div>
+          ) : tab === "note" ? (
             <div className="space-y-2 overflow-y-auto p-3">
               <div className="text-[11px] text-muted-foreground">On <span className="font-medium text-foreground">{pageName}</span> — captured automatically.</div>
               <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Describe the edit / bug / idea…" className="min-h-[84px]" />

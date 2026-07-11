@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LogOut, Menu, Search, PanelLeft, X } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Search, PanelLeft, X, MessageSquareText } from "lucide-react";
 import { DashboardActionTokenProvider } from "@/components/layout/dashboard-action-token";
+import { DmUnreadProvider, useDmUnread } from "@/components/direct-messages/dm-unread";
 import { dashboardNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
   }
 
   return (
+    <DmUnreadProvider>
     <div className="min-h-screen bg-background">
       {/* Mobile backdrop */}
       {mobileOpen && (
@@ -170,6 +172,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
               <Input className="pl-9" placeholder="Search participants, waves, tags..." />
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <MessagesBell />
               <ThemeToggle />
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-medium">{displayName}</p>
@@ -192,6 +195,26 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
         </DashboardActionTokenProvider>
       </div>
     </div>
+    </DmUnreadProvider>
+  );
+}
+
+// Header bell → Direct Messages, with a live unread badge.
+function MessagesBell() {
+  const { unread } = useDmUnread();
+  return (
+    <Link
+      href="/dashboard/direct-messages"
+      aria-label={unread > 0 ? `Direct Messages (${unread} unread)` : "Direct Messages"}
+      className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+    >
+      <MessageSquareText className="h-5 w-5" />
+      {unread > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-none text-destructive-foreground">
+          {unread > 99 ? "99+" : unread}
+        </span>
+      )}
+    </Link>
   );
 }
 
@@ -200,6 +223,8 @@ function LeafLink({
 }: {
   item: NavLeaf; collapsed: boolean; active: boolean; indent?: boolean; onNavigate: () => void;
 }) {
+  const { unread } = useDmUnread();
+  const badge = item.href === "/dashboard/direct-messages" && unread > 0 ? unread : 0;
   return (
     <Link
       href={item.href}
@@ -212,8 +237,18 @@ function LeafLink({
         indent && !collapsed ? "lg:pl-9" : "",
       )}
     >
-      <item.icon className="h-4 w-4 shrink-0" />
+      <span className="relative shrink-0">
+        <item.icon className="h-4 w-4" />
+        {badge > 0 && collapsed && (
+          <span className="absolute -right-1.5 -top-1.5 hidden h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-bold leading-none text-destructive-foreground lg:flex" />
+        )}
+      </span>
       <span className={collapsed ? "lg:hidden" : ""}>{item.label}</span>
+      {badge > 0 && (
+        <span className={cn("ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold leading-none text-destructive-foreground", collapsed ? "lg:hidden" : "")}>
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
       <span className={cn("pointer-events-none absolute left-full z-50 ml-2 hidden whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs font-medium text-popover-foreground shadow-md", collapsed ? "lg:group-hover:block" : "")}>
         {item.label}
       </span>
