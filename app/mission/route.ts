@@ -4,8 +4,10 @@ import {
   publicSiteUrl,
   renderFaviconLinks,
   renderFonts,
+  renderJoinCta,
   renderNavScript,
   renderNavStyles,
+  renderSiteFooter,
   renderSiteHeader,
   renderThemeScript,
 } from "@/lib/public-site/static-pages";
@@ -224,7 +226,11 @@ export async function GET() {
         ${categoryCards ? `<div class="impact-categories">${categoryCards}</div>` : ""}
       </div>
     </section>
+
+    ${renderJoinCta(siteUrl)}
   </main>
+
+  ${renderSiteFooter(siteUrl)}
 
   ${renderNavScript()}
 </body>

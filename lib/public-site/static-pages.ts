@@ -143,6 +143,140 @@ export function renderSiteHeader(siteUrl: string) {
   </nav>`;
 }
 
+/** "Join the Journey" sign-up CTA — matches the homepage. Posts to the
+ *  public join-journey endpoint via a small inline AJAX handler. */
+export function renderJoinCta(siteUrl: string) {
+  return `<style>
+    .mjg-join{background:var(--paper,#fbfaf7);padding:92px 20px;text-align:center;border-top:1px solid var(--line,#e4ded2);}
+    .mjg-join .in{max-width:720px;margin:0 auto;}
+    .mjg-join .qm{font-family:var(--font-display);font-size:110px;line-height:.5;color:var(--gold,#c9aa70);opacity:.16;height:52px;user-select:none;}
+    .mjg-join h2{font-family:var(--font-display);font-size:clamp(34px,5vw,54px);margin:0 0 18px;color:var(--ink,#111);}
+    .mjg-join h2 em{color:var(--gold,#c9aa70);font-style:italic;}
+    .mjg-join .lead{font-size:18px;line-height:1.6;color:var(--muted,#5f6d66);margin:0 auto 10px;max-width:560px;}
+    .mjg-join .sub{font-size:14px;color:var(--muted,#5f6d66);opacity:.85;margin:0 0 28px;}
+    .mjg-join .perks{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;margin:0 0 34px;}
+    .mjg-join .perk{font-size:14px;color:var(--ink,#111);display:inline-flex;align-items:center;gap:8px;}
+    .mjg-join .perk::before{content:"\\2713";color:var(--gold,#c9aa70);font-weight:800;}
+    .mjg-join form{max-width:560px;margin:0 auto;background:var(--card,#fff);border:1px solid var(--line,#e4ded2);border-radius:14px;padding:28px;text-align:left;}
+    .mjg-join .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+    .mjg-join input{width:100%;padding:13px 15px;border:1px solid var(--line,#e4ded2);border-radius:8px;background:var(--paper,#fff);color:var(--ink,#111);font-size:15px;font-family:var(--font-body,inherit);}
+    .mjg-join input::placeholder{color:var(--muted,#8a8a8a);}
+    .mjg-join button{width:100%;margin-top:12px;background:var(--gold,#c9aa70);color:#fff;border:none;border-radius:8px;padding:15px;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font-body,inherit);transition:opacity .2s;}
+    .mjg-join button:hover{opacity:.9;}
+    .mjg-join button:disabled{opacity:.6;cursor:default;}
+    .mjg-join .fine{font-size:12.5px;line-height:1.6;color:var(--muted,#5f6d66);text-align:center;margin:16px 0 0;}
+    .mjg-join .ok{color:var(--ink,#111);font-size:16px;text-align:center;padding:14px 4px;margin:0;}
+    @media(max-width:520px){.mjg-join .row{grid-template-columns:1fr;}}
+  </style>
+  <section class="mjg-join" id="join">
+    <div class="in">
+      <div class="qm">&ldquo;</div>
+      <h2>Join the <em>Journey</em></h2>
+      <p class="lead">Join the conversation &mdash; share your thoughts and reflections from your own journey.</p>
+      <p class="sub">You&rsquo;re one of the early supporters &mdash; your input will shape the book.</p>
+      <div class="perks">
+        <span class="perk">Early chapter drafts</span>
+        <span class="perk">Reflection worksheets</span>
+        <span class="perk">Live Q&amp;A invites</span>
+        <span class="perk">Blueprint actions</span>
+      </div>
+      <form id="mjgJoinForm" method="post" action="${siteUrl}/api/public/join-journey">
+        <input type="hidden" name="form_type" value="join_the_journey" />
+        <input type="hidden" name="source" value="Website Sign Up" />
+        <div class="row">
+          <input type="text" name="first_name" placeholder="First name" required />
+          <input type="text" name="last_name" placeholder="Last name" required />
+        </div>
+        <input type="email" name="email" placeholder="Email address" required />
+        <button type="submit">Join the Journey &rarr;</button>
+        <p class="fine">Your information will only be used to send you updates about The Stewardship Blueprint. No spam, ever. Unsubscribe at any time.</p>
+      </form>
+    </div>
+  </section>
+  <script>(function(){
+    var f=document.getElementById('mjgJoinForm');if(!f)return;
+    f.addEventListener('submit',function(e){e.preventDefault();
+      var b=f.querySelector('button');b.disabled=true;b.textContent='Joining\\u2026';
+      var d={};new FormData(f).forEach(function(v,k){d[k]=v;});
+      fetch(f.action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
+        .then(function(r){return r.json();})
+        .then(function(res){if(res&&res.ok!==false){f.innerHTML='<p class="ok">Thank you &mdash; you are on the journey. Watch your inbox for a first note.</p>';}
+          else{b.disabled=false;b.textContent='Join the Journey \\u2192';alert((res&&res.error)||'Something went wrong. Please try again.');}})
+        .catch(function(){b.disabled=false;b.textContent='Join the Journey \\u2192';alert('Something went wrong. Please try again.');});
+    });
+  })();</script>`;
+}
+
+/** Site footer — matches the homepage (Explore / Account / Contact + social). */
+export function renderSiteFooter(siteUrl: string) {
+  const year = new Date().getFullYear();
+  const mapHref = "https://www.google.com/maps/dir//2330+W+Ray+Rd+Ste+%233,+Chandler,+AZ+85224/@33.3208879,-111.964255,45043m/data=!3m1!1e3";
+  return `<style>
+    .mjg-ftr{background:var(--paper,#0f0f0f);border-top:1px solid var(--line,#2b2a25);padding:64px 20px 26px;color:var(--muted,#b6bcb6);}
+    .mjg-ftr .in{max-width:1180px;margin:0 auto;}
+    .mjg-ftr .cols{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.1fr;gap:40px;}
+    .mjg-ftr .logo{height:32px;width:auto;}
+    .mjg-ftr .logo-dark{display:none;}
+    [data-theme="dark"] .mjg-ftr .logo-light{display:none;}
+    [data-theme="dark"] .mjg-ftr .logo-dark{display:inline;}
+    .mjg-ftr .desc{font-size:14px;line-height:1.7;color:var(--muted,#b6bcb6);max-width:280px;margin:18px 0 0;}
+    .mjg-ftr h4{font-family:var(--font-display);font-size:20px;color:var(--ink,#f8f6f1);margin:0 0 18px;}
+    .mjg-ftr ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;}
+    .mjg-ftr a{color:var(--muted,#b6bcb6);text-decoration:none;font-size:15px;transition:color .2s;}
+    .mjg-ftr a:hover{color:var(--gold,#c9aa70);}
+    .mjg-ftr .bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--line,#2b2a25);margin-top:44px;padding-top:24px;font-size:14px;color:var(--muted,#b6bcb6);}
+    .mjg-ftr .gold-j{color:var(--gold,#c9aa70);}
+    .mjg-ftr .social{display:flex;gap:16px;}
+    .mjg-ftr .social a{display:inline-flex;color:var(--muted,#b6bcb6);}
+    .mjg-ftr .social a:hover{color:var(--gold,#c9aa70);}
+    .mjg-ftr .social svg{width:20px;height:20px;fill:currentColor;}
+    @media(max-width:820px){.mjg-ftr .cols{grid-template-columns:1fr 1fr;gap:32px;}.mjg-ftr .bottom{flex-direction:column;align-items:flex-start;}}
+  </style>
+  <footer class="mjg-ftr">
+    <div class="in">
+      <div class="cols">
+        <div>
+          <img class="logo logo-light" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" alt="Michael J. Gauthier" />
+          <img class="logo logo-dark" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" alt="Michael J. Gauthier" />
+          <p class="desc">Welcome to my personal mission: Encouraging others to use their God given resources for God given purposes</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="${siteUrl}/">Home</a></li>
+            <li><a href="${siteUrl}/about">About</a></li>
+            <li><a href="${siteUrl}/resources">Resources</a></li>
+            <li><a href="${siteUrl}/contact">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href="https://my.michaeljgauthier.com/login">Login</a></li>
+            <li><a href="${siteUrl}/#join">Register</a></li>
+            <li><a href="tel:+14804667070">Call Us</a></li>
+            <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="tel:+14804667070">(480) 466-7070</a></li>
+            <li><a href="${mapHref}" target="_blank" rel="noopener">2330 W Ray Rd Ste #3,<br />Chandler, AZ 85224</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="bottom">
+        <span>${year} &copy; Michael<span class="gold-j">J.</span>Gauthier.com &nbsp;- All rights reserved.</span>
+        <span class="social">
+          <a href="https://www.facebook.com/StrategicIncomeGroup" aria-label="Facebook" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://www.linkedin.com/in/michaeljgauthier/" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg></a>
+        </span>
+      </div>
+    </div>
+  </footer>`;
+}
+
 /** Nav JS — place just before </body> */
 export function renderNavScript() {
   return `<script>(function(){
