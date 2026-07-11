@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, Search, PenSquare, Camera, Paperclip, Mic, X, CircleDot } from "lucide-react";
+import { Send, Search, PenSquare, Camera, Paperclip, Mic, X, CircleDot, Loader2, FileText, StopCircle } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 
 type Person = { id: string; name: string; email: string };
+type Attachment = { type: "image" | "audio" | "video" | "file"; url: string; name: string; mimeType: string; size: number };
 type Conversation = {
   id: string;
   other: Person | null;
@@ -18,7 +19,7 @@ type Conversation = {
   last_sender_id: string | null;
   unread: number;
 };
-type Message = { id: string; sender_id: string | null; body: string; importance: "normal" | "important" | "urgent"; attachments: unknown[]; created_at: string; mine: boolean };
+type Message = { id: string; sender_id: string | null; body: string; importance: "normal" | "important" | "urgent"; attachments: Attachment[]; created_at: string; mine: boolean };
 
 const IMPORTANCE_DOT: Record<string, string> = {
   normal: "bg-muted-foreground/40",
@@ -70,7 +71,51 @@ export function DmInbox({ canStart, className }: { canStart: boolean; className?
   const [dateFilter, setDateFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [composeOpen, setComposeOpen] = useState(false);
+  const [pending, setPending] = useState<Attachment[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [recording, setRecording] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  const uploadFiles = useCallback(async (files: FileList | File[]) => {
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/direct-messages/upload", { method: "POST", headers: { "x-mjg-action-token": token ?? "" }, body: fd });
+        const data = await res.json();
+        if (res.ok && data.attachment) setPending((p) => [...p, data.attachment]);
+      }
+    } finally {
+      setUploading(false);
+    }
+  }, [token]);
+
+  async function toggleRecording() {
+    if (recording) {
+      recorderRef.current?.stop();
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia) return;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    chunksRef.current = [];
+    const recorder = new MediaRecorder(stream);
+    recorderRef.current = recorder;
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+    recorder.onstop = async () => {
+      stream.getTracks().forEach((t) => t.stop());
+      setRecording(false);
+      const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+      const file = new File([blob], `voice-note-${Date.now()}.webm`, { type: blob.type });
+      await uploadFiles([file]);
+    };
+    recorder.start();
+    setRecording(true);
+  }
 
   const loadConversations = useCallback(async () => {
     try {
@@ -104,15 +149,15 @@ export function DmInbox({ canStart, className }: { canStart: boolean; className?
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
   async function sendReply() {
-    if (!reply.trim() || !activeId) return;
+    if ((!reply.trim() && !pending.length) || !activeId) return;
     setSending(true);
     try {
       const res = await fetch(`/api/direct-messages/conversations/${activeId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ actionToken: token, body: reply.trim(), importance }),
+        body: JSON.stringify({ actionToken: token, body: reply.trim(), importance, attachments: pending }),
       });
-      if (res.ok) { setReply(""); setImportance("normal"); await loadThread(activeId); }
+      if (res.ok) { setReply(""); setImportance("normal"); setPending([]); await loadThread(activeId); }
     } finally {
       setSending(false);
     }
@@ -197,7 +242,12 @@ export function DmInbox({ canStart, className }: { canStart: boolean; className?
                         <span className={cn("h-1.5 w-1.5 rounded-full", IMPORTANCE_DOT[m.importance])} /> {m.importance}
                       </span>
                     )}
-                    <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                    {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
+                    {m.attachments.length > 0 && (
+                      <div className={cn("space-y-1.5", m.body && "mt-1.5")}>
+                        {m.attachments.map((a, i) => <AttachmentView key={i} a={a} mine={m.mine} />)}
+                      </div>
+                    )}
                     <p className={cn("mt-1 text-[11px]", m.mine ? "text-primary-foreground/70" : "text-muted-foreground")}>{formatTime(m.created_at)}</p>
                   </div>
                 </div>
@@ -206,10 +256,25 @@ export function DmInbox({ canStart, className }: { canStart: boolean; className?
             </div>
 
             <div className="border-t p-3">
+              {/* Pending attachments */}
+              {(pending.length > 0 || uploading) && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {pending.map((a, i) => (
+                    <span key={i} className="inline-flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-1 text-xs">
+                      {a.type === "image" ? <Camera className="h-3.5 w-3.5" /> : a.type === "audio" ? <Mic className="h-3.5 w-3.5" /> : <FileText className="h-3.5 w-3.5" />}
+                      <span className="max-w-[140px] truncate">{a.name}</span>
+                      <button type="button" onClick={() => setPending((p) => p.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-foreground"><X className="h-3 w-3" /></button>
+                    </span>
+                  ))}
+                  {uploading && <span className="inline-flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-1 text-xs text-muted-foreground"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading…</span>}
+                </div>
+              )}
+              <input ref={fileRef} type="file" multiple className="sr-only" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt" onChange={(e) => { if (e.target.files?.length) uploadFiles(e.target.files); e.target.value = ""; }} />
+              <input ref={cameraRef} type="file" className="sr-only" accept="image/*" capture="environment" onChange={(e) => { if (e.target.files?.length) uploadFiles(e.target.files); e.target.value = ""; }} />
               <div className="flex items-center gap-2">
-                <button type="button" title="Photo (coming soon)" disabled className="text-muted-foreground/50"><Camera className="h-5 w-5" /></button>
-                <button type="button" title="Attach file (coming soon)" disabled className="text-muted-foreground/50"><Paperclip className="h-5 w-5" /></button>
-                <button type="button" title="Voice note (coming soon)" disabled className="text-muted-foreground/50"><Mic className="h-5 w-5" /></button>
+                <button type="button" title="Photo" onClick={() => cameraRef.current?.click()} className="text-muted-foreground transition-colors hover:text-foreground"><Camera className="h-5 w-5" /></button>
+                <button type="button" title="Attach file" onClick={() => fileRef.current?.click()} className="text-muted-foreground transition-colors hover:text-foreground"><Paperclip className="h-5 w-5" /></button>
+                <button type="button" title={recording ? "Stop recording" : "Voice note"} onClick={toggleRecording} className={cn("transition-colors", recording ? "text-destructive" : "text-muted-foreground hover:text-foreground")}>{recording ? <StopCircle className="h-5 w-5 animate-pulse" /> : <Mic className="h-5 w-5" />}</button>
                 <Select value={importance} onValueChange={(v) => setImportance(v as typeof importance)}>
                   <SelectTrigger className="h-9 w-[130px] shrink-0 text-xs"><CircleDot className={cn("h-3.5 w-3.5", importance === "urgent" ? "text-destructive" : importance === "important" ? "text-[color:var(--brand-gold,#c9aa70)]" : "text-muted-foreground")} /><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -225,7 +290,7 @@ export function DmInbox({ canStart, className }: { canStart: boolean; className?
                   className="flex-1"
                   onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
                 />
-                <Button onClick={sendReply} disabled={sending || !reply.trim()} size="icon"><Send className="h-4 w-4" /></Button>
+                <Button onClick={sendReply} disabled={sending || uploading || (!reply.trim() && !pending.length)} size="icon"><Send className="h-4 w-4" /></Button>
               </div>
             </div>
           </>
@@ -240,6 +305,32 @@ export function DmInbox({ canStart, className }: { canStart: boolean; className?
         />
       )}
     </div>
+  );
+}
+
+function AttachmentView({ a, mine }: { a: Attachment; mine: boolean }) {
+  if (a.type === "image") {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <a href={a.url} target="_blank" rel="noopener noreferrer"><img src={a.url} alt={a.name} className="max-h-52 w-full rounded-lg object-cover" /></a>
+    );
+  }
+  if (a.type === "audio") {
+    return <audio controls src={a.url} className="w-full max-w-[240px]" />;
+  }
+  if (a.type === "video") {
+    return <video controls src={a.url} className="max-h-52 w-full rounded-lg" />;
+  }
+  return (
+    <a
+      href={a.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn("inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs", mine ? "border-primary-foreground/30 bg-primary-foreground/10" : "bg-background")}
+    >
+      <FileText className="h-4 w-4 shrink-0" />
+      <span className="max-w-[180px] truncate">{a.name}</span>
+    </a>
   );
 }
 

@@ -128,7 +128,7 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
       {open && (
         <div data-fab-ignore className={cn(
           "fixed z-[100] flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl print:hidden",
-          expanded ? "inset-3 sm:inset-6" : "bottom-20 right-5 max-h-[80vh] w-[400px]",
+          expanded ? "inset-3 sm:inset-6" : "bottom-20 right-5 max-h-[80vh] w-[420px]",
         )}>
           <div className="flex items-center gap-1 border-b border-border p-1">
             <button onClick={() => setTab("note")} className={cn("flex-1 rounded-lg px-3 py-1.5 text-xs font-medium", tab === "note" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted")}>New request</button>
