@@ -4,9 +4,11 @@ import {
   publicSiteUrl,
   renderFaviconLinks,
   renderFonts,
+  renderInstallScript,
   renderJoinCta,
   renderNavScript,
   renderNavStyles,
+  renderPwaHeadTags,
   renderSiteFooter,
   renderSiteHeader,
   renderThemeScript,
@@ -62,6 +64,7 @@ export async function GET() {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mission | Michael J. Gauthier</title>
   ${renderFaviconLinks()}
+  ${renderPwaHeadTags()}
   ${renderThemeScript()}
   ${renderFonts()}
   <style>
@@ -233,6 +236,7 @@ export async function GET() {
   ${renderSiteFooter(siteUrl)}
 
   ${renderNavScript()}
+  ${renderInstallScript()}
 </body>
 </html>`;
 

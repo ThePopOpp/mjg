@@ -256,6 +256,7 @@ export function renderSiteFooter(siteUrl: string) {
             <li><a href="${siteUrl}/#join">Register</a></li>
             <li><a href="tel:+14804667070">Call Us</a></li>
             <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+            <li><a href="#" data-mjg-install onclick="mjgInstall();return false;">Install the app</a></li>
           </ul>
         </div>
         <div>
@@ -417,16 +418,40 @@ const INSTALL_HELPER_JS = `(function(){
   if(document.readyState!=='loading')hideIfInstalled();else document.addEventListener('DOMContentLoaded',hideIfInstalled);
 })();`;
 
-function injectPwa(html: string) {
-  const headTags = `  <link rel="manifest" href="/manifest.webmanifest" />
+/** PWA <head> tags (manifest + apple icon/meta) for hand-built Next pages. */
+export function renderPwaHeadTags() {
+  return `<link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="MJG" />`;
+}
+
+/** The install helper <script> (defines window.mjgInstall + registers the SW). */
+export function renderInstallScript() {
+  return `<script>${INSTALL_HELPER_JS}</script>`;
+}
+
+// Add an "Install the app" link into the footer Account column (after "Email Us").
+function injectFooterInstall(html: string) {
+  return html.replace(
+    />Email Us<\/a><\/li>/,
+    `>Email Us</a></li><li><a href="#" data-mjg-install onclick="mjgInstall();return false;">Install the app</a></li>`,
+  );
+}
+
+function injectPwa(html: string) {
   let out = html;
   if (!/rel=["']manifest["']/i.test(out)) {
-    out = out.replace(/<\/head>/i, `${headTags}\n</head>`);
+    out = /<\/head>/i.test(out)
+      ? out.replace(/<\/head>/i, `  ${renderPwaHeadTags()}\n</head>`)
+      : `${renderPwaHeadTags()}\n${out}`;
   }
-  out = out.replace(/<\/body>/i, `<script>${INSTALL_HELPER_JS}</script>\n</body>`);
+  out = injectFooterInstall(out);
+  // Some exported pages are missing a closing </body>; fall back to </html> / append.
+  const script = renderInstallScript();
+  if (/<\/body>/i.test(out)) out = out.replace(/<\/body>/i, `${script}\n</body>`);
+  else if (/<\/html>/i.test(out)) out = out.replace(/<\/html>/i, `${script}\n</html>`);
+  else out = `${out}\n${script}`;
   return out;
 }
 

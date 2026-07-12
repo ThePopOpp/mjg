@@ -1,6 +1,6 @@
 import { getPublishedPosts, normalizePostTags } from "@/lib/content/blog";
 import { getPublishedAudioForTarget } from "@/lib/content/media";
-import { publicSiteUrl, renderFaviconLinks, renderFonts, renderNavScript, renderNavStyles, renderSiteHeader, renderStaticPage, renderThemeScript } from "@/lib/public-site/static-pages";
+import { publicSiteUrl, renderFaviconLinks, renderFonts, renderInstallScript, renderNavScript, renderNavStyles, renderPwaHeadTags, renderSiteFooter, renderSiteHeader, renderStaticPage, renderThemeScript } from "@/lib/public-site/static-pages";
 
 export async function GET() {
   const [posts, audioAssets] = await Promise.all([getPublishedPosts(), getPublishedAudioForTarget("frontend_resources", 6)]);
@@ -20,6 +20,7 @@ function renderArchive(posts: any[], audioAssets: any[], siteUrl: string) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Resources | Michael J. Gauthier</title>
   ${renderFaviconLinks()}
+  ${renderPwaHeadTags()}
   ${renderThemeScript()}
   ${renderFonts()}
   <style>
@@ -70,7 +71,9 @@ function renderArchive(posts: any[], audioAssets: any[], siteUrl: string) {
     </section>
   </main>
   ${renderAudioModal()}
+  ${renderSiteFooter(siteUrl)}
   ${renderNavScript()}
+  ${renderInstallScript()}
 </body>
 </html>`;
 }

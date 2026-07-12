@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPublishedPostBySlug, normalizePostTags } from "@/lib/content/blog";
-import { publicSiteUrl, renderFaviconLinks, renderFonts, renderNavScript, renderNavStyles, renderSiteHeader, renderThemeScript } from "@/lib/public-site/static-pages";
+import { publicSiteUrl, renderFaviconLinks, renderFonts, renderInstallScript, renderNavScript, renderNavStyles, renderPwaHeadTags, renderSiteFooter, renderSiteHeader, renderThemeScript } from "@/lib/public-site/static-pages";
 
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
@@ -22,6 +22,7 @@ function renderPost(post: any) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(post.title)} | Michael J. Gauthier</title>
   ${renderFaviconLinks()}
+  ${renderPwaHeadTags()}
   ${renderThemeScript()}
   ${renderFonts()}
   <style>
@@ -62,7 +63,9 @@ function renderPost(post: any) {
       <div class="tags">${tags.map((tag: any) => `<span class="tag">${escapeHtml(tag.name)}</span>`).join("")}</div>
     </article>
   </main>
+  ${renderSiteFooter(siteUrl)}
   ${renderNavScript()}
+  ${renderInstallScript()}
 </body>
 </html>`;
 }
