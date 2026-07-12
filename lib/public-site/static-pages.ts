@@ -212,8 +212,8 @@ export function renderSiteFooter(siteUrl: string) {
   const year = new Date().getFullYear();
   const mapHref = "https://www.google.com/maps/dir//2330+W+Ray+Rd+Ste+%233,+Chandler,+AZ+85224/@33.3208879,-111.964255,45043m/data=!3m1!1e3";
   return `<style>
-    .mjg-ftr{background:var(--paper,#0f0f0f);border-top:1px solid var(--line,#2b2a25);padding:64px 20px 26px;color:var(--muted,#b6bcb6);}
-    .mjg-ftr .in{max-width:1180px;margin:0 auto;}
+    .mjg-ftr{background:var(--paper,#0f0f0f);border-top:1px solid var(--line,#2b2a25);padding:64px 0 26px;color:var(--muted,#b6bcb6);}
+    .mjg-ftr .in{max-width:1160px;margin:0 auto;padding:0 2rem;}
     .mjg-ftr .cols{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.1fr;gap:40px;}
     .mjg-ftr .logo{height:32px;width:auto;}
     .mjg-ftr .logo-dark{display:none;}
@@ -231,7 +231,7 @@ export function renderSiteFooter(siteUrl: string) {
     .mjg-ftr .install:hover{border-color:var(--gold,#c9aa70);color:var(--gold,#c9aa70);}
     .mjg-ftr .install svg{width:20px;height:20px;}
     .mjg-ftr .social{display:flex;gap:14px;}
-    .mjg-ftr .social a{display:inline-flex;color:var(--muted,#b6bcb6);}
+    .mjg-ftr .social a{display:inline-flex;color:var(--ink,#f8f6f1);}
     .mjg-ftr .social a:hover{color:var(--gold,#c9aa70);}
     .mjg-ftr .social svg{width:20px;height:20px;fill:currentColor;}
     @media(max-width:820px){.mjg-ftr .cols{grid-template-columns:1fr 1fr;gap:32px;}.mjg-ftr .bottom{flex-direction:column;align-items:flex-start;}}
@@ -446,7 +446,9 @@ const FOOTER_INSTALL_CSS = `<style>
     .mjg-install-btn:hover{background:rgba(130,130,130,.12);}
     .mjg-install-btn svg{width:20px;height:20px;}
     .social-icons{gap:14px;}
-    .social-icon{width:20px !important;height:20px !important;}
+    .social-icon{width:20px !important;height:20px !important;color:var(--text);}
+    .footer-container{padding:0 2rem;}
+    .sub-footer{padding:0 2rem;}
   </style>`;
 
 // Place the "Install app" button in the sub-footer, to the left of the social icons.
