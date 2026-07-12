@@ -226,7 +226,11 @@ export function renderSiteFooter(siteUrl: string) {
     .mjg-ftr a:hover{color:var(--gold,#c9aa70);}
     .mjg-ftr .bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--line,#2b2a25);margin-top:44px;padding-top:24px;font-size:14px;color:var(--muted,#b6bcb6);}
     .mjg-ftr .gold-j{color:var(--gold,#c9aa70);}
-    .mjg-ftr .social{display:flex;gap:16px;}
+    .mjg-ftr .bottom-right{display:flex;align-items:center;gap:14px;}
+    .mjg-ftr .install{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line,#2b2a25);border-radius:8px;padding:6px 12px;font-size:14px;font-weight:600;color:var(--ink,#f8f6f1);text-decoration:none;white-space:nowrap;line-height:1;transition:background .2s,border-color .2s,color .2s;}
+    .mjg-ftr .install:hover{border-color:var(--gold,#c9aa70);color:var(--gold,#c9aa70);}
+    .mjg-ftr .install svg{width:20px;height:20px;}
+    .mjg-ftr .social{display:flex;gap:14px;}
     .mjg-ftr .social a{display:inline-flex;color:var(--muted,#b6bcb6);}
     .mjg-ftr .social a:hover{color:var(--gold,#c9aa70);}
     .mjg-ftr .social svg{width:20px;height:20px;fill:currentColor;}
@@ -256,7 +260,6 @@ export function renderSiteFooter(siteUrl: string) {
             <li><a href="${siteUrl}/#join">Register</a></li>
             <li><a href="tel:+14804667070">Call Us</a></li>
             <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
-            <li><a href="#" data-mjg-install onclick="mjgInstall();return false;">Install the app</a></li>
           </ul>
         </div>
         <div>
@@ -269,9 +272,12 @@ export function renderSiteFooter(siteUrl: string) {
       </div>
       <div class="bottom">
         <span>${year} &copy; Michael<span class="gold-j">J.</span>Gauthier.com &nbsp;- All rights reserved.</span>
-        <span class="social">
-          <a href="https://www.facebook.com/StrategicIncomeGroup" aria-label="Facebook" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg></a>
-          <a href="https://www.linkedin.com/in/michaeljgauthier/" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg></a>
+        <span class="bottom-right">
+          <a href="#" class="install" data-mjg-install onclick="mjgInstall();return false;">${DOWNLOAD_SVG}Install app</a>
+          <span class="social">
+            <a href="https://www.facebook.com/StrategicIncomeGroup" aria-label="Facebook" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg></a>
+            <a href="https://www.linkedin.com/in/michaeljgauthier/" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg></a>
+          </span>
         </span>
       </div>
     </div>
@@ -431,20 +437,30 @@ export function renderInstallScript() {
   return `<script>${INSTALL_HELPER_JS}</script>`;
 }
 
-// Add an "Install the app" link into the footer Account column (after "Email Us").
+const DOWNLOAD_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+
+// An "Install app" pill (download icon + label) + 20×20 social icons for the
+// static-page sub-footer.
+const FOOTER_INSTALL_CSS = `<style>
+    .mjg-install-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(130,130,130,.4);border-radius:8px;padding:6px 12px;font-size:14px;font-weight:600;text-decoration:none;color:var(--text,#111);white-space:nowrap;line-height:1;transition:background .2s;}
+    .mjg-install-btn:hover{background:rgba(130,130,130,.12);}
+    .mjg-install-btn svg{width:20px;height:20px;}
+    .social-icons{gap:14px;}
+    .social-icon{width:20px !important;height:20px !important;}
+  </style>`;
+
+// Place the "Install app" button in the sub-footer, to the left of the social icons.
 function injectFooterInstall(html: string) {
-  return html.replace(
-    />Email Us<\/a><\/li>/,
-    `>Email Us</a></li><li><a href="#" data-mjg-install onclick="mjgInstall();return false;">Install the app</a></li>`,
-  );
+  if (!/<div class="social-icons">/.test(html)) return html;
+  const btn = `<a href="#" class="mjg-install-btn" data-mjg-install onclick="mjgInstall();return false;">${DOWNLOAD_SVG}Install app</a>`;
+  return html.replace(/<div class="social-icons">/, `<div class="social-icons">${btn}`);
 }
 
 function injectPwa(html: string) {
   let out = html;
   if (!/rel=["']manifest["']/i.test(out)) {
-    out = /<\/head>/i.test(out)
-      ? out.replace(/<\/head>/i, `  ${renderPwaHeadTags()}\n</head>`)
-      : `${renderPwaHeadTags()}\n${out}`;
+    const head = `  ${renderPwaHeadTags()}\n  ${FOOTER_INSTALL_CSS}`;
+    out = /<\/head>/i.test(out) ? out.replace(/<\/head>/i, `${head}\n</head>`) : `${head}\n${out}`;
   }
   out = injectFooterInstall(out);
   // Some exported pages are missing a closing </body>; fall back to </html> / append.
