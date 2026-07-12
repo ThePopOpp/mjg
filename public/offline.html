@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Offline — Michael J. Gauthier</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: #111111; color: #f4f1ea; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; text-align: center; padding: 24px; }
+    .card { max-width: 380px; }
+    .mark { width: 64px; height: 64px; border-radius: 14px; background: #1b1a17; border: 1px solid #2b2620;
+      display: inline-flex; align-items: center; justify-content: center; font-weight: 800; letter-spacing: -.02em;
+      font-family: Georgia, serif; color: #fff; font-size: 22px; margin-bottom: 20px; }
+    h1 { font-family: Georgia, serif; font-weight: 600; font-size: 24px; margin: 0 0 10px; }
+    p { color: #b6bcb6; line-height: 1.6; margin: 0 0 20px; }
+    button { background: #c9aa70; color: #111; border: none; border-radius: 8px; padding: 12px 20px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button:hover { opacity: .9; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="mark">MJG</div>
+    <h1>You&rsquo;re offline</h1>
+    <p>It looks like you&rsquo;ve lost your connection. Check your network and try again — the app will pick up right where you left off.</p>
+    <button onclick="location.reload()">Try again</button>
+  </div>
+</body>
+</html>
