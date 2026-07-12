@@ -4,6 +4,7 @@ import { sendSms } from "@/lib/twilio/sms";
 import { brandEmailButton, brandEmailHeader } from "@/lib/brand/assets";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
 import { getDmPrefs } from "@/lib/direct-messages/preferences";
+import { sendPushToUser } from "@/lib/push/web-push";
 
 const DEBOUNCE_MS = 5 * 60 * 1000; // don't re-alert the same recipient within 5 min
 const MESSAGES_URL = "https://my.michaeljgauthier.com/dashboard/direct-messages";
@@ -32,6 +33,16 @@ export async function notifyDmRecipients(conversationId: string, senderId: strin
     const snippet = preview.slice(0, 140);
 
     for (const p of parts ?? []) {
+      // Web push fires on every message (like any messenger) to the recipient's
+      // subscribed devices — it's the least intrusive channel.
+      await sendPushToUser(p.user_id, {
+        title: `New message from ${senderName}`,
+        body: snippet,
+        url: "/dashboard/direct-messages",
+        tag: `dm-${conversationId}`,
+      });
+
+      // Email/SMS are debounced so a rapid back-and-forth doesn't spam.
       if (p.last_notified_at && now - new Date(p.last_notified_at).getTime() < DEBOUNCE_MS) continue;
 
       const prefs = await getDmPrefs(p.user_id);
