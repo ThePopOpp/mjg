@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChevronDown, LogOut, Menu, Search, PanelLeft, X, MessageSquareText } from "lucide-react";
 import { DashboardActionTokenProvider } from "@/components/layout/dashboard-action-token";
 import { DmUnreadProvider, useDmUnread } from "@/components/direct-messages/dm-unread";
+import { InstallAppButton } from "@/components/pwa/install-app-button";
 import { dashboardNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -172,6 +173,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
               <Input className="pl-9" placeholder="Search participants, waves, tags..." />
             </div>
             <div className="ml-auto flex items-center gap-3">
+              <InstallAppButton />
               <MessagesBell />
               <ThemeToggle />
               <div className="hidden text-right sm:block">
