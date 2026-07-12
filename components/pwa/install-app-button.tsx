@@ -17,12 +17,16 @@ export function InstallAppButton({
   responsiveLabel = true,
   variant = "outline",
   size = "sm",
+  fullWidth = false,
+  caption,
   className,
 }: {
   label?: string;
   responsiveLabel?: boolean;
   variant?: "outline" | "default" | "ghost" | "secondary";
   size?: "sm" | "default" | "lg";
+  fullWidth?: boolean;
+  caption?: string;
   className?: string;
 } = {}) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
@@ -80,11 +84,12 @@ export function InstallAppButton({
       : ["Look for the install icon in the address bar (a monitor/⊕ icon on the right).", "Or open the browser ⋮ menu → “Install Michael J. Gauthier…”.", "Confirm — the app opens in its own window with the MJG icon."];
 
   return (
-    <div className="relative" ref={ref}>
-      <Button onClick={onClick} variant={variant} size={size} className={cn("gap-1.5", className)}>
+    <div className={cn("relative", fullWidth && "w-full")} ref={ref}>
+      <Button onClick={onClick} variant={variant} size={size} className={cn("gap-1.5", fullWidth && "w-full", className)}>
         <Download className="h-4 w-4" />
         <span className={responsiveLabel ? "hidden sm:inline" : undefined}>{label}</span>
       </Button>
+      {caption ? <p className="mt-2 text-center text-xs text-muted-foreground">{caption}</p> : null}
 
       {showHelp && (
         <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-border bg-popover p-4 text-popover-foreground shadow-xl">

@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { InstallAppButton } from "@/components/pwa/install-app-button";
 import { createClient } from "@/lib/supabase/browser";
 
 export function LoginForm() {
@@ -129,6 +130,14 @@ export function LoginForm() {
             {loading === "magic" ? "Sending link..." : "Email me a sign-in link"}
           </Button>
         </form>
+        <div className="mt-4 border-t pt-4">
+          <InstallAppButton
+            fullWidth
+            responsiveLabel={false}
+            label="Install the MJG App"
+            caption="Get the app on your desktop or phone — no app store needed."
+          />
+        </div>
       </CardContent>
     </Card>
   );
