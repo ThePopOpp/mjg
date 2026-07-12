@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -11,7 +12,19 @@ type BeforeInstallPromptEvent = Event & {
 
 // A clear "Install app" affordance. Uses the native install prompt when the
 // browser offers one; otherwise shows step-by-step instructions per platform.
-export function InstallAppButton() {
+export function InstallAppButton({
+  label = "Install app",
+  responsiveLabel = true,
+  variant = "outline",
+  size = "sm",
+  className,
+}: {
+  label?: string;
+  responsiveLabel?: boolean;
+  variant?: "outline" | "default" | "ghost" | "secondary";
+  size?: "sm" | "default" | "lg";
+  className?: string;
+} = {}) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -68,9 +81,9 @@ export function InstallAppButton() {
 
   return (
     <div className="relative" ref={ref}>
-      <Button onClick={onClick} variant="outline" size="sm" className="gap-1.5">
+      <Button onClick={onClick} variant={variant} size={size} className={cn("gap-1.5", className)}>
         <Download className="h-4 w-4" />
-        <span className="hidden sm:inline">Install app</span>
+        <span className={responsiveLabel ? "hidden sm:inline" : undefined}>{label}</span>
       </Button>
 
       {showHelp && (

@@ -4,6 +4,7 @@ import blackLogo from "@/docs/mjg-logos/mjg_black_white.png";
 import whiteLogo from "@/docs/mjg-logos/mjg_white.png";
 import { LoginForm } from "@/components/auth/login-form";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { InstallAppButton } from "@/components/pwa/install-app-button";
 import { getCurrentProfile, isActiveDashboardProfile } from "@/lib/auth/server";
 import { ROLES } from "@/lib/rbac/roles";
 
@@ -46,10 +47,14 @@ export default async function LoginPage() {
           </p>
         </div>
       </section>
-      <section className="flex items-center justify-center">
+      <section className="flex flex-col items-center justify-center gap-6">
         <Suspense>
           <LoginForm />
         </Suspense>
+        <div className="flex flex-col items-center gap-2">
+          <InstallAppButton label="Install the MJG App" responsiveLabel={false} />
+          <p className="text-xs text-muted-foreground">Get the app on your desktop or phone — no app store needed.</p>
+        </div>
       </section>
     </main>
   );

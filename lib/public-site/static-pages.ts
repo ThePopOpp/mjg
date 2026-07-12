@@ -386,12 +386,48 @@ function transformStaticHtml(html: string) {
       .replace(new RegExp(`href='${escapeRegExp(fileName)}'`, "g"), `href='${absolute}'`);
   }
 
-  return injectFaviconLinks(output);
+  return injectPwa(injectFaviconLinks(output));
 }
 
 function injectFaviconLinks(html: string) {
   if (/<link[^>]+rel=["'](?:shortcut )?icon["']/i.test(html)) return html;
   return html.replace(/<\/head>/i, `  ${renderFaviconLinks()}\n</head>`);
+}
+
+// Client helper for the public site: registers the service worker (so the site
+// is installable) and exposes window.mjgInstall() for the "Install the MJG App"
+// buttons — native prompt when available, else platform instructions.
+const INSTALL_HELPER_JS = `(function(){
+  var deferred=null;
+  function hideIfInstalled(){
+    try{var s=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+      if(s){var els=document.querySelectorAll('[data-mjg-install]');for(var i=0;i<els.length;i++){els[i].style.display='none';}}}catch(e){}
+  }
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;});
+  window.addEventListener('appinstalled',function(){deferred=null;hideIfInstalled();});
+  window.mjgInstall=function(){
+    if(deferred){deferred.prompt();try{deferred.userChoice.finally(function(){deferred=null;});}catch(e){}return;}
+    var ua=navigator.userAgent,msg;
+    if(/iPad|iPhone|iPod/.test(ua))msg='To install on iPhone/iPad: tap the Share button in Safari, then \\u201CAdd to Home Screen.\\u201D';
+    else if(/Android/.test(ua))msg='To install on Android: open Chrome\\u2019s \\u22EE menu, then \\u201CInstall app.\\u201D';
+    else msg='To install: click the install icon in your browser\\u2019s address bar, or open the \\u22EE menu and choose \\u201CInstall Michael J. Gauthier\\u2026\\u201D (Chrome or Edge).';
+    window.alert(msg);
+  };
+  if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}
+  if(document.readyState!=='loading')hideIfInstalled();else document.addEventListener('DOMContentLoaded',hideIfInstalled);
+})();`;
+
+function injectPwa(html: string) {
+  const headTags = `  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="MJG" />`;
+  let out = html;
+  if (!/rel=["']manifest["']/i.test(out)) {
+    out = out.replace(/<\/head>/i, `${headTags}\n</head>`);
+  }
+  out = out.replace(/<\/body>/i, `<script>${INSTALL_HELPER_JS}</script>\n</body>`);
+  return out;
 }
 
 function escapeRegExp(value: string) {
