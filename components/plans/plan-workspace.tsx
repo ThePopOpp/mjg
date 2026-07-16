@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Columns3, Eye, LayoutGrid, Plus, Rows3, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowLeft, Columns3, Eye, LayoutGrid, Plus, Rows3, Search, SlidersHorizontal, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BoardView } from "./views/board-view";
@@ -46,6 +47,8 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
   const [announcement, setAnnouncement] = useState("");
   const [addingGroup, setAddingGroup] = useState(false);
   const [groupName, setGroupName] = useState("");
+  const [confirmDeletePlan, setConfirmDeletePlan] = useState(false);
+  const [deletingPlan, setDeletingPlan] = useState(false);
 
   // Re-seed when the server component re-renders (e.g. after router.refresh()).
   useEffect(() => setTasks(data.tasks), [data.tasks]);
@@ -244,6 +247,21 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
     }
   }
 
+  async function deletePlan() {
+    setDeletingPlan(true);
+    setError(null);
+    try {
+      await send(`/api/plans/${plan.id}`, "DELETE", {});
+      // Leave before refreshing — this page no longer has a plan to render.
+      router.push("/dashboard/plans");
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Plan delete failed.");
+      setDeletingPlan(false);
+      setConfirmDeletePlan(false);
+    }
+  }
+
   const Icon = planIcon(plan.icon);
   const color = planColor(plan.color);
   const memberPeople = data.members.map((m) => m.person).filter(Boolean) as typeof people;
@@ -282,6 +300,16 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <MemberAvatarStack people={memberPeople} max={4} />
+          {access.canManage ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setConfirmDeletePlan(true)}
+              className="gap-1.5 text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-3.5 w-3.5" aria-hidden /> Delete plan
+            </Button>
+          ) : null}
         </div>
       </div>
 
@@ -507,6 +535,27 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
           onInlineChange={(task, patch) => void updateTaskFields(task.id, patch)}
         />
       )}
+
+      <Dialog open={confirmDeletePlan} onOpenChange={(open) => !open && !deletingPlan && setConfirmDeletePlan(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete this plan?</DialogTitle>
+            <DialogDescription>
+              <span className="font-medium text-foreground">{plan.name}</span> and its {tasks.length} task
+              {tasks.length === 1 ? "" : "s"}, groups, labels and activity history will be permanently deleted. This cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="ghost" onClick={() => setConfirmDeletePlan(false)} disabled={deletingPlan}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => void deletePlan()} disabled={deletingPlan}>
+              {deletingPlan ? "Deleting…" : "Delete plan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <TaskDetailDrawer
         task={selected}

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Search, Sparkles, SquareStack, X } from "lucide-react";
+import { ChevronLeft, Search, Sparkles, SquareStack } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -185,21 +185,19 @@ export function CreatePlanDialog({
   return (
     <Dialog open={open} onOpenChange={close}>
       <DialogContent className="flex h-[100dvh] max-h-[100dvh] w-full max-w-none flex-col gap-0 rounded-none p-0 sm:h-auto sm:max-h-[92vh] sm:max-w-5xl sm:rounded-lg">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3 sm:px-6 sm:py-4">
-          <div className="min-w-0">
-            <DialogTitle className="text-lg font-semibold tracking-tight sm:text-xl">Create a plan</DialogTitle>
-            <DialogDescription className="mt-0.5 text-xs sm:text-sm">
-              {step === "choose" ? "Start from scratch or pick a template." : "Name it and choose who can see it."}
-            </DialogDescription>
-          </div>
-          {/* The primitive's own close button sits under our sticky header, so it's
-              replaced with one that stays reachable. */}
-          <Button variant="ghost" size="icon" onClick={() => close(false)} aria-label="Close" className="shrink-0">
-            <X className="h-4 w-4" />
-          </Button>
+        {/* DialogContent renders its own close button (absolute right-4 top-4), so
+            this header leaves room for it rather than adding a second one. */}
+        <div className="shrink-0 border-b border-border px-4 py-3 pr-14 sm:px-6 sm:py-4 sm:pr-14">
+          <DialogTitle className="text-lg font-semibold tracking-tight sm:text-xl">Create a plan</DialogTitle>
+          <DialogDescription className="mt-0.5 text-xs sm:text-sm">
+            {step === "choose" ? "Start from scratch or pick a template." : "Name it and choose who can see it."}
+          </DialogDescription>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        {/* min-h-0 is load-bearing: a flex child defaults to min-height:auto and will
+            refuse to shrink below its content, which pushes the footer out of the
+            dialog instead of scrolling. */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="grid gap-0 md:grid-cols-[1.15fr_1fr]">
             <div className="min-w-0 border-border p-4 sm:p-6 md:border-r">
               {step === "choose" ? (
@@ -398,7 +396,9 @@ export function CreatePlanDialog({
           </div>
         </div>
 
-        <div className="sticky bottom-0 flex flex-col gap-2 border-t border-border bg-background px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        {/* Last row of the flex column, so it's pinned to the bottom of the dialog on
+            every breakpoint without needing position: sticky. */}
+        <div className="shrink-0 flex flex-col gap-2 border-t border-border bg-background px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="min-h-[1.25rem] text-sm text-destructive" role="alert">
             {error ?? (blockedByPremium && step === "choose" ? "Premium is not enabled for your account." : "")}
           </div>

@@ -41,8 +41,9 @@ export async function listPlansForActor(actor: PlanActor, includeArchived = fals
   const supabase = createSupabaseAdminClient();
   const isSuperAdmin = normalizeAppRole(actor.role) === ROLES.SUPER_ADMIN;
 
-  const { data: memberships } = await supabase.from("plan_members").select("plan_id").eq("user_id", actor.id);
+  const { data: memberships } = await supabase.from("plan_members").select("plan_id,role").eq("user_id", actor.id);
   const memberPlanIds = (memberships ?? []).map((m) => m.plan_id as string);
+  const myRoleByPlan = new Map((memberships ?? []).map((m) => [m.plan_id as string, m.role as PlanMemberRole]));
 
   let query = supabase.from("plans").select("*").order("updated_at", { ascending: false });
   if (!includeArchived) query = query.is("archived_at", null);
@@ -78,6 +79,7 @@ export async function listPlansForActor(actor: PlanActor, includeArchived = fals
       completed_count: planTasks.filter((t) => t.status === "complete").length,
       member_count: members.filter((m) => m.plan_id === plan.id).length,
       owner: owners.get(plan.owner_id) ?? null,
+      can_manage: computeAccess(plan, myRoleByPlan.get(plan.id) ?? null, actor).canManage,
     };
   });
 }

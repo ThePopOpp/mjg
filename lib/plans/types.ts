@@ -164,4 +164,7 @@ export type PlanSummary = Plan & {
   completed_count: number;
   member_count: number;
   owner: PlanPerson | null;
+  // Resolved server-side per plan so the index can show owner-only actions without
+  // re-deriving permissions on the client. The API re-checks regardless.
+  can_manage: boolean;
 };

@@ -2,9 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Search, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Search, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { CreatePlanDialog } from "./create-plan/create-plan-dialog";
 import { ProgressIndicator } from "./shared/badges";
 import { planColor, planIcon } from "@/lib/plans/constants";
@@ -26,9 +29,35 @@ export function PlansIndexClient({
   owner: PlanPerson;
   premiumAllowed: boolean;
 }) {
+  const router = useRouter();
+  const token = useDashboardActionToken();
   const [creating, setCreating] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const [deleting, setDeleting] = useState<PlanSummary | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function confirmDelete() {
+    if (!deleting) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/plans/${deleting.id}`, {
+        method: "DELETE",
+        headers: { "content-type": "application/json", "x-mjg-action-token": token },
+        body: JSON.stringify({ actionToken: token }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message ?? "Plan delete failed.");
+      setDeleting(null);
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Plan delete failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -107,8 +136,10 @@ export function PlansIndexClient({
             const progress = plan.task_count ? (plan.completed_count / plan.task_count) * 100 : 0;
 
             return (
+              // The delete control is a sibling of the Link, not a child — a button
+              // nested inside an anchor is invalid HTML and breaks keyboard nav.
+              <div key={plan.id} className="group relative">
               <Link
-                key={plan.id}
                 href={`/dashboard/plans/${plan.id}?view=${plan.default_view}`}
                 className={cn(
                   "flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm transition",
@@ -148,11 +179,30 @@ export function PlansIndexClient({
                   </span>
                 </div>
 
-                <p className="truncate border-t border-border pt-2 text-xs text-muted-foreground">
+                <p className="truncate border-t border-border pt-2 pr-8 text-xs text-muted-foreground">
                   {plan.owner_id === owner.id ? "Owned by you" : `Owned by ${plan.owner?.name ?? "someone else"}`}
                   {plan.visibility === "private" ? " · Private" : ""}
                 </p>
               </Link>
+
+              {plan.can_manage ? (
+                <button
+                  type="button"
+                  onClick={() => setDeleting(plan)}
+                  aria-label={`Delete ${plan.name}`}
+                  title={`Delete ${plan.name}`}
+                  className={cn(
+                    "absolute bottom-3 right-3 flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition",
+                    "hover:bg-destructive/10 hover:text-destructive",
+                    // Hidden until hover, but always reachable by keyboard.
+                    "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  )}
+                >
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden />
+                </button>
+              ) : null}
+              </div>
             );
           })}
         </div>
@@ -166,6 +216,37 @@ export function PlansIndexClient({
         owner={owner}
         premiumAllowed={premiumAllowed}
       />
+
+      <Dialog
+        open={Boolean(deleting)}
+        onOpenChange={(open) => {
+          if (!open && !busy) {
+            setDeleting(null);
+            setError(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete this plan?</DialogTitle>
+            <DialogDescription>
+              {/* Deletion cascades, so say exactly what goes with it. */}
+              <span className="font-medium text-foreground">{deleting?.name}</span> and its{" "}
+              {deleting?.task_count ?? 0} task{deleting?.task_count === 1 ? "" : "s"}, groups, labels and activity history will
+              be permanently deleted. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          <DialogFooter className="gap-2">
+            <Button variant="ghost" onClick={() => setDeleting(null)} disabled={busy}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={busy}>
+              {busy ? "Deleting…" : "Delete plan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
