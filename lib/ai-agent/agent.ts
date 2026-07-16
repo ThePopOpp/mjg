@@ -56,9 +56,11 @@ Guidelines:
 - If a request is ambiguous or missing a required detail, ask a brief clarifying question instead of guessing.
 - This is a faith-based stewardship pilot; keep tone warm and pastoral in member-facing content. Keep your own replies concise and professional.`;
 
-// Compose the full system prompt: base persona + skill playbooks + recalled memory.
-export function buildSystemPrompt(memories: AgentMemory[] = []): string {
-  return SYSTEM_PROMPT + renderSkillsForPrompt() + renderMemoryForPrompt(memories);
+// Compose the full system prompt: base persona + skill playbooks + recalled memory
+// + the training-docs index (titles/summaries only — the bodies are fetched on
+// demand via search_training_docs / read_training_doc).
+export function buildSystemPrompt(memories: AgentMemory[] = [], trainingDocsIndex = ""): string {
+  return SYSTEM_PROMPT + renderSkillsForPrompt() + renderMemoryForPrompt(memories) + trainingDocsIndex;
 }
 
 function getModel(): string {

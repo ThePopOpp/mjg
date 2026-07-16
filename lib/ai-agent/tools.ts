@@ -1626,6 +1626,61 @@ const updateDevRequestStatusTool: AgentTool = {
   },
 };
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Training docs — reference material the team uploads (AI Agent → Training Docs).
+// The system prompt carries only the index (titles + summaries); these tools pull
+// the actual text, so a big library doesn't inflate every request.
+// ──────────────────────────────────────────────────────────────────────────────
+
+const searchTrainingDocsTool: AgentTool = {
+  name: "search_training_docs",
+  description:
+    "Search the team's uploaded training docs (guides, playbooks, brand/process material) for a phrase or topic, returning matching docs with an excerpt around the hit. Use this whenever a question touches MJG-specific process, policy, terminology, or 'how do we…' — the answer may be written down here rather than in the database. Follow up with read_training_doc for the full text.",
+  parameters: {
+    type: "object",
+    properties: {
+      query: { type: "string", description: "Phrase or topic to look for, e.g. 'refund policy' or 'onboarding steps'." },
+      limit: { type: "number", description: "Max docs to return (default 5)." },
+    },
+    required: ["query"],
+  },
+  requiresConfirmation: false,
+  async execute(args: { query: string; limit?: number }) {
+    const { searchTrainingDocs } = await import("@/lib/ai-agent/training-docs/data");
+    const results = await searchTrainingDocs(String(args.query ?? ""), Math.min(Number(args.limit) || 5, 10));
+    return { count: results.length, results };
+  },
+};
+
+const readTrainingDocTool: AgentTool = {
+  name: "read_training_doc",
+  description:
+    "Read the full markdown text of one training doc by id. Ids come from the TRAINING DOCS index in your instructions or from search_training_docs. Long docs are truncated — narrow with search_training_docs when you only need one section.",
+  parameters: {
+    type: "object",
+    properties: { id: { type: "string", description: "The training doc id." } },
+    required: ["id"],
+  },
+  requiresConfirmation: false,
+  async execute(args: { id: string }) {
+    const { getTrainingDoc } = await import("@/lib/ai-agent/training-docs/data");
+    const doc = await getTrainingDoc(String(args.id ?? ""));
+    if (!doc) return { error: "No training doc with that id." };
+    if (doc.status !== "ready") {
+      return { error: `"${doc.title}" has no readable text (${doc.status}).`, reason: doc.conversion_error };
+    }
+    const MAX = 24_000; // keep a single doc from eating the context window
+    const body = doc.content_md ?? "";
+    return {
+      id: doc.id,
+      title: doc.title,
+      summary: doc.summary,
+      truncated: body.length > MAX,
+      content: body.slice(0, MAX),
+    };
+  },
+};
+
 export const AGENT_TOOLS: AgentTool[] = [
   // Reads
   searchParticipants,
@@ -1687,6 +1742,9 @@ export const AGENT_TOOLS: AgentTool[] = [
   createCmsDraftPageTool,
   updateCmsDraftPageTool,
   updateDevRequestStatusTool,
+  // Training docs (read-only reference material)
+  searchTrainingDocsTool,
+  readTrainingDocTool,
   // Memory (internal, no confirmation)
   rememberTool,
   forgetTool,
