@@ -30,8 +30,10 @@ export async function GET(request: Request) {
     const actor = await requireSuperAdmin(request);
     const url = new URL(request.url);
     const scope = (url.searchParams.get("scope") as "inbox" | "shared" | "all") || "inbox";
+    // ?active=1 → open queue only (excludes done + archived). The Review FAB uses it.
+    const active = url.searchParams.get("active") === "1";
     const me = (actor.email ?? "").toLowerCase();
-    const [notes, unread, recipients] = await Promise.all([listNotes(scope, me), unreadCount(me), listShareRecipients()]);
+    const [notes, unread, recipients] = await Promise.all([listNotes(scope, me, { active }), unreadCount(me), listShareRecipients()]);
     return NextResponse.json({ notes, unread, me, recipients });
   } catch (error) {
     const m = error instanceof Error ? error.message : "Failed to load notes.";

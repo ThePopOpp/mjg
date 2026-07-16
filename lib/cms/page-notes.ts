@@ -26,16 +26,29 @@ export type PageNote = {
   created_by_email: string | null;
   created_at: string;
   updated_at: string;
+  completed_at: string | null;
 };
 
 const COLUMNS =
-  "id, page_slug, page_label, page_url, element_ref, element_type, element_label, heading_text, dom_selector, bounding_box, descriptor, note, change_type, priority, status, created_by, created_by_email, created_at, updated_at";
+  "id, page_slug, page_label, page_url, element_ref, element_type, element_label, heading_text, dom_selector, bounding_box, descriptor, note, change_type, priority, status, created_by, created_by_email, created_at, updated_at, completed_at";
 
 export async function listPageNotes(pageSlug?: string): Promise<PageNote[]> {
   const sb = createSupabaseAdminClient();
   let q = sb.from("cms_page_notes").select(COLUMNS).order("created_at", { ascending: false }).limit(500);
   if (pageSlug) q = q.eq("page_slug", pageSlug);
   const { data, error } = await q;
+  if (error) throw new Error(error.message);
+  return (data ?? []) as PageNote[];
+}
+
+export async function listCompletedPageNotes(): Promise<PageNote[]> {
+  const sb = createSupabaseAdminClient();
+  const { data, error } = await sb
+    .from("cms_page_notes")
+    .select(COLUMNS)
+    .eq("status", "done")
+    .order("completed_at", { ascending: false, nullsFirst: false })
+    .limit(500);
   if (error) throw new Error(error.message);
   return (data ?? []) as PageNote[];
 }
@@ -85,14 +98,23 @@ export async function updatePageNote(
   patch: Partial<Pick<PageNote, "note" | "change_type" | "priority" | "status">>,
 ): Promise<PageNote> {
   const sb = createSupabaseAdminClient();
+  const now = new Date().toISOString();
   const { data, error } = await sb
     .from("cms_page_notes")
-    .update({ ...patch, updated_at: new Date().toISOString() })
+    .update({ ...patch, ...completedAtPatch(patch.status), updated_at: now })
     .eq("id", id)
     .select(COLUMNS)
     .single();
   if (error) throw new Error(error.message);
   return data as PageNote;
+}
+
+// completed_at is derived from status so the two can't disagree, whichever surface
+// made the change. Reopening a request clears it, so it leaves Completed Edits and
+// stops counting toward the unreviewed badge.
+export function completedAtPatch(status: string | undefined) {
+  if (!status) return {};
+  return { completed_at: status === "done" ? new Date().toISOString() : null };
 }
 
 export async function reassignPageNote(id: string, email: string): Promise<PageNote> {

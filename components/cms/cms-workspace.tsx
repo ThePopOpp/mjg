@@ -1,18 +1,20 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboard, PanelsTopLeft, MousePointerClick, ClipboardList, X } from "lucide-react";
+import { LayoutDashboard, PanelsTopLeft, MousePointerClick, ClipboardList, CheckCheck, X } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { CmsPagesList } from "@/components/cms/cms-pages-list";
 import { FrontendEdits, type FrontendPage } from "@/components/cms/frontend-edits";
 import { EditRequests } from "@/components/cms/edit-requests";
+import { CompletedEdits } from "@/components/cms/completed-edits";
 import { CmsOverview, type CmsNav } from "@/components/cms/cms-overview";
 import { AgentChat } from "@/components/ai-agent/agent-chat";
 import { PageHelp } from "@/components/dashboard/page-help";
 import { CMS_HELP, CMS_HELP_INTRO, CMS_HELP_TITLE } from "@/lib/content/help-text";
 import type { CmsPage } from "@/lib/cms/types";
 
-type View = "overview" | "pages" | "editor" | "requests";
+type View = "overview" | "pages" | "editor" | "requests" | "completed";
 
 const STEWARD_CONTEXT =
   "You are Steward helping with the MJG CMS. You can list, create, and update CMS DRAFT pages and answer questions about pages and edit requests. Everything you author is a draft for a Super Admin to review — never publish or edit the live site.";
@@ -20,6 +22,20 @@ const STEWARD_CONTEXT =
 export function CmsWorkspace({ initialPages, frontendPages, displayName }: { initialPages: CmsPage[]; frontendPages: FrontendPage[]; displayName?: string }) {
   const [view, setView] = React.useState<View>("overview");
   const [stewardOpen, setStewardOpen] = React.useState(false);
+  const token = useDashboardActionToken();
+
+  // Count of edits completed since this user last opened the Completed Edits tab.
+  // Fetched here rather than inside the tab, because the badge has to show while a
+  // different tab is open. Opening the tab stamps the watermark and clears it.
+  const [completedUnreviewed, setCompletedUnreviewed] = React.useState(0);
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admin/cms/completed-edits", { headers: { "x-mjg-action-token": token } })
+      .then((r) => r.json())
+      .then((r) => { if (!cancelled && typeof r.unreviewed === "number") setCompletedUnreviewed(r.unreviewed); })
+      .catch(() => { /* badge is a nicety; never block the CMS on it */ });
+    return () => { cancelled = true; };
+  }, [token]);
 
   const nav: CmsNav = {
     pages: () => setView("pages"), editor: () => setView("editor"),
@@ -49,10 +65,25 @@ export function CmsWorkspace({ initialPages, frontendPages, displayName }: { ini
           <TabsTrigger value="pages" className="gap-1.5"><PanelsTopLeft className="h-3.5 w-3.5" /> Pages</TabsTrigger>
           <TabsTrigger value="editor" className="gap-1.5"><MousePointerClick className="h-3.5 w-3.5" /> Frontend Editor</TabsTrigger>
           <TabsTrigger value="requests" className="gap-1.5"><ClipboardList className="h-3.5 w-3.5" /> Edit Requests</TabsTrigger>
+          <TabsTrigger value="completed" className="gap-1.5">
+            <CheckCheck className="h-3.5 w-3.5" /> Completed Edits
+            {completedUnreviewed > 0 && (
+              <span
+                className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold tabular-nums text-primary-foreground"
+                aria-label={`${completedUnreviewed} completed since your last visit`}
+              >
+                {completedUnreviewed > 99 ? "99+" : completedUnreviewed}
+              </span>
+            )}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-5"><CmsOverview pages={initialPages} nav={nav} /></TabsContent>
         <TabsContent value="pages" className="mt-5"><CmsPagesList initialPages={initialPages} /></TabsContent>
         <TabsContent value="requests" className="mt-5"><EditRequests /></TabsContent>
+        <TabsContent value="completed" className="mt-5">
+          {/* Mounted only when open, so its mark-reviewed effect means "actually viewed". */}
+          <CompletedEdits onReviewed={() => setCompletedUnreviewed(0)} />
+        </TabsContent>
       </Tabs>
 
       {stewardOpen && (

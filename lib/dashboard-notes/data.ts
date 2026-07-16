@@ -21,6 +21,7 @@ export type DashboardNote = {
   shared: boolean;
   created_at: string;
   updated_at: string;
+  completed_at: string | null;
 };
 export type DashboardNoteComment = {
   id: string; note_id: string; author_email: string | null; author_name: string | null; body: string; created_at: string;
@@ -28,13 +29,32 @@ export type DashboardNoteComment = {
 
 const lc = (s: string | null | undefined) => (s ?? "").trim().toLowerCase();
 
-export async function listNotes(scope: "inbox" | "shared" | "all", me: string): Promise<DashboardNote[]> {
+// `active` excludes completed and archived work. The Review FAB passes it so the
+// list stays the open queue — completed requests live in CMS → Completed Edits.
+export async function listNotes(
+  scope: "inbox" | "shared" | "all",
+  me: string,
+  opts: { active?: boolean } = {},
+): Promise<DashboardNote[]> {
   const sb = createSupabaseAdminClient();
   let q = sb.from("dashboard_notes").select("*").order("created_at", { ascending: false }).limit(300);
   const email = lc(me);
   if (scope === "shared") q = q.contains("recipient_emails", [email]);
   else if (scope === "inbox") q = q.or(`created_by_email.eq.${email},recipient_emails.cs.{${email}}`);
+  if (opts.active) q = q.not("status", "in", "(done,archived)");
   const { data, error } = await q;
+  if (error) throw new Error(error.message);
+  return (data ?? []) as DashboardNote[];
+}
+
+export async function listCompletedNotes(): Promise<DashboardNote[]> {
+  const sb = createSupabaseAdminClient();
+  const { data, error } = await sb
+    .from("dashboard_notes")
+    .select("*")
+    .eq("status", "done")
+    .order("completed_at", { ascending: false, nullsFirst: false })
+    .limit(500);
   if (error) throw new Error(error.message);
   return (data ?? []) as DashboardNote[];
 }
@@ -77,7 +97,11 @@ export async function createNote(input: CreateNoteInput): Promise<DashboardNote>
 
 export async function updateStatus(id: string, status: string): Promise<DashboardNote> {
   const sb = createSupabaseAdminClient();
-  const { data, error } = await sb.from("dashboard_notes").update({ status, updated_at: new Date().toISOString() }).eq("id", id).select("*").single();
+  // completed_at is derived from status — see completedAtPatch in lib/cms/page-notes.
+  const { data, error } = await sb
+    .from("dashboard_notes")
+    .update({ status, completed_at: status === "done" ? new Date().toISOString() : null, updated_at: new Date().toISOString() })
+    .eq("id", id).select("*").single();
   if (error) throw new Error(error.message);
   return data as DashboardNote;
 }

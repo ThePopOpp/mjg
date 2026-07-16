@@ -71,7 +71,9 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
 
   const load = React.useCallback(async () => {
     try {
-      const r = await fetch("/api/dashboard-notes?scope=inbox", { headers: { "x-mjg-action-token": token } }).then((x) => x.json());
+      // active=1 → open queue only. Completed and archived requests drop out of this
+      // list the moment they're marked done; their home is CMS → Completed Edits.
+      const r = await fetch("/api/dashboard-notes?scope=inbox&active=1", { headers: { "x-mjg-action-token": token } }).then((x) => x.json());
       if (Array.isArray(r.notes)) setNotes(r.notes);
       if (Array.isArray(r.recipients)) setPeople(r.recipients);
       setUnread(r.unread ?? 0);
