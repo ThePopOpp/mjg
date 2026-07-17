@@ -54,6 +54,7 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
   const [deletingPlan, setDeletingPlan] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [newTask, setNewTask] = useState({ title: "", groupId: "" });
+  const [deletingGroup, setDeletingGroup] = useState<BoardColumn | null>(null);
 
   // Re-seed when the server component re-renders (e.g. after router.refresh()).
   useEffect(() => setTasks(data.tasks), [data.tasks]);
@@ -277,6 +278,25 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Group create failed.");
+    }
+  }
+
+  async function deleteGroup() {
+    const column = deletingGroup;
+    if (!column?.groupId) return;
+    setError(null);
+    setSaving(true);
+    try {
+      await send(`/api/plans/${plan.id}/groups/${column.groupId}`, "DELETE", {});
+      // plan_groups.id is ON DELETE SET NULL on plan_tasks, so its tasks survive as
+      // ungrouped — reflect that locally rather than dropping them from the board.
+      setTasks((current) => current.map((t) => (t.group_id === column.groupId ? { ...t, group_id: null } : t)));
+      setDeletingGroup(null);
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Group delete failed.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -569,6 +589,7 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
           onOpenTask={setSelected}
           onMove={onMove}
           onQuickAdd={(column, title) => void quickAdd(column, title)}
+          onDeleteGroup={canEdit && groupBy === "group" ? setDeletingGroup : undefined}
         />
       ) : view === "grid" ? (
         <GridView
@@ -595,6 +616,27 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
         // Calendar shows every task in date order, so it ignores grouping.
         <CalendarView tasks={applySort(applyFilters(tasks, filters), sortBy)} onOpenTask={setSelected} />
       )}
+
+      <Dialog open={Boolean(deletingGroup)} onOpenChange={(open) => !open && !saving && setDeletingGroup(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete “{deletingGroup?.title}”?</DialogTitle>
+            <DialogDescription>
+              {/* Say what happens to the contents — deleting a column shouldn't feel
+                  like it might take the work with it. */}
+              {deletingGroup?.tasks.length
+                ? `The group is removed. Its ${deletingGroup.tasks.length} task${deletingGroup.tasks.length === 1 ? "" : "s"} are kept and moved to “No group”, so nothing is lost — you can drag them somewhere else afterwards.`
+                : "The group is empty, so nothing else changes."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button variant="ghost" onClick={() => setDeletingGroup(null)} disabled={saving}>Cancel</Button>
+            <Button variant="destructive" onClick={() => void deleteGroup()} disabled={saving}>
+              {saving ? "Deleting…" : "Delete group"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={addOpen} onOpenChange={(open) => !open && !saving && setAddOpen(false)}>
         <DialogContent className="max-w-md">

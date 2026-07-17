@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckSquare, Flag, GripVertical, Plus } from "lucide-react";
+import { CheckSquare, Flag, GripVertical, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { MemberAvatarStack } from "@/components/plans/shared/member-avatar-stack";
 import { DueDate, LabelChip, PriorityBadge, StatusBadge } from "@/components/plans/shared/badges";
@@ -125,6 +125,7 @@ export function BoardView({
   onOpenTask,
   onMove,
   onQuickAdd,
+  onDeleteGroup,
 }: {
   columns: BoardColumn[];
   labels: PlanLabel[];
@@ -134,6 +135,9 @@ export function BoardView({
   onOpenTask: (task: PlanTaskDetail) => void;
   onMove: (taskId: string, column: BoardColumn, index: number) => void;
   onQuickAdd: (column: BoardColumn, title: string) => void;
+  // Only supplied when grouping by Group — the other groupings aren't real
+  // records, so there'd be nothing to delete.
+  onDeleteGroup?: (column: BoardColumn) => void;
 }) {
   const [dragId, setDragId] = useState<string | null>(null);
   const [overColumn, setOverColumn] = useState<string | null>(null);
@@ -170,7 +174,7 @@ export function BoardView({
               drop(column, column.tasks.length);
             }}
             className={cn(
-              "flex shrink-0 flex-col rounded-xl border bg-muted/30 transition",
+              "group/col flex shrink-0 flex-col rounded-xl border bg-muted/30 transition",
               isCollapsed ? "w-12" : "w-72",
               overColumn === column.key ? "border-primary/60 bg-accent/30" : "border-border",
             )}
@@ -199,6 +203,18 @@ export function BoardView({
                       <span className="text-[10px] tabular-nums text-muted-foreground">
                         {complete}/{column.tasks.length} done
                       </span>
+                    ) : null}
+                    {/* No delete on the "No group" catch-all — it isn't a record. */}
+                    {onDeleteGroup && column.groupId ? (
+                      <button
+                        type="button"
+                        onClick={() => onDeleteGroup(column)}
+                        className="rounded p-1 text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive focus-visible:opacity-100 group-hover/col:opacity-100"
+                        aria-label={`Delete group ${column.title}`}
+                        title={`Delete group ${column.title}`}
+                      >
+                        <Trash2 className="h-3 w-3" aria-hidden />
+                      </button>
                     ) : null}
                     <button
                       type="button"
