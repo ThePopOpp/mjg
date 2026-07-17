@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import { INSTALL_GUIDES, SHARE_ICON_SVG } from "@/lib/pwa/install-guide";
 
 const DEFAULT_SITE_URL = "https://my.michaeljgauthier.com";
 // Where THIS app is served — login, the legal pages, and the SMS/email consent
@@ -421,24 +422,88 @@ function injectFaviconLinks(html: string) {
   return html.replace(/<\/head>/i, `  ${renderFaviconLinks()}\n</head>`);
 }
 
-// Client helper for the public site: registers the service worker (so the site
-// is installable) and exposes window.mjgInstall() for the "Install the MJG App"
-// buttons — native prompt when available, else platform instructions.
+// Client helper for the public site: registers the service worker (so the site is
+// installable) and exposes window.mjgInstall() for the "Install app" buttons —
+// native prompt when available, else a styled guide.
+//
+// The guides and platform detection come from lib/pwa/install-guide.ts and are
+// serialised in below, so this and the React button can't drift apart. It used to
+// be a window.alert() with one sentence, which on iOS — where the Share menu is
+// the ONLY install route — was the entire install experience.
 const INSTALL_HELPER_JS = `(function(){
+  var GUIDES=${JSON.stringify(INSTALL_GUIDES)};
+  var SHARE=${JSON.stringify(SHARE_ICON_SVG)};
   var deferred=null;
+
+  function platform(){
+    var ua=navigator.userAgent||'';
+    if(/FBAN|FBAV|FB_IAB|Instagram|LinkedInApp|Twitter|MicroMessenger|Snapchat|Pinterest|\\bLine\\//i.test(ua))return 'in-app';
+    if(/iPhone|iPod/.test(ua))return 'iphone';
+    // iPadOS 13+ reports as "Macintosh"; touch points are what give it away.
+    if(/iPad/.test(ua)||(/Macintosh/.test(ua)&&(navigator.maxTouchPoints||0)>1))return 'ipad';
+    if(/Android/.test(ua))return 'android';
+    var safari=/Safari/.test(ua)&&!/Chrome|Chromium|Edg|OPR|Brave/.test(ua);
+    if(/Macintosh|Mac OS X/.test(ua)&&safari)return 'macos-safari';
+    return 'desktop';
+  }
+
   function hideIfInstalled(){
     try{var s=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
       if(s){var els=document.querySelectorAll('[data-mjg-install]');for(var i=0;i<els.length;i++){els[i].style.display='none';}}}catch(e){}
   }
+
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function showGuide(){
+    var g=GUIDES[platform()]||GUIDES.desktop;
+    var old=document.getElementById('mjg-install-modal');
+    if(old)old.remove();
+
+    var steps='';
+    for(var i=0;i<g.steps.length;i++){
+      var showShare=i===0&&/Share button/.test(g.steps[i]);
+      steps+='<li><span class="n">'+(i+1)+'</span><span class="t">'+esc(g.steps[i])+(showShare?'<span class="share">'+SHARE+'</span>':'')+'</span></li>';
+    }
+
+    var el=document.createElement('div');
+    el.id='mjg-install-modal';
+    el.innerHTML=
+      '<style>'+
+      '#mjg-install-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}'+
+      '#mjg-install-modal .bd{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);}'+
+      '#mjg-install-modal .pn{position:relative;z-index:1;width:min(420px,100%);max-height:86vh;overflow:auto;background:var(--paper,#fff);color:var(--ink,#111);border:1px solid var(--line,#e4ded2);border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3);font-family:var(--font-body,system-ui,sans-serif);}'+
+      '#mjg-install-modal h3{font-family:var(--font-display,Georgia,serif);font-size:21px;margin:0 0 6px;}'+
+      '#mjg-install-modal .sub{color:var(--muted,#5f6d66);font-size:13px;line-height:1.6;margin:0 0 16px;}'+
+      '#mjg-install-modal .warn{display:flex;gap:8px;border:1px solid rgba(201,164,110,.45);background:rgba(201,164,110,.12);border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.6;margin:0 0 14px;}'+
+      '#mjg-install-modal ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;}'+
+      '#mjg-install-modal li{display:flex;gap:10px;font-size:14px;line-height:1.6;}'+
+      '#mjg-install-modal .n{flex:0 0 20px;height:20px;border-radius:999px;background:rgba(201,164,110,.18);color:var(--gold,#c9a46e);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px;}'+
+      '#mjg-install-modal .t{color:var(--muted,#5f6d66);}'+
+      '#mjg-install-modal .share{display:inline-flex;width:24px;height:24px;padding:3px;margin-left:6px;vertical-align:-6px;border:1px solid var(--line,#e4ded2);border-radius:6px;color:var(--ink,#111);}'+
+      '#mjg-install-modal .share svg{width:100%;height:100%;}'+
+      '#mjg-install-modal .note{color:var(--muted,#5f6d66);font-size:12px;line-height:1.6;margin:16px 0 0;}'+
+      '#mjg-install-modal .cl{margin-top:18px;width:100%;border:0;border-radius:8px;background:var(--ink,#111);color:var(--paper,#fff);padding:11px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;}'+
+      '</style>'+
+      '<div class="bd" data-close></div>'+
+      '<div class="pn" role="dialog" aria-modal="true" aria-label="'+esc(g.title)+'">'+
+      '<h3>'+esc(g.title)+'</h3>'+
+      '<p class="sub">It installs like a normal app \\u2014 its own icon and window, and it works offline. No app store needed.</p>'+
+      (g.blocked?'<div class="warn">'+esc(g.blocked)+'</div>':'')+
+      '<ol>'+steps+'</ol>'+
+      (g.note?'<p class="note">'+esc(g.note)+'</p>':'')+
+      '<button class="cl" data-close>Got it</button>'+
+      '</div>';
+
+    el.addEventListener('click',function(e){if(e.target&&e.target.hasAttribute('data-close'))el.remove();});
+    document.addEventListener('keydown',function onKey(e){if(e.key==='Escape'){el.remove();document.removeEventListener('keydown',onKey);}});
+    document.body.appendChild(el);
+  }
+
   window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;});
   window.addEventListener('appinstalled',function(){deferred=null;hideIfInstalled();});
   window.mjgInstall=function(){
     if(deferred){deferred.prompt();try{deferred.userChoice.finally(function(){deferred=null;});}catch(e){}return;}
-    var ua=navigator.userAgent,msg;
-    if(/iPad|iPhone|iPod/.test(ua))msg='To install on iPhone/iPad: tap the Share button in Safari, then \\u201CAdd to Home Screen.\\u201D';
-    else if(/Android/.test(ua))msg='To install on Android: open Chrome\\u2019s \\u22EE menu, then \\u201CInstall app.\\u201D';
-    else msg='To install: click the install icon in your browser\\u2019s address bar, or open the \\u22EE menu and choose \\u201CInstall Michael J. Gauthier\\u2026\\u201D (Chrome or Edge).';
-    window.alert(msg);
+    showGuide();
   };
   if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}
   if(document.readyState!=='loading')hideIfInstalled();else document.addEventListener('DOMContentLoaded',hideIfInstalled);
@@ -446,9 +511,14 @@ const INSTALL_HELPER_JS = `(function(){
 
 /** PWA <head> tags (manifest + apple icon/meta) for hand-built Next pages. */
 export function renderPwaHeadTags() {
+  // apple-mobile-web-app-* are what iOS reads when adding to the Home Screen —
+  // without them it saves a browser shortcut instead of a standalone app. Mirrors
+  // the `appleWebApp` metadata the React pages get from app/layout.tsx.
   return `<link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="MJG" />`;
 }
 

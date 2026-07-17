@@ -1,17 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Download, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Download, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import {
+  detectInstallPlatform,
+  INSTALL_GUIDES,
+  SHARE_ICON_SVG,
+  type InstallPlatform,
+} from "@/lib/pwa/install-guide";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-// A clear "Install app" affordance. Uses the native install prompt when the
-// browser offers one; otherwise shows step-by-step instructions per platform.
+// "Install app". Uses the browser's native prompt where one exists (Chrome, Edge,
+// Android). On iOS and macOS Safari there is no such prompt — Apple offers no
+// programmatic install — so it opens a guide instead. See lib/pwa/install-guide.ts.
 export function InstallAppButton({
   label = "Install app",
   responsiveLabel = true,
@@ -32,8 +40,7 @@ export function InstallAppButton({
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
-  const ref = useRef<HTMLDivElement>(null);
+  const [platform, setPlatform] = useState<InstallPlatform>("desktop");
 
   useEffect(() => {
     const standalone =
@@ -41,10 +48,7 @@ export function InstallAppButton({
       (navigator as unknown as { standalone?: boolean }).standalone === true;
     if (standalone) { setInstalled(true); return; }
 
-    const ua = navigator.userAgent;
-    if (/iPad|iPhone|iPod/.test(ua)) setPlatform("ios");
-    else if (/Android/.test(ua)) setPlatform("android");
-    else setPlatform("desktop");
+    setPlatform(detectInstallPlatform({ userAgent: navigator.userAgent, maxTouchPoints: navigator.maxTouchPoints }));
 
     const onBIP = (e: Event) => { e.preventDefault(); setDeferred(e as BeforeInstallPromptEvent); };
     const onInstalled = () => { setInstalled(true); setDeferred(null); setShowHelp(false); };
@@ -56,14 +60,10 @@ export function InstallAppButton({
     };
   }, []);
 
-  useEffect(() => {
-    if (!showHelp) return;
-    const onClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setShowHelp(false); };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [showHelp]);
-
+  // Already running as an installed app — nothing to offer.
   if (installed) return null;
+
+  const guide = INSTALL_GUIDES[platform];
 
   async function onClick() {
     if (deferred) {
@@ -73,41 +73,59 @@ export function InstallAppButton({
       setDeferred(null);
       return;
     }
-    setShowHelp((s) => !s);
+    setShowHelp(true);
   }
 
-  const steps =
-    platform === "ios"
-      ? ["Tap the Share button in Safari's toolbar.", "Scroll down and tap “Add to Home Screen.”", "Tap “Add” — the MJG app icon appears on your home screen."]
-      : platform === "android"
-      ? ["Tap the ⋮ menu in Chrome (top right).", "Tap “Install app” (or “Add to Home screen”).", "Confirm — the MJG app icon appears on your home screen."]
-      : ["Look for the install icon in the address bar (a monitor/⊕ icon on the right).", "Or open the browser ⋮ menu → “Install Michael J. Gauthier…”.", "Confirm — the app opens in its own window with the MJG icon."];
-
   return (
-    <div className={cn("relative", fullWidth && "w-full")} ref={ref}>
-      <Button onClick={onClick} variant={variant} size={size} className={cn("gap-1.5", fullWidth && "w-full", className)}>
-        <Download className="h-4 w-4" />
-        <span className={responsiveLabel ? "hidden sm:inline" : undefined}>{label}</span>
-      </Button>
-      {caption ? <p className="mt-2 text-center text-xs text-muted-foreground">{caption}</p> : null}
+    <>
+      <div className={cn(fullWidth && "w-full")}>
+        <Button onClick={onClick} variant={variant} size={size} className={cn("gap-1.5", fullWidth && "w-full", className)}>
+          <Download className="h-4 w-4" />
+          <span className={responsiveLabel ? "hidden sm:inline" : undefined}>{label}</span>
+        </Button>
+        {caption ? <p className="mt-2 text-center text-xs text-muted-foreground">{caption}</p> : null}
+      </div>
 
-      {showHelp && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-border bg-popover p-4 text-popover-foreground shadow-xl">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-sm font-semibold">Install the MJG app</p>
-            <button onClick={() => setShowHelp(false)} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
-          </div>
-          <ol className="space-y-2">
-            {steps.map((s, i) => (
-              <li key={i} className="flex gap-2 text-sm leading-6 text-muted-foreground">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary">{i + 1}</span>
-                <span>{s}</span>
+      <Dialog open={showHelp} onOpenChange={setShowHelp}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{guide.title}</DialogTitle>
+            <DialogDescription>
+              It installs like a normal app — its own icon and window, and it works offline. No app store needed.
+            </DialogDescription>
+          </DialogHeader>
+
+          {guide.blocked ? (
+            <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-5 text-amber-800 dark:text-amber-300">
+              <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span>{guide.blocked}</span>
+            </div>
+          ) : null}
+
+          <ol className="space-y-3">
+            {guide.steps.map((step, i) => (
+              <li key={i} className="flex gap-2.5 text-sm leading-6">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary">
+                  {i + 1}
+                </span>
+                <span className="text-muted-foreground">
+                  {step}
+                  {/* Show the Share glyph beside the step that names it — people scan
+                      for the shape, not the word. */}
+                  {i === 0 && /Share button/.test(step) ? (
+                    <span
+                      className="ml-1.5 inline-flex h-6 w-6 translate-y-1.5 items-center justify-center rounded-md border border-border bg-muted p-1 text-foreground"
+                      dangerouslySetInnerHTML={{ __html: SHARE_ICON_SVG }}
+                    />
+                  ) : null}
+                </span>
               </li>
             ))}
           </ol>
-          <p className="mt-3 text-xs text-muted-foreground">It installs like a normal app — icon, own window, and offline support. No app store needed.</p>
-        </div>
-      )}
-    </div>
+
+          {guide.note ? <p className="text-xs leading-5 text-muted-foreground">{guide.note}</p> : null}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
