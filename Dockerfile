@@ -38,11 +38,19 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./next.config.ts
+# ⚠️ ANY route handler that readFileSync's from process.cwd() at runtime needs its
+# directory COPY'd here, or it 500s with ENOENT in production while working fine in
+# `next dev` (where the whole repo is on disk). Two do today:
+#
 # The public marketing site (root /, /mission, /post, …) is served by route
 # handlers that readFileSync these static HTML files at runtime via
 # process.cwd()/main/*. Without this COPY the runner lacks main/ and every
 # public page 500s with ENOENT (the dashboard is unaffected — it never reads main/).
 COPY --from=builder /app/main ./main
+# /privacy and /terms render from these markdown files at runtime
+# (lib/public-site/legal.ts). Only docs/legal is copied — the rest of docs/ is
+# internal specs that shouldn't ship in a public image.
+COPY --from=builder /app/docs/legal ./docs/legal
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]

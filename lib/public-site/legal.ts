@@ -20,9 +20,26 @@ import {
 // second copy to drift. Twilio's A2P 10DLC review needs these publicly reachable,
 // alongside the SMS/email opt-in and opt-out pages.
 
+// NOTE: this reads from disk at runtime, so docs/legal MUST be COPY'd into the
+// Docker runtime stage — see the Dockerfile. It works in `next dev` regardless
+// (the repo is on disk), so a missing COPY only shows up in production.
+function readLegalDoc(file: string) {
+  const filePath = path.join(process.cwd(), "docs", "legal", file);
+  try {
+    return readFileSync(filePath, "utf8");
+  } catch (error) {
+    // A bare ENOENT here says nothing about the cause; name it.
+    throw new Error(
+      `Legal document not found at ${filePath}. If this is production, docs/legal is missing from the runtime image — check the COPY in the Dockerfile. (${
+        error instanceof Error ? error.message : String(error)
+      })`,
+    );
+  }
+}
+
 export function renderLegalPage(input: { file: string; title: string; eyebrow: string }) {
   const siteUrl = publicSiteUrl();
-  const markdown = readFileSync(path.join(process.cwd(), "docs", "legal", input.file), "utf8");
+  const markdown = readLegalDoc(input.file);
 
   // The doc's own H1 and "Effective Date" line are lifted into the page header,
   // then dropped from the body so they don't render twice.
