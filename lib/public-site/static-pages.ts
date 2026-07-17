@@ -275,8 +275,8 @@ export function renderSiteFooter(siteUrl: string) {
           <ul>
             <li><a href="${app}/privacy">Privacy Policy</a></li>
             <li><a href="${app}/terms">Terms of Service</a></li>
-            <li><a href="${app}/sms/opt-in">SMS</a></li>
-            <li><a href="${app}/email/opt-in">Email</a></li>
+            <li><a href="${app}/sms/opt-in">SMS Management</a></li>
+            <li><a href="${app}/email/opt-in">Email Management</a></li>
           </ul>
         </div>
         <div>
@@ -414,7 +414,45 @@ function transformStaticHtml(html: string) {
       .replace(new RegExp(`href='${escapeRegExp(fileName)}'`, "g"), `href='${absolute}'`);
   }
 
-  return injectPwa(injectFaviconLinks(output));
+  return injectLegalFooterColumn(injectPwa(injectFaviconLinks(output)));
+}
+
+// The static pages in main/*.html carry their own hardcoded <footer>, separate from
+// renderSiteFooter() (which serves /mission, /resources and CMS pages). Rather than
+// paste a Legal column into five HTML files — and have it drift the next time a link
+// changes — it's injected here, so both footers stay in step from one place.
+function injectLegalFooterColumn(html: string) {
+  if (!/<h3>Contact<\/h3>/.test(html)) return html; // landing pages have no footer
+  if (/>Legal</.test(html)) return html; // already present — don't double-inject
+
+  const app = appUrl();
+  const column = `<!-- Legal Column -->
+      <div class="footer-section">
+        <h3>Legal</h3>
+        <ul class="footer-links">
+          <li><a href="${app}/privacy">Privacy Policy</a></li>
+          <li><a href="${app}/terms">Terms of Service</a></li>
+          <li><a href="${app}/sms/opt-in">SMS Management</a></li>
+          <li><a href="${app}/email/opt-in">Email Management</a></li>
+        </ul>
+      </div>
+
+      `;
+
+  // Insert before the Contact column so the order is Logo · Explore · Account ·
+  // Legal · Contact, and widen the grid from 4 columns to 5.
+  return html
+    .replace(/(<div class="footer-section">\s*<h3>Contact<\/h3>)/, `${column}$1`)
+    .replace(
+      /<\/head>/i,
+      `  <style>
+    .footer-container{grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:2.25rem;}
+    @media(max-width:1100px){.footer-container{grid-template-columns:1fr 1fr 1fr;gap:2rem;}}
+    @media(max-width:900px){.footer-container{grid-template-columns:1fr 1fr;gap:2rem;}}
+    @media(max-width:640px){.footer-container{grid-template-columns:1fr;gap:1.5rem;}}
+  </style>
+</head>`,
+    );
 }
 
 function injectFaviconLinks(html: string) {
