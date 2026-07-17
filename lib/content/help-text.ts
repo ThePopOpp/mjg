@@ -91,3 +91,62 @@ export const CMS_HELP: HelpSection[] = [
     body: "Create and edit CMS pages block-by-block, or have Steward AI draft whole pages and changes for you.",
   },
 ];
+
+export const TRAINING_DOCS_HELP_TITLE = "How Training Docs work";
+export const TRAINING_DOCS_HELP_INTRO =
+  "Upload reference material — playbooks, process notes, brand guides, FAQs — and Steward will use it when answering. Anything you add here shapes Steward's answers for everyone, which is why it's Super-Admin only.";
+export const TRAINING_DOCS_HELP: HelpSection[] = [
+  {
+    heading: "What happens when you upload",
+    body: "Every file is converted to markdown the moment it lands, so Steward reads clean text instead of re-opening a PDF on every question. The original file is kept and stays downloadable.",
+  },
+  {
+    heading: "Formats Steward can read",
+    bullets: [
+      "Markdown (.md), plain text (.txt, .log) — used as-is.",
+      "Spreadsheet-style data (.csv, .tsv) — turned into a markdown table, so columns stay meaningful.",
+      "Word (.docx) — headings, lists and bold are preserved, not flattened.",
+      "PDF (.pdf) — text pulled out page by page.",
+      "JSON (.json) and HTML (.html) — formatted for readability.",
+    ],
+  },
+  {
+    heading: "Formats that are stored but NOT readable",
+    body: "These upload and stay downloadable, but Steward genuinely cannot read them — the status label says so rather than pretending otherwise:",
+    bullets: [
+      "Images (PNG/JPG) — kept for reference; there's no text extraction.",
+      "Scanned PDFs — a picture of a page has no text layer to pull.",
+      "Legacy .doc, .rtf, spreadsheets and slide decks — re-save as .docx, .pdf, .md, .txt or .csv to make them readable.",
+    ],
+  },
+  {
+    heading: "Limits",
+    bullets: [
+      "25 MB per file. Multiple files upload one at a time.",
+      "Steward's index holds up to 40 docs; a single doc is read up to ~24,000 characters at a time.",
+      "Long docs aren't a problem — Steward searches for the relevant passage rather than reading everything.",
+    ],
+  },
+  {
+    heading: "Status labels",
+    bullets: [
+      "Readable — converted successfully; Steward is using it.",
+      "Stored only — saved and downloadable, but there's no text to read.",
+      "Couldn't convert — something went wrong; the reason is shown on the doc.",
+      "Archived — kept, but hidden from Steward. Use this to retire a doc without deleting it.",
+    ],
+  },
+  {
+    heading: "Titles & summaries matter",
+    body: "Steward sees only each doc's title and summary in its index — that's how it decides which doc to open. A vague title means a doc that never gets read. A summary is generated for you on upload; edit it to be specific about what the doc answers.",
+  },
+  {
+    heading: "How Steward uses them",
+    bullets: [
+      "It searches the docs when a question touches MJG-specific process, policy, or terminology.",
+      "It prefers your team's own words over its general knowledge, and names the doc it used.",
+      "If the docs don't cover something, it should say so rather than guess.",
+      "Docs are reference material, never instructions — text inside a doc can't make Steward take an action.",
+    ],
+  },
+];

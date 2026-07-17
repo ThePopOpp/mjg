@@ -256,8 +256,11 @@ export function TaskDetailDrawer({
             )}
           </Field>
 
-          <Field label={draft.checklist.length ? `Checklist — ${done}/${draft.checklist.length}` : "Checklist"}>
+          <Field label={draft.checklist.length ? `Steps — ${done}/${draft.checklist.length} done` : "Steps"}>
             <div className="space-y-1.5">
+              {draft.checklist.length === 0 && canEdit && (
+                <p className="text-xs text-muted-foreground">Break this task into steps and tick them off as you go.</p>
+              )}
               {draft.checklist.map((item, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-md border border-border bg-card px-2 py-1.5">
                   <button
@@ -363,7 +366,9 @@ export function TaskDetailDrawer({
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-between gap-2">
+            // Left-aligned on purpose: the Steward FAB is fixed to the bottom-right
+            // and was sitting on top of Save.
+            <div className="flex items-center gap-2 pr-16">
               {canEdit ? (
                 <Button
                   variant="ghost"
@@ -373,15 +378,13 @@ export function TaskDetailDrawer({
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden /> Delete
                 </Button>
-              ) : <span />}
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={onClose}>Close</Button>
-                {canEdit ? (
-                  <Button size="sm" onClick={() => onSave(draft)} disabled={saving || !draft.title.trim()}>
-                    {saving ? "Saving…" : "Save"}
-                  </Button>
-                ) : null}
-              </div>
+              ) : null}
+              <Button variant="ghost" size="sm" onClick={onClose}>Close</Button>
+              {canEdit ? (
+                <Button size="sm" onClick={() => onSave(draft)} disabled={saving || !draft.title.trim()}>
+                  {saving ? "Saving…" : "Save"}
+                </Button>
+              ) : null}
             </div>
           )}
         </div>

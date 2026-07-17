@@ -3,14 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Columns3, Eye, LayoutGrid, Plus, Rows3, Search, SlidersHorizontal, Trash2, X } from "lucide-react";
+import { ArrowLeft, CalendarDays, Columns3, Eye, LayoutGrid, ListChecks, Plus, Rows3, Search, SlidersHorizontal, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BoardView } from "./views/board-view";
 import { GridView } from "./views/grid-view";
+import { ListView } from "./views/list-view";
+import { CalendarView } from "./views/calendar-view";
 import { TaskDetailDrawer, type TaskDraft } from "./tasks/task-detail-drawer";
 import { MemberAvatarStack } from "./shared/member-avatar-stack";
 import { planColor, planIcon, TASK_PRIORITIES, TASK_STATUSES } from "@/lib/plans/constants";
@@ -49,6 +52,8 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
   const [groupName, setGroupName] = useState("");
   const [confirmDeletePlan, setConfirmDeletePlan] = useState(false);
   const [deletingPlan, setDeletingPlan] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [newTask, setNewTask] = useState({ title: "", groupId: "" });
 
   // Re-seed when the server component re-renders (e.g. after router.refresh()).
   useEffect(() => setTasks(data.tasks), [data.tasks]);
@@ -233,6 +238,34 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
     }
   }
 
+  // The always-visible "Add task" path. Board/List columns also have their own
+  // inline quick-add, but that's only discoverable once columns exist — this
+  // button works from any view, including an empty plan.
+  async function addTaskFromDialog() {
+    const title = newTask.title.trim();
+    if (!title) return;
+    setError(null);
+    setSaving(true);
+    try {
+      const groupId = newTask.groupId || groups[0]?.id || null;
+      const result = (await send(`/api/plans/${plan.id}/tasks`, "POST", { title, group_id: groupId })) as { task: PlanTaskDetail };
+      setTasks((current) => [...current, { ...result.task, assignee_ids: [], label_ids: [], checklist: [] }]);
+      setNewTask({ title: "", groupId: newTask.groupId });
+      setAddOpen(false);
+      // Open it straight away so dates, assignees and steps are one click on, not a hunt.
+      setSelected({ ...result.task, assignee_ids: [], label_ids: [], checklist: [] });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Task create failed.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function openAddTask(groupId?: string | null) {
+    setNewTask({ title: "", groupId: groupId ?? groups[0]?.id ?? "" });
+    setAddOpen(true);
+  }
+
   async function addGroup() {
     const name = groupName.trim();
     if (!name) return;
@@ -314,11 +347,13 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
       </div>
 
       <div className="flex flex-col gap-3 border-t border-border pt-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/40 p-0.5" role="tablist" aria-label="View">
+        <div className="flex items-center gap-1 overflow-x-auto rounded-lg border border-border bg-muted/40 p-0.5" role="tablist" aria-label="View">
           {(
             [
-              { value: "board" as const, label: "Board", icon: Columns3 },
-              { value: "grid" as const, label: "Grid", icon: Rows3 },
+              { value: "board" as const, label: "Kanban", icon: Columns3 },
+              { value: "grid" as const, label: "Table", icon: Rows3 },
+              { value: "list" as const, label: "List", icon: ListChecks },
+              { value: "calendar" as const, label: "Calendar", icon: CalendarDays },
             ]
           ).map((option) => (
             <button
@@ -388,6 +423,12 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
             <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden /> Filters
             {hasActiveFilters(filters) ? <span className="ml-0.5 h-1.5 w-1.5 rounded-full bg-primary" aria-hidden /> : null}
           </Button>
+
+          {canEdit ? (
+            <Button size="sm" onClick={() => openAddTask()} className="gap-1.5">
+              <Plus className="h-3.5 w-3.5" aria-hidden /> Add task
+            </Button>
+          ) : null}
 
           {canEdit ? (
             addingGroup ? (
@@ -503,16 +544,21 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
       {/* Drag-and-drop outcomes are announced here for screen readers. */}
       <p aria-live="polite" className="sr-only">{announcement}</p>
 
-      {tasks.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-muted-foreground/25 px-6 py-16 text-center">
+      {/* An empty plan still renders its columns — the previous empty state replaced
+          the board entirely, which hid the very "Add task" it told people to use. */}
+      {tasks.length === 0 && canEdit ? (
+        <div className="rounded-lg border border-dashed border-muted-foreground/25 px-6 py-8 text-center">
           <p className="text-sm font-medium">This plan has no tasks yet.</p>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-            {canEdit
-              ? "Use “Add task” at the bottom of any column to create your first one."
-              : "Nothing has been added to this plan yet."}
+            Add your first one — you can set dates, assignees, labels and steps once it exists.
           </p>
+          <Button size="sm" onClick={() => openAddTask()} className="mt-3 gap-1.5">
+            <Plus className="h-3.5 w-3.5" aria-hidden /> Add task
+          </Button>
         </div>
-      ) : view === "board" ? (
+      ) : null}
+
+      {view === "board" ? (
         <BoardView
           columns={columns}
           labels={labels}
@@ -524,7 +570,7 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
           onMove={onMove}
           onQuickAdd={(column, title) => void quickAdd(column, title)}
         />
-      ) : (
+      ) : view === "grid" ? (
         <GridView
           columns={columns}
           labels={labels}
@@ -534,7 +580,62 @@ export function PlanWorkspace({ data, initialView }: { data: PlanWorkspaceData; 
           onOpenTask={setSelected}
           onInlineChange={(task, patch) => void updateTaskFields(task.id, patch)}
         />
+      ) : view === "list" ? (
+        <ListView
+          columns={columns}
+          labels={labels}
+          people={people}
+          canEdit={canEdit}
+          grouped={groupBy !== "none"}
+          onOpenTask={setSelected}
+          onToggleComplete={(task) => void updateTaskFields(task.id, { status: task.status === "complete" ? "not_started" : "complete" })}
+          onAddTask={groupBy === "group" ? (column) => openAddTask(column.groupId) : undefined}
+        />
+      ) : (
+        // Calendar shows every task in date order, so it ignores grouping.
+        <CalendarView tasks={applySort(applyFilters(tasks, filters), sortBy)} onOpenTask={setSelected} />
       )}
+
+      <Dialog open={addOpen} onOpenChange={(open) => !open && !saving && setAddOpen(false)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add a task</DialogTitle>
+            <DialogDescription>It opens straight after, so you can add dates, assignees and steps.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Task</Label>
+              <Input
+                autoFocus
+                value={newTask.title}
+                onChange={(e) => setNewTask((t) => ({ ...t, title: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter" && newTask.title.trim()) void addTaskFromDialog(); }}
+                placeholder="What needs doing?"
+                maxLength={300}
+              />
+            </div>
+            {groups.length > 0 && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Group</Label>
+                <Select value={newTask.groupId || groups[0].id} onValueChange={(v) => setNewTask((t) => ({ ...t, groupId: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {groups.map((g) => (
+                      <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button variant="ghost" onClick={() => setAddOpen(false)} disabled={saving}>Cancel</Button>
+            <Button onClick={() => void addTaskFromDialog()} disabled={saving || !newTask.title.trim()}>
+              {saving ? "Adding…" : "Add task"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={confirmDeletePlan} onOpenChange={(open) => !open && !deletingPlan && setConfirmDeletePlan(false)}>
         <DialogContent className="max-w-sm">

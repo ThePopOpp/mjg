@@ -84,10 +84,24 @@ export function taskPriority(value: string | null | undefined) {
   return TASK_PRIORITIES.find((p) => p.value === value) ?? TASK_PRIORITIES[1];
 }
 
+// Stored values stay "board"/"grid" (existing rows use them); the labels are what
+// people actually call these views.
 export const PLAN_VIEWS: Array<{ value: PlanView; label: string; description: string }> = [
-  { value: "board", label: "Board", description: "Kanban columns you can drag tasks between." },
-  { value: "grid", label: "Grid", description: "A table for scanning and editing task details fast." },
+  { value: "board", label: "Kanban", description: "Columns you can drag tasks between." },
+  { value: "grid", label: "Table", description: "A spreadsheet-style grid for editing details fast." },
+  { value: "list", label: "List", description: "A compact checklist, grouped and scannable." },
+  { value: "calendar", label: "Calendar", description: "Tasks laid out by due date." },
 ];
+
+// A plan started from scratch gets these columns. Without them a new plan opens
+// with no columns at all — and therefore nowhere to add a task. These are also what
+// the create-plan preview shows for a Basic plan, so the two must agree.
+export const DEFAULT_SCRATCH_GROUPS = [
+  { key: "todo", name: "To Do" },
+  { key: "doing", name: "In Progress" },
+  { key: "waiting", name: "Waiting" },
+  { key: "done", name: "Completed" },
+] as const;
 
 export const PLAN_MEMBER_ROLES: Array<{ value: PlanMemberRole; label: string; description: string }> = [
   { value: "owner", label: "Owner", description: "Full control, including settings and members." },

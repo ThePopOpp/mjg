@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { PlanAccessError, type PlanActor } from "./auth";
+import { DEFAULT_SCRATCH_GROUPS } from "./constants";
 import type { PlanTask, PlanTemplate, TaskPriority, TaskStatus, TemplateData } from "./types";
 
 // Writes for Plan Builder. Every function here assumes the caller has ALREADY
@@ -7,7 +8,7 @@ import type { PlanTask, PlanTemplate, TaskPriority, TaskStatus, TemplateData } f
 
 const TASK_STATUSES = new Set<TaskStatus>(["not_started", "in_progress", "waiting", "blocked", "complete"]);
 const TASK_PRIORITIES = new Set<TaskPriority>(["low", "medium", "high", "urgent"]);
-const PLAN_VIEWS = new Set(["grid", "board"]);
+const PLAN_VIEWS = new Set(["grid", "board", "list", "calendar"]);
 const PLAN_VISIBILITIES = new Set(["private", "team"]);
 const PLAN_COLOR_VALUES = new Set(["gold", "sand", "clay", "plum", "slate", "ink"]);
 
@@ -81,7 +82,12 @@ export async function createPlan(actor: PlanActor, input: CreatePlanInput): Prom
   if (!name) throw new PlanAccessError("Plan name is required.", 400);
   if (name.length > 120) throw new PlanAccessError("Plan name must be 120 characters or fewer.", 400);
 
-  const templateData: TemplateData = input.template?.template_data ?? {};
+  // No template → seed the default columns. A plan with no groups renders an empty
+  // board with nowhere to add a task, and it would contradict the create-plan
+  // preview, which shows these four.
+  const templateData: TemplateData = input.template?.template_data ?? {
+    groups: DEFAULT_SCRATCH_GROUPS.map((g) => ({ key: g.key, name: g.name })),
+  };
   const supabase = createSupabaseAdminClient();
 
   // One transaction: plan + owner + members + groups + labels + tasks + checklists

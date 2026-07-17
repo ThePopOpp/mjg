@@ -48,7 +48,8 @@ export default async function PlanPage({
     );
   }
 
-  const initialView: PlanView = view === "grid" || view === "board" ? view : data.plan.default_view;
+  const VIEWS: PlanView[] = ["grid", "board", "list", "calendar"];
+  const initialView: PlanView = VIEWS.includes(view as PlanView) ? (view as PlanView) : data.plan.default_view;
 
   return <PlanWorkspace data={data} initialView={initialView} />;
 }

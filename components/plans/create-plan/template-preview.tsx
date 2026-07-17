@@ -1,7 +1,7 @@
 "use client";
 
 import { Clock, LayoutGrid, ListChecks, Sparkles } from "lucide-react";
-import { PLAN_TYPE_FEATURES } from "@/lib/plans/constants";
+import { DEFAULT_SCRATCH_GROUPS, PLAN_TYPE_FEATURES } from "@/lib/plans/constants";
 import type { PlanTemplate, PlanType, TemplateData } from "@/lib/plans/types";
 
 // The right-hand preview panel. The miniature is an original abstract rendering of
@@ -51,7 +51,8 @@ export function TemplatePreview({ selection }: { selection: PreviewSelection }) 
   const planType: PlanType = isTemplate ? selection.template.plan_type : selection.planType;
   const data: TemplateData = isTemplate ? selection.template.template_data ?? {} : {};
 
-  const groups = isTemplate ? (data.groups ?? []).map((g) => g.name) : ["To Do", "In Progress", "Waiting", "Completed"];
+  // Same source as the groups actually created — see DEFAULT_SCRATCH_GROUPS.
+  const groups = isTemplate ? (data.groups ?? []).map((g) => g.name) : DEFAULT_SCRATCH_GROUPS.map((g) => g.name);
   const tasks = data.tasks ?? [];
   const taskCount = isTemplate ? tasks.length : 0;
 
@@ -90,13 +91,13 @@ export function TemplatePreview({ selection }: { selection: PreviewSelection }) 
         <Row icon={LayoutGrid} label="Views" value={features.views.join(", ")} />
         <Row
           icon={ListChecks}
-          label={isTemplate ? `Groups (${groups.length})` : "Groups"}
+          label={`Groups (${groups.length})`}
           value={groups.length ? groups.join(" → ") : "None — you'll add your own"}
         />
         <Row
           icon={Sparkles}
           label="Starter tasks"
-          value={taskCount ? `${taskCount} task${taskCount === 1 ? "" : "s"}, ready to edit or delete` : "None — start from an empty board"}
+          value={taskCount ? `${taskCount} task${taskCount === 1 ? "" : "s"}, ready to edit or delete` : "None — you'll add your own"}
         />
         <Row icon={Clock} label="Estimated setup" value={`About ${setupMinutes} minute${setupMinutes === 1 ? "" : "s"}`} />
       </div>

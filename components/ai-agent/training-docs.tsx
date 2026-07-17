@@ -21,6 +21,8 @@ import { FieldSelect } from "@/components/ui/field-select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { PageHelp } from "@/components/dashboard/page-help";
+import { TRAINING_DOCS_HELP, TRAINING_DOCS_HELP_INTRO, TRAINING_DOCS_HELP_TITLE } from "@/lib/content/help-text";
 
 type Doc = {
   id: string;
@@ -155,6 +157,14 @@ export function TrainingDocs() {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold tracking-tight">Training Docs</h2>
+          <p className="text-xs text-muted-foreground">Reference material Steward uses when answering.</p>
+        </div>
+        <PageHelp title={TRAINING_DOCS_HELP_TITLE} intro={TRAINING_DOCS_HELP_INTRO} sections={TRAINING_DOCS_HELP} />
+      </div>
+
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}

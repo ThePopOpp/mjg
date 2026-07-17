@@ -5,7 +5,9 @@
 export type PlanType = "basic" | "premium";
 export type PlanVisibility = "private" | "team";
 export type PlanStatus = "active" | "archived";
-export type PlanView = "grid" | "board";
+// Stored values are unchanged ("board" = Kanban, "grid" = Table) so existing plans
+// keep working; the labels live in PLAN_VIEWS.
+export type PlanView = "grid" | "board" | "list" | "calendar";
 export type PlanMemberRole = "owner" | "editor" | "member" | "viewer";
 export type TaskStatus = "not_started" | "in_progress" | "waiting" | "blocked" | "complete";
 export type TaskPriority = "low" | "medium" | "high" | "urgent";
