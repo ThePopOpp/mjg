@@ -3,6 +3,11 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 
 const DEFAULT_SITE_URL = "https://my.michaeljgauthier.com";
+// Where THIS app is served — login, the legal pages, and the SMS/email consent
+// pages all live here. It's separate from publicSiteUrl() because the marketing
+// site and the app are different hosts today. Set NEXT_PUBLIC_APP_URL to move it
+// (e.g. when the primary domain changes) rather than editing links one by one.
+const DEFAULT_APP_URL = "https://my.michaeljgauthier.com";
 
 const STATIC_ROUTES: Record<string, string> = {
   "index.html": "/",
@@ -210,11 +215,12 @@ export function renderJoinCta(siteUrl: string) {
 /** Site footer — matches the homepage (Explore / Account / Contact + social). */
 export function renderSiteFooter(siteUrl: string) {
   const year = new Date().getFullYear();
+  const app = appUrl();
   const mapHref = "https://www.google.com/maps/dir//2330+W+Ray+Rd+Ste+%233,+Chandler,+AZ+85224/@33.3208879,-111.964255,45043m/data=!3m1!1e3";
   return `<style>
     .mjg-ftr{background:var(--paper,#0f0f0f);border-top:1px solid var(--line,#2b2a25);padding:64px 0 26px;color:var(--muted,#b6bcb6);}
     .mjg-ftr .in{max-width:1160px;margin:0 auto;padding:0 2rem;}
-    .mjg-ftr .cols{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.1fr;gap:40px;}
+    .mjg-ftr .cols{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.1fr;gap:36px;}
     .mjg-ftr .logo{height:32px;width:auto;}
     .mjg-ftr .logo-dark{display:none;}
     [data-theme="dark"] .mjg-ftr .logo-light{display:none;}
@@ -234,6 +240,7 @@ export function renderSiteFooter(siteUrl: string) {
     .mjg-ftr .social a{display:inline-flex;color:var(--ink,#f8f6f1);}
     .mjg-ftr .social a:hover{color:var(--gold,#c9aa70);}
     .mjg-ftr .social svg{width:20px;height:20px;fill:currentColor;}
+    @media(max-width:1024px){.mjg-ftr .cols{grid-template-columns:1fr 1fr 1fr;gap:32px;}}
     @media(max-width:820px){.mjg-ftr .cols{grid-template-columns:1fr 1fr;gap:32px;}.mjg-ftr .bottom{flex-direction:column;align-items:flex-start;}}
   </style>
   <footer class="mjg-ftr">
@@ -256,10 +263,19 @@ export function renderSiteFooter(siteUrl: string) {
         <div>
           <h4>Account</h4>
           <ul>
-            <li><a href="https://my.michaeljgauthier.com/login">Login</a></li>
+            <li><a href="${app}/login">Login</a></li>
             <li><a href="${siteUrl}/#join">Register</a></li>
             <li><a href="tel:+14804667070">Call Us</a></li>
             <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="${app}/privacy">Privacy Policy</a></li>
+            <li><a href="${app}/terms">Terms of Service</a></li>
+            <li><a href="${app}/sms/opt-in">SMS</a></li>
+            <li><a href="${app}/email/opt-in">Email</a></li>
           </ul>
         </div>
         <div>
@@ -312,6 +328,10 @@ export function renderNavScript() {
 
 export function publicSiteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, "");
+}
+
+export function appUrl() {
+  return (process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL).replace(/\/$/, "");
 }
 
 export function renderStaticPage(fileName: string) {
