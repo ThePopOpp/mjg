@@ -2,6 +2,12 @@
 // fonts, voice, and reusable on-brand snippets. Consumed by the dashboard Assets
 // page and by the AI agent (Steward) so generated content stays on-brand.
 
+// Logos are self-hosted at /mjg-logos (public/), NOT WordPress. These URLs are
+// ABSOLUTE because they render in email, where relative paths don't resolve — and
+// PNG because most email clients (Gmail, Outlook) strip SVG. The base tracks the
+// site domain via env, so it follows the primary-domain move automatically.
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://my.michaeljgauthier.com").replace(/\/$/, "");
+
 export const BRAND_KIT = {
   name: "Michael J. Gauthier",
   shortName: "MJG",
@@ -12,13 +18,13 @@ export const BRAND_KIT = {
     {
       key: "logo_black",
       label: "Primary logo (black)",
-      url: "https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg",
+      url: `${SITE}/mjg-logos/mjg_black_white.png`,
       usage: "Light backgrounds (default).",
     },
     {
       key: "logo_white",
       label: "Primary logo (white)",
-      url: "https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg",
+      url: `${SITE}/mjg-logos/mjg_white.png`,
       usage: "Dark backgrounds.",
     },
   ],

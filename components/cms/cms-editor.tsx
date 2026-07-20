@@ -509,7 +509,7 @@ function CanvasHeader({ compact }: { compact: boolean }) {
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", minHeight: 58 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" alt="MJG" style={{ height: 30 }} />
+          <img src="/mjg-logos/mjg_black_white.png" alt="MJG" style={{ height: 30 }} />
           <span style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 14, color: "#111" }}>Michael <span style={{ color: "#c9a46e" }}>J.</span> Gauthier</span>
         </div>
         {compact ? (

@@ -124,10 +124,10 @@ export function renderSiteHeader(siteUrl: string) {
     <div class="nav-inner">
       <a href="${siteUrl}/" class="nav-logo">
         <img id="nav-logo"
-          src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+          src="/mjg-logos/mjg_black_white.png"
           alt="Michael J. Gauthier"
-          data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
-          data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+          data-logo-light="/mjg-logos/mjg_black_white.png"
+          data-logo-dark="/mjg-logos/mjg_white.png" />
         <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
       </a>
       <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="Open menu">
@@ -248,8 +248,8 @@ export function renderSiteFooter(siteUrl: string) {
     <div class="in">
       <div class="cols">
         <div>
-          <img class="logo logo-light" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" alt="Michael J. Gauthier" />
-          <img class="logo logo-dark" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" alt="Michael J. Gauthier" />
+          <img class="logo logo-light" src="/mjg-logos/mjg_black_white.png" alt="Michael J. Gauthier" />
+          <img class="logo logo-dark" src="/mjg-logos/mjg_white.png" alt="Michael J. Gauthier" />
           <p class="desc">Welcome to my personal mission: Encouraging others to use their God given resources for God given purposes</p>
         </div>
         <div>

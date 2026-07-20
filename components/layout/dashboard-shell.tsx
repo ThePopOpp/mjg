@@ -90,12 +90,12 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
           >
             <span className={`relative block h-12 ${collapsed ? "lg:h-9 lg:w-9 w-28" : "w-28"}`}>
               <img
-                src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+                src="/mjg-logos/mjg_black_white.png"
                 alt="MJG"
                 className="h-full w-full object-contain object-left dark:hidden"
               />
               <img
-                src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg"
+                src="/mjg-logos/mjg_white.png"
                 alt="MJG"
                 className="hidden h-full w-full object-contain object-left dark:block"
               />

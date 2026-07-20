@@ -768,7 +768,7 @@ nav { position: sticky; top: 0; z-index: 200; width: 100%; font-family: 'Roboto'
 <nav>
   <div class="nav-inner">
     <a href="https://blueprint.michaeljgauthier.com/" class="nav-logo">
-      <img id="nav-logo-img" src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg" data-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" alt="Michael J. Gauthier" />
+      <img id="nav-logo-img" src="/mjg-logos/mjg_black_white.png" data-light="/mjg-logos/mjg_black_white.png" data-dark="/mjg-logos/mjg_white.png" alt="Michael J. Gauthier" />
       <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
     </a>
     <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open menu" type="button">
@@ -805,7 +805,7 @@ nav { position: sticky; top: 0; z-index: 200; width: 100%; font-family: 'Roboto'
         <input class="ap-vol-slider" id="ap-vol-modal" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" style="--ap-vol-pct:80%" />
         <svg class="ap-vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 5.5h2l4-3v11l-4-3H1V5.5z"/><path d="M11 4.5c1.5 1 2 2 2 3.5s-.5 2.5-2 3.5"/><path d="M13 2c2 1.5 3 3 3 6s-1 4.5-3 6"/></svg>
       </div>
-      <audio class="ap-audio" id="mjg-audio-modal" preload="metadata"><source src="https://michaeljgauthier.com/wp-content/uploads/2026/04/The-Stewardship-Blueprint-Chapters-1-and-2-Summary.wav" type="audio/wav" /></audio>
+      <audio class="ap-audio" id="mjg-audio-modal" preload="metadata"><source src="/media/The-Stewardship-Blueprint-Chapters-1-and-2-Summary.wav" type="audio/wav" /></audio>
     </div>
   </div>
 </div>
@@ -1204,10 +1204,10 @@ footer a { color: var(--text-muted); text-decoration: none; }
   <div class="footer-container">
     <div class="footer-section logo-section">
       <img id="footer-logo" class="footer-logo"
-        src="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
+        src="/mjg-logos/mjg_black_white.png"
         alt="Michael J. Gauthier"
-        data-logo-light="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_Black-1.svg"
-        data-logo-dark="https://michaeljgauthier.com/wp-content/uploads/2025/03/MJG_Logo_White-1.svg" />
+        data-logo-light="/mjg-logos/mjg_black_white.png"
+        data-logo-dark="/mjg-logos/mjg_white.png" />
       <p class="footer-description">Welcome to my personal mission: Encouraging others to use their God given resources for God given purposes</p>
     </div>
     <div class="footer-section">
