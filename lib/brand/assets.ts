@@ -5,8 +5,9 @@
 // Logos are self-hosted at /mjg-logos (public/), NOT WordPress. These URLs are
 // ABSOLUTE because they render in email, where relative paths don't resolve — and
 // PNG because most email clients (Gmail, Outlook) strip SVG. The base tracks the
-// site domain via env, so it follows the primary-domain move automatically.
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://my.michaeljgauthier.com").replace(/\/$/, "");
+// site domain via env (set NEXT_PUBLIC_SITE_URL), defaulting to the primary domain
+// so emails depend only on the app's canonical host — no WordPress, no subdomain.
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://michaeljgauthier.com").replace(/\/$/, "");
 
 export const BRAND_KIT = {
   name: "Michael J. Gauthier",

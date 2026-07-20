@@ -40,9 +40,9 @@ const sampleMergeData: Record<string, string> = {
   check_in_status: "completed",
   survey_status: "sent",
   inner_circle_status: "invited",
-  site_url: "https://my.michaeljgauthier.com",
-  preferences_url: "https://my.michaeljgauthier.com/contact",
-  unsubscribe_url: "https://my.michaeljgauthier.com/contact",
+  site_url: "https://michaeljgauthier.com",
+  preferences_url: "https://michaeljgauthier.com/contact",
+  unsubscribe_url: "https://michaeljgauthier.com/contact",
 };
 
 const categories = [
@@ -982,7 +982,9 @@ function logoPatchForChoice(logoChoice: LogoChoice, blockType: BlockType): Parti
 
 function resolveImageUrl(url: string) {
   if (/^(https?:)?\/\//i.test(url) || url.startsWith("{{")) return url;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://my.michaeljgauthier.com";
+  // Absolutize relative logo/media paths for email (relative URLs don't resolve in
+  // an email client). Tracks the site domain via env; defaults to the primary domain.
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://michaeljgauthier.com";
   return `${siteUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
 }
 
