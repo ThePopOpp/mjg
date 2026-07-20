@@ -395,6 +395,11 @@ function transformStaticHtml(html: string) {
   const siteUrl = publicSiteUrl();
   let output = html
     .replaceAll("https://blueprint.michaeljgauthier.com", siteUrl)
+    // The main/*.html sources hardcode ~72 my.michaeljgauthier.com nav/footer/CTA
+    // links. Rewrite them to the configured site domain so the marketing pages
+    // follow the primary-domain move (via NEXT_PUBLIC_SITE_URL) instead of leaning
+    // on the my. → apex redirect. URL host only, so mailto:/@ addresses are safe.
+    .replaceAll("https://my.michaeljgauthier.com", siteUrl)
     .replace(/https:\/\/michaeljgauthier\.com\/login\/?/g, `${siteUrl}/login`)
     .replace(/https:\/\/michaeljgauthier\.com\/register\/?/g, `${siteUrl}/#join`)
     .replace(
