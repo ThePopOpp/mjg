@@ -77,12 +77,37 @@ export async function POST(request: NextRequest) {
       { onConflict: "participant_id,user_id" },
     );
 
-    await sendWelcomeAccessEmail({
+    // By this point they ARE enrolled — participant, profile, journey events and the
+    // form submission are all written. Letting a mail-provider failure throw here
+    // would hand a fully-enrolled visitor "Something went wrong", and they'd sign up
+    // again (each retry writing another form_submissions row). So the send is
+    // non-fatal — but never silent: a failure raises a dashboard notification, since
+    // the person is left without the credentials the email carries.
+    const welcomeEmail = await sendWelcomeAccessEmail({
       email,
       firstName,
       tempPassword: profileResult.tempPassword,
       existingAccount: profileResult.existingAccount,
+    }).catch((emailError: unknown) => {
+      const reason = emailError instanceof Error ? emailError.message : "Unknown email error.";
+      console.error("[join-journey] welcome email failed", { email, reason });
+      return { failed: true as const, reason };
     });
+
+    if (welcomeEmail && "failed" in welcomeEmail) {
+      await supabase
+        .from("notifications")
+        .insert({
+          participant_id: participant.id,
+          type: "join_the_journey_welcome_email_failed",
+          title: "Welcome email failed to send",
+          message: `${firstName} ${lastName} (${email}) joined The Journey, but the welcome email with their sign-in details could not be sent. Reason: ${welcomeEmail.reason}`,
+          destination: "dashboard",
+          status: "queued",
+          metadata: { email, reason: welcomeEmail.reason },
+        })
+        .then(undefined, () => undefined); // never let the alert itself sink the signup
+    }
 
     await supabase.from("notifications").insert({
       participant_id: participant.id,
@@ -231,7 +256,12 @@ async function ensureParticipantProfile(input: {
       email: input.email,
       password: tempPassword,
       email_confirm: true,
-      phone: input.phone || undefined,
+      // Supabase auth rejects anything that isn't E.164 and fails the WHOLE signup
+      // with a 500 — so a visitor typing "(480) 555-0142" could never join. The
+      // phone is still saved on the participant + profile records regardless; it's
+      // optional here, so anything we can't confidently normalise is simply omitted
+      // rather than allowed to sink the signup.
+      phone: toE164(input.phone),
       user_metadata: {
         first_name: input.firstName,
         last_name: input.lastName,
@@ -340,6 +370,21 @@ function generateTemporaryPassword() {
 
 function stringValue(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+/** Best-effort E.164 for Supabase auth. Returns undefined when unsure — the caller
+ *  treats the phone as optional, so "unsure" must never fail the signup. */
+function toE164(phone?: string) {
+  const raw = (phone ?? "").trim();
+  if (!raw) return undefined;
+
+  const digits = raw.replace(/\D/g, "");
+  // Already international ("+44 20 …"): keep the country code the visitor gave us.
+  if (raw.startsWith("+")) return digits.length >= 8 && digits.length <= 15 ? `+${digits}` : undefined;
+  // Bare NANP number, with or without the country code.
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return undefined;
 }
 
 function labelize(value: string) {
