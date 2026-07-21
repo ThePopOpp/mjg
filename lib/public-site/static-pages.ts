@@ -137,7 +137,7 @@ export function renderSiteHeader(siteUrl: string) {
         <li><a href="${siteUrl}/">Home</a></li>
         <li><a href="${siteUrl}/about">About</a></li>
         <li><a href="${siteUrl}/mission">Mission</a></li>
-        <li><a href="${siteUrl}/#listen">Listen</a></li>
+        <li><a href="${siteUrl}/listen">Listen</a></li>
         <li><a href="${siteUrl}/resources">Resources</a></li>
         <li><a href="${siteUrl}/contact">Contact</a></li>
         <li><a href="${siteUrl}/#join" class="nav-cta">Join the Journey</a></li>

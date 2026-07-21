@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { SendToClaudeButton } from "@/components/dev-requests/send-to-claude-button";
 import { AskStewardButton } from "@/components/ai-agent/ask-steward-button";
+import { ListenOrderPanel } from "@/components/media-studio/listen-order-panel";
 import { cn } from "@/lib/utils";
 
 type AssetType = "audio" | "video" | "photo" | "document";
@@ -47,6 +48,7 @@ function typeIconFor(active: AssetType) {
 const displayTargets = [
   { key: "frontend_home", label: "Frontend home" },
   { key: "frontend_resources", label: "Resources page" },
+  { key: "frontend_listen", label: "Listen page" },
   { key: "user_dashboard_notifications", label: "User dashboard notifications" },
   { key: "user_dashboard_audio", label: "User dashboard audio files" },
   { key: "selected_users", label: "Selected users later" },
@@ -148,11 +150,14 @@ export function MediaStudioDashboard({
 
       {/* Studio content */}
       {subTab === "studio" && active === "audio" && (
-        <AudioStudio
-          actionToken={effectiveActionToken}
-          editTrigger={audioEditTrigger}
-          onPlay={setPlayerAsset}
-        />
+        <>
+          <AudioStudio
+            actionToken={effectiveActionToken}
+            editTrigger={audioEditTrigger}
+            onPlay={setPlayerAsset}
+          />
+          <ListenOrderPanel assets={visibleAssets} actionToken={effectiveActionToken} />
+        </>
       )}
       {subTab === "studio" && active === "document" && (
         <ResourceStudio
@@ -350,6 +355,10 @@ function AudioStudio({
           status: nextStatus,
           visibility,
           metadata: {
+            // saveMediaAsset REPLACES metadata wholesale, so spread the existing
+            // object first — otherwise editing a track here silently wipes the
+            // sort_order set by the Listen-page ordering panel.
+            ...(editingAsset?.metadata ?? {}),
             thumbnail_url: currentThumbnail || null,
             publish_at: publishAt || null,
             display_targets: targets,

@@ -76,6 +76,97 @@ export async function getPublishedAudioForTarget(target: string, limit = 6) {
     .slice(0, limit);
 }
 
+export const LISTEN_TARGET = "frontend_listen";
+
+/** Sort key for a track on the Listen page. Assets with no explicit order sort after
+ *  the ordered ones instead of vanishing or jumping around. */
+export function audioSortOrder(asset: { metadata?: Record<string, any> | null }) {
+  const raw = asset.metadata?.sort_order;
+  const value = typeof raw === "number" ? raw : typeof raw === "string" ? Number(raw) : NaN;
+  return Number.isFinite(value) ? value : Number.MAX_SAFE_INTEGER;
+}
+
+/**
+ * Audio for a display target in deliberate chapter order.
+ *
+ * A sibling of getPublishedAudioForTarget() rather than an extension of it — the
+ * homepage and Resources page rely on that one's newest-first ordering, and an
+ * audiobook needs the opposite: the order a Super Admin arranged in Media Studio.
+ * Ordering lives in metadata.sort_order (jsonb, so no migration); ties and unordered
+ * tracks fall back to created_at ascending, which is stable across reloads.
+ */
+export async function getOrderedAudioForTarget(target: string, limit = 100) {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("media_assets")
+    .select("*")
+    .eq("asset_type", "audio")
+    .eq("status", "published")
+    .not("file_url", "is", null)
+    .order("created_at", { ascending: true })
+    .limit(300);
+
+  if (error) return [];
+
+  return (data ?? [])
+    .filter((asset) => {
+      const targets = Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : [];
+      return targets.includes(target);
+    })
+    .sort((a, b) => audioSortOrder(a) - audioSortOrder(b))
+    .slice(0, limit);
+}
+
+/** Audio assets flagged for a target regardless of status — the Media Studio
+ *  ordering panel needs to show drafts too, or a track disappears while you're
+ *  arranging it. */
+export async function getAudioForTargetIncludingDrafts(target: string) {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("media_assets")
+    .select("*")
+    .eq("asset_type", "audio")
+    .neq("status", "deleted")
+    .order("created_at", { ascending: true })
+    .limit(300);
+
+  if (error) return [];
+
+  return (data ?? [])
+    .filter((asset) => {
+      const targets = Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : [];
+      return targets.includes(target);
+    })
+    .sort((a, b) => audioSortOrder(a) - audioSortOrder(b));
+}
+
+/** Persist a new Listen-page running order. Writes sort_order for EVERY id given so
+ *  the sequence stays dense and stable, and merges into existing metadata so sibling
+ *  keys (display_targets, thumbnail_url) survive. */
+export async function saveAudioSortOrder(orderedIds: string[], actorUserId?: string) {
+  const supabase = createSupabaseAdminClient();
+  if (!orderedIds.length) return { updated: 0 };
+
+  const { data, error } = await supabase.from("media_assets").select("id, metadata").in("id", orderedIds);
+  if (error) throw error;
+
+  const existing = new Map((data ?? []).map((row) => [row.id as string, row.metadata]));
+  let updated = 0;
+
+  for (const [index, id] of orderedIds.entries()) {
+    if (!existing.has(id)) continue;
+    const metadata = { ...(existing.get(id) ?? {}), sort_order: index };
+    const { error: updateError } = await supabase
+      .from("media_assets")
+      .update({ metadata, updated_by: actorUserId ?? null, updated_at: new Date().toISOString() })
+      .eq("id", id);
+    if (updateError) throw updateError;
+    updated += 1;
+  }
+
+  return { updated };
+}
+
 export async function saveMediaAsset(input: MediaAssetInput) {
   const supabase = createSupabaseAdminClient();
   const slug = slugify(input.slug || input.title);
