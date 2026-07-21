@@ -48,12 +48,17 @@ Rules:
 A dedicated, stylized page with a hero and the Join the Movement form, using the
 site nav and footer.
 
-## Route
-`/join-the-movement` — **this route already exists** as
-`app/join-the-movement/route.ts`, which serves the legacy static file
-`main/join-the-movement.html`. Replace it with a proper rendered page (same route),
-or introduce a new route and redirect the old one. Prefer **replacing in place** so
-existing links keep working.
+## Route — `/join-the-movement` (its own standalone page) ✅ decided
+This is a **dedicated page**, not a homepage section or modal — chosen for SEO,
+tracking, and linkability.
+
+The route **already exists** (`app/join-the-movement/route.ts`) serving the legacy
+static file `main/join-the-movement.html`. **Replace it in place at the same URL** —
+keeping `/join-the-movement` preserves any existing indexing and inbound links,
+which is the whole point of giving it its own page. Do not create a second route.
+
+The homepage `#join` section can stay as-is; this page becomes the canonical
+destination worth linking to and tracking.
 
 ## ⚠️ Do NOT build a new form endpoint — one already exists
 
@@ -87,10 +92,15 @@ The legacy `main/join-the-movement.html` used a smaller set (`first_name`,
 `last_name`, `phone`, `email`, `interest`, `consent`) — treat the homepage version
 as the source of truth, and confirm the final field list with the owner.
 
-> `church_name` and `questions` are **not** accepted by `/api/public/join-journey`
-> today. Either extend the endpoint to persist them (they'd land naturally in the
-> `form_submissions` payload) or drop them. **Decide before building** — silently
-> discarding submitted fields is the failure mode to avoid.
+> **`church_name` and `questions` are already saved — no work needed.** The endpoint
+> passes the *entire* raw form body into `form_submissions.payload` (jsonb) via
+> `recordSubmission`, so every submitted field is captured even though only
+> `email / first_name / last_name / phone / hear_about` are mapped to the participant
+> record. Send them along with the rest of the form and they'll persist.
+>
+> Optional, later: "promote" them to structured fields (a participant column or a
+> dashboard column in the submissions view) if the team wants to filter on them.
+> Not required for this build.
 
 ## Page structure
 1. **Hero** — eyebrow, headline, supporting line, and the mission framing
@@ -166,6 +176,35 @@ targets.
    currently points **Listen** at `${siteUrl}/#listen` (a homepage anchor). Change
    it to `${siteUrl}/listen`.
 
+4. **Build track ordering (required)** — see below. An audiobook has a deliberate
+   chapter order; the current default (newest-first) is wrong for this.
+
+## Track ordering — a real feature, not just a sort key ✅ decided
+
+Super Admins must be able to **organize the tracks** — set the order they play in on
+the Listen page.
+
+**Storage:** `media_assets.metadata.sort_order` (a number). Keeps it migration-free
+and consistent with how `display_targets` already works.
+
+**UI (in Media Studio):** the simplest thing that genuinely works — either
+- drag-and-drop reordering of the Listen-page track list, or
+- an explicit "Order" number field per asset.
+
+Drag-and-drop is nicer; **if you build it, hand-roll it with native HTML5 drag
+events** — this repo has no drag library and the Project Manager kanban + Plan
+Builder board both do it natively. Persist the new order for every affected track,
+not just the moved one, so the sequence stays dense and stable.
+
+**Reading:** the Listen page sorts by `metadata.sort_order` ascending, falling back
+to a stable secondary sort (e.g. `created_at`) for tracks with no order set — a
+missing order must never make a track vanish or jump around.
+
+> `getPublishedAudioForTarget()` currently hardcodes `order("updated_at", desc)` and
+> a `limit` of 6. For the Listen page either extend it (an options arg for ordering
+> and limit) or add a sibling function. **Don't change the existing behaviour of the
+> homepage and Resources callers** — they rely on it today.
+
 ## Page design — stylized audio library
 - Hero introducing the book ("coming soon") and what these recordings are.
 - **Track list**, each row: title, description, duration, and a play control.
@@ -196,20 +235,21 @@ descending, which is **not** a sensible chapter order.
 
 ---
 
-## Open decisions — settle these before building
+## Decisions — all settled ✅ (owner, 2026-07-20)
 
-1. **Where do audio files live?**
-   - `public/media/` — simple, but **every file ships inside the Docker image**. The
-     existing 7.7 MB `.wav` already bloats it. Bad for a growing library.
-   - **Supabase storage (`mjg-media` bucket)** — what Media Studio uploads already
-     use, keeps the image small, manageable from the dashboard. **Recommended for an
-     audio library.**
-2. **Track ordering** — explicit `metadata.sort_order`, or newest-first? A book's
-   chapters need deliberate order.
-3. **Join form fields** — is `church_name` / `questions` persisted (extend the
-   endpoint) or dropped?
-4. **Does `/join-the-movement` replace the legacy static page**, or live at a new
-   route with a redirect?
+1. **Audio storage → `public/media/` for now.** The library is intentionally small
+   at launch. Move to Supabase storage (`mjg-media`) when it grows — the Listen page
+   reads `file_url` either way, so that migration is later a URL swap, not a rewrite.
+   - ⚠️ **Keep the files small.** Everything in `public/` ships inside the Docker
+     image on every deploy; the existing 7.7 MB `.wav` already bloats it. Use
+     compressed audio (`.m4a`/`.mp3`), not WAV. If the total climbs past ~50 MB or
+     tracks keep being added, that's the signal to move to storage.
+2. **Track ordering → build the organize feature.** See "Track ordering" above.
+3. **`church_name` / `questions` → already persisted**, no work needed (they land in
+   `form_submissions.payload`). Promoting them to structured fields is optional and
+   out of scope.
+4. **Join the Movement → its own dedicated page** at `/join-the-movement`, replacing
+   the legacy static file in place (SEO, tracking, linkability).
 
 ## Don't
 - Don't build these as React `page.tsx` files (no nav/footer/theme).
