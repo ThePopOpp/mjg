@@ -7,12 +7,12 @@ These Terms of Service (**“Terms”**) govern your access to and use of the we
 
 These Terms apply to:
 
-- [my.michaeljgauthier.com](https://my.michaeljgauthier.com/)
+- [michaeljgauthier.com](https://michaeljgauthier.com/)
 - MJG accounts, dashboards, forms, assessments, resources, and programs
 - SMS, MMS, email, appointment, event, and other communications
 - Any other service that links to these Terms
 
-By accessing or using the services, you agree to these Terms and the [Privacy Policy](https://my.michaeljgauthier.com/privacy-policy/). If you do not agree, do not use the services.
+By accessing or using the services, you agree to these Terms and the [Privacy Policy](https://michaeljgauthier.com/privacy). If you do not agree, do not use the services.
 
 ## 1. Eligibility
 
@@ -123,7 +123,7 @@ Message types may include:
 
 You may enroll through:
 
-[SMS Opt-In](https://my.michaeljgauthier.com/sms/opt-in)
+[SMS Opt-In](https://michaeljgauthier.com/sms/opt-in)
 
 By affirmatively opting in, you authorize MJG and its messaging providers to send SMS or MMS messages to the mobile number you provide, including messages sent using automated technology where permitted by law.
 
@@ -148,17 +148,17 @@ Message and data rates may apply. Your wireless carrier’s terms and charges go
 You may opt out at any time by:
 
 - Replying **STOP** to an MJG text message, or
-- Using the [SMS Opt-Out](https://my.michaeljgauthier.com/sms/opt-out) page
+- Using the [SMS Opt-Out](https://michaeljgauthier.com/sms/opt-out) page
 
 After opting out, you may receive one final confirmation message. No additional SMS program messages will be sent unless you provide new consent.
 
-To re-enroll, use the [SMS Opt-In](https://my.michaeljgauthier.com/sms/opt-in) page or another MJG-approved consent method.
+To re-enroll, use the [SMS Opt-In](https://michaeljgauthier.com/sms/opt-in) page or another MJG-approved consent method.
 
 ### 7.5 Help
 
 Reply **HELP** for assistance. You may also contact MJG through:
 
-[Contact MJG](https://my.michaeljgauthier.com/contact)
+[Contact MJG](https://michaeljgauthier.com/contact)
 
 ### 7.6 Delivery and Carrier Disclaimer
 
@@ -168,7 +168,7 @@ Wireless carriers are not liable for delayed or undelivered messages.
 
 ### 7.7 Privacy
 
-SMS information is handled according to the [Privacy Policy](https://my.michaeljgauthier.com/privacy-policy/).
+SMS information is handled according to the [Privacy Policy](https://michaeljgauthier.com/privacy).
 
 Mobile information and text-message opt-in consent will not be sold or shared with third parties or affiliates for their own marketing or promotional purposes. Information may be processed by carriers, aggregators, messaging providers, and technical vendors solely as necessary to deliver, secure, support, or document MJG communications.
 
@@ -176,11 +176,11 @@ Mobile information and text-message opt-in consent will not be sold or shared wi
 
 You may subscribe to MJG email communications through:
 
-[Email Opt-In](https://my.michaeljgauthier.com/email/opt-in)
+[Email Opt-In](https://michaeljgauthier.com/email/opt-in)
 
 You may unsubscribe through:
 
-[Email Opt-Out](https://my.michaeljgauthier.com/email/opt-out)
+[Email Opt-Out](https://michaeljgauthier.com/email/opt-out)
 
 You may also use the unsubscribe link included in an email.
 
@@ -279,7 +279,7 @@ Unless applicable law requires otherwise, any legal action arising from or relat
 
 We may revise these Terms periodically. The updated Terms will be posted at:
 
-[Terms of Service](https://my.michaeljgauthier.com/terms-of-service/)
+[Terms of Service](https://michaeljgauthier.com/terms)
 
 The “Last Updated” date will identify the latest revision. Material changes may also be communicated through the website, dashboard, email, or another appropriate method.
 
@@ -311,7 +311,7 @@ Section headings are provided for convenience and do not affect interpretation.
 
 Questions regarding these Terms may be submitted through:
 
-[Contact MJG](https://my.michaeljgauthier.com/contact)
+[Contact MJG](https://michaeljgauthier.com/contact)
 
 **Michael J. Gauthier**  
 2330 W Ray Rd, Suite 3  

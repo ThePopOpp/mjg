@@ -5,7 +5,7 @@
 
 Michael J. Gauthier and the “Created for More” and “The Stewardship Blueprint” programs (collectively, **“MJG,” “we,” “us,” or “our”**) respect your privacy. This Privacy Policy explains how we collect, use, disclose, retain, and protect information when you visit or use:
 
-- [my.michaeljgauthier.com](https://my.michaeljgauthier.com/)
+- [michaeljgauthier.com](https://michaeljgauthier.com/)
 - The MJG website, dashboard, forms, resources, and related online services
 - Our SMS, MMS, email, event, appointment, and other communications
 - Any other service that links to this Privacy Policy
@@ -82,11 +82,11 @@ MJG offers an optional SMS program known as **Created for More — SMS Updates**
 
 You may opt in at:
 
-[SMS Opt-In](https://my.michaeljgauthier.com/sms/opt-in)
+[SMS Opt-In](https://michaeljgauthier.com/sms/opt-in)
 
 You may opt out at:
 
-[SMS Opt-Out](https://my.michaeljgauthier.com/sms/opt-out)
+[SMS Opt-Out](https://michaeljgauthier.com/sms/opt-out)
 
 You may also reply **STOP** to a message to unsubscribe or reply **HELP** for assistance. Message frequency varies and is generally limited to a few messages per month. Message and data rates may apply.
 
@@ -104,11 +104,11 @@ After an SMS opt-out request, we may send one final confirmation message. We wil
 
 You may subscribe to MJG email communications at:
 
-[Email Opt-In](https://my.michaeljgauthier.com/email/opt-in)
+[Email Opt-In](https://michaeljgauthier.com/email/opt-in)
 
 You may unsubscribe at:
 
-[Email Opt-Out](https://my.michaeljgauthier.com/email/opt-out)
+[Email Opt-Out](https://michaeljgauthier.com/email/opt-out)
 
 You may also unsubscribe through the link included in an email. We may continue to send non-promotional communications that are necessary to administer an account, respond to a request, provide a requested service, deliver security notices, or satisfy legal obligations.
 
@@ -199,7 +199,7 @@ Depending on where you live, you may have rights regarding your personal informa
 
 To submit a privacy request, use the contact form at:
 
-[Contact MJG](https://my.michaeljgauthier.com/contact)
+[Contact MJG](https://michaeljgauthier.com/contact)
 
 We may need to verify your identity before completing a request. Authorized agents may be required to provide proof of authority. We will not unlawfully discriminate against you for exercising applicable privacy rights.
 
@@ -229,7 +229,7 @@ MJG operates from the United States. If you access the services from another cou
 
 We may update this Privacy Policy periodically. We will post the revised version at:
 
-[Privacy Policy](https://my.michaeljgauthier.com/privacy-policy/)
+[Privacy Policy](https://michaeljgauthier.com/privacy)
 
 The “Last Updated” date will indicate when the policy was most recently revised. Material changes may also be communicated through the website, dashboard, email, or another appropriate method.
 
@@ -237,7 +237,7 @@ The “Last Updated” date will indicate when the policy was most recently revi
 
 Questions or requests regarding this Privacy Policy may be submitted through:
 
-[Contact MJG](https://my.michaeljgauthier.com/contact)
+[Contact MJG](https://michaeljgauthier.com/contact)
 
 **Michael J. Gauthier**  
 2330 W Ray Rd, Suite 3  
