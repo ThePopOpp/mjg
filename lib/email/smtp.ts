@@ -38,11 +38,21 @@ export function hasSmtpConfig() {
 
 async function sendViaResend(input: SendEmailInput): Promise<SmtpResult> {
   const apiKey = process.env.RESEND_API_KEY!;
-  const from =
-    process.env.RESEND_FROM_EMAIL ??
-    process.env.NOTIFICATION_FROM_EMAIL ??
-    "noreply@my.michaeljgauthier.com";
-  const replyTo = input.replyTo ?? process.env.RESEND_REPLY_TO ?? from;
+
+  // All outbound mail goes out as hello@michaeljgauthier.com. This used to fall back
+  // to NOTIFICATION_FROM_EMAIL and then a hardcoded my.michaeljgauthier.com address,
+  // which meant a missing or misspelled RESEND_FROM_EMAIL didn't fail — it silently
+  // sent under a different identity, from a domain that isn't even verified in
+  // Resend. A misconfigured sender is worse than a bounced send, so refuse instead.
+  // Trimmed and emptiness-checked because ?? alone treats "" as a real value.
+  const from = (process.env.RESEND_FROM_EMAIL ?? "").trim();
+  if (!from) {
+    throw new Error(
+      "RESEND_FROM_EMAIL is not set. Refusing to send under a fallback identity — set it to hello@michaeljgauthier.com.",
+    );
+  }
+
+  const replyTo = input.replyTo?.trim() || process.env.RESEND_REPLY_TO?.trim() || from;
 
   const body: Record<string, unknown> = {
     from,
