@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { computeStepDate, defaultStepOffsets } from "@/lib/experiences/schedule";
@@ -272,7 +273,7 @@ export function ExperienceWizard({
               </div>
               <div className="w-40 space-y-1.5">
                 <Label>Start time</Label>
-                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                <TimePicker value={startTime} onChange={setStartTime} />
                 <p className="text-xs text-muted-foreground">The first email goes out then.</p>
               </div>
             </div>
