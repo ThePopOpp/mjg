@@ -7,7 +7,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { getExperienceById } from "@/lib/experiences/repository";
-import { FREQUENCY_LABELS } from "@/lib/experiences/types";
+import { FREQUENCY_LABELS, OFFSET_UNIT_LABELS } from "@/lib/experiences/types";
+
+function cadenceLabel(exp: any) {
+  if (exp.frequency === "custom" && exp.custom_interval_value && exp.custom_interval_unit) {
+    return `Every ${exp.custom_interval_value} ${OFFSET_UNIT_LABELS[exp.custom_interval_unit as keyof typeof OFFSET_UNIT_LABELS].toLowerCase()}`;
+  }
+  return FREQUENCY_LABELS[exp.frequency as keyof typeof FREQUENCY_LABELS] ?? exp.frequency;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +55,7 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
       <SectionHeader
         eyebrow={experience.experience_types?.name ?? "Experience"}
         title={experience.name}
-        description={`${FREQUENCY_LABELS[experience.frequency as "weekly" | "biweekly"]} · ${experience.duration_weeks} weeks · starts ${new Date(`${experience.start_date}T00:00:00Z`).toLocaleDateString([], { timeZone: "UTC", dateStyle: "medium" })}`}
+        description={`${cadenceLabel(experience)} · ${experience.duration_weeks} steps · starts ${new Date(`${experience.start_date}T00:00:00Z`).toLocaleDateString([], { timeZone: "UTC", dateStyle: "medium" })} ${(experience.start_time ?? "").slice(0, 5)}`}
       />
 
       <div className="grid gap-4 md:grid-cols-4">

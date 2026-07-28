@@ -1,16 +1,29 @@
-export type ExperienceFrequency = "weekly" | "biweekly";
+export type ExperienceFrequency = "weekly" | "biweekly" | "custom";
+export type OffsetUnit = "minute" | "hour" | "day" | "week" | "month";
 export type ExperienceStatus = "draft" | "scheduled" | "active" | "completed" | "cancelled";
 export type SendEventStatus = "scheduled" | "sent" | "skipped" | "failed";
 
 export const FREQUENCY_LABELS: Record<ExperienceFrequency, string> = {
   weekly: "Weekly",
   biweekly: "Bi-Weekly (2 weeks)",
+  custom: "Custom",
 };
 
-export const FREQUENCY_INTERVAL_DAYS: Record<ExperienceFrequency, number> = {
-  weekly: 7,
-  biweekly: 14,
+// Base interval (in the given unit) between consecutive steps for the preset cadences.
+export const PRESET_CADENCE: Record<"weekly" | "biweekly", { value: number; unit: OffsetUnit }> = {
+  weekly: { value: 1, unit: "week" },
+  biweekly: { value: 2, unit: "week" },
 };
+
+export const OFFSET_UNIT_LABELS: Record<OffsetUnit, string> = {
+  minute: "Minutes",
+  hour: "Hours",
+  day: "Days",
+  week: "Weeks",
+  month: "Months",
+};
+
+export const OFFSET_UNITS: OffsetUnit[] = ["minute", "hour", "day", "week", "month"];
 
 export type ExperienceType = {
   id: string;
@@ -19,6 +32,7 @@ export type ExperienceType = {
   description: string | null;
   default_frequency: ExperienceFrequency;
   default_duration_weeks: number;
+  category: string | null;
   status: "active" | "archived";
   created_at: string;
   updated_at: string;
@@ -43,17 +57,14 @@ export type ExperienceAttendee = {
   created_at: string;
 };
 
-export type ExperienceSendEvent = {
+export type ExperienceStep = {
   id: string;
   experience_id: string;
-  attendee_id: string;
   step_number: number;
-  template_id: string | null;
-  subject: string | null;
-  status: SendEventStatus;
-  scheduled_at: string;
-  sent_at: string | null;
-  error_message: string | null;
+  label: string | null;
+  email_template_id: string | null;
+  offset_value: number;
+  offset_unit: OffsetUnit;
 };
 
 export type Experience = {
@@ -62,7 +73,10 @@ export type Experience = {
   name: string;
   facilitator_id: string | null;
   start_date: string;
+  start_time: string;
   frequency: ExperienceFrequency;
+  custom_interval_value: number | null;
+  custom_interval_unit: OffsetUnit | null;
   duration_weeks: number;
   status: ExperienceStatus;
   created_by: string | null;
@@ -70,14 +84,27 @@ export type Experience = {
   updated_at: string;
 };
 
-// Payload the create wizard submits.
+// ── Wizard payload ─────────────────────────────────────────────────────────────
 export type AttendeeInput = { name?: string | null; email: string };
+
+// One row of the Selections repeater: a template + when it goes out (offset from start).
+export type WizardStepInput = {
+  emailTemplateId?: string | null;
+  offsetValue: number;
+  offsetUnit: OffsetUnit;
+  label?: string | null;
+};
+
 export type CreateExperienceInput = {
-  experienceTypeId: string;
+  experienceTypeId?: string | null; // null for a custom "New Experience"
   name?: string;
   startDate: string; // yyyy-mm-dd
+  startTime?: string; // HH:MM (24h)
   frequency: ExperienceFrequency;
-  durationWeeks: number;
+  customIntervalValue?: number | null;
+  customIntervalUnit?: OffsetUnit | null;
+  durationWeeks: number; // number of steps
   facilitatorId?: string | null;
   attendees: AttendeeInput[];
+  steps: WizardStepInput[];
 };

@@ -1,33 +1,54 @@
-import { FREQUENCY_INTERVAL_DAYS, type ExperienceFrequency } from "./types";
+import { PRESET_CADENCE, type ExperienceFrequency, type OffsetUnit } from "./types";
 
-/**
- * Compute the send date for a given step of an experience.
- * Step 1 goes out on the start date; each later step is spaced by the cadence
- * interval (7 days weekly, 14 days bi-weekly).
- *
- * The start date is a calendar date (yyyy-mm-dd); we anchor sends at that local
- * date. We build the timestamp in UTC to keep the computation deterministic and
- * free of the host's timezone (the scheduler only compares scheduled_at <= now).
- */
-export function computeStepDate(startDate: string, frequency: ExperienceFrequency, stepNumber: number): Date {
-  const base = new Date(`${startDate}T09:00:00.000Z`); // 09:00 UTC on the start date
-  const offsetDays = (stepNumber - 1) * FREQUENCY_INTERVAL_DAYS[frequency];
-  base.setUTCDate(base.getUTCDate() + offsetDays);
-  return base;
+const MS: Record<Exclude<OffsetUnit, "month">, number> = {
+  minute: 60_000,
+  hour: 3_600_000,
+  day: 86_400_000,
+  week: 604_800_000,
+};
+
+/** The experience anchor time = start date + start time, interpreted as UTC. */
+export function startAnchor(startDate: string, startTime = "09:00"): Date {
+  const time = /^\d{2}:\d{2}(:\d{2})?$/.test(startTime) ? startTime : "09:00";
+  const hms = time.length === 5 ? `${time}:00` : time;
+  return new Date(`${startDate}T${hms}.000Z`);
+}
+
+/** Add an offset (value + unit) to a base date. Months are calendar months; others are fixed. */
+export function addOffset(base: Date, value: number, unit: OffsetUnit): Date {
+  const d = new Date(base);
+  if (unit === "month") {
+    d.setUTCMonth(d.getUTCMonth() + value);
+    return d;
+  }
+  return new Date(d.getTime() + value * MS[unit]);
+}
+
+/** Scheduled send time for a step given its offset from the experience start. */
+export function computeStepDate(
+  startDate: string,
+  startTime: string,
+  offsetValue: number,
+  offsetUnit: OffsetUnit,
+): Date {
+  return addOffset(startAnchor(startDate, startTime), offsetValue, offsetUnit);
 }
 
 /**
- * Build the full schedule for an experience: one entry per step.
- * `steps` is 1..durationWeeks — the number of weekly/bi-weekly touchpoints.
+ * Default per-step offsets for a cadence, used to pre-fill the Selections repeater.
+ * Step 1 is always offset 0 (goes out at the start); each later step adds one interval.
  */
-export function computeSchedule(
-  startDate: string,
+export function defaultStepOffsets(
   frequency: ExperienceFrequency,
   stepCount: number,
-): { stepNumber: number; scheduledAt: Date }[] {
-  const schedule: { stepNumber: number; scheduledAt: Date }[] = [];
-  for (let step = 1; step <= stepCount; step++) {
-    schedule.push({ stepNumber: step, scheduledAt: computeStepDate(startDate, frequency, step) });
-  }
-  return schedule;
+  custom?: { value: number; unit: OffsetUnit } | null,
+): { offsetValue: number; offsetUnit: OffsetUnit }[] {
+  const interval =
+    frequency === "custom" && custom
+      ? custom
+      : PRESET_CADENCE[frequency === "biweekly" ? "biweekly" : "weekly"];
+  return Array.from({ length: Math.max(0, stepCount) }, (_, i) => ({
+    offsetValue: i * interval.value,
+    offsetUnit: interval.unit,
+  }));
 }

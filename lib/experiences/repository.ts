@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { upsertParticipant } from "@/lib/pilot/repository";
+import { sendTemplateEmail } from "@/lib/email/templates";
 import { computeStepDate } from "./schedule";
 import type {
   CreateExperienceInput,
@@ -7,6 +8,8 @@ import type {
   ExperienceFrequency,
   ExperienceType,
   ExperienceTypeStep,
+  OffsetUnit,
+  WizardStepInput,
 } from "./types";
 
 function splitName(name?: string | null): { firstName: string; lastName: string } {
@@ -126,18 +129,26 @@ export async function getExperienceById(id: string) {
 
 export async function createExperience(input: CreateExperienceInput, actorUserId?: string | null): Promise<Experience> {
   const supabase = createSupabaseAdminClient();
-  const type = (await supabase.from("experience_types").select("*").eq("id", input.experienceTypeId).maybeSingle()).data as ExperienceType | null;
-  if (!type) throw new Error("Experience type not found.");
 
-  const name = input.name?.trim() || `${type.name} — ${input.startDate}`;
+  // Type is optional — a custom "New Experience" carries just a name.
+  let type: ExperienceType | null = null;
+  if (input.experienceTypeId) {
+    type = (await supabase.from("experience_types").select("*").eq("id", input.experienceTypeId).maybeSingle()).data as ExperienceType | null;
+  }
+  const name = input.name?.trim() || (type ? `${type.name} — ${input.startDate}` : "");
+  if (!name) throw new Error("Give the experience a name.");
+
   const { data: experience, error } = await supabase
     .from("experiences")
     .insert({
-      experience_type_id: type.id,
+      experience_type_id: type?.id ?? null,
       name,
       facilitator_id: input.facilitatorId || null,
       start_date: input.startDate,
+      start_time: input.startTime || "09:00",
       frequency: input.frequency,
+      custom_interval_value: input.frequency === "custom" ? input.customIntervalValue ?? null : null,
+      custom_interval_unit: input.frequency === "custom" ? input.customIntervalUnit ?? null : null,
       duration_weeks: input.durationWeeks,
       status: "draft",
       created_by: actorUserId || null,
@@ -157,7 +168,50 @@ export async function createExperience(input: CreateExperienceInput, actorUserId
     if (attErr) throw attErr;
   }
 
+  // Insert the per-experience email sequence (the Selections repeater).
+  const stepRows = (input.steps ?? []).map((s, i) => ({
+    experience_id: experience.id,
+    step_number: i + 1,
+    label: s.label?.trim() || null,
+    email_template_id: s.emailTemplateId || null,
+    offset_value: Math.max(0, Math.floor(Number(s.offsetValue) || 0)),
+    offset_unit: s.offsetUnit,
+  }));
+  if (stepRows.length) {
+    const { error: stepErr } = await supabase.from("experience_steps").insert(stepRows);
+    if (stepErr) throw stepErr;
+  }
+
   return experience as Experience;
+}
+
+/** Instant test: render each configured step's template and email it to a test address now. */
+export async function testExperience(
+  input: { steps: WizardStepInput[]; testEmail: string; name?: string },
+  actorUserId?: string | null,
+) {
+  const email = input.testEmail.trim().toLowerCase();
+  if (!email.includes("@")) throw new Error("A valid test email is required.");
+  const steps = (input.steps ?? []).filter((s) => s.emailTemplateId);
+  if (!steps.length) throw new Error("Add at least one step with an email template to test.");
+
+  let sent = 0;
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i];
+    await sendTemplateEmail({
+      templateId: step.emailTemplateId as string,
+      actorUserId: actorUserId ?? undefined,
+      recipient: {
+        email,
+        merge_data: {
+          experience_name: input.name ?? "Test Experience",
+          session_number: String(i + 1),
+        },
+      },
+    });
+    sent++;
+  }
+  return { sent };
 }
 
 /**
@@ -172,20 +226,19 @@ export async function sendExperience(experienceId: string, actorUserId?: string 
   const { data: experience, error: expErr } = await supabase.from("experiences").select("*").eq("id", experienceId).maybeSingle();
   if (expErr) throw expErr;
   if (!experience) throw new Error("Experience not found.");
-  if (!experience.experience_type_id) throw new Error("Experience has no type.");
 
   const { data: attendees, error: attErr } = await supabase.from("experience_attendees").select("*").eq("experience_id", experienceId);
   if (attErr) throw attErr;
   if (!attendees?.length) throw new Error("Add at least one attendee before sending.");
 
-  // Step → template map for this experience's type.
+  // Per-experience email sequence (the Selections repeater) drives the schedule.
   const { data: steps, error: stepsErr } = await supabase
-    .from("experience_type_steps")
-    .select("step_number,email_template_id,subject_override")
-    .eq("experience_type_id", experience.experience_type_id);
+    .from("experience_steps")
+    .select("step_number,email_template_id,offset_value,offset_unit")
+    .eq("experience_id", experienceId)
+    .order("step_number", { ascending: true });
   if (stepsErr) throw stepsErr;
-  const stepMap = new Map<number, { template_id: string | null; subject: string | null }>();
-  for (const s of steps ?? []) stepMap.set(s.step_number, { template_id: s.email_template_id, subject: s.subject_override });
+  if (!steps?.length) throw new Error("Configure at least one step before sending.");
 
   // 1) Upsert every attendee as a participant, capturing the participant_id.
   const participantIds: string[] = [];
@@ -234,20 +287,19 @@ export async function sendExperience(experienceId: string, actorUserId?: string 
   }
 
   // 3) Generate scheduled send events (one per attendee × per step), idempotently.
-  const frequency = experience.frequency as ExperienceFrequency;
-  const stepCount = experience.duration_weeks as number;
+  const startDate = experience.start_date as string;
+  const startTime = (experience.start_time as string) || "09:00";
   const eventRows: any[] = [];
   for (const attendee of attendees) {
-    for (let step = 1; step <= stepCount; step++) {
-      const mapped = stepMap.get(step) ?? { template_id: null, subject: null };
+    for (const step of steps) {
       eventRows.push({
         experience_id: experienceId,
         attendee_id: attendee.id,
-        step_number: step,
-        template_id: mapped.template_id,
-        subject: mapped.subject,
+        step_number: step.step_number,
+        template_id: step.email_template_id,
+        subject: null,
         status: "scheduled",
-        scheduled_at: computeStepDate(experience.start_date, frequency, step).toISOString(),
+        scheduled_at: computeStepDate(startDate, startTime, step.offset_value, step.offset_unit as OffsetUnit).toISOString(),
       });
     }
   }
