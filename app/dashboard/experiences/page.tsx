@@ -15,7 +15,7 @@ export default async function ExperiencesPage() {
   if (!profile) redirect("/login?next=/dashboard/experiences");
   if (!can(profile.role, PERMISSIONS.MANAGE_EXPERIENCES)) redirect("/access-restricted");
 
-  const { experiences } = await getExperiencesData();
+  const { experiences, emailEvents } = await getExperiencesData();
 
   return (
     <div className="space-y-6">
@@ -33,7 +33,7 @@ export default async function ExperiencesPage() {
           </Link>
         </div>
       </div>
-      <ExperiencesList experiences={experiences} />
+      <ExperiencesList experiences={experiences} emailEvents={emailEvents} />
     </div>
   );
 }

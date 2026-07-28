@@ -8,6 +8,7 @@ import type {
   ExperienceFrequency,
   ExperienceType,
   ExperienceTypeStep,
+  EmailEvent,
   OffsetUnit,
   WizardStepInput,
 } from "./types";
@@ -98,9 +99,35 @@ export async function getExperiencesData() {
     for (const row of attendees ?? []) counts[row.experience_id] = (counts[row.experience_id] ?? 0) + 1;
   }
 
-  return {
-    experiences: (experiences ?? []).map((e: any) => ({ ...e, attendee_count: counts[e.id] ?? 0 })),
-  };
+  const expList = (experiences ?? []).map((e: any) => ({ ...e, attendee_count: counts[e.id] ?? 0 }));
+
+  // Every scheduled email, computed from each experience's step offsets (works for
+  // drafts too — no need for send events to exist). One entry per experience × step.
+  const expById = new Map<string, any>(expList.map((e: any) => [e.id, e]));
+  const emailEvents: EmailEvent[] = [];
+  if (ids.length) {
+    const { data: steps } = await supabase
+      .from("experience_steps")
+      .select("id,experience_id,step_number,offset_value,offset_unit, email_templates(name)")
+      .in("experience_id", ids)
+      .order("step_number", { ascending: true });
+    for (const s of steps ?? []) {
+      const exp = expById.get((s as any).experience_id);
+      if (!exp) continue;
+      const when = computeStepDate(exp.start_date, exp.start_time || "09:00", (s as any).offset_value, (s as any).offset_unit as OffsetUnit);
+      emailEvents.push({
+        id: (s as any).id,
+        experienceId: exp.id,
+        experienceName: exp.name,
+        stepNumber: (s as any).step_number,
+        templateName: (s as any).email_templates?.name ?? null,
+        scheduledAt: when.toISOString(),
+        recipients: exp.attendee_count,
+      });
+    }
+  }
+
+  return { experiences: expList, emailEvents };
 }
 
 export async function getExperienceById(id: string) {

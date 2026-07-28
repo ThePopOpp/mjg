@@ -84,6 +84,17 @@ export type Experience = {
   updated_at: string;
 };
 
+// One scheduled email on the admin calendar (one per experience × step).
+export type EmailEvent = {
+  id: string;
+  experienceId: string;
+  experienceName: string;
+  stepNumber: number;
+  templateName: string | null;
+  scheduledAt: string;
+  recipients: number;
+};
+
 // ── Wizard payload ─────────────────────────────────────────────────────────────
 export type AttendeeInput = { name?: string | null; email: string };
 
