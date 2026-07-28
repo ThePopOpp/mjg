@@ -10,8 +10,16 @@ import { getCurrentProfile } from "@/lib/auth/server";
 import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
 import { MyTasksCard } from "@/components/dashboard/my-tasks-card";
+import { FacilitatorDashboard } from "@/components/facilitator/facilitator-dashboard";
+import { ROLES } from "@/lib/rbac/roles";
 
 export default async function DashboardPage() {
+  const profileForRole = await getCurrentProfile();
+  // Facilitators get a scoped dashboard rather than the admin overview.
+  if (profileForRole?.role === ROLES.FACILITATOR) {
+    return <FacilitatorDashboard profile={profileForRole} />;
+  }
+
   const [data, profile] = await Promise.all([getPilotDashboardData(), getCurrentProfile()]);
   const pilotMetrics = getPilotMetrics(data);
   const myTasks = profile

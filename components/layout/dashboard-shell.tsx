@@ -7,11 +7,11 @@ import { ChevronDown, LogOut, Menu, Search, PanelLeft, X, MessageSquareText } fr
 import { DashboardActionTokenProvider } from "@/components/layout/dashboard-action-token";
 import { DmUnreadProvider, useDmUnread } from "@/components/direct-messages/dm-unread";
 import { InstallAppButton } from "@/components/pwa/install-app-button";
-import { dashboardNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
+import { dashboardNav, facilitatorNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { ROLE_LABELS } from "@/lib/rbac/roles";
+import { ROLES, ROLE_LABELS } from "@/lib/rbac/roles";
 import { can } from "@/lib/rbac/permissions";
 import { cn } from "@/lib/utils";
 import type { DashboardProfile } from "@/lib/auth/server";
@@ -28,8 +28,11 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
   const displayName = `${profile.firstName} ${profile.lastName}`.trim() || profile.email;
   const pathname = usePathname();
 
+  // Facilitators get their own scoped sidebar; everyone else gets the admin nav.
+  const navForRole = profile.role === ROLES.FACILITATOR ? facilitatorNav : dashboardNav;
+
   // Permission-filter: drop items the role can't see; drop now-empty groups.
-  const visibleEntries: NavEntry[] = dashboardNav
+  const visibleEntries: NavEntry[] = navForRole
     .map((entry): NavEntry | null => {
       if (entry.kind === "group") {
         const items = entry.items.filter((it) => !it.permission || can(profile.role, it.permission));

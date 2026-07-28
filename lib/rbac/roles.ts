@@ -2,6 +2,7 @@ export const ROLES = {
   SUPER_ADMIN: "super_admin",
   ADMIN: "admin",
   TEAM_MEMBER: "team_member",
+  FACILITATOR: "facilitator",
   CONTENT_REVIEWER: "content_reviewer",
   PASTOR_ELDER_REVIEWER: "pastor_elder_reviewer",
   PARTICIPANT: "participant",
@@ -13,6 +14,7 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   [ROLES.SUPER_ADMIN]: "Super Admin",
   [ROLES.ADMIN]: "Admin",
   [ROLES.TEAM_MEMBER]: "Team Member",
+  [ROLES.FACILITATOR]: "Facilitator",
   [ROLES.CONTENT_REVIEWER]: "Content Reviewer",
   [ROLES.PASTOR_ELDER_REVIEWER]: "Pastor/Elder Reviewer",
   [ROLES.PARTICIPANT]: "Participant",
@@ -22,6 +24,7 @@ export const DASHBOARD_ROLES = [
   ROLES.SUPER_ADMIN,
   ROLES.ADMIN,
   ROLES.TEAM_MEMBER,
+  ROLES.FACILITATOR,
   ROLES.CONTENT_REVIEWER,
   ROLES.PASTOR_ELDER_REVIEWER,
 ] as const satisfies readonly AppRole[];

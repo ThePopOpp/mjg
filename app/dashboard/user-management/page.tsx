@@ -21,6 +21,7 @@ export default async function UserManagementPage() {
     { label: "Participants", value: roleCount(ROLES.PARTICIPANT) },
     { label: "Pastor/Elders", value: roleCount(ROLES.PASTOR_ELDER_REVIEWER) },
     { label: "Team Members (Team Leaders)", value: roleCount(ROLES.TEAM_MEMBER) },
+    { label: "Facilitators", value: roleCount(ROLES.FACILITATOR) },
     { label: "Content Reviewers", value: roleCount(ROLES.CONTENT_REVIEWER) },
   ];
 

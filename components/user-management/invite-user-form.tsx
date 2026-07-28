@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ROLE_LABELS, ROLES, type AppRole } from "@/lib/rbac/roles";
 
-const baseInviteRoles = [ROLES.ADMIN, ROLES.TEAM_MEMBER, ROLES.CONTENT_REVIEWER, ROLES.PASTOR_ELDER_REVIEWER, ROLES.PARTICIPANT];
+const baseInviteRoles = [ROLES.ADMIN, ROLES.TEAM_MEMBER, ROLES.FACILITATOR, ROLES.CONTENT_REVIEWER, ROLES.PASTOR_ELDER_REVIEWER, ROLES.PARTICIPANT];
 
 export function InviteUserForm({ currentUserRole }: { currentUserRole?: AppRole }) {
   const router = useRouter();

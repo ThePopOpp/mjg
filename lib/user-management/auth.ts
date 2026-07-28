@@ -73,6 +73,43 @@ export async function requireAdminManager(request?: Request, actionToken?: strin
   return { ...profile, role };
 }
 
+// Build & send Experiences — admin-driven program builder. Super Admin / Admin only.
+export async function requireExperienceManager(request?: Request, actionToken?: string | null) {
+  const { user } = await getAuthenticatedUser(request, actionToken);
+
+  const { profile, error } = await getProfileForAuthUser(user);
+
+  if (error) throw error;
+  const role = normalizeResolvedRole(profile, user.email);
+  if (!profile || profile.status !== "active") {
+    throw new Error("Active admin profile required.");
+  }
+  if (!(role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN)) {
+    throw new Error("Experience management permission required.");
+  }
+
+  return { ...profile, role };
+}
+
+// Facilitator surfaces (My Team, add/notify participant). Facilitators plus admins,
+// who may also operate. Team operations are scoped to the actor's own teams downstream.
+export async function requireFacilitator(request?: Request, actionToken?: string | null) {
+  const { user } = await getAuthenticatedUser(request, actionToken);
+
+  const { profile, error } = await getProfileForAuthUser(user);
+
+  if (error) throw error;
+  const role = normalizeResolvedRole(profile, user.email);
+  if (!profile || profile.status !== "active") {
+    throw new Error("Active profile required.");
+  }
+  if (!(role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN || role === ROLES.FACILITATOR)) {
+    throw new Error("Facilitator permission required.");
+  }
+
+  return { ...profile, role };
+}
+
 export async function requireSuperAdmin(request?: Request, actionToken?: string | null) {
   const { user } = await getAuthenticatedUser(request, actionToken);
 

@@ -22,6 +22,7 @@ import {
   Phone,
   Settings,
   Share2,
+  Sparkles,
   Users,
   UsersRound,
   UserCircle,
@@ -62,6 +63,7 @@ export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/project-manager", label: "Project Manager", icon: FolderKanban },
   { kind: "item", href: "/dashboard/plans", label: "Plans", icon: ClipboardList },
   { kind: "item", href: "/dashboard/bookings", label: "Bookings & Events", icon: CalendarClock },
+  { kind: "item", href: "/dashboard/experiences", label: "Experiences", icon: Sparkles, permission: PERMISSIONS.MANAGE_EXPERIENCES },
   { kind: "item", href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
@@ -70,4 +72,13 @@ export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/guide", label: "Team Guide", icon: BookOpen },
   { kind: "item", href: "/dashboard/settings", label: "Settings", icon: Settings, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/user-management", label: "User Management", icon: BarChart3, permission: PERMISSIONS.MANAGE_USERS },
+];
+
+// Facilitators get a dedicated, scoped sidebar (not the admin nav). Phase 2 ships the
+// core: Dashboard, My Team, Direct Messages. Downloads / Experiences (receive views) /
+// In The News / My Profile / Settings arrive in Phase 3.
+export const facilitatorNav: NavEntry[] = [
+  { kind: "item", href: "/dashboard", label: "Dashboard", icon: Home },
+  { kind: "item", href: "/dashboard/team", label: "My Team", icon: UsersRound },
+  { kind: "item", href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },
 ];
