@@ -137,6 +137,51 @@ export async function addTeamParticipant(
   return participant;
 }
 
+/** Team participant ids across all teams this facilitator leads. */
+async function teamParticipantIds(profileId: string): Promise<string[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data: teams } = await supabase.from("facilitator_teams").select("id").eq("facilitator_id", profileId);
+  const teamIds = (teams ?? []).map((t: any) => t.id);
+  if (!teamIds.length) return [];
+  const { data: members } = await supabase.from("facilitator_team_members").select("participant_id").in("team_id", teamIds);
+  return Array.from(new Set((members ?? []).map((m: any) => m.participant_id)));
+}
+
+/** Team-scoped check-in results, survey responses, and form-submission history. */
+export async function getTeamResults(profileId: string) {
+  const supabase = createSupabaseAdminClient();
+  const ids = await teamParticipantIds(profileId);
+  if (!ids.length) return { checkIns: [], surveys: [], submissions: [] };
+
+  const [checkIns, surveys, submissions] = await Promise.all([
+    supabase
+      .from("check_in_results")
+      .select("*, participants(first_name,last_name,email,wave,participant_type)")
+      .in("participant_id", ids)
+      .order("created_at", { ascending: false })
+      .limit(200),
+    supabase
+      .from("survey_responses")
+      .select("*, participants(first_name,last_name,email,wave,source,participant_type)")
+      .in("participant_id", ids)
+      .order("created_at", { ascending: false })
+      .limit(200),
+    supabase
+      .from("form_submissions")
+      .select("id,form_type,email,participant_id,status,created_at, participants(first_name,last_name)")
+      .in("participant_id", ids)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(200),
+  ]);
+
+  return {
+    checkIns: checkIns.data ?? [],
+    surveys: surveys.data ?? [],
+    submissions: submissions.data ?? [],
+  };
+}
+
 /** Is this participant on one of the facilitator's teams? (authorization for notify) */
 export async function participantOnFacilitatorTeam(profileId: string, participantId: string): Promise<boolean> {
   const supabase = createSupabaseAdminClient();
