@@ -7,11 +7,12 @@ import { getAllTypesWithSteps, getEmailTemplateOptions, getFacilitators } from "
 
 export const dynamic = "force-dynamic";
 
-export default async function NewExperiencePage() {
+export default async function NewExperiencePage({ searchParams }: { searchParams: Promise<{ preview?: string }> }) {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login?next=/dashboard/experiences/new");
   if (!can(profile.role, PERMISSIONS.MANAGE_EXPERIENCES)) redirect("/access-restricted");
 
+  const { preview } = await searchParams;
   const [types, templates, facilitators] = await Promise.all([
     getAllTypesWithSteps(),
     getEmailTemplateOptions(),
@@ -38,6 +39,7 @@ export default async function NewExperiencePage() {
           id: f.id,
           name: f.full_name || `${f.first_name ?? ""} ${f.last_name ?? ""}`.trim() || f.email,
         }))}
+        previewId={preview ?? null}
       />
     </div>
   );

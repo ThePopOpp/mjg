@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, Settings2 } from "lucide-react";
+import { Settings2 } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Button } from "@/components/ui/button";
 import { ExperiencesList } from "@/components/experiences/experiences-list";
+import { NewExperienceButton } from "@/components/experiences/new-experience-button";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { getExperiencesData } from "@/lib/experiences/repository";
@@ -28,9 +29,7 @@ export default async function ExperiencesPage() {
           <Link href="/dashboard/experiences/types">
             <Button variant="outline" size="sm"><Settings2 className="mr-2 h-4 w-4" /> Experience Types</Button>
           </Link>
-          <Link href="/dashboard/experiences/new">
-            <Button size="sm"><Plus className="mr-2 h-4 w-4" /> New Experience</Button>
-          </Link>
+          <NewExperienceButton />
         </div>
       </div>
       <ExperiencesList experiences={experiences} emailEvents={emailEvents} />

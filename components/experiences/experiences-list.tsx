@@ -74,7 +74,7 @@ export function ExperiencesList({ experiences, emailEvents = [] }: { experiences
       ) : view === "table" ? (
         <TableView experiences={experiences} />
       ) : (
-        <CalendarView events={emailEvents} />
+        <EmailCalendar events={emailEvents} />
       )}
     </div>
   );
@@ -182,7 +182,7 @@ function EventChip({ e }: { e: EmailEvent }) {
   );
 }
 
-function CalendarView({ events }: { events: EmailEvent[] }) {
+export function EmailCalendar({ events }: { events: EmailEvent[] }) {
   const [mode, setMode] = useState<CalMode>("month");
   const [cursor, setCursor] = useState<Date>(() => startOfDay(new Date()));
 

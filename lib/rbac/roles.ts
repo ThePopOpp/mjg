@@ -43,3 +43,10 @@ export function canAccessDashboard(role: string | null | undefined) {
   const normalizedRole = normalizeAppRole(role);
   return Boolean(normalizedRole && (DASHBOARD_ROLES as readonly AppRole[]).includes(normalizedRole));
 }
+
+// Portal = the member-facing area (facilitators + participants) plus everyone who can
+// see the admin dashboard. Use this to gate shared content pages (Resources, Downloads,
+// My Team, etc.) — NOT admin-only pages, which stay on canAccessDashboard.
+export function canAccessPortal(role: string | null | undefined) {
+  return canAccessDashboard(role) || normalizeAppRole(role) === ROLES.PARTICIPANT;
+}

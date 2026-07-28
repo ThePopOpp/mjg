@@ -116,6 +116,7 @@ export type CreateExperienceInput = {
   customIntervalUnit?: OffsetUnit | null;
   durationWeeks: number; // number of steps
   facilitatorId?: string | null;
+  previewId?: string | null;
   attendees: AttendeeInput[];
   steps: WizardStepInput[];
 };

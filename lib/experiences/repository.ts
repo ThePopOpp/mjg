@@ -171,6 +171,7 @@ export async function createExperience(input: CreateExperienceInput, actorUserId
       experience_type_id: type?.id ?? null,
       name,
       facilitator_id: input.facilitatorId || null,
+      preview_id: input.previewId || null,
       start_date: input.startDate,
       start_time: input.startTime || "09:00",
       frequency: input.frequency,

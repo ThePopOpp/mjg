@@ -53,10 +53,12 @@ export function ExperienceWizard({
   types,
   templates,
   facilitators,
+  previewId = null,
 }: {
   types: TypeOption[];
   templates: TemplateOption[];
   facilitators: FacilitatorOption[];
+  previewId?: string | null;
 }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
@@ -144,6 +146,7 @@ export function ExperienceWizard({
       customIntervalUnit: customInterval?.unit ?? null,
       durationWeeks: steps.length,
       facilitatorId: facilitatorId || null,
+      previewId: previewId || null,
       attendees: validEmails,
       steps: steps.map((s) => ({ emailTemplateId: s.emailTemplateId || null, offsetValue: s.offsetValue, offsetUnit: s.offsetUnit })),
       send,

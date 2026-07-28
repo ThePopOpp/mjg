@@ -84,7 +84,7 @@ export const facilitatorNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/team", label: "My Team", icon: UsersRound },
   { kind: "item", href: "/dashboard/my-experiences", label: "Experiences", icon: Sparkles },
   { kind: "item", href: "/dashboard/downloads", label: "Downloads", icon: Download },
-  { kind: "item", href: "/dashboard/news", label: "In The News", icon: Newspaper },
+  { kind: "item", href: "/dashboard/resources", label: "Resources", icon: Newspaper },
   { kind: "item", href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },
   { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
   { kind: "item", href: "/dashboard/preferences", label: "Settings", icon: Settings },

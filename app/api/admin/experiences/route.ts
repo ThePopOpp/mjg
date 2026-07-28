@@ -47,6 +47,7 @@ export async function POST(request: Request) {
         customIntervalUnit: frequency === "custom" && UNITS.has(body.customIntervalUnit) ? body.customIntervalUnit : null,
         durationWeeks: Math.floor(durationWeeks),
         facilitatorId: body.facilitatorId || null,
+        previewId: body.previewId || null,
         attendees: validAttendees,
         steps,
       },
