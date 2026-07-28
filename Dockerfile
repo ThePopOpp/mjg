@@ -51,6 +51,9 @@ COPY --from=builder /app/main ./main
 # (lib/public-site/legal.ts). Only docs/legal is copied — the rest of docs/ is
 # internal specs that shouldn't ship in a public image.
 COPY --from=builder /app/docs/legal ./docs/legal
+# Coolify scheduled tasks run helper scripts from here inside the container — e.g.
+# scripts/experiences-cron.mjs, which hits /api/admin/experiences/send-due.
+COPY --from=builder /app/scripts ./scripts
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]
