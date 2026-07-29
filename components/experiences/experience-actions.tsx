@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Archive, Trash2, Save, Plus, Image as ImageIcon, Music } from "lucide-react";
+import { Pencil, Archive, Trash2, Save, Plus } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MediaUploadField } from "@/components/experiences/media-upload-field";
 
 type PreviewShape = {
   id: string;
@@ -136,8 +137,8 @@ export function ExperienceActions({
           <div className="space-y-3">
             <div className="space-y-1.5"><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
             <div className="flex gap-3">
-              <div className="w-48 space-y-1.5"><Label>Start date</Label><DatePicker value={startDate} onChange={setStartDate} /></div>
-              <div className="w-36 space-y-1.5"><Label>Start time</Label><TimePicker value={startTime} onChange={setStartTime} /></div>
+              <div className="flex-1 space-y-1.5"><Label>Start date</Label><DatePicker value={startDate} onChange={setStartDate} /></div>
+              <div className="flex-1 space-y-1.5"><Label>Start time</Label><TimePicker value={startTime} onChange={setStartTime} /></div>
             </div>
             <div className="flex gap-3">
               <div className="flex-1 space-y-1.5"><Label>Status</Label>
@@ -170,10 +171,10 @@ export function ExperienceActions({
                 <div className="mt-3 space-y-3">
                   <div className="space-y-1.5"><Label>Title</Label><Input value={pTitle} onChange={(e) => setPTitle(e.target.value)} placeholder="6 Week Challenge" /></div>
                   <div className="space-y-1.5"><Label>Content</Label><Textarea rows={4} value={pContent} onChange={(e) => setPContent(e.target.value)} placeholder="What this experience is about…" /></div>
-                  <UploadField label="Image" icon={ImageIcon} url={pImage} setUrl={setPImage} accept="image/*" upload={upload} setBusy={setBusy} setError={setError} />
-                  <div className="space-y-1.5"><Label>Video URL (embed or link)</Label><Input value={pVideo} onChange={(e) => setPVideo(e.target.value)} placeholder="https://…" /></div>
-                  <UploadField label="Audio" icon={Music} url={pAudio} setUrl={setPAudio} accept="audio/*" upload={upload} setBusy={setBusy} setError={setError} />
-                  <div className="space-y-1.5"><Label>Document URL</Label><Input value={pDoc} onChange={(e) => setPDoc(e.target.value)} placeholder="https://… (PDF)" /></div>
+                  <MediaUploadField label="Image (JPEG / PNG)" url={pImage} setUrl={setPImage} accept="image/png,image/jpeg,image/webp,image/gif" upload={upload} setBusy={setBusy} setError={setError} />
+                  <MediaUploadField label="Video" url={pVideo} setUrl={setPVideo} accept="video/*" upload={upload} setBusy={setBusy} setError={setError} />
+                  <MediaUploadField label="Audio" url={pAudio} setUrl={setPAudio} accept="audio/*" upload={upload} setBusy={setBusy} setError={setError} />
+                  <MediaUploadField label="Document (PDF)" url={pDoc} setUrl={setPDoc} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.csv" upload={upload} setBusy={setBusy} setError={setError} />
                   <div className="space-y-1.5"><Label>Frequency</Label>
                     <Select value={pFreq || "none"} onValueChange={(v) => setPFreq(v === "none" ? "" : v)}>
                       <SelectTrigger><SelectValue placeholder="Select frequency" /></SelectTrigger>
@@ -208,32 +209,3 @@ export function ExperienceActions({
   );
 }
 
-function UploadField({
-  label, icon: Icon, url, setUrl, accept, upload, setBusy, setError,
-}: {
-  label: string;
-  icon: typeof ImageIcon;
-  url: string;
-  setUrl: (v: string) => void;
-  accept: string;
-  upload: (f: File) => Promise<string>;
-  setBusy: (b: boolean) => void;
-  setError: (e: string | null) => void;
-}) {
-  const ref = useRef<HTMLInputElement>(null);
-  return (
-    <div className="space-y-1.5">
-      <Label>{label}</Label>
-      <div className="flex gap-2">
-        <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a URL or upload" />
-        <input ref={ref} type="file" accept={accept} className="hidden" onChange={async (e) => {
-          const f = e.target.files?.[0];
-          if (!f) return;
-          setBusy(true); setError(null);
-          try { setUrl(await upload(f)); } catch (err) { setError(err instanceof Error ? err.message : "Upload failed."); } finally { setBusy(false); }
-        }} />
-        <Button type="button" variant="outline" size="icon" onClick={() => ref.current?.click()} aria-label={`Upload ${label}`}><Icon className="h-4 w-4" /></Button>
-      </div>
-    </div>
-  );
-}

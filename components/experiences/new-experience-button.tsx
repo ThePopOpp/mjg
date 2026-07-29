@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Upload, PencilLine, ArrowRight, FileText, Image as ImageIcon, Music } from "lucide-react";
+import { Plus, Upload, PencilLine, ArrowRight, FileText } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MediaUploadField } from "@/components/experiences/media-upload-field";
 
 const NEW_URL = "/dashboard/experiences/new";
 
@@ -36,6 +37,7 @@ export function NewExperienceButton() {
   const [imageUrl, setImageUrl] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
+  const [documentUrl, setDocumentUrl] = useState("");
   const [frequency, setFrequency] = useState("");
 
   async function upload(file: File, folder: string): Promise<string> {
@@ -78,7 +80,7 @@ export function NewExperienceButton() {
     setBusy(true);
     setError(null);
     try {
-      await createPreviewAndGo({ title, content, imageUrl, videoUrl, audioUrl, frequencyLabel: frequency });
+      await createPreviewAndGo({ title, content, imageUrl, videoUrl, audioUrl, documentUrl, frequencyLabel: frequency });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to save preview.");
       setBusy(false);
@@ -152,9 +154,10 @@ export function NewExperienceButton() {
             <div className="space-y-1.5"><Label>Experience title</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="6 Week Challenge" /></div>
             <div className="space-y-1.5"><Label>Content</Label><Textarea rows={5} value={content} onChange={(e) => setContent(e.target.value)} placeholder="What this experience is about…" /></div>
 
-            <MediaField label="Image" icon={ImageIcon} url={imageUrl} setUrl={setImageUrl} accept="image/*" onUpload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
-            <div className="space-y-1.5"><Label>Video URL (embed or link)</Label><Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://…" /></div>
-            <MediaField label="Audio" icon={Music} url={audioUrl} setUrl={setAudioUrl} accept="audio/*" onUpload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
+            <MediaUploadField label="Image (JPEG / PNG)" url={imageUrl} setUrl={setImageUrl} accept="image/png,image/jpeg,image/webp,image/gif" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
+            <MediaUploadField label="Video" url={videoUrl} setUrl={setVideoUrl} accept="video/*" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
+            <MediaUploadField label="Audio" url={audioUrl} setUrl={setAudioUrl} accept="audio/*" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
+            <MediaUploadField label="Document (PDF)" url={documentUrl} setUrl={setDocumentUrl} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.csv" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
 
             <div className="space-y-1.5">
               <Label>Frequency</Label>
@@ -176,32 +179,3 @@ export function NewExperienceButton() {
   );
 }
 
-function MediaField({
-  label, icon: Icon, url, setUrl, accept, onUpload, setBusy, setError,
-}: {
-  label: string;
-  icon: typeof ImageIcon;
-  url: string;
-  setUrl: (v: string) => void;
-  accept: string;
-  onUpload: (f: File) => Promise<string>;
-  setBusy: (b: boolean) => void;
-  setError: (e: string | null) => void;
-}) {
-  const ref = useRef<HTMLInputElement>(null);
-  return (
-    <div className="space-y-1.5">
-      <Label>{label}</Label>
-      <div className="flex gap-2">
-        <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a URL or upload" />
-        <input ref={ref} type="file" accept={accept} className="hidden" onChange={async (e) => {
-          const f = e.target.files?.[0];
-          if (!f) return;
-          setBusy(true); setError(null);
-          try { setUrl(await onUpload(f)); } catch (err) { setError(err instanceof Error ? err.message : "Upload failed."); } finally { setBusy(false); }
-        }} />
-        <Button type="button" variant="outline" size="icon" onClick={() => ref.current?.click()} aria-label={`Upload ${label}`}><Icon className="h-4 w-4" /></Button>
-      </div>
-    </div>
-  );
-}
