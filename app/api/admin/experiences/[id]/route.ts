@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { requireExperienceManager } from "@/lib/user-management/auth";
 import { updateExperience, setExperienceArchived, deleteExperience } from "@/lib/experiences/repository";
+import { applyExperiencePreview } from "@/lib/experiences/previews";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
-    await requireExperienceManager(request, body.actionToken);
+    const actor = await requireExperienceManager(request, body.actionToken);
 
     // Archive/unarchive when `archived` is present; otherwise a field edit.
     if (typeof body.archived === "boolean") {
@@ -21,6 +22,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       startDate: typeof body.startDate === "string" ? body.startDate : undefined,
       startTime: typeof body.startTime === "string" ? body.startTime : undefined,
     });
+
+    // Preview: object = add/update, null = remove. Omitted key = leave unchanged.
+    if ("preview" in body) {
+      const p = body.preview;
+      await applyExperiencePreview(
+        id,
+        p === null ? null : { title: p.title, content: p.content, imageUrl: p.imageUrl, videoUrl: p.videoUrl, audioUrl: p.audioUrl, documentUrl: p.documentUrl, frequencyLabel: p.frequencyLabel },
+        actor.id,
+      );
+    }
+
     return NextResponse.json({ ok: true, experience: updated });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to update experience.";

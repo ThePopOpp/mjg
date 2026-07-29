@@ -1,16 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Archive, Trash2, Save } from "lucide-react";
+import { Pencil, Archive, Trash2, Save, Plus, Image as ImageIcon, Music } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+type PreviewShape = {
+  id: string;
+  title: string;
+  content: string | null;
+  image_url: string | null;
+  video_url: string | null;
+  audio_url: string | null;
+  document_url: string | null;
+  frequency_label: string | null;
+};
 
 export type EditableExperience = {
   id: string;
@@ -19,9 +31,14 @@ export type EditableExperience = {
   start_time?: string | null;
   status: string;
   facilitator_id?: string | null;
+  preview?: PreviewShape | null;
 };
 
 const STATUSES = ["draft", "scheduled", "active", "completed", "cancelled"];
+const FREQUENCIES = [
+  ...Array.from({ length: 12 }, (_, i) => `${i + 1} week${i ? "s" : ""}`),
+  ...Array.from({ length: 12 }, (_, i) => `${i + 1} month${i ? "s" : ""}`),
+];
 
 export function ExperienceActions({
   experience,
@@ -45,6 +62,27 @@ export function ExperienceActions({
   const [status, setStatus] = useState(experience.status);
   const [facilitatorId, setFacilitatorId] = useState(experience.facilitator_id ?? "");
 
+  // Preview state
+  const hadPreview = Boolean(experience.preview);
+  const [previewOn, setPreviewOn] = useState(hadPreview);
+  const [pTitle, setPTitle] = useState(experience.preview?.title ?? "");
+  const [pContent, setPContent] = useState(experience.preview?.content ?? "");
+  const [pImage, setPImage] = useState(experience.preview?.image_url ?? "");
+  const [pVideo, setPVideo] = useState(experience.preview?.video_url ?? "");
+  const [pAudio, setPAudio] = useState(experience.preview?.audio_url ?? "");
+  const [pDoc, setPDoc] = useState(experience.preview?.document_url ?? "");
+  const [pFreq, setPFreq] = useState(experience.preview?.frequency_label ?? "");
+
+  async function upload(file: File): Promise<string> {
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("folder", "experience-previews");
+    const res = await fetch("/api/admin/uploads", { method: "POST", headers: { "x-mjg-action-token": actionToken }, body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Upload failed.");
+    return data.url as string;
+  }
+
   async function call(method: "PATCH" | "DELETE", body: Record<string, unknown>) {
     setBusy(true);
     setError(null);
@@ -66,7 +104,18 @@ export function ExperienceActions({
   }
 
   async function saveEdit() {
-    const ok = await call("PATCH", { name, startDate, startTime, status, facilitatorId: facilitatorId || null });
+    // Preview: object to add/update, null to remove, omitted to leave unchanged.
+    let preview: unknown;
+    if (previewOn) {
+      if (!pTitle.trim()) { setError("Add a preview title (or remove the preview)."); return; }
+      preview = { title: pTitle, content: pContent, imageUrl: pImage, videoUrl: pVideo, audioUrl: pAudio, documentUrl: pDoc, frequencyLabel: pFreq };
+    } else if (hadPreview) {
+      preview = null;
+    }
+    const body: Record<string, unknown> = { name, startDate, startTime, status, facilitatorId: facilitatorId || null };
+    if (preview !== undefined) body.preview = preview;
+
+    const ok = await call("PATCH", body);
     if (ok) { setEditOpen(false); router.refresh(); }
   }
   async function archive() { if (await call("PATCH", { archived: true })) router.refresh(); }
@@ -82,8 +131,8 @@ export function ExperienceActions({
 
       {/* Edit */}
       <Dialog open={editOpen} onOpenChange={(v) => !busy && setEditOpen(v)}>
-        <DialogContent onClick={stop}>
-          <DialogHeader><DialogTitle>Edit experience</DialogTitle><DialogDescription>Update the details for this experience.</DialogDescription></DialogHeader>
+        <DialogContent onClick={stop} className="max-h-[88vh] overflow-y-auto sm:max-w-lg">
+          <DialogHeader><DialogTitle>Edit experience</DialogTitle><DialogDescription>Update the details and preview for this experience.</DialogDescription></DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5"><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
             <div className="flex gap-3">
@@ -104,8 +153,38 @@ export function ExperienceActions({
                 </Select>
               </div>
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
             <p className="text-xs text-muted-foreground">Changing the start date/time reschedules any emails that haven&apos;t sent yet.</p>
+
+            {/* Experience Preview */}
+            <div className="rounded-lg border p-3">
+              <div className="flex items-center justify-between">
+                <div><p className="text-sm font-medium">Experience Preview</p><p className="text-xs text-muted-foreground">Shown to facilitators &amp; participants.</p></div>
+                {previewOn ? (
+                  <Button type="button" variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setPreviewOn(false)}><Trash2 className="mr-1.5 h-4 w-4" /> Remove</Button>
+                ) : (
+                  <Button type="button" variant="outline" size="sm" onClick={() => setPreviewOn(true)}><Plus className="mr-1.5 h-4 w-4" /> {hadPreview ? "Restore preview" : "Add preview"}</Button>
+                )}
+              </div>
+
+              {previewOn && (
+                <div className="mt-3 space-y-3">
+                  <div className="space-y-1.5"><Label>Title</Label><Input value={pTitle} onChange={(e) => setPTitle(e.target.value)} placeholder="6 Week Challenge" /></div>
+                  <div className="space-y-1.5"><Label>Content</Label><Textarea rows={4} value={pContent} onChange={(e) => setPContent(e.target.value)} placeholder="What this experience is about…" /></div>
+                  <UploadField label="Image" icon={ImageIcon} url={pImage} setUrl={setPImage} accept="image/*" upload={upload} setBusy={setBusy} setError={setError} />
+                  <div className="space-y-1.5"><Label>Video URL (embed or link)</Label><Input value={pVideo} onChange={(e) => setPVideo(e.target.value)} placeholder="https://…" /></div>
+                  <UploadField label="Audio" icon={Music} url={pAudio} setUrl={setPAudio} accept="audio/*" upload={upload} setBusy={setBusy} setError={setError} />
+                  <div className="space-y-1.5"><Label>Document URL</Label><Input value={pDoc} onChange={(e) => setPDoc(e.target.value)} placeholder="https://… (PDF)" /></div>
+                  <div className="space-y-1.5"><Label>Frequency</Label>
+                    <Select value={pFreq || "none"} onValueChange={(v) => setPFreq(v === "none" ? "" : v)}>
+                      <SelectTrigger><SelectValue placeholder="Select frequency" /></SelectTrigger>
+                      <SelectContent><SelectItem value="none">None</SelectItem>{FREQUENCIES.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {error && <p className="text-sm text-destructive">{error}</p>}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)} disabled={busy}>Cancel</Button>
@@ -125,6 +204,36 @@ export function ExperienceActions({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function UploadField({
+  label, icon: Icon, url, setUrl, accept, upload, setBusy, setError,
+}: {
+  label: string;
+  icon: typeof ImageIcon;
+  url: string;
+  setUrl: (v: string) => void;
+  accept: string;
+  upload: (f: File) => Promise<string>;
+  setBusy: (b: boolean) => void;
+  setError: (e: string | null) => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <div className="flex gap-2">
+        <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a URL or upload" />
+        <input ref={ref} type="file" accept={accept} className="hidden" onChange={async (e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          setBusy(true); setError(null);
+          try { setUrl(await upload(f)); } catch (err) { setError(err instanceof Error ? err.message : "Upload failed."); } finally { setBusy(false); }
+        }} />
+        <Button type="button" variant="outline" size="icon" onClick={() => ref.current?.click()} aria-label={`Upload ${label}`}><Icon className="h-4 w-4" /></Button>
+      </div>
     </div>
   );
 }

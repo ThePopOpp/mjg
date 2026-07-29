@@ -55,7 +55,7 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
           <ArrowLeft className="h-4 w-4" /> All experiences
         </Link>
         <ExperienceActions
-          experience={{ id: experience.id, name: experience.name, start_date: experience.start_date, start_time: experience.start_time, status: experience.status, facilitator_id: experience.facilitator_id }}
+          experience={{ id: experience.id, name: experience.name, start_date: experience.start_date, start_time: experience.start_time, status: experience.status, facilitator_id: experience.facilitator_id, preview: experience.experience_previews ?? null }}
           facilitators={facilitatorOptions}
         />
       </div>

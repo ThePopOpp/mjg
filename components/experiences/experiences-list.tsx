@@ -20,10 +20,12 @@ type ExperienceRow = {
   attendee_count: number;
   experience_types?: { name: string | null } | null;
   profiles?: { id?: string; full_name: string | null; first_name: string | null; last_name: string | null } | null;
+  experience_previews?: PreviewShape | null;
 };
 
+type PreviewShape = { id: string; title: string; content: string | null; image_url: string | null; video_url: string | null; audio_url: string | null; document_url: string | null; frequency_label: string | null };
 type Facilitator = { id: string; name: string };
-const toEditable = (exp: ExperienceRow) => ({ id: exp.id, name: exp.name, start_date: exp.start_date, start_time: exp.start_time ?? null, status: exp.status, facilitator_id: exp.profiles?.id ?? null });
+const toEditable = (exp: ExperienceRow) => ({ id: exp.id, name: exp.name, start_date: exp.start_date, start_time: exp.start_time ?? null, status: exp.status, facilitator_id: exp.profiles?.id ?? null, preview: exp.experience_previews ?? null });
 
 const STATUS_TONE: Record<ExperienceStatus, string> = {
   draft: "bg-muted text-muted-foreground",

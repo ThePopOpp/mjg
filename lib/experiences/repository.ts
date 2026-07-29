@@ -84,7 +84,7 @@ export async function getExperiencesData() {
   const supabase = createSupabaseAdminClient();
   const { data: experiences, error } = await supabase
     .from("experiences")
-    .select("*, experience_types(name,slug), profiles!experiences_facilitator_id_fkey(id,full_name,first_name,last_name,email)")
+    .select("*, experience_types(name,slug), profiles!experiences_facilitator_id_fkey(id,full_name,first_name,last_name,email), experience_previews(id,title,content,image_url,video_url,audio_url,document_url,frequency_label)")
     .order("start_date", { ascending: false });
   if (error) throw error;
 
@@ -138,7 +138,7 @@ export async function getExperienceById(id: string) {
   const supabase = createSupabaseAdminClient();
   const { data: experience, error } = await supabase
     .from("experiences")
-    .select("*, experience_types(name,slug), profiles!experiences_facilitator_id_fkey(id,full_name,first_name,last_name,email)")
+    .select("*, experience_types(name,slug), profiles!experiences_facilitator_id_fkey(id,full_name,first_name,last_name,email), experience_previews(id,title,content,image_url,video_url,audio_url,document_url,frequency_label)")
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
