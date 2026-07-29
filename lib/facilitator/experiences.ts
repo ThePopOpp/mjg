@@ -32,7 +32,7 @@ export async function getFacilitatorExperiences(profileId: string): Promise<{ ex
     .eq("facilitator_id", profileId)
     .order("start_date", { ascending: false });
 
-  const experiences = rows ?? [];
+  const experiences = (rows ?? []).filter((e: any) => !e.archived_at);
   const ids = experiences.map((e: any) => e.id);
 
   const counts: Record<string, number> = {};

@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
-import { getExperienceById } from "@/lib/experiences/repository";
+import { getExperienceById, getFacilitators } from "@/lib/experiences/repository";
+import { ExperienceActions } from "@/components/experiences/experience-actions";
 import { FREQUENCY_LABELS, OFFSET_UNIT_LABELS } from "@/lib/experiences/types";
 
 function cadenceLabel(exp: any) {
@@ -29,9 +30,10 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
   if (!profile) redirect(`/login?next=/dashboard/experiences/${id}`);
   if (!can(profile.role, PERMISSIONS.MANAGE_EXPERIENCES)) redirect("/access-restricted");
 
-  const data = await getExperienceById(id);
+  const [data, facilitators] = await Promise.all([getExperienceById(id), getFacilitators()]);
   if (!data) notFound();
   const { experience, attendees, sendEvents } = data as any;
+  const facilitatorOptions = facilitators.map((f: any) => ({ id: f.id, name: f.full_name || `${f.first_name ?? ""} ${f.last_name ?? ""}`.trim() || f.email }));
 
   const facilitator = experience.profiles;
   const facilitatorName = facilitator
@@ -48,9 +50,15 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
 
   return (
     <div className="space-y-6">
-      <Link href="/dashboard/experiences" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> All experiences
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href="/dashboard/experiences" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> All experiences
+        </Link>
+        <ExperienceActions
+          experience={{ id: experience.id, name: experience.name, start_date: experience.start_date, start_time: experience.start_time, status: experience.status, facilitator_id: experience.facilitator_id }}
+          facilitators={facilitatorOptions}
+        />
+      </div>
 
       <SectionHeader
         eyebrow={experience.experience_types?.name ?? "Experience"}

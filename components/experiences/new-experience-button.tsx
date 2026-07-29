@@ -59,12 +59,14 @@ export function NewExperienceButton() {
     router.push(`${NEW_URL}?preview=${data.id}`);
   }
 
-  async function onPdfPicked(file: File) {
+  async function onFilePicked(file: File) {
     setBusy(true);
     setError(null);
     try {
       const url = await upload(file, "experience-previews");
-      await createPreviewAndGo({ title: file.name.replace(/\.[^.]+$/, ""), documentUrl: url });
+      // Route by type: images become the preview image, everything else a document.
+      const key = file.type.startsWith("image/") ? "imageUrl" : "documentUrl";
+      await createPreviewAndGo({ title: file.name.replace(/\.[^.]+$/, ""), [key]: url });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed.");
       setBusy(false);
@@ -108,13 +110,13 @@ export function NewExperienceButton() {
               <Button variant="outline" size="sm" disabled={busy} onClick={() => router.push(NEW_URL)}>Continue</Button>
             </div>
 
-            {/* 2. Upload PDF */}
+            {/* 2. Upload a file */}
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div className="flex items-center gap-3">
                 <FileText className="h-5 w-5 text-muted-foreground" />
-                <div><p className="font-medium">Upload a PDF</p><p className="text-xs text-muted-foreground">Use a PDF as the preview.</p></div>
+                <div><p className="font-medium">Upload a file</p><p className="text-xs text-muted-foreground">PDF, JPEG, PNG, or a document.</p></div>
               </div>
-              <input ref={pdfInput} type="file" accept="application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onPdfPicked(f); }} />
+              <input ref={pdfInput} type="file" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFilePicked(f); }} />
               <Button variant="outline" size="sm" disabled={busy} onClick={() => pdfInput.current?.click()}><Upload className="mr-2 h-4 w-4" /> Upload</Button>
             </div>
 

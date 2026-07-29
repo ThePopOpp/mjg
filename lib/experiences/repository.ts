@@ -99,7 +99,11 @@ export async function getExperiencesData() {
     for (const row of attendees ?? []) counts[row.experience_id] = (counts[row.experience_id] ?? 0) + 1;
   }
 
-  const expList = (experiences ?? []).map((e: any) => ({ ...e, attendee_count: counts[e.id] ?? 0 }));
+  // Hide archived experiences. Filtered in JS (not SQL) so the list keeps working even
+  // before the archived_at column migration is applied.
+  const expList = (experiences ?? [])
+    .filter((e: any) => !e.archived_at)
+    .map((e: any) => ({ ...e, attendee_count: counts[e.id] ?? 0 }));
 
   // Every scheduled email, computed from each experience's step offsets (works for
   // drafts too — no need for send events to exist). One entry per experience × step.
@@ -348,6 +352,75 @@ export async function sendExperience(experienceId: string, actorUserId?: string 
   if (updErr) throw updErr;
 
   return { experience: updated, scheduledEvents: eventRows.length };
+}
+
+export async function updateExperience(
+  id: string,
+  input: { name?: string; facilitatorId?: string | null; status?: string; startDate?: string; startTime?: string },
+) {
+  const supabase = createSupabaseAdminClient();
+  const { data: existing, error: exErr } = await supabase.from("experiences").select("*").eq("id", id).maybeSingle();
+  if (exErr) throw exErr;
+  if (!existing) throw new Error("Experience not found.");
+
+  const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (typeof input.name === "string" && input.name.trim()) patch.name = input.name.trim();
+  if (input.facilitatorId !== undefined) patch.facilitator_id = input.facilitatorId || null;
+  if (input.status) patch.status = input.status;
+  if (input.startDate && /^\d{4}-\d{2}-\d{2}$/.test(input.startDate)) patch.start_date = input.startDate;
+  if (input.startTime && /^\d{2}:\d{2}$/.test(input.startTime)) patch.start_time = input.startTime;
+
+  const { data: updated, error } = await supabase.from("experiences").update(patch).eq("id", id).select("*").single();
+  if (error) throw error;
+
+  // If the schedule anchor moved, re-time the not-yet-sent events (keep sent ones).
+  const dateChanged = (patch.start_date && patch.start_date !== existing.start_date) || (patch.start_time && patch.start_time !== existing.start_time);
+  if (dateChanged) await regenerateScheduledSends(id, updated.start_date, updated.start_time || "09:00");
+
+  return updated;
+}
+
+async function regenerateScheduledSends(experienceId: string, startDate: string, startTime: string) {
+  const supabase = createSupabaseAdminClient();
+  const { data: pending } = await supabase.from("experience_send_events").select("id").eq("experience_id", experienceId).eq("status", "scheduled").limit(1);
+  if (!pending?.length) return;
+
+  const [{ data: steps }, { data: attendees }] = await Promise.all([
+    supabase.from("experience_steps").select("step_number,email_template_id,offset_value,offset_unit").eq("experience_id", experienceId),
+    supabase.from("experience_attendees").select("id").eq("experience_id", experienceId),
+  ]);
+  if (!steps?.length || !attendees?.length) return;
+
+  await supabase.from("experience_send_events").delete().eq("experience_id", experienceId).eq("status", "scheduled");
+  const rows: any[] = [];
+  for (const att of attendees) {
+    for (const step of steps) {
+      rows.push({
+        experience_id: experienceId,
+        attendee_id: att.id,
+        step_number: step.step_number,
+        template_id: step.email_template_id,
+        status: "scheduled",
+        scheduled_at: computeStepDate(startDate, startTime, step.offset_value, step.offset_unit as OffsetUnit).toISOString(),
+      });
+    }
+  }
+  if (rows.length) await supabase.from("experience_send_events").upsert(rows, { onConflict: "attendee_id,step_number", ignoreDuplicates: true });
+}
+
+export async function setExperienceArchived(id: string, archived: boolean) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.from("experiences").update({ archived_at: archived ? new Date().toISOString() : null }).eq("id", id);
+  if (error) throw error;
+  return { id, archived };
+}
+
+export async function deleteExperience(id: string) {
+  const supabase = createSupabaseAdminClient();
+  // Attendees, steps, and send events cascade via FK on delete.
+  const { error } = await supabase.from("experiences").delete().eq("id", id);
+  if (error) throw error;
+  return { id };
 }
 
 // ── Types editor ───────────────────────────────────────────────────────────────

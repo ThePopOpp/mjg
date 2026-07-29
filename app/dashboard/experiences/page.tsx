@@ -7,7 +7,7 @@ import { ExperiencesList } from "@/components/experiences/experiences-list";
 import { NewExperienceButton } from "@/components/experiences/new-experience-button";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
-import { getExperiencesData } from "@/lib/experiences/repository";
+import { getExperiencesData, getFacilitators } from "@/lib/experiences/repository";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,8 @@ export default async function ExperiencesPage() {
   if (!profile) redirect("/login?next=/dashboard/experiences");
   if (!can(profile.role, PERMISSIONS.MANAGE_EXPERIENCES)) redirect("/access-restricted");
 
-  const { experiences, emailEvents } = await getExperiencesData();
+  const [{ experiences, emailEvents }, facilitators] = await Promise.all([getExperiencesData(), getFacilitators()]);
+  const facilitatorOptions = facilitators.map((f: any) => ({ id: f.id, name: f.full_name || `${f.first_name ?? ""} ${f.last_name ?? ""}`.trim() || f.email }));
 
   return (
     <div className="space-y-6">
@@ -32,7 +33,7 @@ export default async function ExperiencesPage() {
           <NewExperienceButton />
         </div>
       </div>
-      <ExperiencesList experiences={experiences} emailEvents={emailEvents} />
+      <ExperiencesList experiences={experiences} emailEvents={emailEvents} facilitators={facilitatorOptions} />
     </div>
   );
 }

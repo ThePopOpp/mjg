@@ -6,19 +6,24 @@ import { LayoutGrid, Table as TableIcon, CalendarDays, ChevronLeft, ChevronRight
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { ExperienceActions } from "@/components/experiences/experience-actions";
 import { FREQUENCY_LABELS, type EmailEvent, type ExperienceStatus } from "@/lib/experiences/types";
 
 type ExperienceRow = {
   id: string;
   name: string;
   start_date: string;
+  start_time?: string | null;
   frequency: "weekly" | "biweekly";
   duration_weeks: number;
   status: ExperienceStatus;
   attendee_count: number;
   experience_types?: { name: string | null } | null;
-  profiles?: { full_name: string | null; first_name: string | null; last_name: string | null } | null;
+  profiles?: { id?: string; full_name: string | null; first_name: string | null; last_name: string | null } | null;
 };
+
+type Facilitator = { id: string; name: string };
+const toEditable = (exp: ExperienceRow) => ({ id: exp.id, name: exp.name, start_date: exp.start_date, start_time: exp.start_time ?? null, status: exp.status, facilitator_id: exp.profiles?.id ?? null });
 
 const STATUS_TONE: Record<ExperienceStatus, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -40,7 +45,7 @@ function fmtDate(d: string) {
   return new Date(`${d}T00:00:00Z`).toLocaleDateString([], { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
 }
 
-export function ExperiencesList({ experiences, emailEvents = [] }: { experiences: ExperienceRow[]; emailEvents?: EmailEvent[] }) {
+export function ExperiencesList({ experiences, emailEvents = [], facilitators = [] }: { experiences: ExperienceRow[]; emailEvents?: EmailEvent[]; facilitators?: Facilitator[] }) {
   const [view, setView] = useState<View>("cards");
 
   const views: { key: View; label: string; icon: typeof LayoutGrid }[] = [
@@ -70,9 +75,9 @@ export function ExperiencesList({ experiences, emailEvents = [] }: { experiences
       {!experiences.length ? (
         <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">No experiences yet. Create one to get started.</CardContent></Card>
       ) : view === "cards" ? (
-        <CardsView experiences={experiences} />
+        <CardsView experiences={experiences} facilitators={facilitators} />
       ) : view === "table" ? (
-        <TableView experiences={experiences} />
+        <TableView experiences={experiences} facilitators={facilitators} />
       ) : (
         <EmailCalendar events={emailEvents} />
       )}
@@ -84,7 +89,7 @@ function StatusBadge({ status }: { status: ExperienceStatus }) {
   return <span className={cn("inline-flex rounded-full px-2 py-0.5 text-xs font-medium capitalize", STATUS_TONE[status])}>{status}</span>;
 }
 
-function CardsView({ experiences }: { experiences: ExperienceRow[] }) {
+function CardsView({ experiences, facilitators }: { experiences: ExperienceRow[]; facilitators: Facilitator[] }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {experiences.map((exp) => (
@@ -104,7 +109,10 @@ function CardsView({ experiences }: { experiences: ExperienceRow[] }) {
                 <Detail label="Weeks" value={String(exp.duration_weeks)} />
                 <Detail label="Attendees" value={String(exp.attendee_count)} />
               </div>
-              <p className="text-sm text-muted-foreground">Facilitator: <span className="text-foreground">{facilitatorName(exp)}</span></p>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">Facilitator: <span className="text-foreground">{facilitatorName(exp)}</span></p>
+                <ExperienceActions experience={toEditable(exp)} facilitators={facilitators} variant="overlay" />
+              </div>
             </CardContent>
           </Card>
         </Link>
@@ -122,7 +130,7 @@ function Detail({ label, value }: { label: string; value: string }) {
   );
 }
 
-function TableView({ experiences }: { experiences: ExperienceRow[] }) {
+function TableView({ experiences, facilitators }: { experiences: ExperienceRow[]; facilitators: Facilitator[] }) {
   return (
     <Card>
       <CardContent className="p-0">
@@ -137,11 +145,12 @@ function TableView({ experiences }: { experiences: ExperienceRow[] }) {
               <TableHead>Weeks</TableHead>
               <TableHead>Attendees</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {experiences.map((exp) => (
-              <TableRow key={exp.id} className="cursor-pointer">
+              <TableRow key={exp.id}>
                 <TableCell className="font-medium"><Link href={`/dashboard/experiences/${exp.id}`} className="hover:underline">{exp.name}</Link></TableCell>
                 <TableCell>{exp.experience_types?.name ?? "-"}</TableCell>
                 <TableCell>{facilitatorName(exp)}</TableCell>
@@ -150,6 +159,7 @@ function TableView({ experiences }: { experiences: ExperienceRow[] }) {
                 <TableCell>{exp.duration_weeks}</TableCell>
                 <TableCell>{exp.attendee_count}</TableCell>
                 <TableCell><StatusBadge status={exp.status} /></TableCell>
+                <TableCell><ExperienceActions experience={toEditable(exp)} facilitators={facilitators} /></TableCell>
               </TableRow>
             ))}
           </TableBody>
