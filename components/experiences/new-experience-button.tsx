@@ -39,6 +39,7 @@ export function NewExperienceButton() {
   const [audioUrl, setAudioUrl] = useState("");
   const [documentUrl, setDocumentUrl] = useState("");
   const [frequency, setFrequency] = useState("");
+  const [showUrls, setShowUrls] = useState(false);
 
   async function upload(file: File, folder: string): Promise<string> {
     const fd = new FormData();
@@ -154,10 +155,13 @@ export function NewExperienceButton() {
             <div className="space-y-1.5"><Label>Experience title</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="6 Week Challenge" /></div>
             <div className="space-y-1.5"><Label>Content</Label><Textarea rows={5} value={content} onChange={(e) => setContent(e.target.value)} placeholder="What this experience is about…" /></div>
 
-            <MediaUploadField label="Image (JPEG / PNG)" url={imageUrl} setUrl={setImageUrl} accept="image/png,image/jpeg,image/webp,image/gif" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
-            <MediaUploadField label="Video" url={videoUrl} setUrl={setVideoUrl} accept="video/*" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
-            <MediaUploadField label="Audio" url={audioUrl} setUrl={setAudioUrl} accept="audio/*" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
-            <MediaUploadField label="Document (PDF)" url={documentUrl} setUrl={setDocumentUrl} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.csv" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} />
+            <div className="flex items-center justify-end">
+              <label className="flex items-center gap-1.5 text-xs text-muted-foreground"><Switch checked={showUrls} onCheckedChange={setShowUrls} /> Add URL</label>
+            </div>
+            <MediaUploadField label="Image (JPEG / PNG)" url={imageUrl} setUrl={setImageUrl} accept="image/png,image/jpeg,image/webp,image/gif" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} showUrl={showUrls} />
+            <MediaUploadField label="Video" url={videoUrl} setUrl={setVideoUrl} accept="video/*" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} showUrl={showUrls} />
+            <MediaUploadField label="Audio" url={audioUrl} setUrl={setAudioUrl} accept="audio/*" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} showUrl={showUrls} />
+            <MediaUploadField label="Document (PDF)" url={documentUrl} setUrl={setDocumentUrl} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.csv" upload={(f) => upload(f, "experience-previews")} setBusy={setBusy} setError={setError} showUrl={showUrls} />
 
             <div className="space-y-1.5">
               <Label>Frequency</Label>

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { DatePicker } from "@/components/ui/date-picker";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -73,6 +74,7 @@ export function ExperienceActions({
   const [pAudio, setPAudio] = useState(experience.preview?.audio_url ?? "");
   const [pDoc, setPDoc] = useState(experience.preview?.document_url ?? "");
   const [pFreq, setPFreq] = useState(experience.preview?.frequency_label ?? "");
+  const [showUrls, setShowUrls] = useState(false);
 
   async function upload(file: File): Promise<string> {
     const fd = new FormData();
@@ -122,7 +124,11 @@ export function ExperienceActions({
   async function archive() { if (await call("PATCH", { archived: true })) router.refresh(); }
   async function del() { if (await call("DELETE", {})) { setConfirmDelete(false); router.refresh(); } }
 
+  // Wrapper (icon buttons live inside a card <Link>): block the link's default nav.
   const stop = (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); };
+  // Dialog content: only stop bubbling to the card link — do NOT preventDefault, or the
+  // browser cancels the file input's open-file default action.
+  const stopProp = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
     <div className={variant === "overlay" ? "flex items-center gap-0.5" : "flex items-center justify-end gap-0.5"} onClick={stop}>
@@ -132,7 +138,7 @@ export function ExperienceActions({
 
       {/* Edit */}
       <Dialog open={editOpen} onOpenChange={(v) => !busy && setEditOpen(v)}>
-        <DialogContent onClick={stop} className="max-h-[88vh] overflow-y-auto sm:max-w-lg">
+        <DialogContent onClick={stopProp} className="max-h-[88vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader><DialogTitle>Edit experience</DialogTitle><DialogDescription>Update the details and preview for this experience.</DialogDescription></DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5"><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
@@ -171,10 +177,13 @@ export function ExperienceActions({
                 <div className="mt-3 space-y-3">
                   <div className="space-y-1.5"><Label>Title</Label><Input value={pTitle} onChange={(e) => setPTitle(e.target.value)} placeholder="6 Week Challenge" /></div>
                   <div className="space-y-1.5"><Label>Content</Label><Textarea rows={4} value={pContent} onChange={(e) => setPContent(e.target.value)} placeholder="What this experience is about…" /></div>
-                  <MediaUploadField label="Image (JPEG / PNG)" url={pImage} setUrl={setPImage} accept="image/png,image/jpeg,image/webp,image/gif" upload={upload} setBusy={setBusy} setError={setError} />
-                  <MediaUploadField label="Video" url={pVideo} setUrl={setPVideo} accept="video/*" upload={upload} setBusy={setBusy} setError={setError} />
-                  <MediaUploadField label="Audio" url={pAudio} setUrl={setPAudio} accept="audio/*" upload={upload} setBusy={setBusy} setError={setError} />
-                  <MediaUploadField label="Document (PDF)" url={pDoc} setUrl={setPDoc} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.csv" upload={upload} setBusy={setBusy} setError={setError} />
+                  <div className="flex items-center justify-end">
+                    <label className="flex items-center gap-1.5 text-xs text-muted-foreground"><Switch checked={showUrls} onCheckedChange={setShowUrls} /> Add URL</label>
+                  </div>
+                  <MediaUploadField label="Image (JPEG / PNG)" url={pImage} setUrl={setPImage} accept="image/png,image/jpeg,image/webp,image/gif" upload={upload} setBusy={setBusy} setError={setError} showUrl={showUrls} />
+                  <MediaUploadField label="Video" url={pVideo} setUrl={setPVideo} accept="video/*" upload={upload} setBusy={setBusy} setError={setError} showUrl={showUrls} />
+                  <MediaUploadField label="Audio" url={pAudio} setUrl={setPAudio} accept="audio/*" upload={upload} setBusy={setBusy} setError={setError} showUrl={showUrls} />
+                  <MediaUploadField label="Document (PDF)" url={pDoc} setUrl={setPDoc} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.rtf,.csv" upload={upload} setBusy={setBusy} setError={setError} showUrl={showUrls} />
                   <div className="space-y-1.5"><Label>Frequency</Label>
                     <Select value={pFreq || "none"} onValueChange={(v) => setPFreq(v === "none" ? "" : v)}>
                       <SelectTrigger><SelectValue placeholder="Select frequency" /></SelectTrigger>
@@ -196,7 +205,7 @@ export function ExperienceActions({
 
       {/* Delete confirm */}
       <Dialog open={confirmDelete} onOpenChange={(v) => !busy && setConfirmDelete(v)}>
-        <DialogContent onClick={stop}>
+        <DialogContent onClick={stopProp}>
           <DialogHeader><DialogTitle>Delete experience?</DialogTitle><DialogDescription>This permanently removes “{experience.name}”, its attendees, and its scheduled emails. This can&apos;t be undone.</DialogDescription></DialogHeader>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <DialogFooter>
