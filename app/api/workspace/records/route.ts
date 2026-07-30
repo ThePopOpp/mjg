@@ -29,6 +29,24 @@ export async function GET(request: Request) {
       if (q) query = query.ilike("title", like);
       const { data } = await query;
       for (const r of data ?? []) results.push({ recordType: "booking", recordId: r.id, label: r.title || "Booking", sublabel: r.start_at ? new Date(r.start_at).toLocaleDateString() : (r.status ?? null), href: `/dashboard/bookings` });
+    } else if (type === "project") {
+      // Project Manager "projects" are distinct project_title/project_id on schedule items.
+      const { data } = await supabase.from("project_schedule_items").select("project_id,project_title").not("project_id", "is", null).limit(400);
+      const seen = new Set<string>();
+      for (const r of data ?? []) {
+        const pid = (r as any).project_id as string;
+        const title = (r as any).project_title as string | null;
+        if (!pid || seen.has(pid)) continue;
+        if (q && !(title ?? "").toLowerCase().includes(q.toLowerCase())) continue;
+        seen.add(pid);
+        results.push({ recordType: "project", recordId: pid, label: title || "Project", sublabel: null, href: `/dashboard/project-manager` });
+        if (results.length >= 20) break;
+      }
+    } else if (type === "workspace") {
+      let query = supabase.from("workspace_documents").select("id,title").is("deleted_at", null).order("updated_at", { ascending: false }).limit(20);
+      if (q) query = query.ilike("title", like);
+      const { data } = await query;
+      for (const r of data ?? []) results.push({ recordType: "workspace", recordId: r.id, label: r.title || "Untitled", sublabel: null, href: `/dashboard/workspace/${r.id}` });
     }
 
     return NextResponse.json({ ok: true, results });

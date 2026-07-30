@@ -20,6 +20,7 @@ import { insertLink, upsertLink } from "@platejs/link";
 import { ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin } from "@platejs/media/react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
+import { LIVE_APP_PLUGINS, LIVE_APP_COMPONENTS, newProjectTrackerNode, newKanbanNode, newCalendarNode } from "@/components/workspace/live-apps";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,12 +34,13 @@ import {
   Check, CheckSquare, CalendarDays, Boxes, ClipboardList, UserCircle, CalendarClock, ExternalLink, Sparkles,
   PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
   Undo2, Redo2, Search as SearchIcon, RemoveFormatting, Maximize2, ChevronDown, Pilcrow, Settings2,
+  FolderKanban, SquareKanban, CalendarRange,
 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { SimpleTooltip } from "@/components/ui/tooltip";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuCheckboxItem,
+  DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuCheckboxItem, DropdownMenuLabel,
   DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { extractPlainText } from "@/lib/workspace/types";
@@ -61,6 +63,7 @@ const PLUGINS = [
   TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin,
   ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin,
   ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin, TocPlugin, TodoItemPlugin, DateFieldPlugin, RecordLinkPlugin,
+  ...LIVE_APP_PLUGINS,
 ];
 
 // TOC element: lists the document's headings with click-to-scroll (from @platejs/toc).
@@ -146,6 +149,7 @@ const COMPONENTS: Record<string, any> = {
       </div>{p.children}
     </PlateElement>
   ),
+  ...LIVE_APP_COMPONENTS,
 };
 
 const TEXT_COLORS = ["inherit", "#1a1a1a", "#b45309", "#c2410c", "#dc2626", "#2563eb", "#6b7280"];
@@ -572,6 +576,17 @@ function TableSettingsDialog({ open, onOpenChange, setTableProps, setCellBackgro
   );
 }
 
+// A large "live app" card for the Insert mega-menu (icon + mini infographic + blurb).
+function InsertMegaCard({ onSelect, icon: Icon, title, desc, accent, children }: { onSelect: () => void; icon: any; title: string; desc: string; accent: string; children: React.ReactNode }) {
+  return (
+    <DropdownMenuItem onSelect={onSelect} className="flex h-auto flex-col items-stretch gap-2 rounded-lg border p-2.5 transition-colors hover:border-primary/50 data-[highlighted]:border-primary/60 data-[highlighted]:bg-accent/40">
+      <span className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: accent }}><Icon className="h-4 w-4" /> {title}</span>
+      <span className="block rounded-md border bg-muted/40 p-2">{children}</span>
+      <span className="text-xs font-normal text-muted-foreground">{desc}</span>
+    </DropdownMenuItem>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right, mentionUsers = [],
 }: {
@@ -621,6 +636,9 @@ export function WorkspaceEditorSurface({
   const insertDate = () => { try { e.tf?.insertNodes?.({ type: DateFieldPlugin.key, date: null, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertRecordLink = (r: any) => { try { e.tf?.insertNodes?.({ type: RecordLinkPlugin.key, recordType: r.recordType, recordId: r.recordId, label: r.label, sublabel: r.sublabel, href: r.href, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertText = (t: string) => { try { e.tf?.insertText?.(t); } catch { /* no-op */ } };
+  const insertProjectTracker = () => { try { e.tf?.insertNodes?.(newProjectTrackerNode()); } catch { /* no-op */ } };
+  const insertKanban = () => { try { e.tf?.insertNodes?.(newKanbanNode()); } catch { /* no-op */ } };
+  const insertCalendar = () => { try { e.tf?.insertNodes?.(newCalendarNode()); } catch { /* no-op */ } };
   const [htmlOpen, setHtmlOpen] = useState(false);
   const [recorderOpen, setRecorderOpen] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
@@ -677,6 +695,9 @@ export function WorkspaceEditorSurface({
     { label: "Code block", keywords: "code snippet", icon: SquareCode, run: insertCodeBlock },
     { label: "Table", keywords: "grid", icon: TableIcon, run: doInsertTable },
     { label: "Table of contents", keywords: "toc outline headings", icon: ListTree, run: insertToc },
+    { label: "Project Tracker", keywords: "project tracker table plan owner status deadline", icon: FolderKanban, run: insertProjectTracker },
+    { label: "Kanban Board", keywords: "kanban board columns cards", icon: SquareKanban, run: insertKanban },
+    { label: "Calendar", keywords: "calendar events schedule month", icon: CalendarRange, run: insertCalendar },
     { label: "Ask AI", keywords: "ai summarize rewrite improve action items assistant", icon: Sparkles, run: () => setAiOpen(true) },
     { label: "Link a record", keywords: "plan client booking record link mjg", icon: Boxes, run: () => setRecordOpen(true) },
     { label: "Columns", keywords: "layout two column split", icon: Columns2, run: insertColumns },
@@ -714,27 +735,53 @@ export function WorkspaceEditorSurface({
         </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger className="inline-flex items-center gap-0.5 rounded px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none data-[state=open]:bg-accent data-[state=open]:text-foreground">Insert<ChevronDown className="h-3 w-3 opacity-60" /></DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="max-h-[70vh] overflow-y-auto">
-            <DropdownMenuItem onSelect={() => uploadMedia(ImagePlugin.key, "image/*")}><ImageIcon /> Image</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => uploadMedia(VideoPlugin.key, "video/*")}><Video /> Video</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => uploadMedia(AudioPlugin.key, "audio/*")}><Music /> Audio</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => uploadMedia(FilePlugin.key, "application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv")}><Paperclip /> Document</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setRecorderOpen(true)}><Mic /> Record audio</DropdownMenuItem>
+          <DropdownMenuContent align="start" className="max-h-[80vh] w-[560px] overflow-y-auto">
+            <DropdownMenuLabel>Building blocks</DropdownMenuLabel>
+            <div className="grid grid-cols-3 gap-2 p-1">
+              <InsertMegaCard onSelect={insertProjectTracker} icon={FolderKanban} title="Project Tracker" accent="#7c3aed" desc="Assign owners, statuses, deadlines & files.">
+                <span className="block space-y-1">
+                  <span className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((i) => <span key={i} className="h-1.5 rounded-full" style={{ background: "#7c3aed", opacity: 0.5 }} />)}</span>
+                  {[0, 1, 2].map((r) => <span key={r} className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((i) => <span key={i} className="h-2 rounded bg-foreground/10" />)}</span>)}
+                </span>
+              </InsertMegaCard>
+              <InsertMegaCard onSelect={insertKanban} icon={SquareKanban} title="Kanban Board" accent="#f59e0b" desc="Cards & columns to track progress.">
+                <span className="grid grid-cols-3 gap-1">{["#ef4444", "#f59e0b", "#3b82f6"].map((c, i) => (
+                  <span key={i} className="block space-y-1">
+                    <span className="block h-1.5 rounded-full" style={{ background: c }} />
+                    <span className="block h-3 rounded" style={{ background: `${c}33` }} />
+                    <span className="block h-3 rounded" style={{ background: `${c}22` }} />
+                  </span>
+                ))}</span>
+              </InsertMegaCard>
+              <InsertMegaCard onSelect={insertCalendar} icon={CalendarRange} title="Calendar" accent="#dc2626" desc="Plan events & schedules by month.">
+                <span className="grid grid-cols-7 gap-0.5">{Array.from({ length: 21 }).map((_, i) => <span key={i} className="block aspect-square rounded-sm" style={{ background: i === 10 ? "#dc2626" : undefined }} data-x={i}><span className={cn("block aspect-square rounded-sm", i === 10 ? "" : "bg-foreground/10")} /></span>)}</span>
+              </InsertMegaCard>
+            </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={doInsertTable}><TableIcon /> Table</DropdownMenuItem>
-            <DropdownMenuItem onSelect={makeTodo}><CheckSquare /> Checklist</DropdownMenuItem>
-            <DropdownMenuItem onSelect={insertDate}><CalendarDays /> Date</DropdownMenuItem>
-            <DropdownMenuItem onSelect={insertColumns}><Columns2 /> Columns</DropdownMenuItem>
-            <DropdownMenuItem onSelect={insertToc}><ListTree /> Table of contents</DropdownMenuItem>
-            <DropdownMenuItem onSelect={insertDivider}><Minus /> Divider</DropdownMenuItem>
+            <DropdownMenuLabel>Media</DropdownMenuLabel>
+            <div className="grid grid-cols-2 gap-0.5">
+              <DropdownMenuItem onSelect={() => uploadMedia(ImagePlugin.key, "image/*")}><ImageIcon /> Image</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => uploadMedia(VideoPlugin.key, "video/*")}><Video /> Video</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => uploadMedia(AudioPlugin.key, "audio/*")}><Music /> Audio</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => uploadMedia(FilePlugin.key, "application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv")}><Paperclip /> Document</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setRecorderOpen(true)}><Mic /> Record audio</DropdownMenuItem>
+            </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={doInsertLink}><Link2 /> Link</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setRecordOpen(true)}><Boxes /> Link a record</DropdownMenuItem>
-            <DropdownMenuItem onSelect={insertCodeBlock}><SquareCode /> Code block</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setHtmlOpen(true)}><FileCode2 /> HTML embed</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setEmojiOpen(true)}><Smile /> Emoji</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => setAiOpen(true)}><Sparkles /> Ask AI</DropdownMenuItem>
+            <DropdownMenuLabel>Basic</DropdownMenuLabel>
+            <div className="grid grid-cols-2 gap-0.5">
+              <DropdownMenuItem onSelect={doInsertTable}><TableIcon /> Table</DropdownMenuItem>
+              <DropdownMenuItem onSelect={makeTodo}><CheckSquare /> Checklist</DropdownMenuItem>
+              <DropdownMenuItem onSelect={insertDate}><CalendarDays /> Date</DropdownMenuItem>
+              <DropdownMenuItem onSelect={insertColumns}><Columns2 /> Columns</DropdownMenuItem>
+              <DropdownMenuItem onSelect={insertToc}><ListTree /> Table of contents</DropdownMenuItem>
+              <DropdownMenuItem onSelect={insertDivider}><Minus /> Divider</DropdownMenuItem>
+              <DropdownMenuItem onSelect={doInsertLink}><Link2 /> Link</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setRecordOpen(true)}><Boxes /> Link a record</DropdownMenuItem>
+              <DropdownMenuItem onSelect={insertCodeBlock}><SquareCode /> Code block</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setHtmlOpen(true)}><FileCode2 /> HTML embed</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setEmojiOpen(true)}><Smile /> Emoji</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setAiOpen(true)}><Sparkles /> Ask AI</DropdownMenuItem>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu>
