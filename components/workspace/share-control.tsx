@@ -25,7 +25,9 @@ export function ShareControl({
 }) {
   const actionToken = useDashboardActionToken();
   const ref = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [collabs, setCollabs] = useState<Collab[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -34,11 +36,32 @@ export function ShareControl({
 
   useEffect(() => setLocalScope(scope), [scope]);
 
+  // The panel is position:fixed so it escapes the scroll container's overflow clip.
+  useEffect(() => {
+    if (!open || !ref.current) { setPos(null); return; }
+    const r = ref.current.getBoundingClientRect();
+    const width = 288;
+    let left = align === "right" ? r.right - width : r.left;
+    left = Math.max(8, Math.min(left, window.innerWidth - width - 8));
+    setPos({ top: r.bottom + 6, left });
+  }, [open, align]);
+
   useEffect(() => {
     if (!open) return;
-    const onDoc = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const onDoc = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (ref.current?.contains(t) || panelRef.current?.contains(t)) return;
+      setOpen(false);
+    };
+    const close = () => setOpen(false);
     document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
   }, [open]);
 
   async function refreshSharing() {
@@ -110,8 +133,8 @@ export function ShareControl({
   return (
     <div className="relative" ref={ref}>
       <SimpleTooltip label="Share">{trigger}</SimpleTooltip>
-      {open ? (
-        <div className={cn("absolute z-50 mt-1 w-72 rounded-md border bg-popover p-3 text-popover-foreground shadow-lg", align === "right" ? "right-0" : "left-0")}>
+      {open && pos ? (
+        <div ref={panelRef} style={{ position: "fixed", top: pos.top, left: pos.left, width: 288 }} className="z-50 rounded-md border bg-popover p-3 text-popover-foreground shadow-lg">
           <p className="mb-2 text-xs font-semibold text-muted-foreground">Who can access</p>
           <div className="space-y-1">
             <ScopeRow active={localScope === "personal"} onClick={() => patchScope("personal")} icon={Lock} title="Personal" sub="Only you" />

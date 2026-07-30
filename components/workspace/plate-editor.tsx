@@ -32,7 +32,7 @@ import {
   Image as ImageIcon, Video, Music, Mic, FileCode2, Paperclip, AtSign, Smile, ListTree,
   Check, CheckSquare, CalendarDays, Boxes, ClipboardList, UserCircle, CalendarClock, ExternalLink, Sparkles,
   PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
-  Undo2, Redo2, Search as SearchIcon, RemoveFormatting, Maximize2, ChevronDown, Pilcrow,
+  Undo2, Redo2, Search as SearchIcon, RemoveFormatting, Maximize2, ChevronDown, Pilcrow, Settings2,
 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { SimpleTooltip } from "@/components/ui/tooltip";
@@ -120,11 +120,16 @@ const COMPONENTS: Record<string, any> = {
       </PlateElement>
     );
   },
-  // Tables render as real HTML tables.
-  [TablePlugin.key]: (p: any) => <PlateElement {...p} as="table" className="my-3 w-full table-fixed border-collapse overflow-hidden rounded-md border border-border text-sm" />,
+  // Tables render as real HTML tables. Border width/color live on the table node as
+  // CSS variables so every cell inherits a full, closed grid the user can restyle.
+  [TablePlugin.key]: (p: any) => {
+    const bw = p.element?.borderWidth ?? 1;
+    const bc = p.element?.borderColor ?? "hsl(var(--border))";
+    return <PlateElement {...p} as="table" style={{ ["--tbl-bw" as any]: `${bw}px`, ["--tbl-bc" as any]: bc, border: `${bw}px solid ${bc}` }} className="my-3 w-full table-fixed border-collapse text-sm" />;
+  },
   [TableRowPlugin.key]: (p: any) => <PlateElement {...p} as="tr" />,
-  [TableCellPlugin.key]: (p: any) => <PlateElement {...p} as="td" className="border border-border px-2 py-1 align-top" />,
-  [TableCellHeaderPlugin.key]: (p: any) => <PlateElement {...p} as="th" className="border border-border bg-muted px-2 py-1 text-left font-semibold" />,
+  [TableCellPlugin.key]: (p: any) => <PlateElement {...p} as="td" style={{ borderWidth: "var(--tbl-bw,1px)", borderColor: "var(--tbl-bc,hsl(var(--border)))", borderStyle: "solid", background: p.element?.background || undefined }} className="px-2 py-1 align-top" />,
+  [TableCellHeaderPlugin.key]: (p: any) => <PlateElement {...p} as="th" style={{ borderWidth: "var(--tbl-bw,1px)", borderColor: "var(--tbl-bc,hsl(var(--border)))", borderStyle: "solid", background: p.element?.background || "hsl(var(--muted))" }} className="px-2 py-1 text-left font-semibold" />,
   // Media (void nodes).
   [ImagePlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={p.element?.url} alt={p.element?.name || ""} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
   [VideoPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><video controls src={p.element?.url} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
@@ -518,6 +523,55 @@ function FindReplaceDialog({ open, onOpenChange, editor }: { open: boolean; onOp
   );
 }
 
+function TableInsertDialog({ open, onOpenChange, onInsert }: { open: boolean; onOpenChange: (v: boolean) => void; onInsert: (rows: number, cols: number) => void }) {
+  const [rows, setRows] = useState(3);
+  const [cols, setCols] = useState(3);
+  const clamp = (n: number, max: number) => Math.max(1, Math.min(max, Math.round(n || 1)));
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-xs">
+        <DialogHeader><DialogTitle className="flex items-center gap-2"><TableIcon className="h-4 w-4" /> Insert table</DialogTitle><DialogDescription>Choose how many rows and columns.</DialogDescription></DialogHeader>
+        <div className="flex gap-3">
+          <div className="flex-1 space-y-1.5"><label className="text-xs font-medium">Rows</label><Input type="number" min={1} max={30} value={rows} onChange={(ev) => setRows(Number(ev.target.value))} /></div>
+          <div className="flex-1 space-y-1.5"><label className="text-xs font-medium">Columns</label><Input type="number" min={1} max={12} value={cols} onChange={(ev) => setCols(Number(ev.target.value))} /></div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={() => { onInsert(clamp(rows, 30), clamp(cols, 12)); onOpenChange(false); }}>Insert</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function TableSettingsDialog({ open, onOpenChange, setTableProps, setCellBackground }: { open: boolean; onOpenChange: (v: boolean) => void; setTableProps: (p: Record<string, unknown>) => void; setCellBackground: (c: string | null) => void }) {
+  const BORDER_W = [{ label: "None", v: 0 }, { label: "Thin", v: 1 }, { label: "Medium", v: 2 }, { label: "Thick", v: 3 }];
+  const BORDER_C = ["hsl(var(--border))", "#111827", "#6b7280", "hsl(var(--primary))", "#dc2626", "#2563eb", "#16a34a"];
+  const BG_C: (string | null)[] = [null, "hsl(var(--muted))", "hsl(var(--primary) / 0.12)", "#fef9c3", "#dcfce7", "#dbeafe", "#fee2e2", "#f3e8ff"];
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader><DialogTitle className="flex items-center gap-2"><Settings2 className="h-4 w-4" /> Table settings</DialogTitle><DialogDescription>Applies to the table your cursor is in.</DialogDescription></DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <p className="mb-1.5 text-xs font-medium">Border thickness</p>
+            <div className="flex gap-1.5">{BORDER_W.map((b) => <button key={b.v} type="button" onClick={() => setTableProps({ borderWidth: b.v })} className="rounded border px-2.5 py-1 text-xs transition-colors hover:bg-accent">{b.label}</button>)}</div>
+          </div>
+          <div>
+            <p className="mb-1.5 text-xs font-medium">Border color</p>
+            <div className="flex flex-wrap gap-1.5">{BORDER_C.map((c) => <button key={c} type="button" aria-label={c} onClick={() => setTableProps({ borderColor: c })} className="h-6 w-6 rounded border" style={{ background: c }} />)}</div>
+          </div>
+          <div>
+            <p className="mb-1.5 text-xs font-medium">Cell background <span className="font-normal text-muted-foreground">(current cell)</span></p>
+            <div className="flex flex-wrap gap-1.5">{BG_C.map((c, i) => <button key={i} type="button" aria-label={c ?? "none"} onClick={() => setCellBackground(c)} className="flex h-6 w-6 items-center justify-center rounded border text-[10px] text-muted-foreground" style={{ background: c ?? "transparent" }}>{c === null ? "✕" : ""}</button>)}</div>
+          </div>
+        </div>
+        <DialogFooter><Button onClick={() => onOpenChange(false)}>Done</Button></DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right, mentionUsers = [],
 }: {
@@ -551,7 +605,9 @@ export function WorkspaceEditorSurface({
       else insertLink(e, { url, text: url });
     } catch { /* no-op */ }
   };
-  const doInsertTable = () => { try { insertTable(e, { rowCount: 3, colCount: 3 }); } catch { /* no-op */ } };
+  const insertTableSized = (rows: number, cols: number) => { try { insertTable(e, { rowCount: rows, colCount: cols }); } catch { /* no-op */ } };
+  const setTableProps = (props: Record<string, unknown>) => { if (!e.selection) return; try { e.tf?.setNodes?.(props, { match: (n: any) => n?.type === TablePlugin.key, at: e.selection }); } catch { /* no-op */ } };
+  const setCellBackground = (background: string | null) => { if (!e.selection) return; try { e.tf?.setNodes?.({ background }, { match: (n: any) => n?.type === TableCellPlugin.key || n?.type === TableCellHeaderPlugin.key, at: e.selection }); } catch { /* no-op */ } };
   const doAddRow = () => { try { insertTableRow(e); } catch { /* no-op */ } };
   const doAddCol = () => { try { insertTableColumn(e); } catch { /* no-op */ } };
   const doDeleteTable = () => { try { deleteTable(e); } catch { /* no-op */ } };
@@ -572,6 +628,9 @@ export function WorkspaceEditorSurface({
   const [aiOpen, setAiOpen] = useState(false);
   const [findOpen, setFindOpen] = useState(false);
   const [outlineOpen, setOutlineOpen] = useState(false);
+  const [tableInsertOpen, setTableInsertOpen] = useState(false);
+  const [tableSettingsOpen, setTableSettingsOpen] = useState(false);
+  const doInsertTable = () => setTableInsertOpen(true);
   const [, setTick] = useState(0);
   const doUndo = () => { try { e.undo?.(); } catch { /* no-op */ } };
   const doRedo = () => { try { e.redo?.(); } catch { /* no-op */ } };
@@ -758,6 +817,7 @@ export function WorkspaceEditorSurface({
         <TBtn icon={TableIcon} title="Insert table" onClick={doInsertTable} />
         <TBtn icon={Rows3} title="Add row" onClick={doAddRow} />
         <TBtn icon={Columns3} title="Add column" onClick={doAddCol} />
+        <TBtn icon={Settings2} title="Table settings (borders, colors)" onClick={() => setTableSettingsOpen(true)} />
         <TBtn icon={Trash2} title="Delete table" onClick={doDeleteTable} />
         <Sep />
         <MediaButton editor={editor} actionToken={actionToken} nodeType={ImagePlugin.key} accept="image/*" icon={ImageIcon} title="Insert image" />
@@ -832,6 +892,8 @@ export function WorkspaceEditorSurface({
       <RecordPickerDialog open={recordOpen} onOpenChange={setRecordOpen} onInsert={insertRecordLink} />
       <AiDialog open={aiOpen} onOpenChange={setAiOpen} getText={getDocText} onInsert={insertAiText} />
       <FindReplaceDialog open={findOpen} onOpenChange={setFindOpen} editor={editor} />
+      <TableInsertDialog open={tableInsertOpen} onOpenChange={setTableInsertOpen} onInsert={insertTableSized} />
+      <TableSettingsDialog open={tableSettingsOpen} onOpenChange={setTableSettingsOpen} setTableProps={setTableProps} setCellBackground={setCellBackground} />
     </Plate>
   );
 }
