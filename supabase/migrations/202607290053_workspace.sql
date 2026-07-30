@@ -63,10 +63,17 @@ alter table public.workspace_documents enable row level security;
 alter table public.workspace_collaborators enable row level security;
 alter table public.workspace_favorites enable row level security;
 
+drop policy if exists "workspace_folders_read" on public.workspace_folders;
 create policy "workspace_folders_read" on public.workspace_folders for select using (public.can_access_dashboard());
+drop policy if exists "workspace_folders_write" on public.workspace_folders;
 create policy "workspace_folders_write" on public.workspace_folders for all using (public.can_manage_users()) with check (public.can_manage_users());
+drop policy if exists "workspace_documents_read" on public.workspace_documents;
 create policy "workspace_documents_read" on public.workspace_documents for select using (public.can_access_dashboard());
+drop policy if exists "workspace_documents_write" on public.workspace_documents;
 create policy "workspace_documents_write" on public.workspace_documents for all using (public.can_manage_users()) with check (public.can_manage_users());
+drop policy if exists "workspace_collaborators_read" on public.workspace_collaborators;
 create policy "workspace_collaborators_read" on public.workspace_collaborators for select using (public.can_access_dashboard());
+drop policy if exists "workspace_collaborators_write" on public.workspace_collaborators;
 create policy "workspace_collaborators_write" on public.workspace_collaborators for all using (public.can_manage_users()) with check (public.can_manage_users());
+drop policy if exists "workspace_favorites_rw" on public.workspace_favorites;
 create policy "workspace_favorites_rw" on public.workspace_favorites for all using (public.can_access_dashboard()) with check (public.can_access_dashboard());

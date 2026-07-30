@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { ArrowLeft, Check, Loader2, AlertTriangle, Plus, Star, FileText, Folder, MessageSquare } from "lucide-react";
+import { ArrowLeft, Check, Loader2, AlertTriangle, Plus, Star, FileText, Folder } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Input } from "@/components/ui/input";
+import { CommentsPanel } from "@/components/workspace/comments-panel";
+import type { WorkspaceComment, MentionUser } from "@/lib/workspace/comments";
 
 const WorkspaceEditorSurface = dynamic(() => import("@/components/workspace/plate-editor").then((m) => m.WorkspaceEditorSurface), {
   ssr: false,
@@ -20,10 +22,14 @@ export function WorkspaceEditor({
   doc,
   navDocs,
   folders,
+  comments,
+  mentionable,
 }: {
   doc: { id: string; title: string; content_json: unknown; scope: string; updated_at: string };
   navDocs: NavDoc[];
   folders: { id: string; name: string }[];
+  comments: WorkspaceComment[];
+  mentionable: MentionUser[];
 }) {
   const actionToken = useDashboardActionToken();
   const router = useRouter();
@@ -84,10 +90,7 @@ export function WorkspaceEditor({
 
   const right = (
     <div className="space-y-4">
-      <div className="rounded-md border bg-card p-3">
-        <p className="mb-2 flex items-center gap-1.5 text-sm font-medium"><MessageSquare className="h-4 w-4" /> Comments</p>
-        <p className="text-xs text-muted-foreground">Comments, mentions, and activity arrive in the next Workspace phase.</p>
-      </div>
+      <CommentsPanel documentId={doc.id} comments={comments} mentionable={mentionable} />
       <div className="rounded-md border bg-card p-3 text-xs text-muted-foreground">
         <p className="mb-2 text-sm font-medium text-foreground">Document info</p>
         <p>Scope: <span className="capitalize text-foreground">{doc.scope}</span></p>
