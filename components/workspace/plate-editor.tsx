@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plate, PlateContent, PlateElement, PlateLeaf, usePlateEditor } from "platejs/react";
+import { toggleList } from "@platejs/list";
 import {
   BoldPlugin, ItalicPlugin, UnderlinePlugin, StrikethroughPlugin, CodePlugin, HighlightPlugin,
   H1Plugin, H2Plugin, H3Plugin, BlockquotePlugin, HorizontalRulePlugin,
@@ -16,7 +17,7 @@ import { useDashboardActionToken } from "@/components/layout/dashboard-action-to
 import {
   Bold, Italic, Underline, Strikethrough, Code, Highlighter, Heading1, Heading2, Heading3,
   Quote, Minus, SquareCode, Link2, List, ListOrdered, ListChecks, AlignLeft, AlignCenter, AlignRight,
-  Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Trash2,
+  Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Trash2, Plus,
   Image as ImageIcon, Video, Music, Paperclip, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -125,6 +126,48 @@ function MediaButton({ editor, actionToken, nodeType, accept, icon, title }: { e
   );
 }
 
+type Cmd = { label: string; keywords?: string; icon: typeof Type; run: () => void };
+
+// Self-contained insert menu (own search + keyboard nav). Opened by "/" on an empty
+// line or the + button. It never inserts a slash node, so normal "/" typing is safe.
+function CommandMenu({ open, pos, commands, onClose }: { open: boolean; pos: { top: number; left: number }; commands: Cmd[]; onClose: () => void }) {
+  const [q, setQ] = useState("");
+  const [i, setI] = useState(0);
+  useEffect(() => { if (open) { setQ(""); setI(0); } }, [open]);
+  const filtered = useMemo(() => commands.filter((c) => `${c.label} ${c.keywords ?? ""}`.toLowerCase().includes(q.trim().toLowerCase())), [commands, q]);
+  useEffect(() => { setI(0); }, [q]);
+  if (!open) return null;
+  return (
+    <>
+      <div className="fixed inset-0 z-40" onMouseDown={(e) => { e.preventDefault(); onClose(); }} />
+      <div className="fixed z-50 w-64 rounded-md border bg-popover p-1 text-popover-foreground shadow-md" style={{ top: pos.top, left: pos.left }} onMouseDown={(e) => e.preventDefault()}>
+        <input
+          autoFocus
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search blocks…"
+          className="mb-1 w-full rounded border bg-background px-2 py-1 text-sm focus:outline-none"
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown") { e.preventDefault(); setI((x) => Math.min(x + 1, filtered.length - 1)); }
+            else if (e.key === "ArrowUp") { e.preventDefault(); setI((x) => Math.max(x - 1, 0)); }
+            else if (e.key === "Enter") { e.preventDefault(); filtered[i]?.run(); onClose(); }
+            else if (e.key === "Escape") { e.preventDefault(); onClose(); }
+          }}
+        />
+        <ul className="max-h-64 overflow-y-auto">
+          {filtered.length ? filtered.map((c, idx) => (
+            <li key={c.label}>
+              <button type="button" onMouseDown={(e) => { e.preventDefault(); c.run(); onClose(); }} className={cn("flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm", idx === i ? "bg-accent text-foreground" : "hover:bg-accent")}>
+                <c.icon className="h-4 w-4 text-muted-foreground" /> {c.label}
+              </button>
+            </li>
+          )) : <li className="px-2 py-2 text-xs text-muted-foreground">No matching blocks</li>}
+        </ul>
+      </div>
+    </>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right,
 }: {
@@ -147,10 +190,30 @@ export function WorkspaceEditorSurface({
   const setAlign = (val: string) => { try { (editor.tf as any)?.setNodes?.({ [TextAlignPlugin.key]: val }, { match: (n: any) => !!n?.type }); } catch { /* no-op */ } };
   const insertLink = () => { const url = typeof window !== "undefined" ? window.prompt("Link URL") : null; if (url) { try { (editor.tf as any)?.a?.toggle?.({ url }); } catch { /* no-op */ } } };
 
+  const [menu, setMenu] = useState<{ open: boolean; top: number; left: number }>({ open: false, top: 0, left: 0 });
+  const openMenu = (top: number, left: number) => setMenu({ open: true, top, left });
+  const closeMenu = () => setMenu((m) => ({ ...m, open: false }));
+  const list = (listStyleType: string) => { try { toggleList(editor as any, { listStyleType } as any); } catch { /* no-op */ } };
+  const commands: Cmd[] = [
+    { label: "Text", keywords: "paragraph body", icon: Type, run: () => { try { (editor.tf as any)?.setNodes?.({ type: "p" }, { match: (n: any) => !!n?.type }); } catch { /* no-op */ } } },
+    { label: "Heading 1", keywords: "h1 title", icon: Heading1, run: () => toggle(H1Plugin.key) },
+    { label: "Heading 2", keywords: "h2", icon: Heading2, run: () => toggle(H2Plugin.key) },
+    { label: "Heading 3", keywords: "h3", icon: Heading3, run: () => toggle(H3Plugin.key) },
+    { label: "Bulleted list", keywords: "ul unordered", icon: List, run: () => list("disc") },
+    { label: "Numbered list", keywords: "ol ordered", icon: ListOrdered, run: () => list("decimal") },
+    { label: "Checklist", keywords: "todo task", icon: ListChecks, run: () => list("todo") },
+    { label: "Quote", keywords: "blockquote", icon: Quote, run: () => toggle(BlockquotePlugin.key) },
+    { label: "Code block", keywords: "code snippet", icon: SquareCode, run: () => toggle(CodeBlockPlugin.key) },
+    { label: "Table", keywords: "grid", icon: TableIcon, run: () => { try { (editor.tf as any)?.insertTable?.({ rowCount: 3, colCount: 3 }); } catch { /* no-op */ } } },
+    { label: "Divider", keywords: "hr line separator", icon: Minus, run: () => { try { (editor.tf as any)?.hr?.insert?.(); } catch { /* no-op */ } } },
+  ];
+
   return (
     <Plate editor={editor} onChange={({ value }: any) => onChange(value)}>
       <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-md border bg-card p-1">
         <TBtn icon={leftOpen ? PanelLeftClose : PanelLeftOpen} title={leftOpen ? "Hide files" : "Show files"} onClick={() => setLeftOpen((o) => !o)} />
+        <Sep />
+        <button type="button" title="Insert block" onMouseDown={(e) => { e.preventDefault(); const r = (e.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><Plus className="h-4 w-4" /></button>
         <Sep />
         <TBtn icon={Bold} title="Bold" onClick={() => toggle(BoldPlugin.key)} />
         <TBtn icon={Italic} title="Italic" onClick={() => toggle(ItalicPlugin.key)} />
@@ -207,11 +270,23 @@ export function WorkspaceEditorSurface({
           {titleSlot}
           <PlateContent
             className={cn("min-h-[62vh] rounded-md border bg-background px-4 py-3 text-[15px] leading-7 focus:outline-none [&_p]:my-1.5")}
-            placeholder="Start writing… (Markdown shortcuts work: # heading, > quote, ** bold, ` code)"
+            placeholder="Start writing… type / for blocks, or use Markdown (# heading, > quote, ** bold, ` code)"
+            onKeyDown={(e: any) => {
+              if (e.key === "/") {
+                const sel = typeof window !== "undefined" ? window.getSelection() : null;
+                const lineEmpty = (sel?.anchorNode?.textContent ?? "") === "";
+                if (sel && sel.isCollapsed && lineEmpty) {
+                  e.preventDefault();
+                  const rect = sel.rangeCount ? sel.getRangeAt(0).getBoundingClientRect() : null;
+                  openMenu((rect?.bottom ?? 220) + 4, rect?.left ?? 240);
+                }
+              }
+            }}
           />
         </div>
         {right && rightOpen ? <aside className="hidden w-72 shrink-0 xl:block">{right}</aside> : null}
       </div>
+      <CommandMenu open={menu.open} pos={{ top: menu.top, left: menu.left }} commands={commands} onClose={closeMenu} />
     </Plate>
   );
 }
