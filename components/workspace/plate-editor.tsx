@@ -12,6 +12,8 @@ import { LinkPlugin } from "@platejs/link/react";
 import { ListPlugin, useListToolbarButton, useListToolbarButtonState, useIndentTodoToolBarButton, useIndentTodoToolBarButtonState } from "@platejs/list/react";
 import { FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin } from "@platejs/basic-styles/react";
 import { TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin } from "@platejs/table/react";
+import { insertTable, insertTableRow, insertTableColumn, deleteTable } from "@platejs/table";
+import { insertLink } from "@platejs/link";
 import { ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin } from "@platejs/media/react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import {
@@ -188,7 +190,14 @@ export function WorkspaceEditorSurface({
   const toggle = (key: string) => { try { (editor.tf as any)?.[key]?.toggle?.(); } catch { /* no-op */ } };
   const setMark = (key: string, val: string) => { try { (editor.tf as any)?.addMark?.(key, val); } catch { /* no-op */ } };
   const setAlign = (val: string) => { try { (editor.tf as any)?.setNodes?.({ [TextAlignPlugin.key]: val }, { match: (n: any) => !!n?.type }); } catch { /* no-op */ } };
-  const insertLink = () => { const url = typeof window !== "undefined" ? window.prompt("Link URL") : null; if (url) { try { (editor.tf as any)?.a?.toggle?.({ url }); } catch { /* no-op */ } } };
+  const e = editor as any;
+  const doInsertLink = () => { const url = typeof window !== "undefined" ? window.prompt("Link URL (https://…)") : null; if (url) { try { insertLink(e, { url }); } catch { /* no-op */ } } };
+  const doInsertTable = () => { try { insertTable(e, { rowCount: 3, colCount: 3 }); } catch { /* no-op */ } };
+  const doAddRow = () => { try { insertTableRow(e); } catch { /* no-op */ } };
+  const doAddCol = () => { try { insertTableColumn(e); } catch { /* no-op */ } };
+  const doDeleteTable = () => { try { deleteTable(e); } catch { /* no-op */ } };
+  const insertCodeBlock = () => { try { e.tf?.insertNodes?.({ type: CodeBlockPlugin.key, children: [{ type: CodeLinePlugin.key, children: [{ text: "" }] }] }); } catch { /* no-op */ } };
+  const insertDivider = () => { try { e.tf?.insertNodes?.({ type: HorizontalRulePlugin.key, children: [{ text: "" }] }); } catch { /* no-op */ } };
 
   const [menu, setMenu] = useState<{ open: boolean; top: number; left: number }>({ open: false, top: 0, left: 0 });
   const openMenu = (top: number, left: number) => setMenu({ open: true, top, left });
@@ -203,9 +212,9 @@ export function WorkspaceEditorSurface({
     { label: "Numbered list", keywords: "ol ordered", icon: ListOrdered, run: () => list("decimal") },
     { label: "Checklist", keywords: "todo task", icon: ListChecks, run: () => list("todo") },
     { label: "Quote", keywords: "blockquote", icon: Quote, run: () => toggle(BlockquotePlugin.key) },
-    { label: "Code block", keywords: "code snippet", icon: SquareCode, run: () => toggle(CodeBlockPlugin.key) },
-    { label: "Table", keywords: "grid", icon: TableIcon, run: () => { try { (editor.tf as any)?.insertTable?.({ rowCount: 3, colCount: 3 }); } catch { /* no-op */ } } },
-    { label: "Divider", keywords: "hr line separator", icon: Minus, run: () => { try { (editor.tf as any)?.hr?.insert?.(); } catch { /* no-op */ } } },
+    { label: "Code block", keywords: "code snippet", icon: SquareCode, run: insertCodeBlock },
+    { label: "Table", keywords: "grid", icon: TableIcon, run: doInsertTable },
+    { label: "Divider", keywords: "hr line separator", icon: Minus, run: insertDivider },
   ];
 
   return (
@@ -245,19 +254,19 @@ export function WorkspaceEditorSurface({
         <TBtn icon={AlignCenter} title="Align center" onClick={() => setAlign("center")} />
         <TBtn icon={AlignRight} title="Align right" onClick={() => setAlign("right")} />
         <Sep />
-        <TBtn icon={TableIcon} title="Insert table" onClick={() => { try { (editor.tf as any)?.insertTable?.({ rowCount: 3, colCount: 3 }); } catch { /* no-op */ } }} />
-        <TBtn icon={Rows3} title="Add row" onClick={() => { try { (editor.tf as any)?.insertTableRow?.(); } catch { /* no-op */ } }} />
-        <TBtn icon={Columns3} title="Add column" onClick={() => { try { (editor.tf as any)?.insertTableColumn?.(); } catch { /* no-op */ } }} />
-        <TBtn icon={Trash2} title="Delete table" onClick={() => { try { (editor.tf as any)?.deleteTable?.(); } catch { /* no-op */ } }} />
+        <TBtn icon={TableIcon} title="Insert table" onClick={doInsertTable} />
+        <TBtn icon={Rows3} title="Add row" onClick={doAddRow} />
+        <TBtn icon={Columns3} title="Add column" onClick={doAddCol} />
+        <TBtn icon={Trash2} title="Delete table" onClick={doDeleteTable} />
         <Sep />
         <MediaButton editor={editor} actionToken={actionToken} nodeType={ImagePlugin.key} accept="image/*" icon={ImageIcon} title="Insert image" />
         <MediaButton editor={editor} actionToken={actionToken} nodeType={VideoPlugin.key} accept="video/*" icon={Video} title="Insert video" />
         <MediaButton editor={editor} actionToken={actionToken} nodeType={AudioPlugin.key} accept="audio/*" icon={Music} title="Insert audio" />
         <MediaButton editor={editor} actionToken={actionToken} nodeType={FilePlugin.key} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv" icon={Paperclip} title="Insert document" />
         <Sep />
-        <TBtn icon={SquareCode} title="Code block" onClick={() => toggle(CodeBlockPlugin.key)} />
-        <TBtn icon={Link2} title="Insert link" onClick={insertLink} />
-        <TBtn icon={Minus} title="Divider" onClick={() => { try { (editor.tf as any)?.hr?.insert?.(); } catch { /* no-op */ } }} />
+        <TBtn icon={SquareCode} title="Code block" onClick={insertCodeBlock} />
+        <TBtn icon={Link2} title="Insert link" onClick={doInsertLink} />
+        <TBtn icon={Minus} title="Divider" onClick={insertDivider} />
         <div className="ml-auto flex items-center gap-1">
           {statusSlot}
           <TBtn icon={rightOpen ? PanelRightClose : PanelRightOpen} title={rightOpen ? "Hide panel" : "Show panel"} onClick={() => setRightOpen((o) => !o)} />
