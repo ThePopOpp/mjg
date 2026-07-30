@@ -30,10 +30,11 @@ import {
   Quote, Minus, SquareCode, Link2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
   Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Columns2, Trash2, Plus,
   Image as ImageIcon, Video, Music, Mic, FileCode2, Paperclip, AtSign, Smile, ListTree,
-  Check, CheckSquare, CalendarDays, Boxes, ClipboardList, UserCircle, CalendarClock, ExternalLink,
+  Check, CheckSquare, CalendarDays, Boxes, ClipboardList, UserCircle, CalendarClock, ExternalLink, Sparkles,
   PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
+import { extractPlainText } from "@/lib/workspace/types";
 import { cn } from "@/lib/utils";
 
 // Custom void block: render pasted HTML in a sandboxed frame (distinct from a code block).
@@ -379,6 +380,51 @@ function RecordPickerDialog({ open, onOpenChange, onInsert }: { open: boolean; o
   );
 }
 
+const AI_ACTIONS = [
+  { value: "summarize", label: "Summarize" },
+  { value: "action_items", label: "Extract action items" },
+  { value: "improve", label: "Improve writing" },
+  { value: "shorten", label: "Shorten" },
+  { value: "expand", label: "Expand" },
+];
+function AiDialog({ open, onOpenChange, getText, onInsert }: { open: boolean; onOpenChange: (v: boolean) => void; getText: () => string; onInsert: (t: string) => void }) {
+  const actionToken = useDashboardActionToken();
+  const [action, setAction] = useState("summarize");
+  const [result, setResult] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  async function run() {
+    setBusy(true); setError(null); setResult("");
+    try {
+      const res = await fetch("/api/workspace/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actionToken, action, text: getText() }) });
+      const data = await res.json();
+      if (!res.ok) setError(data.error || "AI failed."); else setResult(data.result || "");
+    } catch { setError("AI request failed."); } finally { setBusy(false); }
+  }
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setResult(""); setError(null); } onOpenChange(v); }}>
+      <DialogContent className="sm:max-w-xl">
+        <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" /> AI assistant</DialogTitle><DialogDescription>Run an AI action on this document. Review the result before inserting.</DialogDescription></DialogHeader>
+        <div className="flex gap-2">
+          <Select value={action} onValueChange={setAction}>
+            <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
+            <SelectContent>{AI_ACTIONS.map((a) => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}</SelectContent>
+          </Select>
+          <Button onClick={run} disabled={busy}>{busy ? "Working…" : "Run"}</Button>
+        </div>
+        {error ? <p className="text-sm text-destructive">{error}</p> : null}
+        {result ? <Textarea readOnly value={result} rows={10} className="text-sm" /> : null}
+        {result ? (
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { navigator.clipboard?.writeText(result); }}>Copy</Button>
+            <Button onClick={() => { onInsert(result); onOpenChange(false); setResult(""); }}>Insert into document</Button>
+          </DialogFooter>
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right, mentionUsers = [],
 }: {
@@ -430,6 +476,14 @@ export function WorkspaceEditorSurface({
   const [recorderOpen, setRecorderOpen] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [recordOpen, setRecordOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const getDocText = () => { try { return extractPlainText((editor as any).children ?? []); } catch { return ""; } };
+  const insertAiText = (txt: string) => {
+    try {
+      const nodes = txt.split(/\n+/).map((l) => l.trim()).filter(Boolean).map((l) => ({ type: "p", children: [{ text: l }] }));
+      e.tf?.insertNodes?.(nodes.length ? nodes : [{ type: "p", children: [{ text: txt }] }]);
+    } catch { /* no-op */ }
+  };
 
   const [menu, setMenu] = useState<{ open: boolean; top: number; left: number; cmds: Cmd[] }>({ open: false, top: 0, left: 0, cmds: [] });
   const openMenu = (top: number, left: number, cmds: Cmd[]) => setMenu({ open: true, top, left, cmds });
@@ -448,6 +502,7 @@ export function WorkspaceEditorSurface({
     { label: "Code block", keywords: "code snippet", icon: SquareCode, run: insertCodeBlock },
     { label: "Table", keywords: "grid", icon: TableIcon, run: doInsertTable },
     { label: "Table of contents", keywords: "toc outline headings", icon: ListTree, run: insertToc },
+    { label: "Ask AI", keywords: "ai summarize rewrite improve action items assistant", icon: Sparkles, run: () => setAiOpen(true) },
     { label: "Link a record", keywords: "plan client booking record link mjg", icon: Boxes, run: () => setRecordOpen(true) },
     { label: "Columns", keywords: "layout two column split", icon: Columns2, run: insertColumns },
     { label: "HTML embed", keywords: "html iframe render", icon: FileCode2, run: () => setHtmlOpen(true) },
@@ -524,6 +579,8 @@ export function WorkspaceEditorSurface({
         <TBtn icon={SquareCode} title="Code block" onClick={insertCodeBlock} />
         <TBtn icon={Link2} title="Insert link" onClick={doInsertLink} />
         <TBtn icon={Minus} title="Divider" onClick={insertDivider} />
+        <Sep />
+        <TBtn icon={Sparkles} title="Ask AI" onClick={() => setAiOpen(true)} />
         <div className="ml-auto flex items-center gap-1">
           {statusSlot}
           <TBtn icon={rightOpen ? PanelRightClose : PanelRightOpen} title={rightOpen ? "Hide panel" : "Show panel"} onClick={() => setRightOpen((o) => !o)} />
@@ -566,6 +623,7 @@ export function WorkspaceEditorSurface({
       <HtmlEmbedDialog open={htmlOpen} onOpenChange={setHtmlOpen} onInsert={insertHtml} />
       <RecorderDialog open={recorderOpen} onOpenChange={setRecorderOpen} actionToken={actionToken} onInsert={insertRecordedAudio} />
       <RecordPickerDialog open={recordOpen} onOpenChange={setRecordOpen} onInsert={insertRecordLink} />
+      <AiDialog open={aiOpen} onOpenChange={setAiOpen} getText={getDocText} onInsert={insertAiText} />
     </Plate>
   );
 }
