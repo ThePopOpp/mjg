@@ -13,6 +13,8 @@ export const PERMISSIONS = {
   // Super-Admin-only. Not granted to any other role below, so can(role, MANAGE_CMS)
   // is true ONLY for super_admin (via the super-admin shortcut in can()).
   MANAGE_CMS: "manage_cms",
+  // Super-Admin-only (same pattern as MANAGE_CMS): the Workspace module.
+  MANAGE_WORKSPACE: "manage_workspace",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
