@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, FolderPlus, LayoutGrid, Table as TableIcon, LayoutList, Columns3, CalendarDays, ChevronLeft, ChevronRight, Star, Pencil, Archive, Trash2, FileText } from "lucide-react";
+import { Plus, FolderPlus, LayoutGrid, Table as TableIcon, LayoutList, Columns3, CalendarDays, ChevronLeft, ChevronRight, Star, Pencil, Archive, Trash2, FileText, Search, LayoutTemplate } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import type { WorkspaceDocListItem, WorkspaceFolder } from "@/lib/workspace/types";
 
 type View = "list" | "cards" | "table" | "kanban" | "calendar";
-type Tab = "mine" | "shared" | "favorites";
+type Tab = "mine" | "shared" | "favorites" | "templates";
 
 const VIEWS: { key: View; icon: typeof LayoutGrid }[] = [
   { key: "list", icon: LayoutList },
@@ -27,10 +27,28 @@ const VIEWS: { key: View; icon: typeof LayoutGrid }[] = [
   { key: "calendar", icon: CalendarDays },
 ];
 
-export function WorkspaceHome({ mine, shared, folders }: { mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[]; folders: WorkspaceFolder[] }) {
+type TemplateItem = { id: string; name: string; description: string; category: string };
+type SearchHit = { id: string; title: string; folder_name: string | null; snippet: string | null; updated_at: string };
+
+export function WorkspaceHome({ mine, shared, folders, templates }: { mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[]; folders: WorkspaceFolder[]; templates: TemplateItem[] }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
   const [tab, setTab] = useState<Tab>("mine");
+  const [query, setQuery] = useState("");
+  const [hits, setHits] = useState<SearchHit[] | null>(null);
+
+  useEffect(() => {
+    const q = query.trim();
+    if (!q) { setHits(null); return; }
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/workspace/search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        setHits(res.ok ? data.results : []);
+      } catch { setHits([]); }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [query]);
   const [view, setView] = useState<View>("cards");
   const [folderId, setFolderId] = useState<string>("all");
   const [newFolderOpen, setNewFolderOpen] = useState(false);
@@ -62,15 +80,25 @@ export function WorkspaceHome({ mine, shared, folders }: { mine: WorkspaceDocLis
     const data = await post("/api/workspace/documents", { scope, folderId: folderId === "all" ? null : folderId });
     if (data?.id) router.push(`/dashboard/workspace/${data.id}`);
   }
+  async function newFromTemplate(templateId: string) {
+    const data = await post("/api/workspace/documents", { scope: "personal", templateId });
+    if (data?.id) router.push(`/dashboard/workspace/${data.id}`);
+  }
 
   return (
     <div className="space-y-4">
+      <div className="relative max-w-md">
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search documents…" className="pl-8" />
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>
           <TabsList>
             <TabsTrigger value="mine">My Documents</TabsTrigger>
             <TabsTrigger value="shared">Shared</TabsTrigger>
             <TabsTrigger value="favorites">Favorites</TabsTrigger>
+            <TabsTrigger value="templates"><LayoutTemplate className="mr-1.5 h-4 w-4" /> Templates</TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="flex items-center gap-2">
@@ -95,6 +123,11 @@ export function WorkspaceHome({ mine, shared, folders }: { mine: WorkspaceDocLis
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
+      {hits !== null ? (
+        <SearchResults hits={hits} />
+      ) : tab === "templates" ? (
+        <TemplatesGallery templates={templates} onUse={newFromTemplate} busy={busy} />
+      ) : (
       <Tabs value={tab}>
         <TabsContent value={tab} className="mt-0">
           {!docs.length ? (
@@ -143,8 +176,40 @@ export function WorkspaceHome({ mine, shared, folders }: { mine: WorkspaceDocLis
           )}
         </TabsContent>
       </Tabs>
+      )}
 
       <NewFolderDialog open={newFolderOpen} onOpenChange={setNewFolderOpen} defaultScope={tab === "shared" ? "shared" : "personal"} onCreate={async (name, scope) => { await post("/api/workspace/folders", { name, scope }); setNewFolderOpen(false); router.refresh(); }} busy={busy} />
+    </div>
+  );
+}
+
+function SearchResults({ hits }: { hits: SearchHit[] }) {
+  if (!hits.length) return <Card><CardContent className="p-10 text-center text-sm text-muted-foreground">No documents match your search.</CardContent></Card>;
+  return (
+    <Card><CardContent className="divide-y p-0">
+      {hits.map((h) => (
+        <Link key={h.id} href={`/dashboard/workspace/${h.id}`} className="block px-4 py-3 hover:bg-muted/50">
+          <div className="flex items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-muted-foreground" /><span className="font-medium">{h.title}</span>{h.folder_name ? <span className="text-xs text-muted-foreground">· {h.folder_name}</span> : null}</div>
+          {h.snippet ? <p className="mt-0.5 truncate pl-6 text-xs text-muted-foreground">{h.snippet}</p> : null}
+        </Link>
+      ))}
+    </CardContent></Card>
+  );
+}
+
+function TemplatesGallery({ templates, onUse, busy }: { templates: TemplateItem[]; onUse: (id: string) => void; busy: boolean }) {
+  return (
+    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {templates.map((t) => (
+        <Card key={t.id} className="flex flex-col">
+          <CardContent className="flex flex-1 flex-col gap-2 p-4">
+            <div className="flex items-center gap-2"><LayoutTemplate className="h-4 w-4 text-primary" /><p className="font-medium">{t.name}</p></div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">{t.category}</p>
+            <p className="flex-1 text-sm text-muted-foreground">{t.description}</p>
+            <Button size="sm" variant="outline" className="mt-1 self-start" onClick={() => onUse(t.id)} disabled={busy}><Plus className="mr-2 h-4 w-4" /> Use template</Button>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

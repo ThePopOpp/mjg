@@ -21,14 +21,17 @@ import { ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin } from "@platejs/medi
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   Bold, Italic, Underline, Strikethrough, Code, Highlighter, Heading1, Heading2, Heading3,
   Quote, Minus, SquareCode, Link2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
   Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Columns2, Trash2, Plus,
   Image as ImageIcon, Video, Music, Mic, FileCode2, Paperclip, AtSign, Smile, ListTree,
-  Check, CheckSquare, CalendarDays, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
+  Check, CheckSquare, CalendarDays, Boxes, ClipboardList, UserCircle, CalendarClock, ExternalLink,
+  PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
@@ -38,6 +41,8 @@ const HtmlEmbedPlugin = createPlatePlugin({ key: "html_embed", node: { isElement
 // Custom checkbox (todo) block + inline date field. Components are defined further down.
 const TodoItemPlugin = createPlatePlugin({ key: "todo_item", node: { isElement: true } });
 const DateFieldPlugin = createPlatePlugin({ key: "date_field", node: { isElement: true, isInline: true, isVoid: true } });
+// Inline card linking to an MJG record (plan / participant / booking).
+const RecordLinkPlugin = createPlatePlugin({ key: "record_link", node: { isElement: true, isInline: true, isVoid: true } });
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const PLUGINS = [
@@ -47,7 +52,7 @@ const PLUGINS = [
   FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin,
   TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin,
   ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin,
-  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin, TocPlugin, TodoItemPlugin, DateFieldPlugin,
+  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin, TocPlugin, TodoItemPlugin, DateFieldPlugin, RecordLinkPlugin,
 ];
 
 // TOC element: lists the document's headings with click-to-scroll (from @platejs/toc).
@@ -93,6 +98,20 @@ const COMPONENTS: Record<string, any> = {
   [TocPlugin.key]: (p: any) => <PlateElement {...p}><TocElement />{p.children}</PlateElement>,
   [TodoItemPlugin.key]: TodoItem,
   [DateFieldPlugin.key]: DateField,
+  [RecordLinkPlugin.key]: (p: any) => {
+    const el = p.element ?? {};
+    const Icon = el.recordType === "plan" ? ClipboardList : el.recordType === "participant" ? UserCircle : CalendarClock;
+    return (
+      <PlateElement {...p} as="span" className="mx-0.5 inline-block align-middle">
+        <span contentEditable={false} className="inline-flex items-center gap-1.5 rounded-md border bg-card px-2 py-0.5 text-sm">
+          <Icon className="h-3.5 w-3.5 text-primary" />
+          <span className="font-medium">{el.label}</span>
+          {el.sublabel ? <span className="text-xs text-muted-foreground">· {el.sublabel}</span> : null}
+          <a href={el.href} title="Open record" onClick={(ev) => { ev.preventDefault(); if (el.href && typeof window !== "undefined") window.open(el.href, "_blank", "noopener,noreferrer"); }} className="ml-0.5 text-primary hover:text-primary/80"><ExternalLink className="h-3.5 w-3.5" /></a>
+        </span>{p.children}
+      </PlateElement>
+    );
+  },
   // Tables render as real HTML tables.
   [TablePlugin.key]: (p: any) => <PlateElement {...p} as="table" className="my-3 w-full table-fixed border-collapse overflow-hidden rounded-md border border-border text-sm" />,
   [TableRowPlugin.key]: (p: any) => <PlateElement {...p} as="tr" />,
@@ -324,6 +343,42 @@ function HtmlEmbedDialog({ open, onOpenChange, onInsert }: { open: boolean; onOp
   );
 }
 
+function RecordPickerDialog({ open, onOpenChange, onInsert }: { open: boolean; onOpenChange: (v: boolean) => void; onInsert: (r: any) => void }) {
+  const [type, setType] = useState("plan");
+  const [q, setQ] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  useEffect(() => {
+    if (!open) return;
+    const t = setTimeout(async () => {
+      try { const res = await fetch(`/api/workspace/records?type=${type}&q=${encodeURIComponent(q)}`); const data = await res.json(); setResults(res.ok ? data.results : []); } catch { setResults([]); }
+    }, 250);
+    return () => clearTimeout(t);
+  }, [open, type, q]);
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setQ(""); setResults([]); } onOpenChange(v); }}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Link a record</DialogTitle><DialogDescription>Insert a live card linking this document to an MJG record.</DialogDescription></DialogHeader>
+        <div className="flex gap-2">
+          <Select value={type} onValueChange={(v) => { setType(v); setResults([]); }}>
+            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="plan">Plan</SelectItem><SelectItem value="participant">Client</SelectItem><SelectItem value="booking">Booking</SelectItem></SelectContent>
+          </Select>
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" />
+        </div>
+        <ul className="max-h-64 divide-y overflow-y-auto rounded-md border">
+          {results.length ? results.map((r) => (
+            <li key={`${r.recordType}-${r.recordId}`}>
+              <button type="button" onClick={() => { onInsert(r); onOpenChange(false); setQ(""); }} className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-accent">
+                <span className="truncate font-medium">{r.label}</span>{r.sublabel ? <span className="shrink-0 text-xs text-muted-foreground">{r.sublabel}</span> : null}
+              </button>
+            </li>
+          )) : <li className="px-3 py-4 text-center text-xs text-muted-foreground">No records found.</li>}
+        </ul>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right, mentionUsers = [],
 }: {
@@ -369,10 +424,12 @@ export function WorkspaceEditorSurface({
   const insertToc = () => { try { e.tf?.insertNodes?.({ type: TocPlugin.key, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const makeTodo = () => { try { e.tf?.setNodes?.({ type: TodoItemPlugin.key, checked: false }, { match: (n: any) => !!n?.type && !("text" in n), mode: "lowest" }); } catch { /* no-op */ } };
   const insertDate = () => { try { e.tf?.insertNodes?.({ type: DateFieldPlugin.key, date: null, children: [{ text: "" }] }); } catch { /* no-op */ } };
+  const insertRecordLink = (r: any) => { try { e.tf?.insertNodes?.({ type: RecordLinkPlugin.key, recordType: r.recordType, recordId: r.recordId, label: r.label, sublabel: r.sublabel, href: r.href, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertText = (t: string) => { try { e.tf?.insertText?.(t); } catch { /* no-op */ } };
   const [htmlOpen, setHtmlOpen] = useState(false);
   const [recorderOpen, setRecorderOpen] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [recordOpen, setRecordOpen] = useState(false);
 
   const [menu, setMenu] = useState<{ open: boolean; top: number; left: number; cmds: Cmd[] }>({ open: false, top: 0, left: 0, cmds: [] });
   const openMenu = (top: number, left: number, cmds: Cmd[]) => setMenu({ open: true, top, left, cmds });
@@ -391,6 +448,7 @@ export function WorkspaceEditorSurface({
     { label: "Code block", keywords: "code snippet", icon: SquareCode, run: insertCodeBlock },
     { label: "Table", keywords: "grid", icon: TableIcon, run: doInsertTable },
     { label: "Table of contents", keywords: "toc outline headings", icon: ListTree, run: insertToc },
+    { label: "Link a record", keywords: "plan client booking record link mjg", icon: Boxes, run: () => setRecordOpen(true) },
     { label: "Columns", keywords: "layout two column split", icon: Columns2, run: insertColumns },
     { label: "HTML embed", keywords: "html iframe render", icon: FileCode2, run: () => setHtmlOpen(true) },
     { label: "Record audio", keywords: "voice mic recorder", icon: Mic, run: () => setRecorderOpen(true) },
@@ -432,6 +490,7 @@ export function WorkspaceEditorSurface({
         <ListBtn nodeType="decimal" icon={ListOrdered} title="Numbered list" />
         <TBtn icon={CheckSquare} title="Checklist (checkbox)" onClick={makeTodo} />
         <TBtn icon={CalendarDays} title="Insert date" onClick={insertDate} />
+        <TBtn icon={Boxes} title="Link a record (Plan / Client / Booking)" onClick={() => setRecordOpen(true)} />
         <Sep />
         <TBtn icon={AlignLeft} title="Align left" onClick={() => setAlign("left")} />
         <TBtn icon={AlignCenter} title="Align center" onClick={() => setAlign("center")} />
@@ -506,6 +565,7 @@ export function WorkspaceEditorSurface({
       <CommandMenu open={menu.open} pos={{ top: menu.top, left: menu.left }} commands={menu.cmds} onClose={closeMenu} />
       <HtmlEmbedDialog open={htmlOpen} onOpenChange={setHtmlOpen} onInsert={insertHtml} />
       <RecorderDialog open={recorderOpen} onOpenChange={setRecorderOpen} actionToken={actionToken} onInsert={insertRecordedAudio} />
+      <RecordPickerDialog open={recordOpen} onOpenChange={setRecordOpen} onInsert={insertRecordLink} />
     </Plate>
   );
 }

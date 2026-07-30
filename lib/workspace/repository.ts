@@ -82,8 +82,9 @@ export async function getDocument(id: string, profileId: string): Promise<Worksp
   return doc as WorkspaceDocument;
 }
 
-export async function createDocument(input: { title?: string; scope: WorkspaceScope; folderId?: string | null }, profileId: string) {
+export async function createDocument(input: { title?: string; scope: WorkspaceScope; folderId?: string | null; content?: unknown }, profileId: string) {
   const supabase = createSupabaseAdminClient();
+  const content = input.content ?? EMPTY_DOC;
   const { data, error } = await supabase
     .from("workspace_documents")
     .insert({
@@ -91,8 +92,8 @@ export async function createDocument(input: { title?: string; scope: WorkspaceSc
       scope: input.scope,
       folder_id: input.folderId || null,
       owner_id: profileId,
-      content_json: EMPTY_DOC,
-      plain_text: "",
+      content_json: content,
+      plain_text: extractPlainText(content),
       created_by: profileId,
       updated_by: profileId,
     })
@@ -100,6 +101,33 @@ export async function createDocument(input: { title?: string; scope: WorkspaceSc
     .single();
   if (error) throw error;
   return { id: data.id as string };
+}
+
+export type SearchResult = { id: string; title: string; folder_name: string | null; scope: string; updated_at: string; snippet: string | null };
+
+/** Search accessible documents by title or body text. */
+export async function searchDocuments(profileId: string, q: string): Promise<SearchResult[]> {
+  const term = q.trim();
+  if (!term) return [];
+  const supabase = createSupabaseAdminClient();
+  const like = `%${term.replace(/[%_]/g, "")}%`;
+  const { data } = await supabase
+    .from("workspace_documents")
+    .select("id,title,plain_text,scope,owner_id,updated_at, folder:workspace_folders(name)")
+    .is("deleted_at", null)
+    .or(`title.ilike.${like},plain_text.ilike.${like}`)
+    .order("updated_at", { ascending: false })
+    .limit(40);
+
+  const results: SearchResult[] = [];
+  for (const d of data ?? []) {
+    if (d.scope === "personal" && d.owner_id !== profileId) continue; // only my personal + all shared
+    const text: string = d.plain_text ?? "";
+    const idx = text.toLowerCase().indexOf(term.toLowerCase());
+    const snippet = idx >= 0 ? `${idx > 20 ? "…" : ""}${text.slice(Math.max(0, idx - 20), idx + 80)}…` : text.slice(0, 90) || null;
+    results.push({ id: d.id, title: d.title, folder_name: (d as any).folder?.name ?? null, scope: d.scope, updated_at: d.updated_at, snippet });
+  }
+  return results;
 }
 
 export async function updateDocument(
