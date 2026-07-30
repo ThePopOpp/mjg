@@ -56,6 +56,12 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
     if (localStorage.getItem(STORAGE_KEY) === "1") setCollapsed(true);
   }, []);
 
+  // Entering a Workspace document auto-collapses the main sidebar for more editor room.
+  // Not persisted — the user can re-open it, and their saved preference returns elsewhere.
+  useEffect(() => {
+    if (pathname.startsWith("/dashboard/workspace/")) setCollapsed(true);
+  }, [pathname]);
+
   function toggleCollapsed() {
     setCollapsed((prev) => {
       const next = !prev;
