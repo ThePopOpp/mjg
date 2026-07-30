@@ -77,7 +77,7 @@ const COMPONENTS: Record<string, any> = {
   [HtmlEmbedPlugin.key]: (p: any) => (
     <PlateElement {...p}>
       <div contentEditable={false} className="my-2 overflow-hidden rounded-md border">
-        <iframe sandbox="" title="HTML embed" className="h-64 w-full bg-white" srcDoc={p.element?.html || "<p style='font-family:sans-serif;color:#888;padding:12px'>Empty HTML embed</p>"} />
+        <iframe sandbox="allow-same-origin" title="HTML embed" className="h-[36rem] w-full bg-white" srcDoc={p.element?.html || "<p style='font-family:sans-serif;color:#888;padding:12px'>Empty HTML embed</p>"} />
       </div>{p.children}
     </PlateElement>
   ),
