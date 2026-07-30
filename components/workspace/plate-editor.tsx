@@ -19,6 +19,7 @@ import { insertTable, insertTableRow, insertTableColumn, deleteTable } from "@pl
 import { insertLink, upsertLink } from "@platejs/link";
 import { ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin } from "@platejs/media/react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -94,7 +95,7 @@ const COMPONENTS: Record<string, any> = {
   // Media (void nodes).
   [ImagePlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={p.element?.url} alt={p.element?.name || ""} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
   [VideoPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><video controls src={p.element?.url} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
-  [AudioPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><audio controls src={p.element?.url} className="w-full" /></div>{p.children}</PlateElement>,
+  [AudioPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><BrandAudioPlayer src={p.element?.url} /></div>{p.children}</PlateElement>,
   [FilePlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><a href={p.element?.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm text-primary hover:underline">📎 {p.element?.name || "Download file"}</a></div>{p.children}</PlateElement>,
   // Columns layout.
   [ColumnPlugin.key]: (p: any) => <PlateElement {...p} as="div" className="my-3 flex flex-col gap-4 md:flex-row" />,
@@ -363,7 +364,7 @@ export function WorkspaceEditorSurface({
 
   return (
     <Plate editor={editor} onChange={({ value }: any) => onChange(value)}>
-      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-md border bg-card p-1">
+      <div className="sticky top-16 z-20 flex flex-wrap items-center gap-0.5 rounded-md border bg-card p-1 shadow-sm">
         <TBtn icon={leftOpen ? PanelLeftClose : PanelLeftOpen} title={leftOpen ? "Hide files" : "Show files"} onClick={() => setLeftOpen((o) => !o)} />
         <Sep />
         <button type="button" title="Insert block" onMouseDown={(ev) => { ev.preventDefault(); const r = (ev.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left, commands); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><Plus className="h-4 w-4" /></button>
@@ -433,7 +434,7 @@ export function WorkspaceEditorSurface({
       </div>
 
       <div className="mt-3 flex gap-3">
-        {left && leftOpen ? <aside className="hidden w-56 shrink-0 lg:block">{left}</aside> : null}
+        {left && leftOpen ? <aside className="sticky top-16 hidden max-h-[calc(100vh-6rem)] w-56 shrink-0 self-start overflow-y-auto lg:block">{left}</aside> : null}
         <div className="min-w-0 flex-1">
           {titleSlot}
           <PlateContent
@@ -462,7 +463,7 @@ export function WorkspaceEditorSurface({
             }}
           />
         </div>
-        {right && rightOpen ? <aside className="hidden w-72 shrink-0 xl:block">{right}</aside> : null}
+        {right && rightOpen ? <aside className="sticky top-16 hidden max-h-[calc(100vh-6rem)] w-72 shrink-0 self-start overflow-y-auto xl:block">{right}</aside> : null}
       </div>
       <CommandMenu open={menu.open} pos={{ top: menu.top, left: menu.left }} commands={menu.cmds} onClose={closeMenu} />
       <HtmlEmbedDialog open={htmlOpen} onOpenChange={setHtmlOpen} onInsert={insertHtml} />
