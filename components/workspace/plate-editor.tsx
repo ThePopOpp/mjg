@@ -8,9 +8,12 @@ import {
 } from "@platejs/basic-nodes/react";
 import { CodeBlockPlugin, CodeLinePlugin } from "@platejs/code-block/react";
 import { LinkPlugin } from "@platejs/link/react";
+import { ListPlugin, useListToolbarButton, useListToolbarButtonState, useIndentTodoToolBarButton, useIndentTodoToolBarButtonState } from "@platejs/list/react";
+import { FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin } from "@platejs/basic-styles/react";
 import {
   Bold, Italic, Underline, Strikethrough, Code, Highlighter, Heading1, Heading2, Heading3,
-  Quote, Minus, SquareCode, Link2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
+  Quote, Minus, SquareCode, Link2, List, ListOrdered, ListChecks, AlignLeft, AlignCenter, AlignRight,
+  Baseline, PaintBucket, Type, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +21,8 @@ import { cn } from "@/lib/utils";
 const PLUGINS = [
   BoldPlugin, ItalicPlugin, UnderlinePlugin, StrikethroughPlugin, CodePlugin, HighlightPlugin,
   H1Plugin, H2Plugin, H3Plugin, BlockquotePlugin, HorizontalRulePlugin,
-  CodeBlockPlugin, CodeLinePlugin, LinkPlugin,
+  CodeBlockPlugin, CodeLinePlugin, LinkPlugin, ListPlugin,
+  FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin,
 ];
 
 const COMPONENTS: Record<string, any> = {
@@ -40,37 +44,52 @@ const COMPONENTS: Record<string, any> = {
   ),
 };
 
-const MARKS: { key: string; icon: typeof Bold; title: string }[] = [
-  { key: BoldPlugin.key, icon: Bold, title: "Bold" },
-  { key: ItalicPlugin.key, icon: Italic, title: "Italic" },
-  { key: UnderlinePlugin.key, icon: Underline, title: "Underline" },
-  { key: StrikethroughPlugin.key, icon: Strikethrough, title: "Strikethrough" },
-  { key: CodePlugin.key, icon: Code, title: "Inline code" },
-  { key: HighlightPlugin.key, icon: Highlighter, title: "Highlight" },
-];
-const BLOCKS: { key: string; icon: typeof Bold; title: string }[] = [
-  { key: H1Plugin.key, icon: Heading1, title: "Heading 1" },
-  { key: H2Plugin.key, icon: Heading2, title: "Heading 2" },
-  { key: H3Plugin.key, icon: Heading3, title: "Heading 3" },
-  { key: BlockquotePlugin.key, icon: Quote, title: "Quote" },
-];
+const TEXT_COLORS = ["inherit", "#1a1a1a", "#b45309", "#c2410c", "#dc2626", "#2563eb", "#6b7280"];
+const HIGHLIGHT_COLORS = ["transparent", "#fef08a", "#fde68a", "#fed7aa", "#fbcfe8", "#bfdbfe", "#e5e7eb"];
+const FONT_SIZES = [{ label: "S", value: "13px" }, { label: "M", value: "16px" }, { label: "L", value: "20px" }, { label: "XL", value: "28px" }];
 
-function TBtn({ icon: Icon, title, onClick }: { icon: typeof Bold; title: string; onClick: () => void }) {
+function TBtn({ icon: Icon, title, active, onClick }: { icon: typeof Bold; title: string; active?: boolean; onClick: () => void }) {
   return (
-    <button type="button" title={title} onMouseDown={(e) => { e.preventDefault(); onClick(); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+    <button type="button" title={title} onMouseDown={(e) => { e.preventDefault(); onClick(); }} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", active ? "bg-accent text-foreground" : "text-muted-foreground")}>
       <Icon className="h-4 w-4" />
     </button>
   );
 }
 const Sep = () => <span className="mx-1 h-5 w-px shrink-0 bg-border" />;
 
+// Lists use the plugin hooks (correct v53 toggling + selection handling).
+function ListBtn({ nodeType, icon: Icon, title }: { nodeType: string; icon: typeof List; title: string }) {
+  const state = useListToolbarButtonState({ nodeType });
+  const btn: any = useListToolbarButton(state);
+  const props = btn?.props ?? btn ?? {};
+  return <button type="button" title={title} {...props} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", props?.pressed ? "bg-accent text-foreground" : "text-muted-foreground")}><Icon className="h-4 w-4" /></button>;
+}
+function TodoBtn() {
+  const state = useIndentTodoToolBarButtonState();
+  const btn: any = useIndentTodoToolBarButton(state);
+  const props = btn?.props ?? btn ?? {};
+  return <button type="button" title="Checklist" {...props} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", props?.pressed ? "bg-accent text-foreground" : "text-muted-foreground")}><ListChecks className="h-4 w-4" /></button>;
+}
+
+// Inline swatch menu — buttons preventDefault so the editor selection is preserved.
+function ColorMenu({ icon: Icon, title, colors, onPick }: { icon: typeof Baseline; title: string; colors: string[]; onPick: (c: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span className="relative">
+      <TBtn icon={Icon} title={title} onClick={() => setOpen((o) => !o)} />
+      {open ? (
+        <div className="absolute left-0 z-20 mt-1 flex gap-1 rounded-md border bg-popover p-2 shadow-md" onMouseDown={(e) => e.preventDefault()}>
+          {colors.map((c) => (
+            <button key={c} type="button" title={c} onMouseDown={(e) => { e.preventDefault(); onPick(c); setOpen(false); }} className="h-5 w-5 rounded border" style={{ background: c === "inherit" || c === "transparent" ? "linear-gradient(135deg,#fff 45%,#e11d48 45% 55%,#fff 55%)" : c }} />
+          ))}
+        </div>
+      ) : null}
+    </span>
+  );
+}
+
 export function WorkspaceEditorSurface({
-  initialValue,
-  onChange,
-  titleSlot,
-  statusSlot,
-  left,
-  right,
+  initialValue, onChange, titleSlot, statusSlot, left, right,
 }: {
   initialValue: any;
   onChange: (value: any) => void;
@@ -83,22 +102,47 @@ export function WorkspaceEditorSurface({
   const editor = usePlateEditor({ plugins: PLUGINS, components: COMPONENTS, value });
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
+  const [sizeOpen, setSizeOpen] = useState(false);
 
   const toggle = (key: string) => { try { (editor.tf as any)?.[key]?.toggle?.(); } catch { /* no-op */ } };
-  const insertLink = () => {
-    const url = typeof window !== "undefined" ? window.prompt("Link URL") : null;
-    if (url) { try { (editor.tf as any)?.a?.toggle?.({ url }); } catch { /* no-op */ } }
-  };
+  const setMark = (key: string, val: string) => { try { (editor.tf as any)?.addMark?.(key, val); } catch { /* no-op */ } };
+  const setAlign = (val: string) => { try { (editor.tf as any)?.setNodes?.({ [TextAlignPlugin.key]: val }, { match: (n: any) => !!n?.type }); } catch { /* no-op */ } };
+  const insertLink = () => { const url = typeof window !== "undefined" ? window.prompt("Link URL") : null; if (url) { try { (editor.tf as any)?.a?.toggle?.({ url }); } catch { /* no-op */ } } };
 
   return (
     <Plate editor={editor} onChange={({ value }: any) => onChange(value)}>
-      {/* Top toolbar — spans the full width of all three columns */}
       <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-md border bg-card p-1">
         <TBtn icon={leftOpen ? PanelLeftClose : PanelLeftOpen} title={leftOpen ? "Hide files" : "Show files"} onClick={() => setLeftOpen((o) => !o)} />
         <Sep />
-        {MARKS.map((b) => <TBtn key={b.key} icon={b.icon} title={b.title} onClick={() => toggle(b.key)} />)}
+        <TBtn icon={Bold} title="Bold" onClick={() => toggle(BoldPlugin.key)} />
+        <TBtn icon={Italic} title="Italic" onClick={() => toggle(ItalicPlugin.key)} />
+        <TBtn icon={Underline} title="Underline" onClick={() => toggle(UnderlinePlugin.key)} />
+        <TBtn icon={Strikethrough} title="Strikethrough" onClick={() => toggle(StrikethroughPlugin.key)} />
+        <TBtn icon={Code} title="Inline code" onClick={() => toggle(CodePlugin.key)} />
+        <TBtn icon={Highlighter} title="Highlight" onClick={() => toggle(HighlightPlugin.key)} />
+        <ColorMenu icon={Baseline} title="Text color" colors={TEXT_COLORS} onPick={(c) => setMark(FontColorPlugin.key, c)} />
+        <ColorMenu icon={PaintBucket} title="Background color" colors={HIGHLIGHT_COLORS} onPick={(c) => setMark(FontBackgroundColorPlugin.key, c)} />
+        <span className="relative">
+          <TBtn icon={Type} title="Font size" onClick={() => setSizeOpen((o) => !o)} />
+          {sizeOpen ? (
+            <div className="absolute left-0 z-20 mt-1 flex gap-1 rounded-md border bg-popover p-1 shadow-md" onMouseDown={(e) => e.preventDefault()}>
+              {FONT_SIZES.map((s) => <button key={s.value} type="button" onMouseDown={(e) => { e.preventDefault(); setMark(FontSizePlugin.key, s.value); setSizeOpen(false); }} className="rounded px-2 py-1 text-xs hover:bg-accent">{s.label}</button>)}
+            </div>
+          ) : null}
+        </span>
         <Sep />
-        {BLOCKS.map((b) => <TBtn key={b.key} icon={b.icon} title={b.title} onClick={() => toggle(b.key)} />)}
+        <TBtn icon={Heading1} title="Heading 1" onClick={() => toggle(H1Plugin.key)} />
+        <TBtn icon={Heading2} title="Heading 2" onClick={() => toggle(H2Plugin.key)} />
+        <TBtn icon={Heading3} title="Heading 3" onClick={() => toggle(H3Plugin.key)} />
+        <TBtn icon={Quote} title="Quote" onClick={() => toggle(BlockquotePlugin.key)} />
+        <Sep />
+        <ListBtn nodeType="disc" icon={List} title="Bulleted list" />
+        <ListBtn nodeType="decimal" icon={ListOrdered} title="Numbered list" />
+        <TodoBtn />
+        <Sep />
+        <TBtn icon={AlignLeft} title="Align left" onClick={() => setAlign("left")} />
+        <TBtn icon={AlignCenter} title="Align center" onClick={() => setAlign("center")} />
+        <TBtn icon={AlignRight} title="Align right" onClick={() => setAlign("right")} />
         <Sep />
         <TBtn icon={SquareCode} title="Code block" onClick={() => toggle(CodeBlockPlugin.key)} />
         <TBtn icon={Link2} title="Insert link" onClick={insertLink} />
@@ -109,7 +153,6 @@ export function WorkspaceEditorSurface({
         </div>
       </div>
 
-      {/* Three-column body */}
       <div className="mt-3 flex gap-3">
         {left && leftOpen ? <aside className="hidden w-56 shrink-0 lg:block">{left}</aside> : null}
         <div className="min-w-0 flex-1">
