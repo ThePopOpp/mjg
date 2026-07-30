@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plate, PlateContent, PlateElement, PlateLeaf, usePlateEditor, createPlatePlugin } from "platejs/react";
+import { Plate, PlateContent, PlateElement, PlateLeaf, usePlateEditor, createPlatePlugin, useEditorRef, usePath } from "platejs/react";
 import { toggleList } from "@platejs/list";
 import { ColumnPlugin, ColumnItemPlugin } from "@platejs/layout/react";
 import { insertColumnGroup } from "@platejs/layout";
@@ -12,7 +12,7 @@ import {
 } from "@platejs/basic-nodes/react";
 import { CodeBlockPlugin, CodeLinePlugin } from "@platejs/code-block/react";
 import { LinkPlugin } from "@platejs/link/react";
-import { ListPlugin, useListToolbarButton, useListToolbarButtonState, useIndentTodoToolBarButton, useIndentTodoToolBarButtonState } from "@platejs/list/react";
+import { ListPlugin, useListToolbarButton, useListToolbarButtonState } from "@platejs/list/react";
 import { FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin } from "@platejs/basic-styles/react";
 import { TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin } from "@platejs/table/react";
 import { insertTable, insertTableRow, insertTableColumn, deleteTable } from "@platejs/table";
@@ -25,15 +25,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   Bold, Italic, Underline, Strikethrough, Code, Highlighter, Heading1, Heading2, Heading3,
-  Quote, Minus, SquareCode, Link2, List, ListOrdered, ListChecks, AlignLeft, AlignCenter, AlignRight,
+  Quote, Minus, SquareCode, Link2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
   Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Columns2, Trash2, Plus,
   Image as ImageIcon, Video, Music, Mic, FileCode2, Paperclip, AtSign, Smile, ListTree,
-  PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
+  Check, CheckSquare, CalendarDays, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 
 // Custom void block: render pasted HTML in a sandboxed frame (distinct from a code block).
 const HtmlEmbedPlugin = createPlatePlugin({ key: "html_embed", node: { isElement: true, isVoid: true } });
+// Custom checkbox (todo) block + inline date field. Components are defined further down.
+const TodoItemPlugin = createPlatePlugin({ key: "todo_item", node: { isElement: true } });
+const DateFieldPlugin = createPlatePlugin({ key: "date_field", node: { isElement: true, isInline: true, isVoid: true } });
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const PLUGINS = [
@@ -43,7 +47,7 @@ const PLUGINS = [
   FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin,
   TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin,
   ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin,
-  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin, TocPlugin,
+  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin, TocPlugin, TodoItemPlugin, DateFieldPlugin,
 ];
 
 // TOC element: lists the document's headings with click-to-scroll (from @platejs/toc).
@@ -87,6 +91,8 @@ const COMPONENTS: Record<string, any> = {
     >{children}</a>
   ),
   [TocPlugin.key]: (p: any) => <PlateElement {...p}><TocElement />{p.children}</PlateElement>,
+  [TodoItemPlugin.key]: TodoItem,
+  [DateFieldPlugin.key]: DateField,
   // Tables render as real HTML tables.
   [TablePlugin.key]: (p: any) => <PlateElement {...p} as="table" className="my-3 w-full table-fixed border-collapse overflow-hidden rounded-md border border-border text-sm" />,
   [TableRowPlugin.key]: (p: any) => <PlateElement {...p} as="tr" />,
@@ -131,11 +137,39 @@ function ListBtn({ nodeType, icon: Icon, title }: { nodeType: string; icon: type
   const props = btn?.props ?? btn ?? {};
   return <button type="button" title={title} {...props} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", props?.pressed ? "bg-accent text-foreground" : "text-muted-foreground")}><Icon className="h-4 w-4" /></button>;
 }
-function TodoBtn() {
-  const state = useIndentTodoToolBarButtonState();
-  const btn: any = useIndentTodoToolBarButton(state);
-  const props = btn?.props ?? btn ?? {};
-  return <button type="button" title="Checklist" {...props} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", props?.pressed ? "bg-accent text-foreground" : "text-muted-foreground")}><ListChecks className="h-4 w-4" /></button>;
+// Custom checkbox item: click toggles `checked` and strikes through the text.
+function TodoItem(props: any) {
+  const editor = useEditorRef();
+  const path = usePath();
+  const checked = !!props.element?.checked;
+  return (
+    <PlateElement {...props} as="div" className="my-0.5 flex items-start gap-2">
+      <span contentEditable={false} className="mt-1 shrink-0 select-none">
+        <button
+          type="button"
+          onMouseDown={(ev) => { ev.preventDefault(); try { (editor as any).tf?.setNodes?.({ checked: !checked }, { at: path }); } catch { /* no-op */ } }}
+          className={cn("flex h-4 w-4 items-center justify-center rounded border transition-colors", checked ? "border-primary bg-primary text-primary-foreground" : "border-input hover:border-primary")}
+          aria-label={checked ? "Uncheck" : "Check"}
+        >{checked ? <Check className="h-3 w-3" /> : null}</button>
+      </span>
+      <span className={cn("min-w-0 flex-1", checked && "text-muted-foreground line-through")}>{props.children}</span>
+    </PlateElement>
+  );
+}
+
+// Inline date field: click to pick a date; stored on the node.
+function DateField(props: any) {
+  const editor = useEditorRef();
+  const path = usePath();
+  const date = props.element?.date ?? "";
+  return (
+    <PlateElement {...props} as="span" className="mx-0.5 inline-block align-middle">
+      <span contentEditable={false}>
+        <DatePicker value={date} onChange={(v) => { try { (editor as any).tf?.setNodes?.({ date: v }, { at: path }); } catch { /* no-op */ } }} placeholder="Pick a date" className="h-7 w-auto min-w-[8.5rem] px-2 text-xs" />
+      </span>
+      {props.children}
+    </PlateElement>
+  );
 }
 
 // Inline swatch menu — buttons preventDefault so the editor selection is preserved.
@@ -333,6 +367,8 @@ export function WorkspaceEditorSurface({
   const insertHtml = (html: string) => { try { e.tf?.insertNodes?.({ type: HtmlEmbedPlugin.key, html, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertRecordedAudio = (url: string) => { try { e.tf?.insertNodes?.({ type: AudioPlugin.key, url, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertToc = () => { try { e.tf?.insertNodes?.({ type: TocPlugin.key, children: [{ text: "" }] }); } catch { /* no-op */ } };
+  const makeTodo = () => { try { e.tf?.setNodes?.({ type: TodoItemPlugin.key, checked: false }, { match: (n: any) => !!n?.type && !("text" in n), mode: "lowest" }); } catch { /* no-op */ } };
+  const insertDate = () => { try { e.tf?.insertNodes?.({ type: DateFieldPlugin.key, date: null, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertText = (t: string) => { try { e.tf?.insertText?.(t); } catch { /* no-op */ } };
   const [htmlOpen, setHtmlOpen] = useState(false);
   const [recorderOpen, setRecorderOpen] = useState(false);
@@ -349,7 +385,8 @@ export function WorkspaceEditorSurface({
     { label: "Heading 3", keywords: "h3", icon: Heading3, run: () => toggle(H3Plugin.key) },
     { label: "Bulleted list", keywords: "ul unordered", icon: List, run: () => list("disc") },
     { label: "Numbered list", keywords: "ol ordered", icon: ListOrdered, run: () => list("decimal") },
-    { label: "Checklist", keywords: "todo task", icon: ListChecks, run: () => list("todo") },
+    { label: "Checklist", keywords: "todo task checkbox", icon: CheckSquare, run: makeTodo },
+    { label: "Date", keywords: "date calendar deadline due", icon: CalendarDays, run: insertDate },
     { label: "Quote", keywords: "blockquote", icon: Quote, run: () => toggle(BlockquotePlugin.key) },
     { label: "Code block", keywords: "code snippet", icon: SquareCode, run: insertCodeBlock },
     { label: "Table", keywords: "grid", icon: TableIcon, run: doInsertTable },
@@ -393,7 +430,8 @@ export function WorkspaceEditorSurface({
         <Sep />
         <ListBtn nodeType="disc" icon={List} title="Bulleted list" />
         <ListBtn nodeType="decimal" icon={ListOrdered} title="Numbered list" />
-        <TodoBtn />
+        <TBtn icon={CheckSquare} title="Checklist (checkbox)" onClick={makeTodo} />
+        <TBtn icon={CalendarDays} title="Insert date" onClick={insertDate} />
         <Sep />
         <TBtn icon={AlignLeft} title="Align left" onClick={() => setAlign("left")} />
         <TBtn icon={AlignCenter} title="Align center" onClick={() => setAlign("center")} />
