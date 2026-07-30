@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { CalendarClock, FileText, Plus, Send, Tags } from "lucide-react";
-import { BlogPostActions, BlogPostImageActions } from "@/components/blog-posts/blog-post-actions";
+import { CalendarClock, FileText, Plus, Send } from "lucide-react";
+import { BlogPostViews, type BlogPostRow } from "@/components/blog-posts/blog-post-views";
 import { SectionHeader } from "@/components/dashboard/section-header";
-import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { getBlogAdminData, normalizePostTags } from "@/lib/content/blog";
 
 export default async function BlogPostsPage() {
@@ -14,6 +13,19 @@ export default async function BlogPostsPage() {
   const drafts = posts.filter((post) => post.status === "draft").length;
   const scheduled = posts.filter((post) => post.status === "scheduled").length;
   const emailLinked = posts.filter((post) => post.linked_email_template_id).length;
+
+  const rows: BlogPostRow[] = posts.map((post) => ({
+    id: post.id,
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt ?? null,
+    status: post.status,
+    featured_image_url: post.featured_image_url ?? null,
+    author_name: post.author_name ?? null,
+    category_name: post.category?.name ?? null,
+    tags: normalizePostTags(post).map((t: any) => ({ id: t.id, name: t.name })),
+    date: post.publish_at ?? post.created_at ?? null,
+  }));
 
   return (
     <div className="space-y-6">
@@ -34,48 +46,7 @@ export default async function BlogPostsPage() {
         <SummaryCard title="Email-ready" value={emailLinked} icon={Send} detail="Linked templates" />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        {posts.map((post) => {
-          const tags = normalizePostTags(post);
-          return (
-            <Card key={post.id} className="overflow-hidden">
-              <div className="relative aspect-[16/7] bg-muted">
-                {post.featured_image_url ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={post.featured_image_url} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No featured image</div>
-                )}
-                <BlogPostImageActions slug={post.slug} title={post.title} />
-              </div>
-              <CardHeader>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <CardTitle className="text-xl">
-                      <Link className="hover:underline" href={`/dashboard/blog-posts/${post.id}`}>{post.title}</Link>
-                    </CardTitle>
-                    <CardDescription>/resources/{post.slug} - {post.author_name ?? "Michael J. Gauthier"}</CardDescription>
-                  </div>
-                  <StatusBadge status={post.status} />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p
-                  className="text-sm text-muted-foreground"
-                  style={{ display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 3, overflow: "hidden" }}
-                >
-                  {post.excerpt || "No excerpt yet."}
-                </p>
-                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                  {post.category?.name ? <span className="rounded-md bg-muted px-2 py-1">{post.category.name}</span> : null}
-                  {tags.map((tag: any) => <span key={tag.id} className="rounded-md bg-muted px-2 py-1"><Tags className="mr-1 inline h-3 w-3" />{tag.name}</span>)}
-                </div>
-                <BlogPostActions postId={post.id} />
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      {posts.length ? <BlogPostViews posts={rows} /> : null}
 
       {!posts.length ? (
         <Card>

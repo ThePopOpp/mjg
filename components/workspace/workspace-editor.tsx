@@ -8,6 +8,8 @@ import { ArrowLeft, Check, Loader2, AlertTriangle, Plus, Star, FileText, Folder 
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Input } from "@/components/ui/input";
 import { CommentsPanel } from "@/components/workspace/comments-panel";
+import { ShareControl } from "@/components/workspace/share-control";
+import type { WorkspaceScope } from "@/lib/workspace/types";
 import type { WorkspaceComment, MentionUser } from "@/lib/workspace/comments";
 
 const WorkspaceEditorSurface = dynamic(() => import("@/components/workspace/plate-editor").then((m) => m.WorkspaceEditorSurface), {
@@ -92,8 +94,11 @@ export function WorkspaceEditor({
     <div className="space-y-4">
       <CommentsPanel documentId={doc.id} comments={comments} mentionable={mentionable} />
       <div className="rounded-md border bg-card p-3 text-xs text-muted-foreground">
-        <p className="mb-2 text-sm font-medium text-foreground">Document info</p>
-        <p>Scope: <span className="capitalize text-foreground">{doc.scope}</span></p>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-medium text-foreground">Document info</p>
+          <ShareControl documentId={doc.id} scope={doc.scope as WorkspaceScope} onChanged={() => router.refresh()} variant="button" />
+        </div>
+        <p>Scope: <span className="capitalize text-foreground">{doc.scope === "shared" ? "Public" : doc.scope}</span></p>
         <p>Updated: {new Date(doc.updated_at).toLocaleString()}</p>
       </div>
     </div>

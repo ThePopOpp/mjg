@@ -160,6 +160,46 @@ export async function deleteDocument(id: string) {
   return { id };
 }
 
+export type WorkspaceCollaborator = { id: string; user_id: string; name: string; email: string | null; permission: string };
+export type ShareableUser = { id: string; name: string; email: string | null };
+
+/** Collaborators on a document + the pool of users that can be added. */
+export async function getSharing(documentId: string): Promise<{ collaborators: WorkspaceCollaborator[]; users: ShareableUser[] }> {
+  const supabase = createSupabaseAdminClient();
+  const [{ data: collab }, { data: people }] = await Promise.all([
+    supabase
+      .from("workspace_collaborators")
+      .select("id, user_id, permission, user:profiles!workspace_collaborators_user_id_fkey(full_name,first_name,last_name,email)")
+      .eq("document_id", documentId),
+    supabase.from("profiles").select("id,full_name,first_name,last_name,email").eq("status", "active").order("full_name", { ascending: true }).limit(300),
+  ]);
+  const collaborators: WorkspaceCollaborator[] = (collab ?? []).map((c: any) => ({
+    id: c.id,
+    user_id: c.user_id,
+    name: personName(c.user) || "Unknown",
+    email: c.user?.email ?? null,
+    permission: c.permission,
+  }));
+  const users: ShareableUser[] = (people ?? []).map((p: any) => ({ id: p.id, name: personName(p) || "Unknown", email: p.email ?? null }));
+  return { collaborators, users };
+}
+
+export async function addCollaborator(documentId: string, userId: string, invitedBy: string, permission = "editor") {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase
+    .from("workspace_collaborators")
+    .upsert({ document_id: documentId, user_id: userId, permission, invited_by: invitedBy }, { onConflict: "document_id,user_id" });
+  if (error) throw error;
+  return { documentId, userId };
+}
+
+export async function removeCollaborator(documentId: string, userId: string) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.from("workspace_collaborators").delete().eq("document_id", documentId).eq("user_id", userId);
+  if (error) throw error;
+  return { documentId, userId };
+}
+
 export async function toggleFavorite(userId: string, documentId: string, on: boolean) {
   const supabase = createSupabaseAdminClient();
   if (on) await supabase.from("workspace_favorites").upsert({ user_id: userId, document_id: documentId });

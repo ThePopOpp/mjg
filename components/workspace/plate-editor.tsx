@@ -32,8 +32,15 @@ import {
   Image as ImageIcon, Video, Music, Mic, FileCode2, Paperclip, AtSign, Smile, ListTree,
   Check, CheckSquare, CalendarDays, Boxes, ClipboardList, UserCircle, CalendarClock, ExternalLink, Sparkles,
   PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
+  Undo2, Redo2, Search as SearchIcon, RemoveFormatting, Maximize2, ChevronDown, Pilcrow,
 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
+import { SimpleTooltip } from "@/components/ui/tooltip";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuCheckboxItem,
+  DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
+} from "@/components/ui/dropdown-menu";
 import { extractPlainText } from "@/lib/workspace/types";
 import { cn } from "@/lib/utils";
 
@@ -143,9 +150,11 @@ const EMOJIS = ["😀","😁","😂","🤣","😊","😍","😎","🤔","👍","
 
 function TBtn({ icon: Icon, title, active, onClick }: { icon: typeof Bold; title: string; active?: boolean; onClick: () => void }) {
   return (
-    <button type="button" title={title} onMouseDown={(e) => { e.preventDefault(); onClick(); }} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", active ? "bg-accent text-foreground" : "text-muted-foreground")}>
-      <Icon className="h-4 w-4" />
-    </button>
+    <SimpleTooltip label={title}>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); onClick(); }} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", active ? "bg-accent text-foreground" : "text-muted-foreground")}>
+        <Icon className="h-4 w-4" />
+      </button>
+    </SimpleTooltip>
   );
 }
 const Sep = () => <span className="mx-1 h-5 w-px shrink-0 bg-border" />;
@@ -155,7 +164,7 @@ function ListBtn({ nodeType, icon: Icon, title }: { nodeType: string; icon: type
   const state = useListToolbarButtonState({ nodeType });
   const btn: any = useListToolbarButton(state);
   const props = btn?.props ?? btn ?? {};
-  return <button type="button" title={title} {...props} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", props?.pressed ? "bg-accent text-foreground" : "text-muted-foreground")}><Icon className="h-4 w-4" /></button>;
+  return <SimpleTooltip label={title}><button type="button" {...props} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", props?.pressed ? "bg-accent text-foreground" : "text-muted-foreground")}><Icon className="h-4 w-4" /></button></SimpleTooltip>;
 }
 // Custom checkbox item: click toggles `checked` and strikes through the text.
 function TodoItem(props: any) {
@@ -425,6 +434,90 @@ function AiDialog({ open, onOpenChange, getText, onInsert }: { open: boolean; on
   );
 }
 
+// Live outline built from the document's H1–H3 headings; clicking scrolls to the heading.
+function OutlineNav({ editor }: { editor: any }) {
+  const items: { i: number; lvl: number; text: string }[] = [];
+  (editor.children ?? []).forEach((n: any, i: number) => {
+    const lvl = n?.type === H1Plugin.key ? 1 : n?.type === H2Plugin.key ? 2 : n?.type === H3Plugin.key ? 3 : 0;
+    if (lvl) items.push({ i, lvl, text: (n.children ?? []).map((c: any) => c?.text ?? "").join("").trim() || "Untitled heading" });
+  });
+  const go = (i: number) => { try { const dom = editor.api?.toDOMNode?.(editor.children[i]); dom?.scrollIntoView?.({ behavior: "smooth", block: "start" }); } catch { /* no-op */ } };
+  return (
+    <div className="rounded-md border bg-card p-3">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Outline</p>
+      {items.length ? (
+        <ul className="space-y-0.5">
+          {items.map((it) => (
+            <li key={it.i}>
+              <button type="button" onMouseDown={(ev) => { ev.preventDefault(); go(it.i); }} className={cn("block w-full truncate rounded px-2 py-1 text-left text-sm transition-colors hover:bg-accent", it.lvl === 1 ? "font-medium" : it.lvl === 2 ? "pl-4 text-muted-foreground" : "pl-6 text-muted-foreground")}>{it.text}</button>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-xs text-muted-foreground">Add headings (H1–H3) to build an outline.</p>}
+    </div>
+  );
+}
+
+// In-document find & replace. Operates on text leaves; re-scans on each replace so paths stay valid.
+function FindReplaceDialog({ open, onOpenChange, editor }: { open: boolean; onOpenChange: (v: boolean) => void; editor: any }) {
+  const [find, setFind] = useState("");
+  const [repl, setRepl] = useState("");
+  const [count, setCount] = useState<number | null>(null);
+
+  function leaves(nodes: any[], base: number[] = []): { path: number[]; text: string }[] {
+    const out: { path: number[]; text: string }[] = [];
+    (nodes ?? []).forEach((n, i) => {
+      const p = [...base, i];
+      if (typeof n?.text === "string") out.push({ path: p, text: n.text });
+      else if (Array.isArray(n?.children)) out.push(...leaves(n.children, p));
+    });
+    return out;
+  }
+  function countMatches(term: string) {
+    if (!term) { setCount(null); return; }
+    let c = 0;
+    for (const l of leaves(editor.children)) { let idx = 0; for (;;) { const k = l.text.indexOf(term, idx); if (k < 0) break; c++; idx = k + term.length; } }
+    setCount(c);
+  }
+  function replaceOnce(): boolean {
+    if (!find) return false;
+    for (const l of leaves(editor.children)) {
+      const k = l.text.indexOf(find);
+      if (k >= 0) {
+        try { editor.tf?.insertText?.(repl, { at: { anchor: { path: l.path, offset: k }, focus: { path: l.path, offset: k + find.length } } }); } catch { /* no-op */ }
+        return true;
+      }
+    }
+    return false;
+  }
+  function replaceAll() { let n = 0; while (n < 5000 && replaceOnce()) n++; countMatches(find); }
+  function findFirst() {
+    if (!find) return;
+    for (const l of leaves(editor.children)) {
+      const k = l.text.indexOf(find);
+      if (k >= 0) { try { editor.tf?.select?.({ anchor: { path: l.path, offset: k }, focus: { path: l.path, offset: k + find.length } }); editor.tf?.focus?.(); } catch { /* no-op */ } break; }
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) setCount(null); onOpenChange(v); }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader><DialogTitle className="flex items-center gap-2"><SearchIcon className="h-4 w-4" /> Find &amp; Replace</DialogTitle><DialogDescription>Search the document and replace matches.</DialogDescription></DialogHeader>
+        <div className="space-y-2">
+          <Input value={find} onChange={(ev) => { setFind(ev.target.value); countMatches(ev.target.value); }} placeholder="Find…" />
+          <Input value={repl} onChange={(ev) => setRepl(ev.target.value)} placeholder="Replace with…" />
+          {count !== null ? <p className="text-xs text-muted-foreground">{count} match{count === 1 ? "" : "es"}</p> : null}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={findFirst} disabled={!find}>Find</Button>
+          <Button variant="outline" onClick={() => { replaceOnce(); countMatches(find); }} disabled={!find}>Replace</Button>
+          <Button onClick={replaceAll} disabled={!find}>Replace all</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right, mentionUsers = [],
 }: {
@@ -477,6 +570,29 @@ export function WorkspaceEditorSurface({
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [recordOpen, setRecordOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+  const [findOpen, setFindOpen] = useState(false);
+  const [outlineOpen, setOutlineOpen] = useState(false);
+  const [, setTick] = useState(0);
+  const doUndo = () => { try { e.undo?.(); } catch { /* no-op */ } };
+  const doRedo = () => { try { e.redo?.(); } catch { /* no-op */ } };
+  const MARK_KEYS = [BoldPlugin.key, ItalicPlugin.key, UnderlinePlugin.key, StrikethroughPlugin.key, CodePlugin.key, HighlightPlugin.key, FontColorPlugin.key, FontBackgroundColorPlugin.key, FontSizePlugin.key];
+  const clearFormatting = () => { try { for (const k of MARK_KEYS) e.tf?.removeMark?.(k); } catch { /* no-op */ } };
+  const focusMode = () => { setLeftOpen(false); setRightOpen(false); setOutlineOpen(false); };
+  const uploadMedia = (nodeType: string, accept: string) => {
+    if (typeof document === "undefined") return;
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = accept;
+    input.onchange = async () => {
+      const f = input.files?.[0]; if (!f) return;
+      const fd = new FormData(); fd.append("file", f); fd.append("folder", "workspace");
+      try {
+        const res = await fetch("/api/admin/uploads", { method: "POST", headers: { "x-mjg-action-token": actionToken }, body: fd });
+        const data = await res.json();
+        if (res.ok && data.url) e.tf?.insertNodes?.([{ type: nodeType, url: data.url, name: f.name, children: [{ text: "" }] }]);
+      } catch { /* no-op */ }
+    };
+    input.click();
+  };
   const getDocText = () => { try { return extractPlainText((editor as any).children ?? []); } catch { return ""; } };
   const insertAiText = (txt: string) => {
     try {
@@ -513,11 +629,99 @@ export function WorkspaceEditorSurface({
   const mentionCommands: Cmd[] = mentionUsers.map((u) => ({ label: `@${u.name}`, keywords: u.name, icon: AtSign, run: () => insertText(`@${u.name} `) }));
 
   return (
-    <Plate editor={editor} onChange={({ value }: any) => onChange(value)}>
+    <Plate editor={editor} onChange={({ value }: any) => { onChange(value); if (outlineOpen) setTick((t) => t + 1); }}>
       <div className="sticky top-16 z-20 flex flex-wrap items-center gap-0.5 rounded-md border bg-card p-1 shadow-sm">
         <TBtn icon={leftOpen ? PanelLeftClose : PanelLeftOpen} title={leftOpen ? "Hide files" : "Show files"} onClick={() => setLeftOpen((o) => !o)} />
         <Sep />
-        <button type="button" title="Insert block" onMouseDown={(ev) => { ev.preventDefault(); const r = (ev.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left, commands); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><Plus className="h-4 w-4" /></button>
+        {/* Quip-style menus — alternative access points for actions also on the toolbar. */}
+        <DropdownMenu>
+          <DropdownMenuTrigger className="inline-flex items-center gap-0.5 rounded px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none data-[state=open]:bg-accent data-[state=open]:text-foreground">Edit<ChevronDown className="h-3 w-3 opacity-60" /></DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onSelect={doUndo}><Undo2 /> Undo <DropdownMenuShortcut>Ctrl+Z</DropdownMenuShortcut></DropdownMenuItem>
+            <DropdownMenuItem onSelect={doRedo}><Redo2 /> Redo <DropdownMenuShortcut>Ctrl+Y</DropdownMenuShortcut></DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => setFindOpen(true)}><SearchIcon /> Find &amp; Replace <DropdownMenuShortcut>Ctrl+H</DropdownMenuShortcut></DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="inline-flex items-center gap-0.5 rounded px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none data-[state=open]:bg-accent data-[state=open]:text-foreground">View<ChevronDown className="h-3 w-3 opacity-60" /></DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuCheckboxItem checked={leftOpen} onCheckedChange={(v) => setLeftOpen(!!v)}>Show files</DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem checked={rightOpen} onCheckedChange={(v) => setRightOpen(!!v)}>Show comments</DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem checked={outlineOpen} onCheckedChange={(v) => setOutlineOpen(!!v)}>Show outline</DropdownMenuCheckboxItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={focusMode}><Maximize2 /> Focus mode</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="inline-flex items-center gap-0.5 rounded px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none data-[state=open]:bg-accent data-[state=open]:text-foreground">Insert<ChevronDown className="h-3 w-3 opacity-60" /></DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="max-h-[70vh] overflow-y-auto">
+            <DropdownMenuItem onSelect={() => uploadMedia(ImagePlugin.key, "image/*")}><ImageIcon /> Image</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => uploadMedia(VideoPlugin.key, "video/*")}><Video /> Video</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => uploadMedia(AudioPlugin.key, "audio/*")}><Music /> Audio</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => uploadMedia(FilePlugin.key, "application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv")}><Paperclip /> Document</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setRecorderOpen(true)}><Mic /> Record audio</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={doInsertTable}><TableIcon /> Table</DropdownMenuItem>
+            <DropdownMenuItem onSelect={makeTodo}><CheckSquare /> Checklist</DropdownMenuItem>
+            <DropdownMenuItem onSelect={insertDate}><CalendarDays /> Date</DropdownMenuItem>
+            <DropdownMenuItem onSelect={insertColumns}><Columns2 /> Columns</DropdownMenuItem>
+            <DropdownMenuItem onSelect={insertToc}><ListTree /> Table of contents</DropdownMenuItem>
+            <DropdownMenuItem onSelect={insertDivider}><Minus /> Divider</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={doInsertLink}><Link2 /> Link</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setRecordOpen(true)}><Boxes /> Link a record</DropdownMenuItem>
+            <DropdownMenuItem onSelect={insertCodeBlock}><SquareCode /> Code block</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setHtmlOpen(true)}><FileCode2 /> HTML embed</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setEmojiOpen(true)}><Smile /> Emoji</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => setAiOpen(true)}><Sparkles /> Ask AI</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="inline-flex items-center gap-0.5 rounded px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none data-[state=open]:bg-accent data-[state=open]:text-foreground">Format<ChevronDown className="h-3 w-3 opacity-60" /></DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onSelect={() => toggle(BoldPlugin.key)}><Bold /> Bold <DropdownMenuShortcut>Ctrl+B</DropdownMenuShortcut></DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => toggle(ItalicPlugin.key)}><Italic /> Italic <DropdownMenuShortcut>Ctrl+I</DropdownMenuShortcut></DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => toggle(UnderlinePlugin.key)}><Underline /> Underline <DropdownMenuShortcut>Ctrl+U</DropdownMenuShortcut></DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => toggle(StrikethroughPlugin.key)}><Strikethrough /> Strikethrough</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => toggle(HighlightPlugin.key)}><Highlighter /> Highlight</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => toggle(CodePlugin.key)}><Code /> Inline code</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger><Pilcrow className="mr-2 h-4 w-4" /> Paragraph style</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onSelect={() => { try { (editor.tf as any)?.setNodes?.({ type: "p" }, { match: (n: any) => !!n?.type }); } catch { /* no-op */ } }}><Type /> Text</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => toggle(H1Plugin.key)}><Heading1 /> Heading 1</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => toggle(H2Plugin.key)}><Heading2 /> Heading 2</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => toggle(H3Plugin.key)}><Heading3 /> Heading 3</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => toggle(BlockquotePlugin.key)}><Quote /> Quote</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger><AlignLeft className="mr-2 h-4 w-4" /> Alignment</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onSelect={() => setAlign("left")}><AlignLeft /> Left</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setAlign("center")}><AlignCenter /> Center</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setAlign("right")}><AlignRight /> Right</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger><List className="mr-2 h-4 w-4" /> List</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onSelect={() => list("disc")}><List /> Bulleted list</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => list("decimal")}><ListOrdered /> Numbered list</DropdownMenuItem>
+                <DropdownMenuItem onSelect={makeTodo}><CheckSquare /> Checklist</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={clearFormatting}><RemoveFormatting /> Clear formatting <DropdownMenuShortcut>Ctrl+\</DropdownMenuShortcut></DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Sep />
+        <SimpleTooltip label="Insert block">
+          <button type="button" onMouseDown={(ev) => { ev.preventDefault(); const r = (ev.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left, commands); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><Plus className="h-4 w-4" /></button>
+        </SimpleTooltip>
         <Sep />
         <TBtn icon={Bold} title="Bold" onClick={() => toggle(BoldPlugin.key)} />
         <TBtn icon={Italic} title="Italic" onClick={() => toggle(ItalicPlugin.key)} />
@@ -562,7 +766,9 @@ export function WorkspaceEditorSurface({
         <MediaButton editor={editor} actionToken={actionToken} nodeType={FilePlugin.key} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv" icon={Paperclip} title="Insert document" />
         <TBtn icon={Mic} title="Record audio" onClick={() => setRecorderOpen(true)} />
         <Sep />
-        <button type="button" title="Mention someone" onMouseDown={(ev) => { ev.preventDefault(); if (!mentionCommands.length) return; const r = (ev.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left, mentionCommands); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><AtSign className="h-4 w-4" /></button>
+        <SimpleTooltip label="Mention someone">
+          <button type="button" onMouseDown={(ev) => { ev.preventDefault(); if (!mentionCommands.length) return; const r = (ev.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left, mentionCommands); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><AtSign className="h-4 w-4" /></button>
+        </SimpleTooltip>
         <span className="relative">
           <TBtn icon={Smile} title="Emoji" onClick={() => setEmojiOpen((o) => !o)} />
           {emojiOpen ? (
@@ -589,6 +795,7 @@ export function WorkspaceEditorSurface({
 
       <div className="mt-3 flex gap-3">
         {left && leftOpen ? <aside className="sticky top-16 hidden max-h-[calc(100vh-6rem)] w-56 shrink-0 self-start overflow-y-auto lg:block">{left}</aside> : null}
+        {outlineOpen ? <aside className="sticky top-16 hidden max-h-[calc(100vh-6rem)] w-52 shrink-0 self-start overflow-y-auto md:block"><OutlineNav editor={editor} /></aside> : null}
         <div className="min-w-0 flex-1">
           {titleSlot}
           <PlateContent
@@ -624,6 +831,7 @@ export function WorkspaceEditorSurface({
       <RecorderDialog open={recorderOpen} onOpenChange={setRecorderOpen} actionToken={actionToken} onInsert={insertRecordedAudio} />
       <RecordPickerDialog open={recordOpen} onOpenChange={setRecordOpen} onInsert={insertRecordLink} />
       <AiDialog open={aiOpen} onOpenChange={setAiOpen} getText={getDocText} onInsert={insertAiText} />
+      <FindReplaceDialog open={findOpen} onOpenChange={setFindOpen} editor={editor} />
     </Plate>
   );
 }

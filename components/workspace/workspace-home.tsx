@@ -14,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { ShareControl } from "@/components/workspace/share-control";
 import type { WorkspaceDocListItem, WorkspaceFolder } from "@/lib/workspace/types";
 
 type View = "list" | "cards" | "table" | "kanban" | "calendar";
@@ -155,7 +156,7 @@ export function WorkspaceHome({ mine, shared, folders, templates }: { mine: Work
           ) : view === "kanban" ? (
             <KanbanView docs={docs} onAction={post} refresh={() => router.refresh()} />
           ) : view === "calendar" ? (
-            <CalendarView docs={docs} />
+            <CalendarView docs={docs} refresh={() => router.refresh()} />
           ) : (
             <Card><CardContent className="p-0">
               <Table>
@@ -245,6 +246,7 @@ function DocActions({ doc, onAction, refresh }: { doc: WorkspaceDocListItem; onA
       <button type="button" title="Favorite" onClick={async () => { await onAction(`/api/workspace/documents/${doc.id}/favorite`, { favorite: !doc.is_favorite }); refresh(); }} className={cn("rounded p-1.5 transition-colors hover:bg-accent", doc.is_favorite ? "text-amber-500" : "text-muted-foreground hover:text-foreground")}>
         <Star className={cn("h-4 w-4", doc.is_favorite && "fill-current")} />
       </button>
+      <ShareControl documentId={doc.id} scope={doc.scope} onChanged={refresh} />
       <button type="button" title="Rename" onClick={() => setRenameOpen(true)} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><Pencil className="h-4 w-4" /></button>
       <button type="button" title="Archive" onClick={async () => { await onAction(`/api/workspace/documents/${doc.id}`, { status: "archived" }, "PATCH"); refresh(); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><Archive className="h-4 w-4" /></button>
       <button type="button" title="Delete" onClick={() => setConfirmDelete(true)} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
@@ -306,7 +308,7 @@ function KanbanView({ docs, onAction, refresh }: { docs: WorkspaceDocListItem[];
   );
 }
 
-function CalendarView({ docs }: { docs: WorkspaceDocListItem[] }) {
+function CalendarView({ docs, refresh }: { docs: WorkspaceDocListItem[]; refresh: () => void }) {
   const [cursor, setCursor] = useState(() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() }; });
   const byDay = useMemo(() => {
     const map = new Map<string, WorkspaceDocListItem[]>();
@@ -341,7 +343,12 @@ function CalendarView({ docs }: { docs: WorkspaceDocListItem[] }) {
             <div key={key} className={cn("min-h-[76px] rounded border p-1", inMonth ? "bg-background" : "bg-muted/30 text-muted-foreground/60", key === todayKey && "ring-1 ring-primary")}>
               <div className="text-xs">{d.getDate()}</div>
               <div className="mt-0.5 space-y-0.5">
-                {items.slice(0, 3).map((doc) => <Link key={doc.id} href={`/dashboard/workspace/${doc.id}`} className="block truncate rounded bg-primary/15 px-1 py-0.5 text-[11px] text-primary hover:bg-primary/25" title={doc.title}>{doc.title}</Link>)}
+                {items.slice(0, 3).map((doc) => (
+                  <div key={doc.id} className="flex items-center gap-0.5 rounded bg-primary/15 pr-0.5 hover:bg-primary/25">
+                    <Link href={`/dashboard/workspace/${doc.id}`} className="block min-w-0 flex-1 truncate px-1 py-0.5 text-[11px] text-primary" title={doc.title}>{doc.title}</Link>
+                    <ShareControl documentId={doc.id} scope={doc.scope} onChanged={refresh} variant="mini" />
+                  </div>
+                ))}
                 {items.length > 3 ? <div className="px-1 text-[10px] text-muted-foreground">+{items.length - 3}</div> : null}
               </div>
             </div>
