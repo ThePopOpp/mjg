@@ -110,6 +110,7 @@ export function WorkspaceEditor({
         statusSlot={<SaveStatus state={state} />}
         left={left}
         right={right}
+        mentionUsers={mentionable}
         titleSlot={
           <Input
             value={title}

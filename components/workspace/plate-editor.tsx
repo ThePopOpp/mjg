@@ -5,6 +5,7 @@ import { Plate, PlateContent, PlateElement, PlateLeaf, usePlateEditor, createPla
 import { toggleList } from "@platejs/list";
 import { ColumnPlugin, ColumnItemPlugin } from "@platejs/layout/react";
 import { insertColumnGroup } from "@platejs/layout";
+import { TocPlugin, useTocElementState, useTocElement } from "@platejs/toc/react";
 import {
   BoldPlugin, ItalicPlugin, UnderlinePlugin, StrikethroughPlugin, CodePlugin, HighlightPlugin,
   H1Plugin, H2Plugin, H3Plugin, BlockquotePlugin, HorizontalRulePlugin,
@@ -25,7 +26,8 @@ import {
   Bold, Italic, Underline, Strikethrough, Code, Highlighter, Heading1, Heading2, Heading3,
   Quote, Minus, SquareCode, Link2, List, ListOrdered, ListChecks, AlignLeft, AlignCenter, AlignRight,
   Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Columns2, Trash2, Plus,
-  Image as ImageIcon, Video, Music, Mic, FileCode2, Paperclip, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
+  Image as ImageIcon, Video, Music, Mic, FileCode2, Paperclip, AtSign, Smile, ListTree,
+  PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,8 +42,24 @@ const PLUGINS = [
   FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin,
   TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin,
   ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin,
-  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin,
+  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin, TocPlugin,
 ];
+
+// TOC element: lists the document's headings with click-to-scroll (from @platejs/toc).
+function TocElement() {
+  const state = useTocElementState();
+  const btn: any = useTocElement(state as any);
+  const onClick = btn?.props?.onClick;
+  const headings: any[] = (state as any)?.headingList ?? [];
+  return (
+    <div contentEditable={false} className="my-3 rounded-md border bg-muted/30 p-3">
+      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Table of contents</p>
+      {headings.length ? headings.map((h: any) => (
+        <a key={h.id} onClick={(ev) => onClick?.(ev, h, "smooth")} style={{ paddingLeft: Math.max(0, (h.depth ?? 1) - 1) * 14 }} className="block cursor-pointer truncate rounded px-1 py-0.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground">{h.title}</a>
+      )) : <p className="text-xs text-muted-foreground">Add headings (H1–H3) to build the outline.</p>}
+    </div>
+  );
+}
 
 const COMPONENTS: Record<string, any> = {
   [BoldPlugin.key]: (p: any) => <PlateLeaf {...p} as="strong" />,
@@ -58,8 +76,16 @@ const COMPONENTS: Record<string, any> = {
   [CodeBlockPlugin.key]: (p: any) => <PlateElement {...p} as="pre" className="my-2 overflow-x-auto rounded-md bg-muted p-3 font-mono text-sm" />,
   [CodeLinePlugin.key]: (p: any) => <PlateElement {...p} as="div" />,
   [LinkPlugin.key]: ({ element, children, attributes }: any) => (
-    <a {...attributes} href={element?.url} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">{children}</a>
+    <a
+      {...attributes}
+      href={element?.url}
+      target="_blank"
+      rel="noreferrer"
+      onClick={() => { if (element?.url && typeof window !== "undefined") window.open(element.url, "_blank", "noopener,noreferrer"); }}
+      className="cursor-pointer text-primary underline underline-offset-2"
+    >{children}</a>
   ),
+  [TocPlugin.key]: (p: any) => <PlateElement {...p}><TocElement />{p.children}</PlateElement>,
   // Tables render as real HTML tables.
   [TablePlugin.key]: (p: any) => <PlateElement {...p} as="table" className="my-3 w-full table-fixed border-collapse overflow-hidden rounded-md border border-border text-sm" />,
   [TableRowPlugin.key]: (p: any) => <PlateElement {...p} as="tr" />,
@@ -86,6 +112,7 @@ const COMPONENTS: Record<string, any> = {
 const TEXT_COLORS = ["inherit", "#1a1a1a", "#b45309", "#c2410c", "#dc2626", "#2563eb", "#6b7280"];
 const HIGHLIGHT_COLORS = ["transparent", "#fef08a", "#fde68a", "#fed7aa", "#fbcfe8", "#bfdbfe", "#e5e7eb"];
 const FONT_SIZES = [{ label: "S", value: "13px" }, { label: "M", value: "16px" }, { label: "L", value: "20px" }, { label: "XL", value: "28px" }];
+const EMOJIS = ["😀","😁","😂","🤣","😊","😍","😎","🤔","👍","👏","🙏","🔥","✅","❌","⭐","💡","📌","📎","📝","📅","🎯","🚀","💬","❤️","⚠️","✨","👉","📣","🏆","🙌"];
 
 function TBtn({ icon: Icon, title, active, onClick }: { icon: typeof Bold; title: string; active?: boolean; onClick: () => void }) {
   return (
@@ -263,7 +290,7 @@ function HtmlEmbedDialog({ open, onOpenChange, onInsert }: { open: boolean; onOp
 }
 
 export function WorkspaceEditorSurface({
-  initialValue, onChange, titleSlot, statusSlot, left, right,
+  initialValue, onChange, titleSlot, statusSlot, left, right, mentionUsers = [],
 }: {
   initialValue: any;
   onChange: (value: any) => void;
@@ -271,6 +298,7 @@ export function WorkspaceEditorSurface({
   statusSlot?: React.ReactNode;
   left?: React.ReactNode;
   right?: React.ReactNode;
+  mentionUsers?: { id: string; name: string }[];
 }) {
   const value = useMemo(() => (Array.isArray(initialValue) && initialValue.length ? initialValue : [{ type: "p", children: [{ text: "" }] }]), [initialValue]);
   const editor = usePlateEditor({ plugins: PLUGINS, components: COMPONENTS, value });
@@ -303,11 +331,14 @@ export function WorkspaceEditorSurface({
   const insertColumns = () => { try { insertColumnGroup(e, { columns: 2 }); } catch { /* no-op */ } };
   const insertHtml = (html: string) => { try { e.tf?.insertNodes?.({ type: HtmlEmbedPlugin.key, html, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertRecordedAudio = (url: string) => { try { e.tf?.insertNodes?.({ type: AudioPlugin.key, url, children: [{ text: "" }] }); } catch { /* no-op */ } };
+  const insertToc = () => { try { e.tf?.insertNodes?.({ type: TocPlugin.key, children: [{ text: "" }] }); } catch { /* no-op */ } };
+  const insertText = (t: string) => { try { e.tf?.insertText?.(t); } catch { /* no-op */ } };
   const [htmlOpen, setHtmlOpen] = useState(false);
   const [recorderOpen, setRecorderOpen] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
 
-  const [menu, setMenu] = useState<{ open: boolean; top: number; left: number }>({ open: false, top: 0, left: 0 });
-  const openMenu = (top: number, left: number) => setMenu({ open: true, top, left });
+  const [menu, setMenu] = useState<{ open: boolean; top: number; left: number; cmds: Cmd[] }>({ open: false, top: 0, left: 0, cmds: [] });
+  const openMenu = (top: number, left: number, cmds: Cmd[]) => setMenu({ open: true, top, left, cmds });
   const closeMenu = () => setMenu((m) => ({ ...m, open: false }));
   const list = (listStyleType: string) => { try { toggleList(editor as any, { listStyleType } as any); } catch { /* no-op */ } };
   const commands: Cmd[] = [
@@ -321,18 +352,21 @@ export function WorkspaceEditorSurface({
     { label: "Quote", keywords: "blockquote", icon: Quote, run: () => toggle(BlockquotePlugin.key) },
     { label: "Code block", keywords: "code snippet", icon: SquareCode, run: insertCodeBlock },
     { label: "Table", keywords: "grid", icon: TableIcon, run: doInsertTable },
+    { label: "Table of contents", keywords: "toc outline headings", icon: ListTree, run: insertToc },
     { label: "Columns", keywords: "layout two column split", icon: Columns2, run: insertColumns },
     { label: "HTML embed", keywords: "html iframe render", icon: FileCode2, run: () => setHtmlOpen(true) },
     { label: "Record audio", keywords: "voice mic recorder", icon: Mic, run: () => setRecorderOpen(true) },
+    { label: "Emoji", keywords: "emoji icon smiley", icon: Smile, run: () => setEmojiOpen(true) },
     { label: "Divider", keywords: "hr line separator", icon: Minus, run: insertDivider },
   ];
+  const mentionCommands: Cmd[] = mentionUsers.map((u) => ({ label: `@${u.name}`, keywords: u.name, icon: AtSign, run: () => insertText(`@${u.name} `) }));
 
   return (
     <Plate editor={editor} onChange={({ value }: any) => onChange(value)}>
       <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 rounded-md border bg-card p-1">
         <TBtn icon={leftOpen ? PanelLeftClose : PanelLeftOpen} title={leftOpen ? "Hide files" : "Show files"} onClick={() => setLeftOpen((o) => !o)} />
         <Sep />
-        <button type="button" title="Insert block" onMouseDown={(e) => { e.preventDefault(); const r = (e.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><Plus className="h-4 w-4" /></button>
+        <button type="button" title="Insert block" onMouseDown={(ev) => { ev.preventDefault(); const r = (ev.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left, commands); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><Plus className="h-4 w-4" /></button>
         <Sep />
         <TBtn icon={Bold} title="Bold" onClick={() => toggle(BoldPlugin.key)} />
         <TBtn icon={Italic} title="Italic" onClick={() => toggle(ItalicPlugin.key)} />
@@ -375,6 +409,17 @@ export function WorkspaceEditorSurface({
         <MediaButton editor={editor} actionToken={actionToken} nodeType={FilePlugin.key} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv" icon={Paperclip} title="Insert document" />
         <TBtn icon={Mic} title="Record audio" onClick={() => setRecorderOpen(true)} />
         <Sep />
+        <button type="button" title="Mention someone" onMouseDown={(ev) => { ev.preventDefault(); if (!mentionCommands.length) return; const r = (ev.currentTarget as HTMLElement).getBoundingClientRect(); openMenu(r.bottom + 4, r.left, mentionCommands); }} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><AtSign className="h-4 w-4" /></button>
+        <span className="relative">
+          <TBtn icon={Smile} title="Emoji" onClick={() => setEmojiOpen((o) => !o)} />
+          {emojiOpen ? (
+            <div className="absolute left-0 z-20 mt-1 grid w-56 grid-cols-8 gap-0.5 rounded-md border bg-popover p-2 shadow-md" onMouseDown={(ev) => ev.preventDefault()}>
+              {EMOJIS.map((em) => <button key={em} type="button" onMouseDown={(ev) => { ev.preventDefault(); insertText(em); setEmojiOpen(false); }} className="rounded p-1 text-lg hover:bg-accent">{em}</button>)}
+            </div>
+          ) : null}
+        </span>
+        <TBtn icon={ListTree} title="Table of contents" onClick={insertToc} />
+        <Sep />
         <TBtn icon={Columns2} title="Columns" onClick={insertColumns} />
         <TBtn icon={FileCode2} title="HTML embed" onClick={() => setHtmlOpen(true)} />
         <Sep />
@@ -394,14 +439,24 @@ export function WorkspaceEditorSurface({
           <PlateContent
             className={cn("min-h-[62vh] rounded-md border bg-background px-4 py-3 text-[15px] leading-7 focus:outline-none [&_p]:my-1.5")}
             placeholder="Start writing… type / for blocks, or use Markdown (# heading, > quote, ** bold, ` code)"
-            onKeyDown={(e: any) => {
-              if (e.key === "/") {
-                const sel = typeof window !== "undefined" ? window.getSelection() : null;
-                const lineEmpty = (sel?.anchorNode?.textContent ?? "") === "";
-                if (sel && sel.isCollapsed && lineEmpty) {
-                  e.preventDefault();
-                  const rect = sel.rangeCount ? sel.getRangeAt(0).getBoundingClientRect() : null;
-                  openMenu((rect?.bottom ?? 220) + 4, rect?.left ?? 240);
+            onKeyDown={(ev: any) => {
+              const sel = typeof window !== "undefined" ? window.getSelection() : null;
+              if (!sel || !sel.isCollapsed) return;
+              const rect = () => (sel.rangeCount ? sel.getRangeAt(0).getBoundingClientRect() : null);
+              // "/" on an empty line → block insert menu.
+              if (ev.key === "/") {
+                if ((sel.anchorNode?.textContent ?? "") === "") {
+                  ev.preventDefault();
+                  const r = rect();
+                  openMenu((r?.bottom ?? 220) + 4, r?.left ?? 240, commands);
+                }
+              } else if (ev.key === "@" && mentionCommands.length) {
+                // "@" after whitespace / at line start → mention picker (emails keep typing).
+                const before = (sel.anchorNode?.textContent ?? "").slice(0, sel.anchorOffset ?? 0);
+                if (before === "" || /\s$/.test(before)) {
+                  ev.preventDefault();
+                  const r = rect();
+                  openMenu((r?.bottom ?? 220) + 4, r?.left ?? 240, mentionCommands);
                 }
               }
             }}
@@ -409,7 +464,7 @@ export function WorkspaceEditorSurface({
         </div>
         {right && rightOpen ? <aside className="hidden w-72 shrink-0 xl:block">{right}</aside> : null}
       </div>
-      <CommandMenu open={menu.open} pos={{ top: menu.top, left: menu.left }} commands={commands} onClose={closeMenu} />
+      <CommandMenu open={menu.open} pos={{ top: menu.top, left: menu.left }} commands={menu.cmds} onClose={closeMenu} />
       <HtmlEmbedDialog open={htmlOpen} onOpenChange={setHtmlOpen} onInsert={insertHtml} />
       <RecorderDialog open={recorderOpen} onOpenChange={setRecorderOpen} actionToken={actionToken} onInsert={insertRecordedAudio} />
     </Plate>
