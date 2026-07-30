@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Plate, PlateContent, PlateElement, PlateLeaf, usePlateEditor } from "platejs/react";
 import {
   BoldPlugin, ItalicPlugin, UnderlinePlugin, StrikethroughPlugin, CodePlugin, HighlightPlugin,
@@ -10,10 +10,14 @@ import { CodeBlockPlugin, CodeLinePlugin } from "@platejs/code-block/react";
 import { LinkPlugin } from "@platejs/link/react";
 import { ListPlugin, useListToolbarButton, useListToolbarButtonState, useIndentTodoToolBarButton, useIndentTodoToolBarButtonState } from "@platejs/list/react";
 import { FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin } from "@platejs/basic-styles/react";
+import { TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin } from "@platejs/table/react";
+import { ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin } from "@platejs/media/react";
+import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import {
   Bold, Italic, Underline, Strikethrough, Code, Highlighter, Heading1, Heading2, Heading3,
   Quote, Minus, SquareCode, Link2, List, ListOrdered, ListChecks, AlignLeft, AlignCenter, AlignRight,
-  Baseline, PaintBucket, Type, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
+  Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Trash2,
+  Image as ImageIcon, Video, Music, Paperclip, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +27,8 @@ const PLUGINS = [
   H1Plugin, H2Plugin, H3Plugin, BlockquotePlugin, HorizontalRulePlugin,
   CodeBlockPlugin, CodeLinePlugin, LinkPlugin, ListPlugin,
   FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin,
+  TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin,
+  ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin,
 ];
 
 const COMPONENTS: Record<string, any> = {
@@ -42,6 +48,16 @@ const COMPONENTS: Record<string, any> = {
   [LinkPlugin.key]: ({ element, children, attributes }: any) => (
     <a {...attributes} href={element?.url} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">{children}</a>
   ),
+  // Tables render as real HTML tables.
+  [TablePlugin.key]: (p: any) => <PlateElement {...p} as="table" className="my-3 w-full table-fixed border-collapse overflow-hidden rounded-md border border-border text-sm" />,
+  [TableRowPlugin.key]: (p: any) => <PlateElement {...p} as="tr" />,
+  [TableCellPlugin.key]: (p: any) => <PlateElement {...p} as="td" className="border border-border px-2 py-1 align-top" />,
+  [TableCellHeaderPlugin.key]: (p: any) => <PlateElement {...p} as="th" className="border border-border bg-muted px-2 py-1 text-left font-semibold" />,
+  // Media (void nodes).
+  [ImagePlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={p.element?.url} alt={p.element?.name || ""} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
+  [VideoPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><video controls src={p.element?.url} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
+  [AudioPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><audio controls src={p.element?.url} className="w-full" /></div>{p.children}</PlateElement>,
+  [FilePlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><a href={p.element?.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm text-primary hover:underline">📎 {p.element?.name || "Download file"}</a></div>{p.children}</PlateElement>,
 };
 
 const TEXT_COLORS = ["inherit", "#1a1a1a", "#b45309", "#c2410c", "#dc2626", "#2563eb", "#6b7280"];
@@ -88,6 +104,27 @@ function ColorMenu({ icon: Icon, title, colors, onPick }: { icon: typeof Baselin
   );
 }
 
+// Upload via the shared endpoint, then insert a media (void) node with the URL.
+function MediaButton({ editor, actionToken, nodeType, accept, icon, title }: { editor: any; actionToken: string; nodeType: string; accept: string; icon: typeof ImageIcon; title: string }) {
+  const ref = useRef<HTMLInputElement>(null);
+  async function onPick(f: File) {
+    const fd = new FormData();
+    fd.append("file", f);
+    fd.append("folder", "workspace");
+    try {
+      const res = await fetch("/api/admin/uploads", { method: "POST", headers: { "x-mjg-action-token": actionToken }, body: fd });
+      const data = await res.json();
+      if (res.ok && data.url) editor.tf?.insertNodes?.([{ type: nodeType, url: data.url, name: f.name, children: [{ text: "" }] }]);
+    } catch { /* no-op */ }
+  }
+  return (
+    <span>
+      <input ref={ref} type="file" accept={accept} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); e.target.value = ""; }} />
+      <TBtn icon={icon} title={title} onClick={() => ref.current?.click()} />
+    </span>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right,
 }: {
@@ -100,6 +137,7 @@ export function WorkspaceEditorSurface({
 }) {
   const value = useMemo(() => (Array.isArray(initialValue) && initialValue.length ? initialValue : [{ type: "p", children: [{ text: "" }] }]), [initialValue]);
   const editor = usePlateEditor({ plugins: PLUGINS, components: COMPONENTS, value });
+  const actionToken = useDashboardActionToken();
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [sizeOpen, setSizeOpen] = useState(false);
@@ -143,6 +181,16 @@ export function WorkspaceEditorSurface({
         <TBtn icon={AlignLeft} title="Align left" onClick={() => setAlign("left")} />
         <TBtn icon={AlignCenter} title="Align center" onClick={() => setAlign("center")} />
         <TBtn icon={AlignRight} title="Align right" onClick={() => setAlign("right")} />
+        <Sep />
+        <TBtn icon={TableIcon} title="Insert table" onClick={() => { try { (editor.tf as any)?.insertTable?.({ rowCount: 3, colCount: 3 }); } catch { /* no-op */ } }} />
+        <TBtn icon={Rows3} title="Add row" onClick={() => { try { (editor.tf as any)?.insertTableRow?.(); } catch { /* no-op */ } }} />
+        <TBtn icon={Columns3} title="Add column" onClick={() => { try { (editor.tf as any)?.insertTableColumn?.(); } catch { /* no-op */ } }} />
+        <TBtn icon={Trash2} title="Delete table" onClick={() => { try { (editor.tf as any)?.deleteTable?.(); } catch { /* no-op */ } }} />
+        <Sep />
+        <MediaButton editor={editor} actionToken={actionToken} nodeType={ImagePlugin.key} accept="image/*" icon={ImageIcon} title="Insert image" />
+        <MediaButton editor={editor} actionToken={actionToken} nodeType={VideoPlugin.key} accept="video/*" icon={Video} title="Insert video" />
+        <MediaButton editor={editor} actionToken={actionToken} nodeType={AudioPlugin.key} accept="audio/*" icon={Music} title="Insert audio" />
+        <MediaButton editor={editor} actionToken={actionToken} nodeType={FilePlugin.key} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv" icon={Paperclip} title="Insert document" />
         <Sep />
         <TBtn icon={SquareCode} title="Code block" onClick={() => toggle(CodeBlockPlugin.key)} />
         <TBtn icon={Link2} title="Insert link" onClick={insertLink} />
