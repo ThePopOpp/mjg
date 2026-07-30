@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plate, PlateContent, PlateElement, PlateLeaf, usePlateEditor } from "platejs/react";
+import { Plate, PlateContent, PlateElement, PlateLeaf, usePlateEditor, createPlatePlugin } from "platejs/react";
 import { toggleList } from "@platejs/list";
+import { ColumnPlugin, ColumnItemPlugin } from "@platejs/layout/react";
+import { insertColumnGroup } from "@platejs/layout";
 import {
   BoldPlugin, ItalicPlugin, UnderlinePlugin, StrikethroughPlugin, CodePlugin, HighlightPlugin,
   H1Plugin, H2Plugin, H3Plugin, BlockquotePlugin, HorizontalRulePlugin,
@@ -13,16 +15,22 @@ import { ListPlugin, useListToolbarButton, useListToolbarButtonState, useIndentT
 import { FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin } from "@platejs/basic-styles/react";
 import { TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin } from "@platejs/table/react";
 import { insertTable, insertTableRow, insertTableColumn, deleteTable } from "@platejs/table";
-import { insertLink } from "@platejs/link";
+import { insertLink, upsertLink } from "@platejs/link";
 import { ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin } from "@platejs/media/react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   Bold, Italic, Underline, Strikethrough, Code, Highlighter, Heading1, Heading2, Heading3,
   Quote, Minus, SquareCode, Link2, List, ListOrdered, ListChecks, AlignLeft, AlignCenter, AlignRight,
-  Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Trash2, Plus,
-  Image as ImageIcon, Video, Music, Paperclip, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
+  Baseline, PaintBucket, Type, Table as TableIcon, Rows3, Columns3, Columns2, Trash2, Plus,
+  Image as ImageIcon, Video, Music, Mic, FileCode2, Paperclip, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Custom void block: render pasted HTML in a sandboxed frame (distinct from a code block).
+const HtmlEmbedPlugin = createPlatePlugin({ key: "html_embed", node: { isElement: true, isVoid: true } });
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const PLUGINS = [
@@ -32,6 +40,7 @@ const PLUGINS = [
   FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin,
   TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin,
   ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin,
+  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin,
 ];
 
 const COMPONENTS: Record<string, any> = {
@@ -61,6 +70,17 @@ const COMPONENTS: Record<string, any> = {
   [VideoPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><video controls src={p.element?.url} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
   [AudioPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><audio controls src={p.element?.url} className="w-full" /></div>{p.children}</PlateElement>,
   [FilePlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><a href={p.element?.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm text-primary hover:underline">📎 {p.element?.name || "Download file"}</a></div>{p.children}</PlateElement>,
+  // Columns layout.
+  [ColumnPlugin.key]: (p: any) => <PlateElement {...p} as="div" className="my-3 flex flex-col gap-4 md:flex-row" />,
+  [ColumnItemPlugin.key]: (p: any) => <PlateElement {...p} as="div" className="min-w-0 flex-1 rounded-md border border-dashed border-border p-2" />,
+  // HTML embed (sandboxed, script-disabled).
+  [HtmlEmbedPlugin.key]: (p: any) => (
+    <PlateElement {...p}>
+      <div contentEditable={false} className="my-2 overflow-hidden rounded-md border">
+        <iframe sandbox="" title="HTML embed" className="h-64 w-full bg-white" srcDoc={p.element?.html || "<p style='font-family:sans-serif;color:#888;padding:12px'>Empty HTML embed</p>"} />
+      </div>{p.children}
+    </PlateElement>
+  ),
 };
 
 const TEXT_COLORS = ["inherit", "#1a1a1a", "#b45309", "#c2410c", "#dc2626", "#2563eb", "#6b7280"];
@@ -170,6 +190,78 @@ function CommandMenu({ open, pos, commands, onClose }: { open: boolean; pos: { t
   );
 }
 
+// Record audio in-browser, then upload + hand back a URL to insert as an audio block.
+function RecorderDialog({ open, onOpenChange, actionToken, onInsert }: { open: boolean; onOpenChange: (v: boolean) => void; actionToken: string; onInsert: (url: string) => void }) {
+  const [status, setStatus] = useState<"idle" | "recording" | "recorded" | "uploading">("idle");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const mr = useRef<any>(null);
+  const chunks = useRef<Blob[]>([]);
+  const blob = useRef<Blob | null>(null);
+
+  function reset() { setStatus("idle"); setPreviewUrl(null); blob.current = null; chunks.current = []; }
+  async function start() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new (window as any).MediaRecorder(stream);
+      chunks.current = [];
+      rec.ondataavailable = (e: any) => { if (e.data.size) chunks.current.push(e.data); };
+      rec.onstop = () => { const b = new Blob(chunks.current, { type: "audio/webm" }); blob.current = b; setPreviewUrl(URL.createObjectURL(b)); setStatus("recorded"); stream.getTracks().forEach((t: any) => t.stop()); };
+      mr.current = rec; rec.start(); setStatus("recording");
+    } catch { setStatus("idle"); }
+  }
+  function stop() { try { mr.current?.stop(); } catch { /* no-op */ } }
+  async function insert() {
+    if (!blob.current) return;
+    setStatus("uploading");
+    try {
+      const fd = new FormData();
+      fd.append("file", new File([blob.current], `recording-${Date.now()}.webm`, { type: "audio/webm" }));
+      fd.append("folder", "workspace");
+      const res = await fetch("/api/admin/uploads", { method: "POST", headers: { "x-mjg-action-token": actionToken }, body: fd });
+      const data = await res.json();
+      if (res.ok && data.url) { onInsert(data.url); onOpenChange(false); reset(); } else setStatus("recorded");
+    } catch { setStatus("recorded"); }
+  }
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Record audio</DialogTitle><DialogDescription>Record a voice note, preview it, then insert it into the document.</DialogDescription></DialogHeader>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            {status === "recording" ? (
+              <Button variant="destructive" onClick={stop}>■ Stop</Button>
+            ) : (
+              <Button onClick={start} disabled={status === "uploading"}><Mic className="mr-2 h-4 w-4" /> {status === "recorded" ? "Re-record" : "Record"}</Button>
+            )}
+            {status === "recording" ? <span className="text-sm text-muted-foreground">Recording…</span> : null}
+          </div>
+          {previewUrl ? <audio controls src={previewUrl} className="w-full" /> : null}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => { reset(); onOpenChange(false); }}>Cancel</Button>
+          <Button onClick={insert} disabled={!blob.current || status === "uploading"}>{status === "uploading" ? "Inserting…" : "Insert"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function HtmlEmbedDialog({ open, onOpenChange, onInsert }: { open: boolean; onOpenChange: (v: boolean) => void; onInsert: (html: string) => void }) {
+  const [html, setHtml] = useState("");
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) setHtml(""); onOpenChange(v); }}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>HTML embed</DialogTitle><DialogDescription>Paste HTML to render it in the document (scripts are disabled for safety).</DialogDescription></DialogHeader>
+        <Textarea rows={8} value={html} onChange={(e) => setHtml(e.target.value)} placeholder="<div>…</div>" className="font-mono text-xs" />
+        <DialogFooter>
+          <Button variant="outline" onClick={() => { setHtml(""); onOpenChange(false); }}>Cancel</Button>
+          <Button onClick={() => { if (html.trim()) { onInsert(html); setHtml(""); onOpenChange(false); } }} disabled={!html.trim()}>Insert</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right,
 }: {
@@ -191,13 +283,28 @@ export function WorkspaceEditorSurface({
   const setMark = (key: string, val: string) => { try { (editor.tf as any)?.addMark?.(key, val); } catch { /* no-op */ } };
   const setAlign = (val: string) => { try { (editor.tf as any)?.setNodes?.({ [TextAlignPlugin.key]: val }, { match: (n: any) => !!n?.type }); } catch { /* no-op */ } };
   const e = editor as any;
-  const doInsertLink = () => { const url = typeof window !== "undefined" ? window.prompt("Link URL (https://…)") : null; if (url) { try { insertLink(e, { url }); } catch { /* no-op */ } } };
+  const doInsertLink = () => {
+    const url = typeof window !== "undefined" ? window.prompt("Link URL (https://…)") : null;
+    if (!url) return;
+    // Selected text → wrap it in a link (upsertLink). No selection → insert the URL as a link.
+    const sel = typeof window !== "undefined" ? window.getSelection() : null;
+    const hasSelection = !!sel && !sel.isCollapsed && sel.toString().length > 0;
+    try {
+      if (hasSelection) upsertLink(e, { url });
+      else insertLink(e, { url, text: url });
+    } catch { /* no-op */ }
+  };
   const doInsertTable = () => { try { insertTable(e, { rowCount: 3, colCount: 3 }); } catch { /* no-op */ } };
   const doAddRow = () => { try { insertTableRow(e); } catch { /* no-op */ } };
   const doAddCol = () => { try { insertTableColumn(e); } catch { /* no-op */ } };
   const doDeleteTable = () => { try { deleteTable(e); } catch { /* no-op */ } };
   const insertCodeBlock = () => { try { e.tf?.insertNodes?.({ type: CodeBlockPlugin.key, children: [{ type: CodeLinePlugin.key, children: [{ text: "" }] }] }); } catch { /* no-op */ } };
   const insertDivider = () => { try { e.tf?.insertNodes?.({ type: HorizontalRulePlugin.key, children: [{ text: "" }] }); } catch { /* no-op */ } };
+  const insertColumns = () => { try { insertColumnGroup(e, { columns: 2 }); } catch { /* no-op */ } };
+  const insertHtml = (html: string) => { try { e.tf?.insertNodes?.({ type: HtmlEmbedPlugin.key, html, children: [{ text: "" }] }); } catch { /* no-op */ } };
+  const insertRecordedAudio = (url: string) => { try { e.tf?.insertNodes?.({ type: AudioPlugin.key, url, children: [{ text: "" }] }); } catch { /* no-op */ } };
+  const [htmlOpen, setHtmlOpen] = useState(false);
+  const [recorderOpen, setRecorderOpen] = useState(false);
 
   const [menu, setMenu] = useState<{ open: boolean; top: number; left: number }>({ open: false, top: 0, left: 0 });
   const openMenu = (top: number, left: number) => setMenu({ open: true, top, left });
@@ -214,6 +321,9 @@ export function WorkspaceEditorSurface({
     { label: "Quote", keywords: "blockquote", icon: Quote, run: () => toggle(BlockquotePlugin.key) },
     { label: "Code block", keywords: "code snippet", icon: SquareCode, run: insertCodeBlock },
     { label: "Table", keywords: "grid", icon: TableIcon, run: doInsertTable },
+    { label: "Columns", keywords: "layout two column split", icon: Columns2, run: insertColumns },
+    { label: "HTML embed", keywords: "html iframe render", icon: FileCode2, run: () => setHtmlOpen(true) },
+    { label: "Record audio", keywords: "voice mic recorder", icon: Mic, run: () => setRecorderOpen(true) },
     { label: "Divider", keywords: "hr line separator", icon: Minus, run: insertDivider },
   ];
 
@@ -263,6 +373,10 @@ export function WorkspaceEditorSurface({
         <MediaButton editor={editor} actionToken={actionToken} nodeType={VideoPlugin.key} accept="video/*" icon={Video} title="Insert video" />
         <MediaButton editor={editor} actionToken={actionToken} nodeType={AudioPlugin.key} accept="audio/*" icon={Music} title="Insert audio" />
         <MediaButton editor={editor} actionToken={actionToken} nodeType={FilePlugin.key} accept="application/pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv" icon={Paperclip} title="Insert document" />
+        <TBtn icon={Mic} title="Record audio" onClick={() => setRecorderOpen(true)} />
+        <Sep />
+        <TBtn icon={Columns2} title="Columns" onClick={insertColumns} />
+        <TBtn icon={FileCode2} title="HTML embed" onClick={() => setHtmlOpen(true)} />
         <Sep />
         <TBtn icon={SquareCode} title="Code block" onClick={insertCodeBlock} />
         <TBtn icon={Link2} title="Insert link" onClick={doInsertLink} />
@@ -296,6 +410,8 @@ export function WorkspaceEditorSurface({
         {right && rightOpen ? <aside className="hidden w-72 shrink-0 xl:block">{right}</aside> : null}
       </div>
       <CommandMenu open={menu.open} pos={{ top: menu.top, left: menu.left }} commands={commands} onClose={closeMenu} />
+      <HtmlEmbedDialog open={htmlOpen} onOpenChange={setHtmlOpen} onInsert={insertHtml} />
+      <RecorderDialog open={recorderOpen} onOpenChange={setRecorderOpen} actionToken={actionToken} onInsert={insertRecordedAudio} />
     </Plate>
   );
 }
