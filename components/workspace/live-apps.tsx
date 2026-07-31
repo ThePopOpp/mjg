@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
-import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
@@ -218,12 +218,12 @@ function ProjectTrackerElement(props: any) {
                     <StatusCell row={r} statuses={statuses} onSet={(s) => setRow(r.id, { status: s })} onAdd={addStatus} onRemoveStatus={removeStatus} />
                   </td>
                   {/* Deadline */}
-                  <td className={cn(col, "min-w-[170px]")}>
-                    <DateTimePicker
-                      date={r.deadline?.date ?? ""}
-                      time={r.deadline?.time ?? ""}
-                      placeholder="Set date & time…"
-                      onChange={(date, time) => setRow(r.id, { deadline: date || time ? { date, time } : null })}
+                  <td className={cn(col, "min-w-[150px]")}>
+                    <DatePicker
+                      value={r.deadline?.date ?? ""}
+                      onChange={(v) => setRow(r.id, { deadline: v ? { date: v } : null })}
+                      placeholder="Set Date…"
+                      className="h-8 w-full px-2 text-xs"
                     />
                   </td>
                   {/* Attachment */}
@@ -318,8 +318,37 @@ function KanbanElement(props: any) {
     if (!from || !card) return;
     save({ columns: columns.map((c) => c.id === fromCol ? { ...c, cards: c.cards.filter((k: any) => k.id !== cardId) } : c.id === toCol ? { ...c, cards: [...c.cards, card] } : c) });
   };
-  const dragRef = useRef<{ fromCol: string; cardId: string } | null>(null);
+  // Pointer-based drag (native HTML5 DnD is swallowed by the editor). Grip handle starts it;
+  // the drop column is resolved from the element under the pointer via data-kanban-col.
+  const dragInfo = useRef<{ fromCol: string; cardId: string } | null>(null);
+  const dropColRef = useRef<string | null>(null);
   const [dropCol, setDropCol] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ text: string; x: number; y: number } | null>(null);
+  const startCardDrag = (e: any, colId: string, card: any) => {
+    e.preventDefault(); e.stopPropagation();
+    dragInfo.current = { fromCol: colId, cardId: card.id };
+    setPreview({ text: card.text || "New Card", x: e.clientX, y: e.clientY });
+  };
+  useEffect(() => {
+    if (!preview) return;
+    const onMove = (ev: MouseEvent) => {
+      setPreview((p) => (p ? { ...p, x: ev.clientX, y: ev.clientY } : p));
+      const el = document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement | null;
+      const colId = el?.closest?.("[data-kanban-col]")?.getAttribute("data-kanban-col") ?? null;
+      dropColRef.current = colId;
+      setDropCol(colId);
+    };
+    const onUp = () => {
+      const info = dragInfo.current;
+      const target = dropColRef.current;
+      if (info && target && target !== info.fromCol) moveCard(info.fromCol, info.cardId, target);
+      dragInfo.current = null; dropColRef.current = null; setPreview(null); setDropCol(null);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!preview]);
 
   return (
     <PlateElement {...props}>
@@ -342,22 +371,17 @@ function KanbanElement(props: any) {
                 </DropdownMenu>
               </div>
               <div
-                className={cn("min-h-[16px] space-y-2 rounded-md transition-colors", dropCol === c.id && "bg-primary/5 ring-2 ring-primary/40")}
-                onDragEnter={(ev) => { if (dragRef.current) { ev.preventDefault(); ev.stopPropagation(); setDropCol(c.id); } }}
-                onDragOver={(ev) => { if (dragRef.current) { ev.preventDefault(); ev.stopPropagation(); ev.dataTransfer.dropEffect = "move"; if (dropCol !== c.id) setDropCol(c.id); } }}
-                onDragLeave={(ev) => { if (!ev.currentTarget.contains(ev.relatedTarget as Node)) setDropCol((d) => (d === c.id ? null : d)); }}
-                onDrop={(ev) => { ev.preventDefault(); ev.stopPropagation(); const d = dragRef.current; if (d && d.fromCol !== c.id) moveCard(d.fromCol, d.cardId, c.id); dragRef.current = null; setDropCol(null); }}
+                data-kanban-col={c.id}
+                className={cn("min-h-[24px] space-y-2 rounded-md transition-colors", dropCol === c.id && "bg-primary/5 ring-2 ring-primary/40")}
               >
                 {c.cards.map((k: any) => (
                   <div
                     key={k.id}
-                    draggable
-                    onDragStart={(ev) => { dragRef.current = { fromCol: c.id, cardId: k.id }; ev.stopPropagation(); ev.dataTransfer.effectAllowed = "move"; try { ev.dataTransfer.setData("application/x-mjg-card", k.id); } catch { /* no-op */ } }}
-                    onDragEnd={(ev) => { ev.stopPropagation(); dragRef.current = null; setDropCol(null); }}
-                    className="group cursor-grab rounded-md border p-2 active:cursor-grabbing" style={{ background: `${c.color}12`, borderColor: `${c.color}44` }}
+                    className={cn("group rounded-md border p-2", dragInfo.current?.cardId === k.id && preview && "opacity-40")}
+                    style={{ background: `${c.color}12`, borderColor: `${c.color}44` }}
                   >
                     <div className="flex items-start gap-1">
-                      <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-grab text-muted-foreground/50" />
+                      <span onMouseDown={(e) => startCardDrag(e, c.id, k)} className="mt-0.5 shrink-0 cursor-grab text-muted-foreground/50 hover:text-foreground active:cursor-grabbing" title="Drag to move"><GripVertical className="h-3.5 w-3.5" /></span>
                       <EditableText value={k.text} onSave={(v) => setCard(c.id, k.id, v)} placeholder="New Card" className="text-sm" />
                       <DropdownMenu>
                         <DropdownMenuTrigger className="rounded p-0.5 text-muted-foreground opacity-0 hover:bg-accent focus:outline-none group-hover:opacity-100"><MoreHorizontal className="h-3.5 w-3.5" /></DropdownMenuTrigger>
@@ -376,6 +400,11 @@ function KanbanElement(props: any) {
             </div>
           ))}
         </div>
+        {preview ? (
+          <div style={{ position: "fixed", top: preview.y + 12, left: preview.x + 12, pointerEvents: "none" }} className="z-[60] max-w-[220px] truncate rounded-md border bg-card px-2 py-1 text-sm shadow-lg">
+            {preview.text}
+          </div>
+        ) : null}
       </BlockShell>
       {props.children}
     </PlateElement>
