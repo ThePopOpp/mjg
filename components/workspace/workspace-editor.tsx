@@ -108,13 +108,16 @@ export function WorkspaceEditor({
 
   return (
     <div className="space-y-3">
-      <Link href={workspaceId ? `/dashboard/workspace?ws=${workspaceId}` : "/dashboard/workspace"} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> Workspace
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href={workspaceId ? `/dashboard/workspace?ws=${workspaceId}` : "/dashboard/workspace"} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> Workspace
+        </Link>
+        <SaveStatus state={state} />
+      </div>
       <WorkspaceEditorSurface
         initialValue={doc.content_json}
         onChange={(value) => { latest.current.content = value; scheduleSave(); }}
-        statusSlot={<SaveStatus state={state} />}
+        statusSlot={undefined}
         left={left}
         right={right}
         mentionUsers={mentionable}

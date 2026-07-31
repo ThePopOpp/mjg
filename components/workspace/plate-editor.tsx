@@ -576,6 +576,33 @@ function TableSettingsDialog({ open, onOpenChange, setTableProps, setCellBackgro
   );
 }
 
+// Branded link input anchored near the selection (replaces the browser's window.prompt).
+function LinkPopover({ pop, onApply, onClose }: { pop: { top: number; left: number; sel: boolean } | null; onApply: (url: string) => void; onClose: () => void }) {
+  const [url, setUrl] = useState("");
+  useEffect(() => { if (pop) setUrl(""); }, [pop]);
+  if (!pop) return null;
+  return (
+    <>
+      <div className="fixed inset-0 z-40" onMouseDown={(e) => { e.preventDefault(); onClose(); }} />
+      <div style={{ position: "fixed", top: pop.top, left: pop.left, width: 288 }} className="z-50 rounded-md border bg-popover p-2 text-popover-foreground shadow-lg" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1.5">
+          <Link2 className="h-4 w-4 shrink-0 text-primary" />
+          <input
+            autoFocus
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onApply(url); } if (e.key === "Escape") onClose(); }}
+            placeholder="Paste a link (https://…)"
+            className="h-8 min-w-0 flex-1 rounded-md border bg-background px-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+          />
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); onApply(url); }} className="h-8 shrink-0 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">Apply</button>
+        </div>
+        <p className="mt-1 px-1 text-[11px] text-muted-foreground">{pop.sel ? "Links the selected text." : "Inserts the link."}</p>
+      </div>
+    </>
+  );
+}
+
 // A large "live app" card for the Insert mega-menu (icon + mini infographic + blurb).
 function InsertMegaCard({ onSelect, icon: Icon, title, desc, accent, children }: { onSelect: () => void; icon: any; title: string; desc: string; accent: string; children: React.ReactNode }) {
   return (
@@ -610,15 +637,18 @@ export function WorkspaceEditorSurface({
   const setAlign = (val: string) => { try { (editor.tf as any)?.setNodes?.({ [TextAlignPlugin.key]: val }, { match: (n: any) => !!n?.type }); } catch { /* no-op */ } };
   const e = editor as any;
   const doInsertLink = () => {
-    const url = typeof window !== "undefined" ? window.prompt("Link URL (https://…)") : null;
-    if (!url) return;
-    // Selected text → wrap it in a link (upsertLink). No selection → insert the URL as a link.
+    // Open a branded popover anchored to the selection (replaces window.prompt).
     const sel = typeof window !== "undefined" ? window.getSelection() : null;
     const hasSelection = !!sel && !sel.isCollapsed && sel.toString().length > 0;
-    try {
-      if (hasSelection) upsertLink(e, { url });
-      else insertLink(e, { url, text: url });
-    } catch { /* no-op */ }
+    const rect = sel && sel.rangeCount ? sel.getRangeAt(0).getBoundingClientRect() : null;
+    const top = (rect?.bottom ?? 220) + 6;
+    const left = Math.max(8, Math.min(rect?.left ?? 240, (typeof window !== "undefined" ? window.innerWidth : 900) - 300));
+    setLinkPop({ top, left, sel: hasSelection });
+  };
+  const applyLink = (url: string) => {
+    const clean = url.trim();
+    if (clean) { try { if (linkPop?.sel) upsertLink(e, { url: clean }); else insertLink(e, { url: clean, text: clean }); } catch { /* no-op */ } }
+    setLinkPop(null);
   };
   const insertTableSized = (rows: number, cols: number) => { try { insertTable(e, { rowCount: rows, colCount: cols }); } catch { /* no-op */ } };
   const setTableProps = (props: Record<string, unknown>) => { if (!e.selection) return; try { e.tf?.setNodes?.(props, { match: (n: any) => n?.type === TablePlugin.key, at: e.selection }); } catch { /* no-op */ } };
@@ -646,6 +676,7 @@ export function WorkspaceEditorSurface({
   const [aiOpen, setAiOpen] = useState(false);
   const [findOpen, setFindOpen] = useState(false);
   const [outlineOpen, setOutlineOpen] = useState(false);
+  const [linkPop, setLinkPop] = useState<{ top: number; left: number; sel: boolean } | null>(null);
   const [tableInsertOpen, setTableInsertOpen] = useState(false);
   const [tableSettingsOpen, setTableSettingsOpen] = useState(false);
   const doInsertTable = () => setTableInsertOpen(true);
@@ -709,7 +740,7 @@ export function WorkspaceEditorSurface({
   const mentionCommands: Cmd[] = mentionUsers.map((u) => ({ label: `@${u.name}`, keywords: u.name, icon: AtSign, run: () => insertText(`@${u.name} `) }));
 
   return (
-    <Plate editor={editor} onChange={({ value }: any) => { onChange(value); if (outlineOpen) setTick((t) => t + 1); }}>
+    <Plate editor={editor} onChange={({ value }: any) => { onChange(value); setTick((t) => t + 1); }}>
       <div className="sticky top-16 z-20 flex flex-wrap items-center gap-0.5 rounded-md border bg-card p-1 shadow-sm">
         <TBtn icon={leftOpen ? PanelLeftClose : PanelLeftOpen} title={leftOpen ? "Hide files" : "Show files"} onClick={() => setLeftOpen((o) => !o)} />
         <Sep />
@@ -938,6 +969,7 @@ export function WorkspaceEditorSurface({
       <FindReplaceDialog open={findOpen} onOpenChange={setFindOpen} editor={editor} />
       <TableInsertDialog open={tableInsertOpen} onOpenChange={setTableInsertOpen} onInsert={insertTableSized} />
       <TableSettingsDialog open={tableSettingsOpen} onOpenChange={setTableSettingsOpen} setTableProps={setTableProps} setCellBackground={setCellBackground} />
+      <LinkPopover pop={linkPop} onApply={applyLink} onClose={() => setLinkPop(null)} />
     </Plate>
   );
 }

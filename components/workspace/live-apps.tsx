@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createPlatePlugin, PlateElement, useEditorRef, usePath } from "platejs/react";
+import { createPlatePlugin, PlateElement, useEditorRef, usePath, useElement } from "platejs/react";
 import {
   Plus, X, ChevronLeft, ChevronRight, Paperclip, Link2, Mic, Upload, User, FolderKanban,
-  CircleDot, CalendarClock, MoreHorizontal, Trash2, GripVertical, Search,
+  CircleDot, CalendarClock, MoreHorizontal, Trash2, GripVertical, Search, Palette,
 } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
@@ -79,14 +79,27 @@ function EditableText({ value, onSave, placeholder, className }: { value: string
   );
 }
 
-function BlockShell({ icon: Icon, label, color, actions, children }: { icon: any; label: string; color: string; actions?: React.ReactNode; children: React.ReactNode }) {
+const BLOCK_SWATCHES = ["hsl(var(--foreground))", "#C9A46E", "#9B2F2E", "#B58F55", "#7C6F5A", "#4B4844"];
+
+function BlockShell({ icon: Icon, label, color, onColor, actions, children }: { icon: any; label: string; color: string; onColor?: (c: string) => void; actions?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div contentEditable={false} className="my-3 select-none rounded-lg border bg-card p-3 shadow-sm">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 rounded-md border bg-background px-2 py-1 text-sm font-semibold" style={{ color }}>
           <Icon className="h-4 w-4" /> {label}
         </span>
-        <div className="flex items-center gap-1.5">{actions}</div>
+        <div className="flex items-center gap-1.5">
+          {onColor ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none" aria-label="Accent color"><Palette className="h-3.5 w-3.5" /></DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Accent color</DropdownMenuLabel>
+                <div className="flex flex-wrap gap-1.5 p-1.5">{BLOCK_SWATCHES.map((c) => <button key={c} type="button" onClick={() => onColor(c)} aria-label={c} className="h-5 w-5 rounded-full border" style={{ background: c }} />)}</div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
+          {actions}
+        </div>
       </div>
       {children}
     </div>
@@ -122,7 +135,7 @@ function RecordPicker({ home, onPick }: { home: string; onPick: (r: any) => void
 function ProjectTrackerElement(props: any) {
   const editor = useEditorRef();
   const path = usePath();
-  const el = props.element ?? {};
+  const el = (useElement() as any) ?? props.element ?? {};
   const rows: any[] = el.rows ?? [];
   const statuses: any[] = el.statuses ?? DEFAULT_STATUSES;
   const token = useDashboardActionToken();
@@ -140,7 +153,7 @@ function ProjectTrackerElement(props: any) {
 
   return (
     <PlateElement {...props}>
-      <BlockShell icon={FolderKanban} label="Project Tracker" color={BLOCK_ACCENT.tracker} actions={<button type="button" onClick={addRow} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"><Plus className="h-3.5 w-3.5" /> Add row</button>}>
+      <BlockShell icon={FolderKanban} label="Project Tracker" color={el.accent || BLOCK_ACCENT.tracker} onColor={(c) => save({ accent: c })} actions={<button type="button" onClick={addRow} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"><Plus className="h-3.5 w-3.5" /> Add row</button>}>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -291,7 +304,7 @@ function AttachmentCell({ value, token, onSet }: { value: any; token: string; on
 function KanbanElement(props: any) {
   const editor = useEditorRef();
   const path = usePath();
-  const el = props.element ?? {};
+  const el = (useElement() as any) ?? props.element ?? {};
   const columns: any[] = el.columns ?? [];
   const save = (patch: Record<string, unknown>) => { try { (editor as any).tf?.setNodes?.(patch, { at: path }); } catch { /* no-op */ } };
   const setCol = (id: string, patch: any) => save({ columns: columns.map((c) => (c.id === id ? { ...c, ...patch } : c)) });
@@ -305,10 +318,12 @@ function KanbanElement(props: any) {
     if (!from || !card) return;
     save({ columns: columns.map((c) => c.id === fromCol ? { ...c, cards: c.cards.filter((k: any) => k.id !== cardId) } : c.id === toCol ? { ...c, cards: [...c.cards, card] } : c) });
   };
+  const dragRef = useRef<{ fromCol: string; cardId: string } | null>(null);
+  const [dropCol, setDropCol] = useState<string | null>(null);
 
   return (
     <PlateElement {...props}>
-      <BlockShell icon={KanbanIcon} label="Kanban Board" color={BLOCK_ACCENT.kanban} actions={<button type="button" onClick={addColumn} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"><Plus className="h-3.5 w-3.5" /> Add column</button>}>
+      <BlockShell icon={KanbanIcon} label="Kanban Board" color={el.accent || BLOCK_ACCENT.kanban} onColor={(c) => save({ accent: c })} actions={<button type="button" onClick={addColumn} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"><Plus className="h-3.5 w-3.5" /> Add column</button>}>
         <div className="flex gap-3 overflow-x-auto pb-1">
           {columns.map((c) => (
             <div key={c.id} className="w-60 shrink-0">
@@ -326,11 +341,22 @@ function KanbanElement(props: any) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="space-y-2">
+              <div
+                className={cn("min-h-[16px] space-y-2 rounded-md transition-colors", dropCol === c.id && "bg-primary/5 ring-2 ring-primary/40")}
+                onDragOver={(ev) => { if (dragRef.current) { ev.preventDefault(); ev.dataTransfer.dropEffect = "move"; if (dropCol !== c.id) setDropCol(c.id); } }}
+                onDragLeave={(ev) => { if (!ev.currentTarget.contains(ev.relatedTarget as Node)) setDropCol((d) => (d === c.id ? null : d)); }}
+                onDrop={(ev) => { ev.preventDefault(); const d = dragRef.current; if (d && d.fromCol !== c.id) moveCard(d.fromCol, d.cardId, c.id); dragRef.current = null; setDropCol(null); }}
+              >
                 {c.cards.map((k: any) => (
-                  <div key={k.id} className="group rounded-md border p-2" style={{ background: `${c.color}12`, borderColor: `${c.color}44` }}>
+                  <div
+                    key={k.id}
+                    draggable
+                    onDragStart={(ev) => { dragRef.current = { fromCol: c.id, cardId: k.id }; ev.dataTransfer.effectAllowed = "move"; try { ev.dataTransfer.setData("text/plain", k.id); } catch { /* no-op */ } }}
+                    onDragEnd={() => { dragRef.current = null; setDropCol(null); }}
+                    className="group cursor-grab rounded-md border p-2 active:cursor-grabbing" style={{ background: `${c.color}12`, borderColor: `${c.color}44` }}
+                  >
                     <div className="flex items-start gap-1">
-                      <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+                      <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-grab text-muted-foreground/50" />
                       <EditableText value={k.text} onSave={(v) => setCard(c.id, k.id, v)} placeholder="New Card" className="text-sm" />
                       <DropdownMenu>
                         <DropdownMenuTrigger className="rounded p-0.5 text-muted-foreground opacity-0 hover:bg-accent focus:outline-none group-hover:opacity-100"><MoreHorizontal className="h-3.5 w-3.5" /></DropdownMenuTrigger>
@@ -361,7 +387,7 @@ function KanbanIcon() { return <svg viewBox="0 0 24 24" className="h-4 w-4" fill
 function CalendarElement(props: any) {
   const editor = useEditorRef();
   const path = usePath();
-  const el = props.element ?? {};
+  const el = (useElement() as any) ?? props.element ?? {};
   const events: any[] = el.events ?? [];
   const save = (patch: Record<string, unknown>) => { try { (editor as any).tf?.setNodes?.(patch, { at: path }); } catch { /* no-op */ } };
   const [cursor, setCursor] = useState(() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() }; });
@@ -379,7 +405,7 @@ function CalendarElement(props: any) {
 
   return (
     <PlateElement {...props}>
-      <BlockShell icon={CalendarClock} label="Calendar" color={BLOCK_ACCENT.calendar} actions={<div className="flex items-center gap-1"><span className="mr-1 text-sm font-medium">{first.toLocaleDateString([], { month: "long", year: "numeric" })}</span><button type="button" onClick={() => shift(-1)} className="rounded border p-1 hover:bg-accent"><ChevronLeft className="h-4 w-4" /></button><button type="button" onClick={() => shift(1)} className="rounded border p-1 hover:bg-accent"><ChevronRight className="h-4 w-4" /></button></div>}>
+      <BlockShell icon={CalendarClock} label="Calendar" color={el.accent || BLOCK_ACCENT.calendar} onColor={(c) => save({ accent: c })} actions={<div className="flex items-center gap-1"><span className="mr-1 text-sm font-medium">{first.toLocaleDateString([], { month: "long", year: "numeric" })}</span><button type="button" onClick={() => shift(-1)} className="rounded border p-1 hover:bg-accent"><ChevronLeft className="h-4 w-4" /></button><button type="button" onClick={() => shift(1)} className="rounded border p-1 hover:bg-accent"><ChevronRight className="h-4 w-4" /></button></div>}>
         <div className="grid grid-cols-7 text-center text-xs text-muted-foreground">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <div key={d} className="py-1">{d}</div>)}</div>
         <div className="grid grid-cols-7 gap-1">
           {cells.map((d) => {
@@ -390,7 +416,7 @@ function CalendarElement(props: any) {
               <div key={k} className={cn("min-h-[76px] rounded border p-1", inMonth ? "bg-background" : "bg-muted/30 text-muted-foreground/50")}>
                 <div className="flex items-center justify-between">
                   <span className="text-xs">{d.getDate()}</span>
-                  <button type="button" onClick={() => setAdding(k)} className="rounded p-0.5 text-muted-foreground opacity-0 hover:bg-accent hover:opacity-100" aria-label="Add event"><Plus className="h-3 w-3" /></button>
+                  <button type="button" onClick={() => setAdding(k)} className="rounded p-0.5 text-muted-foreground opacity-50 transition-opacity hover:bg-accent hover:opacity-100" aria-label="Add event"><Plus className="h-3 w-3" /></button>
                 </div>
                 <div className="mt-0.5 space-y-0.5">
                   {items.map((e) => (
