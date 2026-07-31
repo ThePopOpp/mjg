@@ -165,7 +165,11 @@ function ProjectTrackerElement(props: any) {
                               <DropdownMenuSeparator />
                               <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Pick an existing {r.home === "plan" ? "plan" : "project"}</p>
                               <RecordPicker home={r.home} onPick={(rec) => setRow(r.id, { name: rec.label, recordId: rec.recordId, href: rec.href })} />
-                              <p className="px-2 pt-1 text-[11px] text-muted-foreground">…or just type a name in the field to create a new one.</p>
+                              {r.home === "plan" && r.name.trim() && !r.recordId ? (
+                                <DropdownMenuItem onSelect={async (ev) => { ev.preventDefault(); const res = await fetch("/api/workspace/records", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actionToken: token, type: "plan", name: r.name.trim() }) }); const d = await res.json(); if (d.ok) setRow(r.id, { recordId: d.recordId, href: d.href }); }}>
+                                  <Plus className="h-3.5 w-3.5" /> Create “{r.name.trim()}” in Plans
+                                </DropdownMenuItem>
+                              ) : <p className="px-2 pt-1 text-[11px] text-muted-foreground">…or type a name in the field to create a new one.</p>}
                             </>
                           ) : null}
                         </DropdownMenuContent>

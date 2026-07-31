@@ -6,38 +6,62 @@ function personName(p: any): string | null {
   return p.full_name || `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || p.email || null;
 }
 
-export async function listFolders(profileId: string): Promise<WorkspaceFolder[]> {
+export const DEFAULT_WORKSPACE_ID = "11111111-1111-1111-1111-111111111111";
+export type WorkspaceSpace = { id: string; name: string; icon: string | null };
+
+export async function listWorkspaces(): Promise<WorkspaceSpace[]> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
+  const { data } = await supabase.from("workspaces").select("id,name,icon").order("created_at", { ascending: true });
+  return (data ?? []) as WorkspaceSpace[];
+}
+
+export async function createWorkspace(name: string, profileId: string) {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("workspaces")
+    .insert({ name: name.trim() || "Untitled workspace", created_by: profileId })
+    .select("id,name,icon")
+    .single();
+  if (error) throw error;
+  return data as WorkspaceSpace;
+}
+
+export async function listFolders(profileId: string, workspaceId?: string): Promise<WorkspaceFolder[]> {
+  const supabase = createSupabaseAdminClient();
+  let query = supabase
     .from("workspace_folders")
     .select("id,name,scope,owner_id,parent_id,created_at")
     .is("archived_at", null)
     .or(`scope.eq.shared,and(scope.eq.personal,owner_id.eq.${profileId})`)
     .order("name", { ascending: true });
+  if (workspaceId) query = query.eq("workspace_id", workspaceId);
+  const { data } = await query;
   return (data ?? []) as WorkspaceFolder[];
 }
 
-export async function createFolder(input: { name: string; scope: WorkspaceScope; parentId?: string | null }, profileId: string) {
+export async function createFolder(input: { name: string; scope: WorkspaceScope; parentId?: string | null; workspaceId?: string | null }, profileId: string) {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
     .from("workspace_folders")
-    .insert({ name: input.name.trim() || "Untitled folder", scope: input.scope, owner_id: input.scope === "personal" ? profileId : null, parent_id: input.parentId || null, created_by: profileId })
+    .insert({ name: input.name.trim() || "Untitled folder", scope: input.scope, owner_id: input.scope === "personal" ? profileId : null, parent_id: input.parentId || null, workspace_id: input.workspaceId || DEFAULT_WORKSPACE_ID, created_by: profileId })
     .select("id")
     .single();
   if (error) throw error;
   return { id: data.id as string };
 }
 
-export async function listDocuments(profileId: string): Promise<{ mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[] }> {
+export async function listDocuments(profileId: string, workspaceId?: string): Promise<{ mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[] }> {
   const supabase = createSupabaseAdminClient();
+  let docsQuery = supabase
+    .from("workspace_documents")
+    .select("id,title,description,scope,folder_id,owner_id,status,updated_at, folder:workspace_folders(name), owner:profiles!workspace_documents_owner_id_fkey(full_name,first_name,last_name,email), updater:profiles!workspace_documents_updated_by_fkey(full_name,first_name,last_name,email)")
+    .is("deleted_at", null)
+    .neq("status", "archived")
+    .order("updated_at", { ascending: false })
+    .limit(300);
+  if (workspaceId) docsQuery = docsQuery.eq("workspace_id", workspaceId);
   const [{ data: docs }, { data: favs }, { data: collabDocs }] = await Promise.all([
-    supabase
-      .from("workspace_documents")
-      .select("id,title,description,scope,folder_id,owner_id,status,updated_at, folder:workspace_folders(name), owner:profiles!workspace_documents_owner_id_fkey(full_name,first_name,last_name,email), updater:profiles!workspace_documents_updated_by_fkey(full_name,first_name,last_name,email)")
-      .is("deleted_at", null)
-      .neq("status", "archived")
-      .order("updated_at", { ascending: false })
-      .limit(300),
+    docsQuery,
     supabase.from("workspace_favorites").select("document_id").eq("user_id", profileId),
     supabase.from("workspace_collaborators").select("document_id").eq("user_id", profileId),
   ]);
@@ -82,7 +106,7 @@ export async function getDocument(id: string, profileId: string): Promise<Worksp
   return doc as WorkspaceDocument;
 }
 
-export async function createDocument(input: { title?: string; scope: WorkspaceScope; folderId?: string | null; content?: unknown }, profileId: string) {
+export async function createDocument(input: { title?: string; scope: WorkspaceScope; folderId?: string | null; content?: unknown; workspaceId?: string | null }, profileId: string) {
   const supabase = createSupabaseAdminClient();
   const content = input.content ?? EMPTY_DOC;
   const { data, error } = await supabase
@@ -91,6 +115,7 @@ export async function createDocument(input: { title?: string; scope: WorkspaceSc
       title: input.title?.trim() || "Untitled",
       scope: input.scope,
       folder_id: input.folderId || null,
+      workspace_id: input.workspaceId || DEFAULT_WORKSPACE_ID,
       owner_id: profileId,
       content_json: content,
       plain_text: extractPlainText(content),

@@ -4,6 +4,25 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type Hit = { recordType: string; recordId: string; label: string; sublabel: string | null; href: string };
 
+// Create a real Plan so a Project Tracker row lives in both Workspace and Plans.
+export async function POST(request: Request) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const actor = await requireSuperAdmin(request, body.actionToken);
+    const name = String(body.name ?? "").trim();
+    if (!name) return NextResponse.json({ error: "A name is required." }, { status: 400 });
+    if (body.type !== "plan") return NextResponse.json({ error: "Only plans can be created here." }, { status: 400 });
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase.from("plans").insert({ name, owner_id: actor.id, created_by: actor.id }).select("id").single();
+    if (error) throw error;
+    return NextResponse.json({ ok: true, recordId: data.id, label: name, href: `/dashboard/plans/${data.id}` });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to create record.";
+    const status = message.includes("permission") || message.includes("Authentication") ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
+}
+
 export async function GET(request: Request) {
   try {
     await requireSuperAdmin(request);

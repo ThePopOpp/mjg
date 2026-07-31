@@ -26,12 +26,14 @@ export function WorkspaceEditor({
   folders,
   comments,
   mentionable,
+  workspaceId,
 }: {
   doc: { id: string; title: string; content_json: unknown; scope: string; updated_at: string };
   navDocs: NavDoc[];
   folders: { id: string; name: string }[];
   comments: WorkspaceComment[];
   mentionable: MentionUser[];
+  workspaceId?: string;
 }) {
   const actionToken = useDashboardActionToken();
   const router = useRouter();
@@ -61,7 +63,7 @@ export function WorkspaceEditor({
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
   async function newDocument() {
-    const res = await fetch("/api/workspace/documents", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actionToken, scope: "personal" }) });
+    const res = await fetch("/api/workspace/documents", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actionToken, scope: "personal", workspaceId }) });
     const data = await res.json();
     if (data?.id) { router.push(`/dashboard/workspace/${data.id}`); router.refresh(); }
   }
@@ -106,7 +108,7 @@ export function WorkspaceEditor({
 
   return (
     <div className="space-y-3">
-      <Link href="/dashboard/workspace" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+      <Link href={workspaceId ? `/dashboard/workspace?ws=${workspaceId}` : "/dashboard/workspace"} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Workspace
       </Link>
       <WorkspaceEditorSurface

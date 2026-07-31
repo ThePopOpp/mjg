@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, FolderPlus, LayoutGrid, Table as TableIcon, LayoutList, Columns3, CalendarDays, ChevronLeft, ChevronRight, Star, Pencil, Archive, Trash2, FileText, Search, LayoutTemplate } from "lucide-react";
+import { Plus, FolderPlus, LayoutGrid, Table as TableIcon, LayoutList, Columns3, CalendarDays, ChevronLeft, ChevronRight, Star, Pencil, Archive, Trash2, FileText, Search, LayoutTemplate, LayoutDashboard, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,10 +31,13 @@ const VIEWS: { key: View; icon: typeof LayoutGrid }[] = [
 
 type TemplateItem = { id: string; name: string; description: string; category: string };
 type SearchHit = { id: string; title: string; folder_name: string | null; snippet: string | null; updated_at: string };
+type Space = { id: string; name: string; icon: string | null };
 
-export function WorkspaceHome({ mine, shared, folders, templates }: { mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[]; folders: WorkspaceFolder[]; templates: TemplateItem[] }) {
+export function WorkspaceHome({ mine, shared, folders, templates, workspaces = [], currentWorkspaceId }: { mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[]; folders: WorkspaceFolder[]; templates: TemplateItem[]; workspaces?: Space[]; currentWorkspaceId?: string }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
+  const [newSpaceOpen, setNewSpaceOpen] = useState(false);
+  const currentSpace = workspaces.find((w) => w.id === currentWorkspaceId);
   const [tab, setTab] = useState<Tab>("mine");
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[] | null>(null);
@@ -78,16 +82,42 @@ export function WorkspaceHome({ mine, shared, folders, templates }: { mine: Work
 
   async function newDocument() {
     const scope = tab === "shared" ? "shared" : "personal";
-    const data = await post("/api/workspace/documents", { scope, folderId: folderId === "all" ? null : folderId });
+    const data = await post("/api/workspace/documents", { scope, folderId: folderId === "all" ? null : folderId, workspaceId: currentWorkspaceId });
     if (data?.id) router.push(`/dashboard/workspace/${data.id}`);
   }
   async function newFromTemplate(templateId: string) {
-    const data = await post("/api/workspace/documents", { scope: "personal", templateId });
+    const data = await post("/api/workspace/documents", { scope: "personal", templateId, workspaceId: currentWorkspaceId });
     if (data?.id) router.push(`/dashboard/workspace/${data.id}`);
+  }
+  async function createWorkspace(name: string) {
+    const data = await post("/api/workspace/spaces", { name });
+    setNewSpaceOpen(false);
+    if (data?.workspace?.id) router.push(`/dashboard/workspace?ws=${data.workspace.id}`); else router.refresh();
   }
 
   return (
     <div className="space-y-4">
+      {workspaces.length ? (
+        <div className="flex flex-wrap items-center gap-2 border-b pb-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-md border bg-card px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-accent focus:outline-none">
+              <LayoutDashboard className="h-4 w-4 text-primary" /> {currentSpace?.name ?? "Workspace"} <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+              {workspaces.map((w) => (
+                <DropdownMenuItem key={w.id} onSelect={() => router.push(`/dashboard/workspace?ws=${w.id}`)}>
+                  <LayoutDashboard className={cn("h-4 w-4", w.id === currentWorkspaceId ? "text-primary" : "text-muted-foreground")} /> {w.name}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setNewSpaceOpen(true)}><Plus className="h-4 w-4" /> New workspace</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" size="sm" onClick={() => setNewSpaceOpen(true)}><Plus className="mr-1.5 h-4 w-4" /> New Workspace</Button>
+        </div>
+      ) : null}
+
       <div className="relative max-w-md">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search documents…" className="pl-8" />
@@ -179,7 +209,8 @@ export function WorkspaceHome({ mine, shared, folders, templates }: { mine: Work
       </Tabs>
       )}
 
-      <NewFolderDialog open={newFolderOpen} onOpenChange={setNewFolderOpen} defaultScope={tab === "shared" ? "shared" : "personal"} onCreate={async (name, scope) => { await post("/api/workspace/folders", { name, scope }); setNewFolderOpen(false); router.refresh(); }} busy={busy} />
+      <NewFolderDialog open={newFolderOpen} onOpenChange={setNewFolderOpen} defaultScope={tab === "shared" ? "shared" : "personal"} onCreate={async (name, scope) => { await post("/api/workspace/folders", { name, scope, workspaceId: currentWorkspaceId }); setNewFolderOpen(false); router.refresh(); }} busy={busy} />
+      <NewWorkspaceDialog open={newSpaceOpen} onOpenChange={setNewSpaceOpen} onCreate={createWorkspace} busy={busy} />
     </div>
   );
 }
@@ -356,6 +387,22 @@ function CalendarView({ docs, refresh }: { docs: WorkspaceDocListItem[]; refresh
         })}
       </div>
     </CardContent></Card>
+  );
+}
+
+function NewWorkspaceDialog({ open, onOpenChange, onCreate, busy }: { open: boolean; onOpenChange: (v: boolean) => void; onCreate: (name: string) => void; busy: boolean }) {
+  const [name, setName] = useState("");
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) setName(""); onOpenChange(v); }}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>New workspace</DialogTitle><DialogDescription>A workspace is a top-level space with its own folders and documents.</DialogDescription></DialogHeader>
+        <div className="space-y-1.5"><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Marketing, Board, Personal" autoFocus /></div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={() => onCreate(name)} disabled={busy || !name.trim()}>Create workspace</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

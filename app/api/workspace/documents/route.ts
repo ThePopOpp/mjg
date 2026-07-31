@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const template = body.templateId ? WORKSPACE_TEMPLATES.find((t) => t.id === body.templateId) : null;
     const content = body.templateId ? getTemplateContent(body.templateId) ?? undefined : undefined;
     const title = typeof body.title === "string" ? body.title : template && template.id !== "blank" ? template.name : undefined;
-    const result = await createDocument({ title, scope, folderId: body.folderId ?? null, content }, actor.id);
+    const result = await createDocument({ title, scope, folderId: body.folderId ?? null, content, workspaceId: body.workspaceId ?? null }, actor.id);
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to create document.";
