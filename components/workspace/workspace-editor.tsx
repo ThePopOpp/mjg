@@ -145,9 +145,14 @@ function NavList({ docs, activeId, icon: Icon }: { docs: NavDoc[]; activeId: str
   );
 }
 
+// Fixed width + always rendered: the label changing (idle → Saving… → Saved) must
+// not change the toolbar's width, or flex-wrap would add/remove a row and jump the page.
 function SaveStatus({ state }: { state: SaveState }) {
-  if (state === "saving") return <span className="inline-flex items-center gap-1.5 px-2 text-xs text-muted-foreground"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</span>;
-  if (state === "saved") return <span className="inline-flex items-center gap-1.5 px-2 text-xs text-emerald-600 dark:text-emerald-400"><Check className="h-3.5 w-3.5" /> Saved</span>;
-  if (state === "error") return <span className="inline-flex items-center gap-1.5 px-2 text-xs text-destructive"><AlertTriangle className="h-3.5 w-3.5" /> Save failed</span>;
-  return null;
+  return (
+    <span className="inline-flex w-[92px] shrink-0 items-center justify-end gap-1.5 whitespace-nowrap px-2 text-xs">
+      {state === "saving" ? <><Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" /> <span className="text-muted-foreground">Saving…</span></> : null}
+      {state === "saved" ? <><Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> <span className="text-emerald-600 dark:text-emerald-400">Saved</span></> : null}
+      {state === "error" ? <><AlertTriangle className="h-3.5 w-3.5 text-destructive" /> <span className="text-destructive">Failed</span></> : null}
+    </span>
+  );
 }
