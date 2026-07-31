@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
-import { DatePicker } from "@/components/ui/date-picker";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
@@ -205,11 +205,13 @@ function ProjectTrackerElement(props: any) {
                     <StatusCell row={r} statuses={statuses} onSet={(s) => setRow(r.id, { status: s })} onAdd={addStatus} onRemoveStatus={removeStatus} />
                   </td>
                   {/* Deadline */}
-                  <td className={cn(col, "min-w-[150px]")}>
-                    <div className="flex items-center gap-1">
-                      <DatePicker value={r.deadline?.date ?? ""} onChange={(v) => setRow(r.id, { deadline: { ...(r.deadline ?? {}), date: v } })} placeholder="Set Date…" className="h-7 w-auto min-w-[7.5rem] px-2 text-xs" />
-                      {r.deadline?.date ? <input type="time" value={r.deadline?.time ?? ""} onChange={(e) => setRow(r.id, { deadline: { ...(r.deadline ?? {}), time: e.target.value } })} className="h-7 rounded border bg-background px-1 text-xs" /> : null}
-                    </div>
+                  <td className={cn(col, "min-w-[170px]")}>
+                    <DateTimePicker
+                      date={r.deadline?.date ?? ""}
+                      time={r.deadline?.time ?? ""}
+                      placeholder="Set date & time…"
+                      onChange={(date, time) => setRow(r.id, { deadline: date || time ? { date, time } : null })}
+                    />
                   </td>
                   {/* Attachment */}
                   <td className={cn("border-b px-2 py-1.5 align-middle", "min-w-[150px]")}>
