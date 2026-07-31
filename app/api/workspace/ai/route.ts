@@ -15,14 +15,17 @@ export async function POST(request: Request) {
     await requireSuperAdmin(request, body.actionToken);
 
     const action = String(body.action ?? "summarize");
+    const custom = typeof body.prompt === "string" ? body.prompt.trim() : "";
     const text = String(body.text ?? "").slice(0, 14000);
-    if (!text.trim()) return NextResponse.json({ error: "There's no text to work with yet." }, { status: 400 });
+    // A free-form prompt can stand on its own; a preset action needs document text.
+    if (!custom && !text.trim()) return NextResponse.json({ error: "There's no text to work with yet." }, { status: 400 });
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return NextResponse.json({ error: "AI isn't configured (OPENAI_API_KEY is missing)." }, { status: 503 });
     const envModel = process.env.OPENAI_MODEL?.trim();
     const model = envModel && !envModel.includes("your_") ? envModel : "gpt-4o";
-    const instruction = PROMPTS[action] ?? PROMPTS.summarize;
+    const instruction = custom || PROMPTS[action] || PROMPTS.summarize;
+    const userContent = text.trim() ? `${instruction}\n\n--- Document ---\n${text}` : instruction;
 
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -30,8 +33,8 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         model,
         messages: [
-          { role: "system", content: "You are a concise writing assistant inside the MJG Workspace document editor. Return only the requested content — no preamble." },
-          { role: "user", content: `${instruction}\n\n---\n${text}` },
+          { role: "system", content: "You are a helpful AI assistant inside the MJG Workspace document editor. Use the document below (when provided) as context and follow the user's instruction. Reply with clean, well-formatted content that's ready to drop into the document — no meta commentary unless asked." },
+          { role: "user", content: userContent },
         ],
       }),
     });

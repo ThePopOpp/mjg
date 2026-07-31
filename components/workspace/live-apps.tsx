@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
-import { DatePicker } from "@/components/ui/date-picker";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
@@ -219,11 +219,11 @@ function ProjectTrackerElement(props: any) {
                   </td>
                   {/* Deadline */}
                   <td className={cn(col, "min-w-[150px]")}>
-                    <DatePicker
-                      value={r.deadline?.date ?? ""}
-                      onChange={(v) => setRow(r.id, { deadline: v ? { date: v } : null })}
+                    <DateTimePicker
+                      dateOnly
+                      date={r.deadline?.date ?? ""}
+                      onChange={(date) => setRow(r.id, { deadline: date ? { date } : null })}
                       placeholder="Set Date…"
-                      className="h-8 w-full px-2 text-xs"
                     />
                   </td>
                   {/* Attachment */}

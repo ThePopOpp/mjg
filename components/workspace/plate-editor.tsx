@@ -407,28 +407,38 @@ const AI_ACTIONS = [
 ];
 function AiDialog({ open, onOpenChange, getText, onInsert }: { open: boolean; onOpenChange: (v: boolean) => void; getText: () => string; onInsert: (t: string) => void }) {
   const actionToken = useDashboardActionToken();
-  const [action, setAction] = useState("summarize");
+  const [prompt, setPrompt] = useState("");
   const [result, setResult] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  async function run() {
+  async function run(opts: { action?: string; prompt?: string }) {
     setBusy(true); setError(null); setResult("");
     try {
-      const res = await fetch("/api/workspace/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actionToken, action, text: getText() }) });
+      const body: Record<string, unknown> = { actionToken, text: getText() };
+      if (opts.prompt) body.prompt = opts.prompt; else body.action = opts.action ?? "summarize";
+      const res = await fetch("/api/workspace/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok) setError(data.error || "AI failed."); else setResult(data.result || "");
     } catch { setError("AI request failed."); } finally { setBusy(false); }
   }
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) { setResult(""); setError(null); } onOpenChange(v); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setResult(""); setError(null); setPrompt(""); } onOpenChange(v); }}>
       <DialogContent className="sm:max-w-xl">
-        <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" /> AI assistant</DialogTitle><DialogDescription>Run an AI action on this document. Review the result before inserting.</DialogDescription></DialogHeader>
-        <div className="flex gap-2">
-          <Select value={action} onValueChange={setAction}>
-            <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
-            <SelectContent>{AI_ACTIONS.map((a) => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}</SelectContent>
-          </Select>
-          <Button onClick={run} disabled={busy}>{busy ? "Working…" : "Run"}</Button>
+        <DialogHeader><DialogTitle className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" /> AI assistant</DialogTitle><DialogDescription>Ask anything or give an instruction — the assistant uses this document as context. Review the result before inserting.</DialogDescription></DialogHeader>
+        <Textarea
+          value={prompt}
+          onChange={(ev) => setPrompt(ev.target.value)}
+          onKeyDown={(ev) => { if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey) && prompt.trim() && !busy) { ev.preventDefault(); run({ prompt: prompt.trim() }); } }}
+          rows={3}
+          placeholder="e.g. “Draft a meeting agenda from these notes”, “List the risks and next steps”, or “Rewrite this in a warmer tone.”  (⌘/Ctrl+Enter to run)"
+          className="text-sm"
+        />
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="mr-0.5 text-xs text-muted-foreground">Quick actions:</span>
+          {AI_ACTIONS.map((a) => (
+            <button key={a.value} type="button" onClick={() => run({ action: a.value })} disabled={busy} className="rounded-full border px-2.5 py-1 text-xs transition-colors hover:bg-accent disabled:opacity-50">{a.label}</button>
+          ))}
+          <Button size="sm" className="ml-auto" onClick={() => run({ prompt: prompt.trim() })} disabled={busy || !prompt.trim()}>{busy ? "Working…" : "Run"}</Button>
         </div>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
         {result ? <Textarea readOnly value={result} rows={10} className="text-sm" /> : null}

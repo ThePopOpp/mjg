@@ -23,13 +23,14 @@ function to24(hour12: number, minute: number, period: "AM" | "PM") {
 function timeLabel(v?: string) { const p = to12(v); return p ? `${p.hour12}:${String(p.minute).padStart(2, "0")} ${p.period}` : ""; }
 
 export function DateTimePicker({
-  date, time, onChange, placeholder = "Set date & time…", className,
+  date, time, onChange, placeholder = "Set date & time…", className, dateOnly = false,
 }: {
   date?: string;
   time?: string;
   onChange: (date: string, time: string) => void;
   placeholder?: string;
   className?: string;
+  dateOnly?: boolean;
 }) {
   const wrapRef = React.useRef<HTMLDivElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
@@ -73,7 +74,7 @@ export function DateTimePicker({
 
   const dateLabel = selected ? selected.toLocaleDateString([], { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }) : "";
   const tLabel = timeLabel(time);
-  const label = dateLabel ? `${dateLabel}${tLabel ? ` · ${tLabel}` : ""}` : "";
+  const label = dateLabel ? (dateOnly ? dateLabel : `${dateLabel}${tLabel ? ` · ${tLabel}` : ""}`) : "";
 
   const setTime = (part: Partial<{ hour12: number; minute: number; period: "AM" | "PM" }>) => {
     const next = { ...parsedTime, ...part };
@@ -106,7 +107,7 @@ export function DateTimePicker({
               const isSel = date === cy;
               const isToday = cy === todayYmd;
               return (
-                <button key={cy} type="button" onClick={() => onChange(cy, time || "")}
+                <button key={cy} type="button" onClick={() => { onChange(cy, dateOnly ? "" : (time || "")); if (dateOnly) setOpen(false); }}
                   className={cn("h-7 rounded text-xs transition-colors", isSel ? "bg-primary text-primary-foreground" : isToday ? "border border-primary text-primary" : inMonth ? "hover:bg-accent" : "text-muted-foreground/50 hover:bg-accent")}>
                   {d.getUTCDate()}
                 </button>
@@ -114,21 +115,23 @@ export function DateTimePicker({
             })}
           </div>
 
-          <div className="mt-2 border-t pt-2">
-            <div className="mb-1 flex items-center justify-between px-0.5">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Time</span>
-              <span className="text-xs text-muted-foreground">{tLabel || "—"}</span>
-            </div>
-            <div className="flex gap-1">
-              <TimeColumn items={Array.from({ length: 12 }, (_, i) => ({ v: i + 1, l: String(i + 1) }))} selected={parsedTime.hour12} onPick={(v) => setTime({ hour12: v })} />
-              <TimeColumn items={Array.from({ length: 60 }, (_, i) => ({ v: i, l: String(i).padStart(2, "0") }))} selected={parsedTime.minute} onPick={(v) => setTime({ minute: v })} />
-              <div className="flex w-12 shrink-0 flex-col gap-0.5">
-                {(["AM", "PM"] as const).map((p) => (
-                  <button key={p} type="button" onClick={() => setTime({ period: p })} className={cn("rounded px-2 py-1 text-xs transition-colors", parsedTime.period === p ? "bg-primary text-primary-foreground" : "hover:bg-accent")}>{p}</button>
-                ))}
+          {!dateOnly ? (
+            <div className="mt-2 border-t pt-2">
+              <div className="mb-1 flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Time</span>
+                <span className="text-xs text-muted-foreground">{tLabel || "—"}</span>
+              </div>
+              <div className="flex gap-1">
+                <TimeColumn items={Array.from({ length: 12 }, (_, i) => ({ v: i + 1, l: String(i + 1) }))} selected={parsedTime.hour12} onPick={(v) => setTime({ hour12: v })} />
+                <TimeColumn items={Array.from({ length: 60 }, (_, i) => ({ v: i, l: String(i).padStart(2, "0") }))} selected={parsedTime.minute} onPick={(v) => setTime({ minute: v })} />
+                <div className="flex w-12 shrink-0 flex-col gap-0.5">
+                  {(["AM", "PM"] as const).map((p) => (
+                    <button key={p} type="button" onClick={() => setTime({ period: p })} className={cn("rounded px-2 py-1 text-xs transition-colors", parsedTime.period === p ? "bg-primary text-primary-foreground" : "hover:bg-accent")}>{p}</button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          ) : null}
 
           <div className="mt-2 flex justify-between px-0.5 text-xs">
             <button type="button" onClick={() => { onChange("", ""); setOpen(false); }} className="text-muted-foreground hover:text-foreground">Clear</button>
