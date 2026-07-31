@@ -23,19 +23,24 @@ export const CalendarPlugin = createPlatePlugin({ key: "doc_calendar", node: { i
 
 const uid = () => (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
 
+// MJG brand block accents (theme-aware). Ink uses the foreground token so it stays
+// visible in dark mode; gold & red are brand hexes that read on both themes.
+export const BLOCK_ACCENT = { tracker: "hsl(var(--foreground))", kanban: "#C9A46E", calendar: "#9B2F2E" };
+
 const DEFAULT_STATUSES = [
-  { label: "Upcoming", color: "#2563eb" },
-  { label: "In Progress", color: "#f59e0b" },
-  { label: "Complete", color: "#16a34a" },
+  { label: "Upcoming", color: "#C9A46E" },
+  { label: "In Progress", color: "#9B2F2E" },
+  { label: "Complete", color: "#3f3a34" },
 ];
-const STATUS_PALETTE = ["#2563eb", "#f59e0b", "#16a34a", "#dc2626", "#7c3aed", "#0891b2", "#db2777"];
-const KANBAN_PALETTE = ["#ef4444", "#f59e0b", "#3b82f6", "#16a34a", "#7c3aed", "#0891b2"];
+const STATUS_PALETTE = ["#C9A46E", "#9B2F2E", "#3f3a34", "#B58F55", "#7C6F5A", "#4B4844", "#191815"];
+// Brand recolor palette for Kanban columns (no green — MJG is gold/ink/warm neutrals).
+const KANBAN_PALETTE = ["#C9A46E", "#B58F55", "#9B2F2E", "#7C6F5A", "#4B4844", "#191815"];
 
 const emptyRow = () => ({ id: uid(), name: "", home: "workspace", recordId: null, href: null, ownerId: null, ownerName: "", status: null, deadline: null, attachment: null });
 const newColumn = (title: string, color: string) => ({ id: uid(), title, color, cards: [] as any[] });
 
 export function newProjectTrackerNode() { return { type: ProjectTrackerPlugin.key, statuses: DEFAULT_STATUSES, rows: [emptyRow(), emptyRow(), emptyRow()], children: [{ text: "" }] }; }
-export function newKanbanNode() { return { type: KanbanPlugin.key, columns: [newColumn("To Do", "#ef4444"), newColumn("In Progress", "#f59e0b"), newColumn("Done", "#3b82f6")], children: [{ text: "" }] }; }
+export function newKanbanNode() { return { type: KanbanPlugin.key, columns: [newColumn("To Do", "#C9A46E"), newColumn("In Progress", "#B58F55"), newColumn("Done", "#9E7A46")], children: [{ text: "" }] }; }
 export function newCalendarNode() { return { type: CalendarPlugin.key, events: [] as any[], children: [{ text: "" }] }; }
 
 // ---- Shared helpers ----
@@ -135,7 +140,7 @@ function ProjectTrackerElement(props: any) {
 
   return (
     <PlateElement {...props}>
-      <BlockShell icon={FolderKanban} label="Project Tracker" color="#7c3aed" actions={<button type="button" onClick={addRow} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"><Plus className="h-3.5 w-3.5" /> Add row</button>}>
+      <BlockShell icon={FolderKanban} label="Project Tracker" color={BLOCK_ACCENT.tracker} actions={<button type="button" onClick={addRow} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"><Plus className="h-3.5 w-3.5" /> Add row</button>}>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -301,7 +306,7 @@ function KanbanElement(props: any) {
 
   return (
     <PlateElement {...props}>
-      <BlockShell icon={KanbanIcon} label="Kanban Board" color="#f59e0b" actions={<button type="button" onClick={addColumn} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"><Plus className="h-3.5 w-3.5" /> Add column</button>}>
+      <BlockShell icon={KanbanIcon} label="Kanban Board" color={BLOCK_ACCENT.kanban} actions={<button type="button" onClick={addColumn} className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"><Plus className="h-3.5 w-3.5" /> Add column</button>}>
         <div className="flex gap-3 overflow-x-auto pb-1">
           {columns.map((c) => (
             <div key={c.id} className="w-60 shrink-0">
@@ -360,7 +365,7 @@ function CalendarElement(props: any) {
   const [cursor, setCursor] = useState(() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() }; });
   const [adding, setAdding] = useState<string | null>(null);
 
-  const addEvent = (dateKey: string, title: string) => { if (title.trim()) save({ events: [...events, { id: uid(), date: dateKey, title: title.trim(), color: "#7c3aed" }] }); setAdding(null); };
+  const addEvent = (dateKey: string, title: string) => { if (title.trim()) save({ events: [...events, { id: uid(), date: dateKey, title: title.trim(), color: "#9B2F2E" }] }); setAdding(null); };
   const removeEvent = (id: string) => save({ events: events.filter((e) => e.id !== id) });
 
   const byDay = useMemo(() => { const map = new Map<string, any[]>(); for (const e of events) map.set(e.date, [...(map.get(e.date) ?? []), e]); return map; }, [events]);
@@ -372,7 +377,7 @@ function CalendarElement(props: any) {
 
   return (
     <PlateElement {...props}>
-      <BlockShell icon={CalendarClock} label="Calendar" color="#dc2626" actions={<div className="flex items-center gap-1"><span className="mr-1 text-sm font-medium">{first.toLocaleDateString([], { month: "long", year: "numeric" })}</span><button type="button" onClick={() => shift(-1)} className="rounded border p-1 hover:bg-accent"><ChevronLeft className="h-4 w-4" /></button><button type="button" onClick={() => shift(1)} className="rounded border p-1 hover:bg-accent"><ChevronRight className="h-4 w-4" /></button></div>}>
+      <BlockShell icon={CalendarClock} label="Calendar" color={BLOCK_ACCENT.calendar} actions={<div className="flex items-center gap-1"><span className="mr-1 text-sm font-medium">{first.toLocaleDateString([], { month: "long", year: "numeric" })}</span><button type="button" onClick={() => shift(-1)} className="rounded border p-1 hover:bg-accent"><ChevronLeft className="h-4 w-4" /></button><button type="button" onClick={() => shift(1)} className="rounded border p-1 hover:bg-accent"><ChevronRight className="h-4 w-4" /></button></div>}>
         <div className="grid grid-cols-7 text-center text-xs text-muted-foreground">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <div key={d} className="py-1">{d}</div>)}</div>
         <div className="grid grid-cols-7 gap-1">
           {cells.map((d) => {

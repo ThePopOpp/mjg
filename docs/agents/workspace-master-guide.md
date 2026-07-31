@@ -28,6 +28,10 @@ continuously.
 
 ## Feature map (at a glance)
 
+- **Workspaces (top level)** — Create multiple named Workspaces (e.g. Marketing, Board, Personal)
+  from the switcher at the top of the home. Each Workspace has its own folders, documents, and
+  search. Switching Workspaces scopes everything to that space; the editor keeps you within a
+  document's Workspace. Existing content lives in the default **General** workspace.
 - **Home & organization** — My Documents / Shared / Favorites / Templates tabs; folders; search;
   five views (List, Cards, Table, Kanban, Calendar); per-document Share control.
 - **Sharing** — Personal (only you) / Public (everyone in the workspace) / share with specific
@@ -36,8 +40,9 @@ continuously.
   Insert (mega-menu), Format (marks, paragraph/alignment/list submenus, Clear formatting).
 - **Writing** — headings, marks, colors, font size, lists, checklists, quotes, alignment, tables,
   columns, table of contents, dividers, links, code blocks, HTML embeds, emoji, dates.
-- **Live apps** — Project Tracker (typed table with Owner/Status/Deadline/Attachment, can pull
-  from Plans or Projects), Kanban Board, Calendar.
+- **Live apps** — Project Tracker (typed table with Owner/Status/Deadline/Attachment; can link an
+  existing Plan or Project, or **create a new Plan** so the project lives in both Workspace and
+  Plans), Kanban Board, Calendar.
 - **Media** — image / video / audio / document upload, plus in-editor audio recording; audio
   plays in the branded MJG player.
 - **Collaboration** — threaded comments with @-mentions, resolve/reopen; live document info.

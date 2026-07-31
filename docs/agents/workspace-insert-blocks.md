@@ -19,9 +19,11 @@ Columns:
 
 1. **Project** — Type a name freely, or click the **⌄** to set the project's *home*:
    - **Workspace** — a standalone project that lives only in this document.
-   - **Plans** — pick an **existing plan** from the MJG Plans module (search list), or type a
-     new name. Linking a plan makes the project reachable from both Workspace and Plans.
-   - **Projects** — pick an **existing project** from the Project Manager, or type a new name.
+   - **Plans** — pick an **existing plan** from the MJG Plans module (search list), or type a new
+     name and choose **"Create '<name>' in Plans"** to create a real Plan record and link it — so
+     the project lives in **both** Workspace and Plans.
+   - **Projects** — pick an **existing project** from the Project Manager, or type a new name
+     (link-to-existing; new PM projects aren't created from here).
    A linked record shows a small **Linked ›** shortcut.
 2. **Owner** — click the **+** to pick an MJG user, or type a custom name.
 3. **Status** — colored options **Upcoming / In Progress / Complete**. Add your own with the
