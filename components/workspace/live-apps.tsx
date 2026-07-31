@@ -68,7 +68,7 @@ function EditableText({ value, onSave, placeholder, className }: { value: string
       placeholder={placeholder}
       onChange={(e) => setV(e.target.value)}
       onBlur={() => { if (v !== value) onSave(v); }}
-      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); (e.target as HTMLInputElement).blur(); } }}
+      onKeyDown={(e) => { e.stopPropagation(); if (e.key === "Enter") { e.preventDefault(); (e.target as HTMLInputElement).blur(); } }}
       className={cn("w-full bg-transparent outline-none placeholder:text-muted-foreground/70", className)}
     />
   );
@@ -102,7 +102,7 @@ function RecordPicker({ home, onPick }: { home: string; onPick: (r: any) => void
     <div className="p-1">
       <div className="relative mb-1">
         <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" className="w-full rounded border bg-background py-1 pl-7 pr-2 text-sm outline-none" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.stopPropagation()} placeholder="Search…" className="w-full rounded border bg-background py-1 pl-7 pr-2 text-sm outline-none" />
       </div>
       <div className="max-h-40 overflow-y-auto">
         {rows.length ? rows.map((r) => (
@@ -156,10 +156,18 @@ function ProjectTrackerElement(props: any) {
                       <EditableText value={r.name} onSave={(v) => setRow(r.id, { name: v })} placeholder="New Project" className="text-sm font-medium" />
                       <DropdownMenu>
                         <DropdownMenuTrigger className="rounded p-0.5 text-muted-foreground hover:bg-accent focus:outline-none"><ChevronDownSm /></DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56">
+                        <DropdownMenuContent align="start" className="w-64">
                           <DropdownMenuLabel>Project home</DropdownMenuLabel>
-                          {HOMES.map((h) => <DropdownMenuItem key={h.v} onSelect={() => setRow(r.id, { home: h.v })}><span className={cn("h-2 w-2 rounded-full", r.home === h.v ? "bg-primary" : "bg-muted-foreground/30")} /> {h.l}</DropdownMenuItem>)}
-                          {r.home !== "workspace" ? (<><DropdownMenuSeparator /><RecordPicker home={r.home} onPick={(rec) => setRow(r.id, { name: rec.label, recordId: rec.recordId, href: rec.href })} /></>) : null}
+                          {/* preventDefault keeps the menu open so the record picker can render below */}
+                          {HOMES.map((h) => <DropdownMenuItem key={h.v} onSelect={(ev) => { ev.preventDefault(); setRow(r.id, { home: h.v, recordId: null, href: null }); }}><span className={cn("h-2 w-2 rounded-full", r.home === h.v ? "bg-primary" : "bg-muted-foreground/30")} /> {h.l}</DropdownMenuItem>)}
+                          {r.home !== "workspace" ? (
+                            <>
+                              <DropdownMenuSeparator />
+                              <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Pick an existing {r.home === "plan" ? "plan" : "project"}</p>
+                              <RecordPicker home={r.home} onPick={(rec) => setRow(r.id, { name: rec.label, recordId: rec.recordId, href: rec.href })} />
+                              <p className="px-2 pt-1 text-[11px] text-muted-foreground">…or just type a name in the field to create a new one.</p>
+                            </>
+                          ) : null}
                         </DropdownMenuContent>
                       </DropdownMenu>
                       <button type="button" onClick={() => removeRow(r.id)} className="rounded p-0.5 text-muted-foreground opacity-0 hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100" aria-label="Delete row"><Trash2 className="h-3.5 w-3.5" /></button>
@@ -235,7 +243,7 @@ function StatusCell({ row, statuses, onSet, onAdd, onRemoveStatus }: { row: any;
         {row.status ? <DropdownMenuItem onSelect={() => onSet(null)}><X className="h-3.5 w-3.5" /> Clear</DropdownMenuItem> : null}
         <DropdownMenuSeparator />
         <div className="p-1">
-          <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && draft.trim()) { onAdd(draft.trim()); setDraft(""); } }} placeholder="New Status…" className="w-full rounded border bg-background px-2 py-1 text-sm outline-none" />
+          <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { e.stopPropagation(); if (e.key === "Enter" && draft.trim()) { onAdd(draft.trim()); setDraft(""); } }} placeholder="New Status…" className="w-full rounded border bg-background px-2 py-1 text-sm outline-none" />
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

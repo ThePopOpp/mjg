@@ -738,23 +738,24 @@ export function WorkspaceEditorSurface({
           <DropdownMenuContent align="start" className="max-h-[80vh] w-[560px] overflow-y-auto">
             <DropdownMenuLabel>Building blocks</DropdownMenuLabel>
             <div className="grid grid-cols-3 gap-2 p-1">
-              <InsertMegaCard onSelect={insertProjectTracker} icon={FolderKanban} title="Project Tracker" accent="#7c3aed" desc="Assign owners, statuses, deadlines & files.">
+              {/* MJG brand gold, stepped down in opacity for the three cards. */}
+              <InsertMegaCard onSelect={insertProjectTracker} icon={FolderKanban} title="Project Tracker" accent="hsl(var(--primary))" desc="Assign owners, statuses, deadlines & files.">
                 <span className="block space-y-1">
-                  <span className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((i) => <span key={i} className="h-1.5 rounded-full" style={{ background: "#7c3aed", opacity: 0.5 }} />)}</span>
-                  {[0, 1, 2].map((r) => <span key={r} className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((i) => <span key={i} className="h-2 rounded bg-foreground/10" />)}</span>)}
+                  <span className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((i) => <span key={i} className="h-1.5 rounded-full" style={{ background: "hsl(var(--primary))" }} />)}</span>
+                  {[0, 1, 2].map((r) => <span key={r} className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((i) => <span key={i} className="h-2 rounded" style={{ background: "hsl(var(--primary) / 0.18)" }} />)}</span>)}
                 </span>
               </InsertMegaCard>
-              <InsertMegaCard onSelect={insertKanban} icon={SquareKanban} title="Kanban Board" accent="#f59e0b" desc="Cards & columns to track progress.">
-                <span className="grid grid-cols-3 gap-1">{["#ef4444", "#f59e0b", "#3b82f6"].map((c, i) => (
+              <InsertMegaCard onSelect={insertKanban} icon={SquareKanban} title="Kanban Board" accent="hsl(var(--primary) / 0.82)" desc="Cards & columns to track progress.">
+                <span className="grid grid-cols-3 gap-1">{[{ b: "hsl(var(--primary))", f: "hsl(var(--primary) / 0.38)", g: "hsl(var(--primary) / 0.22)" }, { b: "hsl(var(--primary) / 0.72)", f: "hsl(var(--primary) / 0.3)", g: "hsl(var(--primary) / 0.18)" }, { b: "hsl(var(--primary) / 0.5)", f: "hsl(var(--primary) / 0.22)", g: "hsl(var(--primary) / 0.13)" }].map((c, i) => (
                   <span key={i} className="block space-y-1">
-                    <span className="block h-1.5 rounded-full" style={{ background: c }} />
-                    <span className="block h-3 rounded" style={{ background: `${c}33` }} />
-                    <span className="block h-3 rounded" style={{ background: `${c}22` }} />
+                    <span className="block h-1.5 rounded-full" style={{ background: c.b }} />
+                    <span className="block h-3 rounded" style={{ background: c.f }} />
+                    <span className="block h-3 rounded" style={{ background: c.g }} />
                   </span>
                 ))}</span>
               </InsertMegaCard>
-              <InsertMegaCard onSelect={insertCalendar} icon={CalendarRange} title="Calendar" accent="#dc2626" desc="Plan events & schedules by month.">
-                <span className="grid grid-cols-7 gap-0.5">{Array.from({ length: 21 }).map((_, i) => <span key={i} className="block aspect-square rounded-sm" style={{ background: i === 10 ? "#dc2626" : undefined }} data-x={i}><span className={cn("block aspect-square rounded-sm", i === 10 ? "" : "bg-foreground/10")} /></span>)}</span>
+              <InsertMegaCard onSelect={insertCalendar} icon={CalendarRange} title="Calendar" accent="hsl(var(--primary) / 0.64)" desc="Plan events & schedules by month.">
+                <span className="grid grid-cols-7 gap-0.5">{Array.from({ length: 21 }).map((_, i) => <span key={i} className="block aspect-square rounded-sm" style={{ background: i === 10 ? "hsl(var(--primary))" : "hsl(var(--primary) / 0.14)" }} />)}</span>
               </InsertMegaCard>
             </div>
             <DropdownMenuSeparator />
