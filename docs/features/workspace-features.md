@@ -1,6 +1,6 @@
 # MJG Workspace — Official Features Document
 
-_The complete, authoritative reference for the MJG Workspace. Last updated 2026-07-30._
+_The complete, authoritative reference for the MJG Workspace. Last updated 2026-07-31._
 
 ---
 
@@ -91,8 +91,10 @@ Every button has a theme-aware tooltip. Groups:
 - **Media** — Image, Video, Audio, Document, Record audio.
 - **Mentions & extras** — @-mention, Emoji, Table of contents.
 - **Layout** — Columns, HTML embed.
-- **Blocks** — Code block, Link, Divider, **Ask AI**.
-- **Far right** — save status + right-panel toggle.
+- **Blocks** — Code block, Link (opens a branded popover anchored at your selection), Divider,
+  **Ask AI**.
+- **Far right** — right-panel toggle. (The **Saved / Saving…** indicator sits on the ← Workspace
+  row above the toolbar, so autosave never reflows the toolbar.)
 
 ### 5.3 Writing shortcuts (in the body)
 - Type **`/`** on an empty line → block insert menu (search + arrow keys + Enter).
@@ -129,12 +131,15 @@ The Insert menu is an MJG-branded mega-menu with three sections.
 - **Table** (size dialog — see §8), **Checklist**, **Date**, **Columns**, **Table of contents**,
   **Divider**, **Link**, **Link a record** (Plan / Client / Booking card), **Code block**,
   **HTML embed** (renders HTML live; scripts disabled), **Emoji**, **Ask AI**.
+  (**Link** opens a branded popover anchored at the selection, not a browser prompt.)
 
 ---
 
 ## 7. Live-app blocks
 
 Interactive blocks whose data saves inside the document. Insert from the mega-menu or `/`.
+Edits appear live (no refresh). Each block header has a **palette** button to set its **accent
+color** from the MJG brand swatches.
 
 ### 7.1 Project Tracker
 A structured, typed table. **Add row** at the top-right; hover a row to delete it. Columns:
@@ -159,7 +164,8 @@ Columns of cards, defaulting to **To Do / In Progress / Done** (gold-stepped).
 - **Add column** (top-right); each column's **⋯** menu **recolors** (brand palette) or **deletes** it;
   the title is editable.
 - Each column has a **+** to add a card; card text is editable inline.
-- Each card's **⋯** menu can **Move to** another column or **Delete** it.
+- **Drag a card** to another column (the target highlights on hover), or use the card's **⋯**
+  menu → **Move to**. The **⋯** menu also deletes a card.
 
 ### 7.3 Calendar
 A month grid for events.
