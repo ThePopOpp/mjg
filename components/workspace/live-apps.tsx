@@ -343,16 +343,17 @@ function KanbanElement(props: any) {
               </div>
               <div
                 className={cn("min-h-[16px] space-y-2 rounded-md transition-colors", dropCol === c.id && "bg-primary/5 ring-2 ring-primary/40")}
-                onDragOver={(ev) => { if (dragRef.current) { ev.preventDefault(); ev.dataTransfer.dropEffect = "move"; if (dropCol !== c.id) setDropCol(c.id); } }}
+                onDragEnter={(ev) => { if (dragRef.current) { ev.preventDefault(); ev.stopPropagation(); setDropCol(c.id); } }}
+                onDragOver={(ev) => { if (dragRef.current) { ev.preventDefault(); ev.stopPropagation(); ev.dataTransfer.dropEffect = "move"; if (dropCol !== c.id) setDropCol(c.id); } }}
                 onDragLeave={(ev) => { if (!ev.currentTarget.contains(ev.relatedTarget as Node)) setDropCol((d) => (d === c.id ? null : d)); }}
-                onDrop={(ev) => { ev.preventDefault(); const d = dragRef.current; if (d && d.fromCol !== c.id) moveCard(d.fromCol, d.cardId, c.id); dragRef.current = null; setDropCol(null); }}
+                onDrop={(ev) => { ev.preventDefault(); ev.stopPropagation(); const d = dragRef.current; if (d && d.fromCol !== c.id) moveCard(d.fromCol, d.cardId, c.id); dragRef.current = null; setDropCol(null); }}
               >
                 {c.cards.map((k: any) => (
                   <div
                     key={k.id}
                     draggable
-                    onDragStart={(ev) => { dragRef.current = { fromCol: c.id, cardId: k.id }; ev.dataTransfer.effectAllowed = "move"; try { ev.dataTransfer.setData("text/plain", k.id); } catch { /* no-op */ } }}
-                    onDragEnd={() => { dragRef.current = null; setDropCol(null); }}
+                    onDragStart={(ev) => { dragRef.current = { fromCol: c.id, cardId: k.id }; ev.stopPropagation(); ev.dataTransfer.effectAllowed = "move"; try { ev.dataTransfer.setData("application/x-mjg-card", k.id); } catch { /* no-op */ } }}
+                    onDragEnd={(ev) => { ev.stopPropagation(); dragRef.current = null; setDropCol(null); }}
                     className="group cursor-grab rounded-md border p-2 active:cursor-grabbing" style={{ background: `${c.color}12`, borderColor: `${c.color}44` }}
                   >
                     <div className="flex items-start gap-1">
@@ -416,7 +417,7 @@ function CalendarElement(props: any) {
               <div key={k} className={cn("min-h-[76px] rounded border p-1", inMonth ? "bg-background" : "bg-muted/30 text-muted-foreground/50")}>
                 <div className="flex items-center justify-between">
                   <span className="text-xs">{d.getDate()}</span>
-                  <button type="button" onClick={() => setAdding(k)} className="rounded p-0.5 text-muted-foreground opacity-50 transition-opacity hover:bg-accent hover:opacity-100" aria-label="Add event"><Plus className="h-3 w-3" /></button>
+                  <button type="button" onClick={() => setAdding(k)} className="flex h-4 w-4 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary transition-colors hover:bg-primary hover:text-primary-foreground" aria-label="Add event" title="Add event"><Plus className="h-3 w-3" /></button>
                 </div>
                 <div className="mt-0.5 space-y-0.5">
                   {items.map((e) => (
