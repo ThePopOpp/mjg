@@ -624,6 +624,19 @@ function InsertMegaCard({ onSelect, icon: Icon, title, desc, accent, children }:
   );
 }
 
+// Read-only render of Plate content — used to preview a template without creating a document.
+export function WorkspaceReadOnlyPreview({ value }: { value: any }) {
+  const initial = useMemo(() => (Array.isArray(value) && value.length ? value : [{ type: "p", children: [{ text: "" }] }]), [value]);
+  const editor = usePlateEditor({ plugins: PLUGINS, components: COMPONENTS, value: initial });
+  return (
+    <Plate editor={editor}>
+      <div className="pointer-events-none select-none [&_*]:cursor-default">
+        <PlateContent readOnly className="rounded-md border bg-background px-4 py-3 text-[15px] leading-7 [&_p]:my-1.5" />
+      </div>
+    </Plate>
+  );
+}
+
 export function WorkspaceEditorSurface({
   initialValue, onChange, titleSlot, statusSlot, left, right, mentionUsers = [],
 }: {

@@ -2,8 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Plus, FolderPlus, LayoutGrid, Table as TableIcon, LayoutList, Columns3, CalendarDays, ChevronLeft, ChevronRight, Star, Pencil, Archive, Trash2, FileText, Search, LayoutTemplate, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Plus, FolderPlus, LayoutGrid, Table as TableIcon, LayoutList, Columns3, CalendarDays, ChevronLeft, ChevronRight, Star, Pencil, Archive, Trash2, FileText, Search, LayoutTemplate, LayoutDashboard, ChevronDown, Eye } from "lucide-react";
+import { getTemplateContent } from "@/lib/workspace/templates";
+
+const WorkspaceReadOnlyPreview = dynamic(() => import("@/components/workspace/plate-editor").then((m) => m.WorkspaceReadOnlyPreview), {
+  ssr: false,
+  loading: () => <div className="p-6 text-center text-sm text-muted-foreground">Loading preview…</div>,
+});
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
@@ -242,6 +249,8 @@ function SearchResults({ hits }: { hits: SearchHit[] }) {
 
 function TemplatesGallery({ templates, hidden, onUse, onDelete, onRestore, onFavorite, busy }: { templates: (TemplateItem & { is_favorite?: boolean })[]; hidden: TemplateItem[]; onUse: (id: string) => void; onDelete: (id: string) => void; onRestore: (id: string) => void; onFavorite: (id: string, on: boolean) => void; busy: boolean }) {
   const [showHidden, setShowHidden] = useState(false);
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const previewTemplate = templates.find((t) => t.id === previewId);
   return (
     <div className="space-y-3">
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -256,12 +265,27 @@ function TemplatesGallery({ templates, hidden, onUse, onDelete, onRestore, onFav
               <p className="flex-1 text-sm text-muted-foreground">{t.description}</p>
               <div className="mt-1 flex items-center gap-2">
                 <Button size="sm" variant="outline" onClick={() => onUse(t.id)} disabled={busy}><Plus className="mr-2 h-4 w-4" /> Use template</Button>
+                <Button size="sm" variant="ghost" onClick={() => setPreviewId(t.id)}><Eye className="mr-1.5 h-4 w-4" /> View</Button>
                 <button type="button" onClick={() => onDelete(t.id)} disabled={busy} title="Delete template" aria-label={`Delete ${t.name}`} className="ml-auto rounded p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <Dialog open={!!previewId} onOpenChange={(v) => { if (!v) setPreviewId(null); }}>
+        <DialogContent className="max-h-[85vh] gap-3 overflow-y-auto sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><LayoutTemplate className="h-4 w-4 text-primary" /> {previewTemplate?.name}</DialogTitle>
+            <DialogDescription>{previewTemplate?.category} · {previewTemplate?.description} — preview only; nothing is created until you use it.</DialogDescription>
+          </DialogHeader>
+          {previewId ? <WorkspaceReadOnlyPreview value={getTemplateContent(previewId) ?? []} /> : null}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewId(null)}>Close</Button>
+            <Button onClick={() => { const id = previewId; setPreviewId(null); if (id) onUse(id); }} disabled={busy}><Plus className="mr-2 h-4 w-4" /> Use this template</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {hidden.length ? (
         <div className="pt-1">
           <button type="button" onClick={() => setShowHidden((s) => !s)} className="text-xs text-muted-foreground hover:text-foreground">{showHidden ? "Hide" : "Show"} deleted templates ({hidden.length})</button>
