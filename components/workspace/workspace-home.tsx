@@ -33,11 +33,19 @@ type TemplateItem = { id: string; name: string; description: string; category: s
 type SearchHit = { id: string; title: string; folder_name: string | null; snippet: string | null; updated_at: string };
 type Space = { id: string; name: string; icon: string | null };
 
-export function WorkspaceHome({ mine, shared, folders, templates, workspaces = [], currentWorkspaceId }: { mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[]; folders: WorkspaceFolder[]; templates: TemplateItem[]; workspaces?: Space[]; currentWorkspaceId?: string }) {
+export function WorkspaceHome({ mine, shared, folders, templates, hiddenTemplateIds = [], favoriteTemplateIds = [], workspaces = [], currentWorkspaceId }: { mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[]; folders: WorkspaceFolder[]; templates: TemplateItem[]; hiddenTemplateIds?: string[]; favoriteTemplateIds?: string[]; workspaces?: Space[]; currentWorkspaceId?: string }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
   const [newSpaceOpen, setNewSpaceOpen] = useState(false);
   const currentSpace = workspaces.find((w) => w.id === currentWorkspaceId);
+  const hiddenSet = useMemo(() => new Set(hiddenTemplateIds), [hiddenTemplateIds]);
+  const favTemplateSet = useMemo(() => new Set(favoriteTemplateIds), [favoriteTemplateIds]);
+  // Favorites sort to the front; hidden ones drop out of the main grid.
+  const visibleTemplates = useMemo(() => {
+    const shown = templates.filter((t) => !hiddenSet.has(t.id)).map((t) => ({ ...t, is_favorite: favTemplateSet.has(t.id) }));
+    return shown.sort((a, b) => (a.is_favorite === b.is_favorite ? 0 : a.is_favorite ? -1 : 1));
+  }, [templates, hiddenSet, favTemplateSet]);
+  const hiddenTemplates = useMemo(() => templates.filter((t) => hiddenSet.has(t.id)), [templates, hiddenSet]);
   const [tab, setTab] = useState<Tab>("mine");
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[] | null>(null);
@@ -94,6 +102,9 @@ export function WorkspaceHome({ mine, shared, folders, templates, workspaces = [
     setNewSpaceOpen(false);
     if (data?.workspace?.id) router.push(`/dashboard/workspace?ws=${data.workspace.id}`); else router.refresh();
   }
+  async function deleteTemplate(id: string) { await post("/api/workspace/templates", { templateId: id }); router.refresh(); }
+  async function restoreTemplate(id: string) { await post("/api/workspace/templates", { templateId: id }, "DELETE"); router.refresh(); }
+  async function favoriteTemplate(id: string, on: boolean) { await post("/api/workspace/templates", { templateId: id, favorite: on }, "PATCH"); router.refresh(); }
 
   return (
     <div className="space-y-4">
@@ -157,7 +168,7 @@ export function WorkspaceHome({ mine, shared, folders, templates, workspaces = [
       {hits !== null ? (
         <SearchResults hits={hits} />
       ) : tab === "templates" ? (
-        <TemplatesGallery templates={templates} onUse={newFromTemplate} busy={busy} />
+        <TemplatesGallery templates={visibleTemplates} hidden={hiddenTemplates} onUse={newFromTemplate} onDelete={deleteTemplate} onRestore={restoreTemplate} onFavorite={favoriteTemplate} busy={busy} />
       ) : (
       <Tabs value={tab}>
         <TabsContent value={tab} className="mt-0">
@@ -229,19 +240,43 @@ function SearchResults({ hits }: { hits: SearchHit[] }) {
   );
 }
 
-function TemplatesGallery({ templates, onUse, busy }: { templates: TemplateItem[]; onUse: (id: string) => void; busy: boolean }) {
+function TemplatesGallery({ templates, hidden, onUse, onDelete, onRestore, onFavorite, busy }: { templates: (TemplateItem & { is_favorite?: boolean })[]; hidden: TemplateItem[]; onUse: (id: string) => void; onDelete: (id: string) => void; onRestore: (id: string) => void; onFavorite: (id: string, on: boolean) => void; busy: boolean }) {
+  const [showHidden, setShowHidden] = useState(false);
   return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {templates.map((t) => (
-        <Card key={t.id} className="flex flex-col">
-          <CardContent className="flex flex-1 flex-col gap-2 p-4">
-            <div className="flex items-center gap-2"><LayoutTemplate className="h-4 w-4 text-primary" /><p className="font-medium">{t.name}</p></div>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">{t.category}</p>
-            <p className="flex-1 text-sm text-muted-foreground">{t.description}</p>
-            <Button size="sm" variant="outline" className="mt-1 self-start" onClick={() => onUse(t.id)} disabled={busy}><Plus className="mr-2 h-4 w-4" /> Use template</Button>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="space-y-3">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        {templates.map((t) => (
+          <Card key={t.id} className="flex flex-col">
+            <CardContent className="flex flex-1 flex-col gap-2 p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2"><LayoutTemplate className="h-4 w-4 text-primary" /><p className="font-medium">{t.name}</p></div>
+                <button type="button" onClick={() => onFavorite(t.id, !t.is_favorite)} disabled={busy} title={t.is_favorite ? "Unfavorite" : "Favorite"} aria-label={t.is_favorite ? `Unfavorite ${t.name}` : `Favorite ${t.name}`} className={cn("shrink-0 rounded p-1 transition-colors hover:bg-accent disabled:opacity-50", t.is_favorite ? "text-amber-500" : "text-muted-foreground hover:text-foreground")}><Star className={cn("h-4 w-4", t.is_favorite && "fill-current")} /></button>
+              </div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">{t.category}</p>
+              <p className="flex-1 text-sm text-muted-foreground">{t.description}</p>
+              <div className="mt-1 flex items-center gap-2">
+                <Button size="sm" variant="outline" onClick={() => onUse(t.id)} disabled={busy}><Plus className="mr-2 h-4 w-4" /> Use template</Button>
+                <button type="button" onClick={() => onDelete(t.id)} disabled={busy} title="Delete template" aria-label={`Delete ${t.name}`} className="ml-auto rounded p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      {hidden.length ? (
+        <div className="pt-1">
+          <button type="button" onClick={() => setShowHidden((s) => !s)} className="text-xs text-muted-foreground hover:text-foreground">{showHidden ? "Hide" : "Show"} deleted templates ({hidden.length})</button>
+          {showHidden ? (
+            <div className="mt-2 divide-y rounded-md border">
+              {hidden.map((t) => (
+                <div key={t.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                  <span className="truncate text-muted-foreground">{t.name} <span className="text-xs">· {t.category}</span></span>
+                  <button type="button" onClick={() => onRestore(t.id)} disabled={busy} className="shrink-0 rounded px-2 py-0.5 text-xs font-medium text-primary hover:underline disabled:opacity-50">Restore</button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

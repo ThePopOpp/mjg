@@ -225,6 +225,39 @@ export async function removeCollaborator(documentId: string, userId: string) {
   return { documentId, userId };
 }
 
+export async function listHiddenTemplateIds(): Promise<string[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase.from("workspace_hidden_templates").select("template_id");
+  return (data ?? []).map((r: any) => r.template_id as string);
+}
+
+export async function hideTemplate(templateId: string, profileId: string) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.from("workspace_hidden_templates").upsert({ template_id: templateId, hidden_by: profileId }, { onConflict: "template_id" });
+  if (error) throw error;
+  return { templateId };
+}
+
+export async function unhideTemplate(templateId: string) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.from("workspace_hidden_templates").delete().eq("template_id", templateId);
+  if (error) throw error;
+  return { templateId };
+}
+
+export async function listFavoriteTemplateIds(userId: string): Promise<string[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase.from("workspace_template_favorites").select("template_id").eq("user_id", userId);
+  return (data ?? []).map((r: any) => r.template_id as string);
+}
+
+export async function favoriteTemplate(userId: string, templateId: string, on: boolean) {
+  const supabase = createSupabaseAdminClient();
+  if (on) await supabase.from("workspace_template_favorites").upsert({ user_id: userId, template_id: templateId }, { onConflict: "user_id,template_id" });
+  else await supabase.from("workspace_template_favorites").delete().eq("user_id", userId).eq("template_id", templateId);
+  return { templateId, favorite: on };
+}
+
 export async function toggleFavorite(userId: string, documentId: string, on: boolean) {
   const supabase = createSupabaseAdminClient();
   if (on) await supabase.from("workspace_favorites").upsert({ user_id: userId, document_id: documentId });
