@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save } from "lucide-react";
+import { Save, KeyRound } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,25 @@ export function UserProfileEditor({ profile, currentUserRole }: { profile: Edita
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  async function sendReset() {
+    setResetting(true); setError(null); setMessage(null);
+    try {
+      const res = await fetch("/api/admin/users/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+        body: JSON.stringify({ userId: profile.id, email: profile.email, actionToken }),
+      });
+      const payload = await res.json();
+      if (!res.ok) setError(payload.error ?? "Could not send the reset email.");
+      else setMessage(`Password reset link emailed to ${payload.sentTo ?? profile.email}.`);
+    } catch {
+      setError("Could not send the reset email.");
+    } finally {
+      setResetting(false);
+    }
+  }
 
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -135,10 +154,16 @@ export function UserProfileEditor({ profile, currentUserRole }: { profile: Edita
       </label>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {message ? <p className="text-sm text-primary">{message}</p> : null}
-      <Button disabled={loading} type="submit">
-        <Save className="h-4 w-4" />
-        {loading ? "Saving..." : "Save changes"}
-      </Button>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button disabled={loading} type="submit">
+          <Save className="h-4 w-4" />
+          {loading ? "Saving..." : "Save changes"}
+        </Button>
+        <Button type="button" variant="outline" onClick={sendReset} disabled={resetting}>
+          <KeyRound className="h-4 w-4" />
+          {resetting ? "Sending…" : "Send password reset"}
+        </Button>
+      </div>
     </form>
   );
 }
