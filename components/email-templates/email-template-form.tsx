@@ -46,6 +46,7 @@ const sampleMergeData: Record<string, string> = {
 };
 
 const categories = [
+  { value: "six_week_challenge", label: "The 6 Week Challenge" },
   { value: "general", label: "General" },
   { value: "new_user_signup", label: "New User Sign-Up" },
   { value: "login", label: "Login / Auth" },
