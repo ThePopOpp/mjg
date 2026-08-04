@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 
 export default async function DirectMessagesPage() {
   const profile = await getCurrentProfile();
-  const canStart = profile?.role === ROLES.SUPER_ADMIN || profile?.role === ROLES.ADMIN;
+  // Admins message anyone; facilitators/participants can start conversations within their group.
+  const canStart = profile?.role === ROLES.SUPER_ADMIN || profile?.role === ROLES.ADMIN || profile?.role === ROLES.FACILITATOR || profile?.role === ROLES.PARTICIPANT;
 
   return (
     <div className="space-y-6">
