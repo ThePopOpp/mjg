@@ -5,14 +5,19 @@ import { createPlatePlugin, PlateElement, useEditorRef, usePath, useElement } fr
 import {
   Plus, X, ChevronLeft, ChevronRight, Paperclip, Link2, Mic, Upload, User, FolderKanban,
   CircleDot, CalendarClock, MoreHorizontal, Trash2, GripVertical, Search, Palette,
+  Download, Share2, Mail, Archive, Check, Image as ImageIcon, Type, AlignLeft, CalendarDays, Clock, CheckSquare, ListChecks, Users, Boxes,
 } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+
+const isImageUrl = (s: string) => /\.(png|jpe?g|gif|webp|svg|avif|bmp)(\?|$)/i.test(s || "");
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -148,6 +153,12 @@ function ProjectTrackerElement(props: any) {
   const addStatus = (label: string) => { const color = STATUS_PALETTE[statuses.length % STATUS_PALETTE.length]; save({ statuses: [...statuses, { label, color }] }); };
   const removeStatus = (label: string) => save({ statuses: statuses.filter((s) => s.label !== label) });
 
+  const columns: any[] = el.columns ?? [];
+  const addColumn = (name: string, type: string) => save({ columns: [...columns, { id: uid(), name, type, ...(type === "select" ? { options: [] } : {}) }] });
+  const updateColumn = (id: string, patch: any) => save({ columns: columns.map((c) => (c.id === id ? { ...c, ...patch } : c)) });
+  const removeColumn = (id: string) => save({ columns: columns.filter((c) => c.id !== id) });
+  const setCell = (rowId: string, colId: string, value: any) => save({ rows: rows.map((r) => (r.id === rowId ? { ...r, cells: { ...(r.cells ?? {}), [colId]: value } } : r)) });
+
   const HOMES = [{ v: "workspace", l: "Workspace" }, { v: "plan", l: "Plans" }, { v: "project", l: "Projects" }];
   const col = "border-b border-r px-2 py-1.5 align-middle";
 
@@ -162,7 +173,23 @@ function ProjectTrackerElement(props: any) {
                 <th className="border-b border-r px-2 py-1.5 font-semibold"><User className="mr-1 inline h-3.5 w-3.5" />Owner</th>
                 <th className="border-b border-r px-2 py-1.5 font-semibold"><CircleDot className="mr-1 inline h-3.5 w-3.5" />Status</th>
                 <th className="border-b border-r px-2 py-1.5 font-semibold"><CalendarClock className="mr-1 inline h-3.5 w-3.5" />Deadline</th>
-                <th className="border-b px-2 py-1.5 font-semibold"><Paperclip className="mr-1 inline h-3.5 w-3.5" />Attachment</th>
+                <th className="border-b border-r px-2 py-1.5 font-semibold"><Paperclip className="mr-1 inline h-3.5 w-3.5" />Attachment</th>
+                {columns.map((c) => {
+                  const Meta = colTypeMeta(c.type).icon;
+                  return (
+                    <th key={c.id} className="border-b border-r px-2 py-1.5 font-semibold">
+                      <div className="flex items-center gap-1">
+                        <Meta className="h-3.5 w-3.5 shrink-0" />
+                        <EditableText value={c.name} onSave={(v) => updateColumn(c.id, { name: v })} placeholder="Column" className="text-xs font-semibold uppercase tracking-wide" />
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="rounded p-0.5 text-muted-foreground hover:bg-accent focus:outline-none"><MoreHorizontal className="h-3.5 w-3.5" /></DropdownMenuTrigger>
+                          <DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => removeColumn(c.id)}><Trash2 className="h-3.5 w-3.5" /> Delete column</DropdownMenuItem></DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </th>
+                  );
+                })}
+                <th className="border-b px-2 py-1.5 text-right"><AddColumnControl onAdd={addColumn} /></th>
               </tr>
             </thead>
             <tbody>
@@ -227,9 +254,16 @@ function ProjectTrackerElement(props: any) {
                     />
                   </td>
                   {/* Attachment */}
-                  <td className={cn("border-b px-2 py-1.5 align-middle", "min-w-[150px]")}>
+                  <td className={cn(col, "min-w-[150px]")}>
                     <AttachmentCell value={r.attachment} token={token} onSet={(a) => setRow(r.id, { attachment: a })} />
                   </td>
+                  {/* Custom columns */}
+                  {columns.map((c) => (
+                    <td key={c.id} className={cn(col, "min-w-[140px]")}>
+                      <CustomCell column={c} value={r.cells?.[c.id]} token={token} onChange={(v) => setCell(r.id, c.id, v)} updateColumn={(patch) => updateColumn(c.id, patch)} />
+                    </td>
+                  ))}
+                  <td className="border-b px-2 py-1.5" />
                 </tr>
               ))}
             </tbody>
@@ -274,15 +308,60 @@ function StatusCell({ row, statuses, onSet, onAdd, onRemoveStatus }: { row: any;
   );
 }
 
+// A viewer modal for an attachment: preview + Download / Share / Email / Archive / Delete / Close.
+function AttachmentModal({ open, onOpenChange, value, onSet }: { open: boolean; onOpenChange: (v: boolean) => void; value: any; onSet: (a: any) => void }) {
+  const [copied, setCopied] = useState(false);
+  if (!value) return null;
+  const url: string = value.url;
+  const name: string = value.name || url;
+  const img = value.kind === "image" || isImageUrl(name) || isImageUrl(url);
+  const pdf = /\.pdf(\?|$)/i.test(name) || /\.pdf(\?|$)/i.test(url);
+  const mailto = `mailto:?subject=${encodeURIComponent(name)}&body=${encodeURIComponent(url)}`;
+  const share = async () => { try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* no-op */ } };
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader><DialogTitle className="truncate">{name}{value.archived ? <span className="ml-2 text-xs font-normal text-muted-foreground">(archived)</span> : null}</DialogTitle><DialogDescription>Preview and manage this attachment.</DialogDescription></DialogHeader>
+        <div className="max-h-[60vh] overflow-auto rounded-md border bg-muted/30 p-2 text-center">
+          {img ? (/* eslint-disable-next-line @next/next/no-img-element */ <img src={url} alt={name} className="mx-auto max-h-[55vh] w-auto rounded" />)
+            : pdf ? <iframe src={url} title={name} className="h-[55vh] w-full rounded bg-white" />
+            : value.kind === "audio" ? <div className="p-4"><BrandAudioPlayer src={url} /></div>
+            : <div className="flex flex-col items-center gap-2 p-10 text-sm text-muted-foreground"><Paperclip className="h-8 w-8" /> Preview isn&rsquo;t available for this file type — use Download to open it.</div>}
+        </div>
+        <DialogFooter className="flex-wrap gap-2 sm:justify-start">
+          <Button asChild variant="outline" size="sm"><a href={url} download={name} target="_blank" rel="noreferrer"><Download className="mr-1.5 h-4 w-4" /> Download</a></Button>
+          <Button variant="outline" size="sm" onClick={share}><Share2 className="mr-1.5 h-4 w-4" /> {copied ? "Copied!" : "Share link"}</Button>
+          <Button asChild variant="outline" size="sm"><a href={mailto}><Mail className="mr-1.5 h-4 w-4" /> Email</a></Button>
+          <Button variant="outline" size="sm" onClick={() => onSet({ ...value, archived: !value.archived })}><Archive className="mr-1.5 h-4 w-4" /> {value.archived ? "Unarchive" : "Archive"}</Button>
+          <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => { onSet(null); onOpenChange(false); }}><Trash2 className="mr-1.5 h-4 w-4" /> Delete</Button>
+          <Button size="sm" className="sm:ml-auto" onClick={() => onOpenChange(false)}>Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function AttachmentCell({ value, token, onSet }: { value: any; token: string; onSet: (a: any) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLInputElement>(null);
   const [urlMode, setUrlMode] = useState(false);
-  if (value?.kind === "audio") return <div className="flex items-center gap-1"><div className="min-w-[8rem] flex-1"><BrandAudioPlayer src={value.url} /></div><button type="button" onClick={() => onSet(null)} className="rounded p-0.5 text-muted-foreground hover:text-destructive"><X className="h-3.5 w-3.5" /></button></div>;
-  if (value) return <div className="flex items-center gap-1"><a href={value.url} target="_blank" rel="noreferrer" className="inline-flex min-w-0 items-center gap-1 truncate text-xs text-primary hover:underline"><Paperclip className="h-3.5 w-3.5 shrink-0" /> {value.name || value.url}</a><button type="button" onClick={() => onSet(null)} className="rounded p-0.5 text-muted-foreground hover:text-destructive"><X className="h-3.5 w-3.5" /></button></div>;
+  const [open, setOpen] = useState(false);
+  if (value) {
+    const name = value.name || value.url;
+    const img = value.kind === "image" || isImageUrl(name) || isImageUrl(value.url);
+    return (
+      <>
+        <button type="button" onClick={() => setOpen(true)} className={cn("inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md border px-1.5 py-1 text-left text-xs transition-colors hover:bg-accent", value.archived && "opacity-50")}>
+          {img ? (/* eslint-disable-next-line @next/next/no-img-element */ <img src={value.url} alt="" className="h-6 w-6 shrink-0 rounded object-cover" />) : value.kind === "audio" ? <Mic className="h-3.5 w-3.5 shrink-0 text-primary" /> : <Paperclip className="h-3.5 w-3.5 shrink-0 text-primary" />}
+          <span className="truncate">{name}</span>
+        </button>
+        <AttachmentModal open={open} onOpenChange={setOpen} value={value} onSet={onSet} />
+      </>
+    );
+  }
   return (
     <div>
-      <input ref={fileRef} type="file" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onSet({ kind: "upload", ...up }); } e.target.value = ""; }} />
+      <input ref={fileRef} type="file" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onSet({ kind: f.type.startsWith("image/") ? "image" : "upload", ...up }); } e.target.value = ""; }} />
       <input ref={audioRef} type="file" accept="audio/*" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onSet({ kind: "audio", ...up }); } e.target.value = ""; }} />
       {urlMode ? (
         <input autoFocus placeholder="Paste URL, press Enter" onKeyDown={(e) => { if (e.key === "Enter") { const v = (e.target as HTMLInputElement).value.trim(); if (v) onSet({ kind: "url", url: v, name: v }); setUrlMode(false); } if (e.key === "Escape") setUrlMode(false); }} className="w-full rounded border bg-background px-2 py-1 text-xs outline-none" />
@@ -297,6 +376,153 @@ function AttachmentCell({ value, token, onSet }: { value: any; token: string; on
         </DropdownMenu>
       )}
     </div>
+  );
+}
+
+// ===================== Custom columns =====================
+const COLUMN_TYPES: { v: string; l: string; icon: any }[] = [
+  { v: "text", l: "Single-line text", icon: Type },
+  { v: "longtext", l: "Multi-line text", icon: AlignLeft },
+  { v: "url", l: "URL / Link", icon: Link2 },
+  { v: "date", l: "Date", icon: CalendarDays },
+  { v: "datetime", l: "Date & time", icon: CalendarClock },
+  { v: "time", l: "Time", icon: Clock },
+  { v: "checkbox", l: "Checkbox", icon: CheckSquare },
+  { v: "select", l: "Select (options)", icon: ListChecks },
+  { v: "user", l: "Users (multi-select)", icon: Users },
+  { v: "image", l: "Image", icon: ImageIcon },
+  { v: "record", l: "Connect (Workspace / Plans / Projects)", icon: Boxes },
+];
+const colTypeMeta = (t: string) => COLUMN_TYPES.find((c) => c.v === t) ?? COLUMN_TYPES[0];
+
+function MultilineCell({ value, onSave }: { value: string; onSave: (v: string) => void }) {
+  const [v, setV] = useState(value ?? "");
+  useEffect(() => setV(value ?? ""), [value]);
+  return <textarea value={v} onChange={(e) => setV(e.target.value)} onBlur={() => { if (v !== value) onSave(v); }} onKeyDown={(e) => e.stopPropagation()} rows={2} placeholder="…" className="w-full resize-y bg-transparent text-sm outline-none placeholder:text-muted-foreground/70" />;
+}
+
+function UrlCell({ value, onChange }: { value: string; onChange: (v: string | null) => void }) {
+  return (
+    <div className="flex items-center gap-1">
+      <EditableText value={value ?? ""} onSave={(v) => onChange(v.trim() || null)} placeholder="https://…" className="text-xs" />
+      {value ? <a href={value} target="_blank" rel="noreferrer" className="shrink-0 text-primary"><Link2 className="h-3.5 w-3.5" /></a> : null}
+    </div>
+  );
+}
+
+function CheckboxCell({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
+  return <button type="button" onClick={() => onChange(!value)} className={cn("flex h-5 w-5 items-center justify-center rounded border transition-colors", value ? "border-primary bg-primary text-primary-foreground" : "border-input hover:border-primary")} aria-label={value ? "Uncheck" : "Check"}>{value ? <Check className="h-3.5 w-3.5" /> : null}</button>;
+}
+
+function SelectCell({ column, value, onChange, updateColumn }: { column: any; value: string | null; onChange: (v: string | null) => void; updateColumn: (patch: any) => void }) {
+  const options: any[] = column.options ?? [];
+  const current = options.find((o) => o.label === value);
+  const [draft, setDraft] = useState("");
+  const addOption = (label: string) => { const color = STATUS_PALETTE[options.length % STATUS_PALETTE.length]; updateColumn({ options: [...options, { label, color }] }); onChange(label); };
+  const removeOption = (label: string) => updateColumn({ options: options.filter((o) => o.label !== label) });
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="focus:outline-none">
+        {current ? <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold" style={{ color: current.color, background: `${current.color}1a` }}><span className="h-2 w-2 rounded-full" style={{ background: current.color }} /> {current.label}</span> : <span className="text-xs italic text-muted-foreground">Set…</span>}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-52">
+        {options.map((o) => (
+          <div key={o.label} className="flex items-center">
+            <button type="button" onClick={() => onChange(o.label)} className="flex flex-1 items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-accent"><span className="h-2.5 w-2.5 rounded-full" style={{ background: o.color }} /><span style={{ color: o.color }} className="font-semibold">{o.label}</span></button>
+            <button type="button" onClick={() => removeOption(o.label)} className="rounded p-1 text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
+          </div>
+        ))}
+        {value ? <DropdownMenuItem onSelect={() => onChange(null)}><X className="h-3.5 w-3.5" /> Clear</DropdownMenuItem> : null}
+        <DropdownMenuSeparator />
+        <div className="p-1"><input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { e.stopPropagation(); if (e.key === "Enter" && draft.trim()) { addOption(draft.trim()); setDraft(""); } }} placeholder="New option…" className="w-full rounded border bg-background px-2 py-1 text-sm outline-none" /></div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function UsersCell({ value, onChange }: { value: any[]; onChange: (v: any[]) => void }) {
+  const users = useMjgUsers();
+  const selected: any[] = value ?? [];
+  const has = (id: string) => selected.some((s) => s.id === id);
+  const toggle = (u: any) => onChange(has(u.id) ? selected.filter((s) => s.id !== u.id) : [...selected, { id: u.id, name: u.name }]);
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="focus:outline-none">
+        {selected.length ? <span className="flex flex-wrap gap-1">{selected.map((s) => <span key={s.id} className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs">{s.name}</span>)}</span> : <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border text-muted-foreground hover:bg-accent"><Plus className="h-3.5 w-3.5" /></span>}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56">
+        <DropdownMenuLabel>Assign people</DropdownMenuLabel>
+        <div className="max-h-44 overflow-y-auto">
+          {users.map((u) => <DropdownMenuItem key={u.id} onSelect={(ev) => { ev.preventDefault(); toggle(u); }}><span className={cn("flex h-4 w-4 items-center justify-center rounded border", has(u.id) ? "border-primary bg-primary text-primary-foreground" : "border-input")}>{has(u.id) ? <Check className="h-3 w-3" /> : null}</span> {u.name}</DropdownMenuItem>)}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function ImageCell({ value, token, onChange }: { value: any; token: string; onChange: (v: any) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
+  if (value) return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} className={cn("inline-flex items-center rounded-md border p-0.5 hover:bg-accent", value.archived && "opacity-50")}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={value.url} alt="" className="h-9 w-12 rounded object-cover" /></button>
+      <AttachmentModal open={open} onOpenChange={setOpen} value={{ ...value, kind: "image" }} onSet={(v) => onChange(v)} />
+    </>
+  );
+  return (
+    <>
+      <input ref={ref} type="file" accept="image/*" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onChange({ kind: "image", ...up }); } e.target.value = ""; }} />
+      <button type="button" onClick={() => ref.current?.click()} className="text-xs italic text-muted-foreground hover:text-foreground">Add image…</button>
+    </>
+  );
+}
+
+function RecordCell({ value, onChange }: { value: any; onChange: (v: any) => void }) {
+  const [home, setHome] = useState(value?.home ?? "plan");
+  if (value?.label) return <div className="flex items-center gap-1"><a href={value.href} className="truncate text-xs text-primary hover:underline">{value.label}</a><button type="button" onClick={() => onChange(null)} className="shrink-0 text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button></div>;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="text-xs italic text-muted-foreground hover:text-foreground focus:outline-none">Connect…</DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-64">
+        <DropdownMenuLabel>Connect to</DropdownMenuLabel>
+        {[{ v: "workspace", l: "Workspace" }, { v: "plan", l: "Plans" }, { v: "project", l: "Projects" }].map((h) => <DropdownMenuItem key={h.v} onSelect={(ev) => { ev.preventDefault(); setHome(h.v); }}><span className={cn("h-2 w-2 rounded-full", home === h.v ? "bg-primary" : "bg-muted-foreground/30")} /> {h.l}</DropdownMenuItem>)}
+        <DropdownMenuSeparator />
+        <RecordPicker home={home} onPick={(rec) => onChange({ label: rec.label, href: rec.href, recordId: rec.recordId, home })} />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function CustomCell({ column, value, token, onChange, updateColumn }: { column: any; value: any; token: string; onChange: (v: any) => void; updateColumn: (patch: any) => void }) {
+  switch (column.type) {
+    case "longtext": return <MultilineCell value={value ?? ""} onSave={onChange} />;
+    case "url": return <UrlCell value={value ?? ""} onChange={onChange} />;
+    case "date": return <DateTimePicker dateOnly date={value?.date ?? ""} onChange={(d) => onChange(d ? { date: d } : null)} placeholder="Set date…" />;
+    case "datetime": return <DateTimePicker date={value?.date ?? ""} time={value?.time ?? ""} onChange={(d, t) => onChange(d || t ? { date: d, time: t } : null)} placeholder="Set date & time…" />;
+    case "time": return <input type="time" value={value ?? ""} onChange={(e) => onChange(e.target.value || null)} onKeyDown={(e) => e.stopPropagation()} className="h-8 rounded border bg-background px-2 text-xs" />;
+    case "checkbox": return <CheckboxCell value={!!value} onChange={onChange} />;
+    case "select": return <SelectCell column={column} value={value ?? null} onChange={onChange} updateColumn={updateColumn} />;
+    case "user": return <UsersCell value={value ?? []} onChange={onChange} />;
+    case "image": return <ImageCell value={value} token={token} onChange={onChange} />;
+    case "record": return <RecordCell value={value} onChange={onChange} />;
+    default: return <EditableText value={value ?? ""} onSave={onChange} placeholder="…" className="text-sm" />;
+  }
+}
+
+function AddColumnControl({ onAdd }: { onAdd: (name: string, type: string) => void }) {
+  const [name, setName] = useState("");
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground focus:outline-none" aria-label="Add column"><Plus className="h-3.5 w-3.5" /></DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72">
+        <DropdownMenuLabel>Add a column</DropdownMenuLabel>
+        <div className="p-1"><input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.stopPropagation()} placeholder="Column name…" className="w-full rounded border bg-background px-2 py-1 text-sm outline-none" /></div>
+        <DropdownMenuSeparator />
+        <div className="max-h-64 overflow-y-auto">
+          {COLUMN_TYPES.map((t) => <DropdownMenuItem key={t.v} onSelect={() => { onAdd(name.trim() || t.l, t.v); setName(""); }}><t.icon className="h-3.5 w-3.5" /> {t.l}</DropdownMenuItem>)}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
