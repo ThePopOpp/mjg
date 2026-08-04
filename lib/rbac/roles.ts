@@ -27,6 +27,7 @@ export const DASHBOARD_ROLES = [
   ROLES.FACILITATOR,
   ROLES.CONTENT_REVIEWER,
   ROLES.PASTOR_ELDER_REVIEWER,
+  ROLES.PARTICIPANT,
 ] as const satisfies readonly AppRole[];
 
 export function isAppRole(role: string | null | undefined): role is AppRole {

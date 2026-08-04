@@ -50,7 +50,9 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     PERMISSIONS.VIEW_DASHBOARD,
     PERMISSIONS.REVIEW_CONTENT,
   ],
-  [ROLES.PARTICIPANT]: [],
+  [ROLES.PARTICIPANT]: [
+    PERMISSIONS.VIEW_DASHBOARD,
+  ],
 };
 
 export function can(role: string | null | undefined, permission: Permission) {
