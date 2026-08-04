@@ -18,7 +18,18 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<string | null>(message);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<"password" | "magic" | null>(null);
+  const [loading, setLoading] = useState<"password" | "magic" | "forgot" | null>(null);
+
+  async function handleForgotPassword() {
+    setError(null); setStatus(null);
+    if (!email) { setError("Enter your email above first, then click Forgot password."); return; }
+    setLoading("forgot");
+    try {
+      await fetch("/api/auth/forgot-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+    } catch { /* ignore — response is intentionally generic */ }
+    setStatus("If an account exists for that email, a password reset link is on its way.");
+    setLoading(null);
+  }
 
   const redirectTo = useMemo(() => {
     if (typeof window === "undefined") return undefined;
@@ -120,6 +131,11 @@ export function LoginForm() {
               </button>
             </div>
           </label>
+          <div className="flex justify-end">
+            <button type="button" onClick={handleForgotPassword} disabled={loading !== null} className="text-xs font-medium text-primary hover:underline disabled:opacity-50">
+              {loading === "forgot" ? "Sending…" : "Forgot password?"}
+            </button>
+          </div>
           {error ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
           {status ? <p className="rounded-md bg-primary/10 p-3 text-sm text-primary">{status}</p> : null}
           <Button className="w-full" disabled={loading !== null || !email || !password} type="submit">
