@@ -29,7 +29,7 @@ export function SelectField({
   required,
   disabled,
 }: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  const options = useMemo(
+  const all = useMemo(
     () =>
       React.Children.toArray(children)
         .filter(React.isValidElement)
@@ -40,15 +40,20 @@ export function SelectField({
         }),
     [children],
   );
-  const initialValue = String(defaultValue ?? options[0]?.value ?? "");
+  // A blank-value option is the placeholder — Radix SelectItem cannot have an empty value.
+  const hasPlaceholder = all.some((o) => o.value === "");
+  const placeholder = all.find((o) => o.value === "")?.label ?? "Select one";
+  const options = all.filter((o) => o.value !== "");
+  // Preserve prior behavior: selects without a placeholder auto-select the first option.
+  const initialValue = String(defaultValue ?? (hasPlaceholder ? "" : options[0]?.value ?? ""));
   const [value, setValue] = useState(initialValue);
 
   return (
     <>
       {name ? <input name={name} required={required} type="hidden" value={value} /> : null}
-      <Select value={value} onValueChange={setValue} disabled={disabled}>
+      <Select value={value || undefined} onValueChange={setValue} disabled={disabled}>
         <SelectTrigger className={cn("bg-card/70", className)}>
-          <SelectValue />
+          <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
