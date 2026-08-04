@@ -5,7 +5,7 @@ import { createPlatePlugin, PlateElement, useEditorRef, usePath, useElement } fr
 import {
   Plus, X, ChevronLeft, ChevronRight, Paperclip, Link2, Mic, Upload, User, FolderKanban,
   CircleDot, CalendarClock, MoreHorizontal, Trash2, GripVertical, Search, Palette,
-  Download, Share2, Mail, Archive, Check, Image as ImageIcon, Type, AlignLeft, CalendarDays, Clock, CheckSquare, ListChecks, Users, Boxes,
+  Download, Share2, Mail, Archive, Check, Image as ImageIcon, Type, AlignLeft, CalendarDays, Clock, CheckSquare, ListChecks, Users, Boxes, Music, Video,
 } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { BrandAudioPlayer } from "@/components/workspace/brand-audio-player";
@@ -316,6 +316,8 @@ function AttachmentModal({ open, onOpenChange, value, onSet }: { open: boolean; 
   const name: string = value.name || url;
   const img = value.kind === "image" || isImageUrl(name) || isImageUrl(url);
   const pdf = /\.pdf(\?|$)/i.test(name) || /\.pdf(\?|$)/i.test(url);
+  const vid = value.kind === "video" || /\.(mp4|mov|webm|m4v|ogv)(\?|$)/i.test(name) || /\.(mp4|mov|webm|m4v|ogv)(\?|$)/i.test(url);
+  const aud = value.kind === "audio" || /\.(wav|mp3|m4a|aac|ogg|flac)(\?|$)/i.test(name) || /\.(wav|mp3|m4a|aac|ogg|flac)(\?|$)/i.test(url);
   const mailto = `mailto:?subject=${encodeURIComponent(name)}&body=${encodeURIComponent(url)}`;
   const share = async () => { try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* no-op */ } };
   return (
@@ -324,8 +326,9 @@ function AttachmentModal({ open, onOpenChange, value, onSet }: { open: boolean; 
         <DialogHeader><DialogTitle className="truncate">{name}{value.archived ? <span className="ml-2 text-xs font-normal text-muted-foreground">(archived)</span> : null}</DialogTitle><DialogDescription>Preview and manage this attachment.</DialogDescription></DialogHeader>
         <div className="max-h-[60vh] overflow-auto rounded-md border bg-muted/30 p-2 text-center">
           {img ? (/* eslint-disable-next-line @next/next/no-img-element */ <img src={url} alt={name} className="mx-auto max-h-[55vh] w-auto rounded" />)
+            : vid ? <video src={url} controls className="mx-auto max-h-[55vh] w-auto rounded bg-black" />
             : pdf ? <iframe src={url} title={name} className="h-[55vh] w-full rounded bg-white" />
-            : value.kind === "audio" ? <div className="p-4"><BrandAudioPlayer src={url} /></div>
+            : aud ? <div className="p-4"><BrandAudioPlayer src={url} /></div>
             : <div className="flex flex-col items-center gap-2 p-10 text-sm text-muted-foreground"><Paperclip className="h-8 w-8" /> Preview isn&rsquo;t available for this file type — use Download to open it.</div>}
         </div>
         <DialogFooter className="flex-wrap gap-2 sm:justify-start">
@@ -361,7 +364,7 @@ function AttachmentCell({ value, token, onSet }: { value: any; token: string; on
   }
   return (
     <div>
-      <input ref={fileRef} type="file" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onSet({ kind: f.type.startsWith("image/") ? "image" : "upload", ...up }); } e.target.value = ""; }} />
+      <input ref={fileRef} type="file" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onSet({ kind: f.type.startsWith("image/") ? "image" : f.type.startsWith("video/") ? "video" : f.type.startsWith("audio/") ? "audio" : "upload", ...up }); } e.target.value = ""; }} />
       <input ref={audioRef} type="file" accept="audio/*" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onSet({ kind: "audio", ...up }); } e.target.value = ""; }} />
       {urlMode ? (
         <input autoFocus placeholder="Paste URL, press Enter" onKeyDown={(e) => { if (e.key === "Enter") { const v = (e.target as HTMLInputElement).value.trim(); if (v) onSet({ kind: "url", url: v, name: v }); setUrlMode(false); } if (e.key === "Escape") setUrlMode(false); }} className="w-full rounded border bg-background px-2 py-1 text-xs outline-none" />
@@ -391,6 +394,8 @@ const COLUMN_TYPES: { v: string; l: string; icon: any }[] = [
   { v: "select", l: "Select (options)", icon: ListChecks },
   { v: "user", l: "Users (multi-select)", icon: Users },
   { v: "image", l: "Image", icon: ImageIcon },
+  { v: "audio", l: "Audio (WAV, MP3, …)", icon: Music },
+  { v: "video", l: "Video (MP4, MOV, …)", icon: Video },
   { v: "record", l: "Connect (Workspace / Plans / Projects)", icon: Boxes },
 ];
 const colTypeMeta = (t: string) => COLUMN_TYPES.find((c) => c.v === t) ?? COLUMN_TYPES[0];
@@ -477,6 +482,45 @@ function ImageCell({ value, token, onChange }: { value: any; token: string; onCh
   );
 }
 
+function AudioCell({ value, token, onChange }: { value: any; token: string; onChange: (v: any) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
+  if (value) return (
+    <>
+      <div className={cn("flex items-center gap-1", value.archived && "opacity-50")}>
+        <div className="min-w-[9rem] flex-1"><BrandAudioPlayer src={value.url} /></div>
+        <button type="button" onClick={() => setOpen(true)} className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground"><MoreHorizontal className="h-3.5 w-3.5" /></button>
+      </div>
+      <AttachmentModal open={open} onOpenChange={setOpen} value={{ ...value, kind: "audio" }} onSet={(v) => onChange(v)} />
+    </>
+  );
+  return (
+    <>
+      <input ref={ref} type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onChange({ kind: "audio", ...up }); } e.target.value = ""; }} />
+      <button type="button" onClick={() => ref.current?.click()} className="text-xs italic text-muted-foreground hover:text-foreground">Add audio…</button>
+    </>
+  );
+}
+
+function VideoCell({ value, token, onChange }: { value: any; token: string; onChange: (v: any) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
+  if (value) return (
+    <>
+      <div className={cn("flex items-center gap-1", value.archived && "opacity-50")}>
+        <button type="button" onClick={() => setOpen(true)} className="rounded-md border p-0.5 hover:bg-accent"><video src={value.url} preload="metadata" className="h-14 w-24 rounded bg-black object-cover" /></button>
+      </div>
+      <AttachmentModal open={open} onOpenChange={setOpen} value={{ ...value, kind: "video" }} onSet={(v) => onChange(v)} />
+    </>
+  );
+  return (
+    <>
+      <input ref={ref} type="file" accept="video/*,.mp4,.mov,.webm,.m4v" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { const up = await uploadFile(f, token); if (up) onChange({ kind: "video", ...up }); } e.target.value = ""; }} />
+      <button type="button" onClick={() => ref.current?.click()} className="text-xs italic text-muted-foreground hover:text-foreground">Add video…</button>
+    </>
+  );
+}
+
 function RecordCell({ value, onChange }: { value: any; onChange: (v: any) => void }) {
   const [home, setHome] = useState(value?.home ?? "plan");
   if (value?.label) return <div className="flex items-center gap-1"><a href={value.href} className="truncate text-xs text-primary hover:underline">{value.label}</a><button type="button" onClick={() => onChange(null)} className="shrink-0 text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button></div>;
@@ -504,6 +548,8 @@ function CustomCell({ column, value, token, onChange, updateColumn }: { column: 
     case "select": return <SelectCell column={column} value={value ?? null} onChange={onChange} updateColumn={updateColumn} />;
     case "user": return <UsersCell value={value ?? []} onChange={onChange} />;
     case "image": return <ImageCell value={value} token={token} onChange={onChange} />;
+    case "audio": return <AudioCell value={value} token={token} onChange={onChange} />;
+    case "video": return <VideoCell value={value} token={token} onChange={onChange} />;
     case "record": return <RecordCell value={value} onChange={onChange} />;
     default: return <EditableText value={value ?? ""} onSave={onChange} placeholder="…" className="text-sm" />;
   }
