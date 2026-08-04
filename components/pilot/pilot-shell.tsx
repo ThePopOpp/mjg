@@ -1,6 +1,19 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PilotThemeToggle } from "@/components/pilot/theme-toggle";
+import { cn } from "@/lib/utils";
+
+// Actual MJG logos: black wordmark on light, white on dark (swapped via the `.dark` class).
+function BrandLogo({ className }: { className?: string }) {
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/mjg-logos/mjg_black_white.png" alt="Michael J. Gauthier" className={cn("w-auto dark:hidden", className)} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/mjg-logos/mjg_white.png" alt="" aria-hidden className={cn("hidden w-auto dark:block", className)} />
+    </>
+  );
+}
 
 type PilotShellProps = {
   eyebrow?: string;
@@ -19,7 +32,7 @@ export function PilotShell({ eyebrow, title, description, children, cta }: Pilot
       <header className="pilot-topbar sticky top-0 z-30">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-end gap-3 text-foreground no-underline">
-            <span className="pilot-logo">MJG</span>
+            <BrandLogo className="h-9" />
             <span className="pilot-signature hidden pb-1 text-sm sm:inline">Michael J. Gauthier</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -56,7 +69,23 @@ export function PilotShell({ eyebrow, title, description, children, cta }: Pilot
         <VideoPlaceholder />
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">{children}</div>
+      <div className="mx-auto max-w-7xl px-4 pb-14 sm:px-6">{children}</div>
+
+      <footer className="mt-8 border-t border-black/10 dark:border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm sm:flex-row sm:px-6">
+          <Link href="/" className="flex items-center gap-3 no-underline">
+            <BrandLogo className="h-7" />
+            <span className="pilot-signature">Michael J. Gauthier</span>
+          </Link>
+          <nav className="flex flex-wrap items-center justify-center gap-5 text-muted-foreground">
+            <Link href="/" className="hover:text-[color:var(--brand-gold)]">Home</Link>
+            <Link href="/created-for-more-7-day-stewardship-pilot" className="hover:text-[color:var(--brand-gold)]">Pilot</Link>
+            <Link href="/check-in" className="hover:text-[color:var(--brand-gold)]">Check-In</Link>
+            <Link href="/surveys/general" className="hover:text-[color:var(--brand-gold)]">Survey</Link>
+          </nav>
+          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Michael J. Gauthier. All rights reserved.</p>
+        </div>
+      </footer>
     </main>
   );
 }
