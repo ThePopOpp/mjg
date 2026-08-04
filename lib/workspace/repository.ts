@@ -155,6 +155,30 @@ export async function searchDocuments(profileId: string, q: string): Promise<Sea
   return results;
 }
 
+export type LinkableDoc = { id: string; title: string; owner_name: string | null; created_at: string; workspace_id: string | null; workspace_name: string | null };
+
+/** Documents the actor can link to (owner's personal + all shared), with owner + workspace. */
+export async function listLinkableDocuments(profileId: string, q: string, workspaceId?: string): Promise<LinkableDoc[]> {
+  const supabase = createSupabaseAdminClient();
+  let query = supabase
+    .from("workspace_documents")
+    .select("id,title,scope,owner_id,created_at,workspace_id, owner:profiles!workspace_documents_owner_id_fkey(full_name,first_name,last_name,email), ws:workspaces(name)")
+    .is("deleted_at", null)
+    .neq("status", "archived")
+    .order("updated_at", { ascending: false })
+    .limit(40);
+  const term = q.trim();
+  if (term) query = query.ilike("title", `%${term.replace(/[%_]/g, "")}%`);
+  if (workspaceId) query = query.eq("workspace_id", workspaceId);
+  const { data } = await query;
+  const rows: LinkableDoc[] = [];
+  for (const d of data ?? []) {
+    if (d.scope === "personal" && d.owner_id !== profileId) continue; // personal → owner only
+    rows.push({ id: d.id, title: d.title || "Untitled", owner_name: personName((d as any).owner), created_at: d.created_at, workspace_id: d.workspace_id, workspace_name: (d as any).ws?.name ?? null });
+  }
+  return rows;
+}
+
 export async function updateDocument(
   id: string,
   input: { title?: string; content?: unknown; folderId?: string | null; scope?: WorkspaceScope; status?: string },

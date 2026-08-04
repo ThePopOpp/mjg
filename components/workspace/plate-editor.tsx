@@ -34,7 +34,7 @@ import {
   Check, CheckSquare, CalendarDays, Boxes, ClipboardList, UserCircle, CalendarClock, ExternalLink, Sparkles,
   PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen,
   Undo2, Redo2, Search as SearchIcon, RemoveFormatting, Maximize2, ChevronDown, Pilcrow, Settings2,
-  FolderKanban, SquareKanban, CalendarRange,
+  FolderKanban, SquareKanban, CalendarRange, FileText, Hash,
 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { SimpleTooltip } from "@/components/ui/tooltip";
@@ -53,6 +53,8 @@ const TodoItemPlugin = createPlatePlugin({ key: "todo_item", node: { isElement: 
 const DateFieldPlugin = createPlatePlugin({ key: "date_field", node: { isElement: true, isInline: true, isVoid: true } });
 // Inline card linking to an MJG record (plan / participant / booking).
 const RecordLinkPlugin = createPlatePlugin({ key: "record_link", node: { isElement: true, isInline: true, isVoid: true } });
+// Inline clickable link to another Workspace document (inserted via the "#" picker).
+const DocLinkPlugin = createPlatePlugin({ key: "doc_link", node: { isElement: true, isInline: true, isVoid: true } });
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const PLUGINS = [
@@ -62,7 +64,7 @@ const PLUGINS = [
   FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin, TextAlignPlugin,
   TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin,
   ImagePlugin, VideoPlugin, AudioPlugin, FilePlugin,
-  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin, TocPlugin, TodoItemPlugin, DateFieldPlugin, RecordLinkPlugin,
+  ColumnPlugin, ColumnItemPlugin, HtmlEmbedPlugin, TocPlugin, TodoItemPlugin, DateFieldPlugin, RecordLinkPlugin, DocLinkPlugin,
   ...LIVE_APP_PLUGINS,
 ];
 
@@ -120,6 +122,16 @@ const COMPONENTS: Record<string, any> = {
           {el.sublabel ? <span className="text-xs text-muted-foreground">· {el.sublabel}</span> : null}
           <a href={el.href} title="Open record" onClick={(ev) => { ev.preventDefault(); if (el.href && typeof window !== "undefined") window.open(el.href, "_blank", "noopener,noreferrer"); }} className="ml-0.5 text-primary hover:text-primary/80"><ExternalLink className="h-3.5 w-3.5" /></a>
         </span>{p.children}
+      </PlateElement>
+    );
+  },
+  [DocLinkPlugin.key]: (p: any) => {
+    const el = p.element ?? {};
+    return (
+      <PlateElement {...p} as="span" className="mx-0.5 inline-block align-middle">
+        <a contentEditable={false} href={el.href} title="Open document" onClick={(ev) => { ev.preventDefault(); if (el.href && typeof window !== "undefined") window.location.assign(el.href); }} className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/5 px-1.5 py-0.5 text-sm font-medium text-primary no-underline transition-colors hover:bg-primary/10">
+          <FileText className="h-3.5 w-3.5" />{el.title || "Untitled"}
+        </a>{p.children}
       </PlateElement>
     );
   },
@@ -285,6 +297,72 @@ function CommandMenu({ open, pos, commands, onClose }: { open: boolean; pos: { t
             </li>
           )) : <li className="px-2 py-2 text-xs text-muted-foreground">No matching blocks</li>}
         </ul>
+      </div>
+    </>
+  );
+}
+
+// The "#" document-link picker: searchable, workspace-filterable, multi-column rows.
+type LinkDoc = { id: string; title: string; owner_name: string | null; created_at: string; workspace_id: string | null; workspace_name: string | null };
+const AVATAR_COLORS = ["#C9A46E", "#9B2F2E", "#5b7a8c", "#7c6f5a", "#8a6d3f", "#4b4844", "#2f6f5e"];
+function initialsOf(name: string | null) { return (name || "?").split(" ").filter(Boolean).map((s) => s[0]).slice(0, 2).join("").toUpperCase() || "?"; }
+function DocLinkMenu({ pos, onClose, onPick, onTab }: { pos: { top: number; left: number }; onClose: () => void; onPick: (d: LinkDoc) => void; onTab: () => void }) {
+  const [q, setQ] = useState("");
+  const [ws, setWs] = useState("all");
+  const [docs, setDocs] = useState<LinkDoc[]>([]);
+  const [workspaces, setWorkspaces] = useState<{ id: string; name: string }[]>([]);
+  const [i, setI] = useState(0);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    let ok = true;
+    const t = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (q.trim()) params.set("q", q.trim());
+        if (ws !== "all") params.set("ws", ws);
+        const res = await fetch(`/api/workspace/doc-links?${params.toString()}`);
+        const d = await res.json();
+        if (ok && d.ok) { setDocs(d.docs); setWorkspaces(d.workspaces ?? []); }
+      } finally { if (ok) setLoading(false); }
+    }, 180);
+    return () => { ok = false; clearTimeout(t); };
+  }, [q, ws]);
+  useEffect(() => setI(0), [docs]);
+  return (
+    <>
+      <div className="fixed inset-0 z-40" onMouseDown={(e) => { e.preventDefault(); onClose(); }} />
+      <div className="fixed z-50 w-80 rounded-md border bg-popover p-1 text-popover-foreground shadow-lg" style={{ top: pos.top, left: pos.left }} onMouseDown={(e) => e.preventDefault()}>
+        <div className="flex items-center gap-1 p-1">
+          <SearchIcon className="ml-1 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <input
+            autoFocus value={q} onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown") { e.preventDefault(); setI((x) => Math.min(x + 1, docs.length - 1)); }
+              else if (e.key === "ArrowUp") { e.preventDefault(); setI((x) => Math.max(x - 1, 0)); }
+              else if (e.key === "Enter") { e.preventDefault(); if (docs[i]) onPick(docs[i]); }
+              else if (e.key === "Tab") { e.preventDefault(); onTab(); }
+              else if (e.key === "Escape") { e.preventDefault(); onClose(); }
+            }}
+            placeholder="Link a document…" className="min-w-0 flex-1 bg-transparent px-1 py-1 text-sm outline-none"
+          />
+          <select value={ws} onChange={(e) => setWs(e.target.value)} className="max-w-[7rem] shrink-0 rounded border bg-background px-1 py-1 text-xs outline-none">
+            <option value="all">All spaces</option>
+            {workspaces.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+          </select>
+        </div>
+        <div className="max-h-64 overflow-y-auto">
+          {loading ? <p className="px-2 py-3 text-center text-xs text-muted-foreground">Loading…</p>
+            : docs.length ? docs.map((d, idx) => (
+              <button key={d.id} type="button" onMouseEnter={() => setI(idx)} onClick={() => onPick(d)} className={cn("flex w-full items-center gap-2 rounded px-2 py-1.5 text-left", i === idx ? "bg-accent" : "")}>
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ background: AVATAR_COLORS[initialsOf(d.owner_name).charCodeAt(0) % AVATAR_COLORS.length] }}>{initialsOf(d.owner_name)}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium">{d.title}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{d.owner_name ?? "—"} · {new Date(d.created_at).toLocaleDateString()}{d.workspace_name ? ` · ${d.workspace_name}` : ""}</span>
+                </span>
+              </button>
+            )) : <p className="px-2 py-3 text-center text-xs text-muted-foreground">No documents found. Press Tab to keep the “#”.</p>}
+        </div>
       </div>
     </>
   );
@@ -688,6 +766,7 @@ export function WorkspaceEditorSurface({
   const makeTodo = () => { try { e.tf?.setNodes?.({ type: TodoItemPlugin.key, checked: false }, { match: (n: any) => !!n?.type && !("text" in n), mode: "lowest" }); } catch { /* no-op */ } };
   const insertDate = () => { try { e.tf?.insertNodes?.({ type: DateFieldPlugin.key, date: null, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertRecordLink = (r: any) => { try { e.tf?.insertNodes?.({ type: RecordLinkPlugin.key, recordType: r.recordType, recordId: r.recordId, label: r.label, sublabel: r.sublabel, href: r.href, children: [{ text: "" }] }); } catch { /* no-op */ } };
+  const insertDocLink = (d: any) => { try { e.tf?.insertNodes?.({ type: DocLinkPlugin.key, docId: d.id, title: d.title, href: `/dashboard/workspace/${d.id}`, children: [{ text: "" }] }); } catch { /* no-op */ } };
   const insertText = (t: string) => { try { e.tf?.insertText?.(t); } catch { /* no-op */ } };
   const insertProjectTracker = () => { try { e.tf?.insertNodes?.(newProjectTrackerNode()); } catch { /* no-op */ } };
   const insertKanban = () => { try { e.tf?.insertNodes?.(newKanbanNode()); } catch { /* no-op */ } };
@@ -732,6 +811,7 @@ export function WorkspaceEditorSurface({
     } catch { /* no-op */ }
   };
 
+  const [docLinkPos, setDocLinkPos] = useState<{ top: number; left: number } | null>(null);
   const [menu, setMenu] = useState<{ open: boolean; top: number; left: number; cmds: Cmd[] }>({ open: false, top: 0, left: 0, cmds: [] });
   const openMenu = (top: number, left: number, cmds: Cmd[]) => setMenu({ open: true, top, left, cmds });
   const closeMenu = () => setMenu((m) => ({ ...m, open: false }));
@@ -753,6 +833,7 @@ export function WorkspaceEditorSurface({
     { label: "Kanban Board", keywords: "kanban board columns cards", icon: SquareKanban, run: insertKanban },
     { label: "Calendar", keywords: "calendar events schedule month", icon: CalendarRange, run: insertCalendar },
     { label: "Ask AI", keywords: "ai summarize rewrite improve action items assistant", icon: Sparkles, run: () => setAiOpen(true) },
+    { label: "Link a document", keywords: "hash document link reference workspace", icon: Hash, run: () => { const s = typeof window !== "undefined" ? window.getSelection() : null; const r = s && s.rangeCount ? s.getRangeAt(0).getBoundingClientRect() : null; setDocLinkPos({ top: (r?.bottom ?? 240) + 4, left: r?.left ?? 260 }); } },
     { label: "Link a record", keywords: "plan client booking record link mjg", icon: Boxes, run: () => setRecordOpen(true) },
     { label: "Columns", keywords: "layout two column split", icon: Columns2, run: insertColumns },
     { label: "HTML embed", keywords: "html iframe render", icon: FileCode2, run: () => setHtmlOpen(true) },
@@ -978,6 +1059,14 @@ export function WorkspaceEditorSurface({
                   const r = rect();
                   openMenu((r?.bottom ?? 220) + 4, r?.left ?? 240, mentionCommands);
                 }
+              } else if (ev.key === "#") {
+                // "#" after whitespace / at line start → link a Workspace document (Tab keeps the "#").
+                const before = (sel.anchorNode?.textContent ?? "").slice(0, sel.anchorOffset ?? 0);
+                if (before === "" || /\s$/.test(before)) {
+                  ev.preventDefault();
+                  const r = rect();
+                  setDocLinkPos({ top: (r?.bottom ?? 220) + 4, left: r?.left ?? 240 });
+                }
               }
             }}
           />
@@ -985,6 +1074,7 @@ export function WorkspaceEditorSurface({
         {right && rightOpen ? <aside className="sticky top-16 hidden max-h-[calc(100vh-6rem)] w-72 shrink-0 self-start overflow-y-auto xl:block">{right}</aside> : null}
       </div>
       <CommandMenu open={menu.open} pos={{ top: menu.top, left: menu.left }} commands={menu.cmds} onClose={closeMenu} />
+      {docLinkPos ? <DocLinkMenu pos={docLinkPos} onClose={() => setDocLinkPos(null)} onPick={(d) => { insertDocLink(d); setDocLinkPos(null); }} onTab={() => { insertText("#"); setDocLinkPos(null); }} /> : null}
       <HtmlEmbedDialog open={htmlOpen} onOpenChange={setHtmlOpen} onInsert={insertHtml} />
       <RecorderDialog open={recorderOpen} onOpenChange={setRecorderOpen} actionToken={actionToken} onInsert={insertRecordedAudio} />
       <RecordPickerDialog open={recordOpen} onOpenChange={setRecordOpen} onInsert={insertRecordLink} />
