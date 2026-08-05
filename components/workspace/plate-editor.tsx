@@ -148,7 +148,7 @@ const COMPONENTS: Record<string, any> = {
   // Media (void nodes).
   [ImagePlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={p.element?.url} alt={p.element?.name || ""} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
   [VideoPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><video controls src={p.element?.url} className="max-h-[28rem] max-w-full rounded-md border" /></div>{p.children}</PlateElement>,
-  [AudioPlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><BrandAudioPlayer src={p.element?.url} /></div>{p.children}</PlateElement>,
+  [AudioPlugin.key]: AudioBlock,
   [FilePlugin.key]: (p: any) => <PlateElement {...p}><div contentEditable={false} className="my-2"><a href={p.element?.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm text-primary hover:underline">📎 {p.element?.name || "Download file"}</a></div>{p.children}</PlateElement>,
   // Columns layout.
   [ColumnPlugin.key]: (p: any) => <PlateElement {...p} as="div" className="my-3 flex flex-col gap-4 md:flex-row" />,
@@ -188,6 +188,28 @@ function ListBtn({ nodeType, icon: Icon, title }: { nodeType: string; icon: type
   return <SimpleTooltip label={title}><button type="button" {...props} className={cn("rounded p-1.5 transition-colors hover:bg-accent hover:text-foreground", props?.pressed ? "bg-accent text-foreground" : "text-muted-foreground")}><Icon className="h-4 w-4" /></button></SimpleTooltip>;
 }
 // Custom checkbox item: click toggles `checked` and strikes through the text.
+// Document audio node: branded player with transcribe (inserts text below) + resizable width.
+function AudioBlock(props: any) {
+  const editor = useEditorRef();
+  const path = usePath();
+  const el = props.element ?? {};
+  const insertTranscript = (text: string) => {
+    try {
+      const nodes = text.split(/\n+/).map((l) => l.trim()).filter(Boolean).map((l) => ({ type: "p", children: [{ text: l }] }));
+      const at = [...path.slice(0, -1), (path[path.length - 1] ?? 0) + 1];
+      (editor as any).tf?.insertNodes?.(nodes.length ? nodes : [{ type: "p", children: [{ text }] }], { at });
+    } catch { /* no-op */ }
+  };
+  const setWidth = (w: number) => { try { (editor as any).tf?.setNodes?.({ width: w }, { at: path }); } catch { /* no-op */ } };
+  return (
+    <PlateElement {...props}>
+      <div contentEditable={false} className="my-2">
+        <BrandAudioPlayer src={el.url} onTranscript={insertTranscript} width={el.width} onWidthChange={setWidth} />
+      </div>{props.children}
+    </PlateElement>
+  );
+}
+
 function TodoItem(props: any) {
   const editor = useEditorRef();
   const path = usePath();

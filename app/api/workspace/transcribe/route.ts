@@ -9,9 +9,23 @@ export async function POST(request: Request) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return NextResponse.json({ error: "Transcription isn't configured (OPENAI_API_KEY is missing)." }, { status: 503 });
 
-    const form = await request.formData();
-    const file = form.get("file");
-    if (!(file instanceof File)) return NextResponse.json({ error: "No audio file was provided." }, { status: 400 });
+    // Accept either a multipart file (from the recorder) or a JSON { url } (from an inline player).
+    let file: File | null = null;
+    const contentType = request.headers.get("content-type") || "";
+    if (contentType.includes("multipart/form-data")) {
+      const form = await request.formData();
+      const f = form.get("file");
+      if (f instanceof File) file = f;
+    } else {
+      const body = await request.json().catch(() => ({}));
+      if (typeof body.url === "string" && body.url) {
+        const r = await fetch(body.url);
+        if (!r.ok) return NextResponse.json({ error: "Could not fetch the audio file." }, { status: 400 });
+        const buf = await r.arrayBuffer();
+        file = new File([buf], "audio.webm", { type: r.headers.get("content-type") || "audio/webm" });
+      }
+    }
+    if (!file) return NextResponse.json({ error: "No audio file was provided." }, { status: 400 });
 
     const oaForm = new FormData();
     oaForm.append("file", file, file.name || "recording.webm");
