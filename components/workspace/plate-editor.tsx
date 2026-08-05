@@ -335,10 +335,12 @@ function caretPos(width = 320): { top: number; left: number } {
 function DocLinkMenu({ pos, onClose, onPick, onTab }: { pos: { top: number; left: number }; onClose: () => void; onPick: (d: LinkDoc) => void; onTab: () => void }) {
   const [q, setQ] = useState("");
   const [ws, setWs] = useState("all");
+  const [wsOpen, setWsOpen] = useState(false);
   const [docs, setDocs] = useState<LinkDoc[]>([]);
   const [workspaces, setWorkspaces] = useState<{ id: string; name: string }[]>([]);
   const [i, setI] = useState(0);
   const [loading, setLoading] = useState(true);
+  const currentWsName = ws === "all" ? "All spaces" : (workspaces.find((w) => w.id === ws)?.name ?? "All spaces");
   useEffect(() => {
     let ok = true;
     const t = setTimeout(async () => {
@@ -372,10 +374,18 @@ function DocLinkMenu({ pos, onClose, onPick, onTab }: { pos: { top: number; left
             }}
             placeholder="Link a document…" className="min-w-0 flex-1 bg-transparent px-1 py-1 text-sm outline-none"
           />
-          <select value={ws} onChange={(e) => setWs(e.target.value)} className="max-w-[7rem] shrink-0 rounded border bg-background px-1 py-1 text-xs outline-none">
-            <option value="all">All spaces</option>
-            {workspaces.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
-          </select>
+          {/* Custom (click-based) filter — a native <select> is blocked by the popover's mousedown preventDefault. */}
+          <div className="relative shrink-0">
+            <button type="button" onClick={() => setWsOpen((o) => !o)} className="flex max-w-[8rem] items-center gap-1 rounded border bg-background px-2 py-1 text-xs hover:bg-accent">
+              <span className="truncate">{currentWsName}</span><ChevronDown className="h-3 w-3 shrink-0 opacity-60" />
+            </button>
+            {wsOpen ? (
+              <div className="absolute right-0 top-full z-[60] mt-1 max-h-48 w-44 overflow-y-auto rounded-md border bg-popover p-1 shadow-lg">
+                <button type="button" onClick={() => { setWs("all"); setWsOpen(false); }} className={cn("block w-full truncate rounded px-2 py-1 text-left text-xs hover:bg-accent", ws === "all" && "bg-accent")}>All spaces</button>
+                {workspaces.map((w) => <button key={w.id} type="button" onClick={() => { setWs(w.id); setWsOpen(false); }} className={cn("block w-full truncate rounded px-2 py-1 text-left text-xs hover:bg-accent", ws === w.id && "bg-accent")}>{w.name}</button>)}
+              </div>
+            ) : null}
+          </div>
         </div>
         <div className="max-h-64 overflow-y-auto">
           {loading ? <p className="px-2 py-3 text-center text-xs text-muted-foreground">Loading…</p>
