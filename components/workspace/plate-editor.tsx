@@ -306,6 +306,32 @@ function CommandMenu({ open, pos, commands, onClose }: { open: boolean; pos: { t
 type LinkDoc = { id: string; title: string; owner_name: string | null; created_at: string; workspace_id: string | null; workspace_name: string | null };
 const AVATAR_COLORS = ["#C9A46E", "#9B2F2E", "#5b7a8c", "#7c6f5a", "#8a6d3f", "#4b4844", "#2f6f5e"];
 function initialsOf(name: string | null) { return (name || "?").split(" ").filter(Boolean).map((s) => s[0]).slice(0, 2).join("").toUpperCase() || "?"; }
+
+// Reliable caret position for popovers. A collapsed selection can yield a 0×0 rect
+// (e.g. an empty line you just clicked into) — fall back to the containing element.
+function caretPos(width = 320): { top: number; left: number } {
+  if (typeof window === "undefined") return { top: 220, left: 240 };
+  const sel = window.getSelection();
+  let rect: DOMRect | null = null;
+  if (sel && sel.rangeCount) {
+    const range = sel.getRangeAt(0);
+    const r = range.getBoundingClientRect();
+    if (r && (r.width || r.height || r.top || r.left)) rect = r;
+    else {
+      const rects = range.getClientRects();
+      if (rects.length) rect = rects[0];
+      else {
+        const node = range.startContainer;
+        const elx = node.nodeType === 3 ? node.parentElement : (node as Element);
+        if (elx) rect = elx.getBoundingClientRect();
+      }
+    }
+  }
+  if (!rect) return { top: 220, left: 240 };
+  const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
+  const top = Math.min(rect.bottom + 4, window.innerHeight - 320);
+  return { top, left };
+}
 function DocLinkMenu({ pos, onClose, onPick, onTab }: { pos: { top: number; left: number }; onClose: () => void; onPick: (d: LinkDoc) => void; onTab: () => void }) {
   const [q, setQ] = useState("");
   const [ws, setWs] = useState("all");
@@ -833,7 +859,7 @@ export function WorkspaceEditorSurface({
     { label: "Kanban Board", keywords: "kanban board columns cards", icon: SquareKanban, run: insertKanban },
     { label: "Calendar", keywords: "calendar events schedule month", icon: CalendarRange, run: insertCalendar },
     { label: "Ask AI", keywords: "ai summarize rewrite improve action items assistant", icon: Sparkles, run: () => setAiOpen(true) },
-    { label: "Link a document", keywords: "hash document link reference workspace", icon: Hash, run: () => { const s = typeof window !== "undefined" ? window.getSelection() : null; const r = s && s.rangeCount ? s.getRangeAt(0).getBoundingClientRect() : null; setDocLinkPos({ top: (r?.bottom ?? 240) + 4, left: r?.left ?? 260 }); } },
+    { label: "Link a document", keywords: "hash document link reference workspace", icon: Hash, run: () => setDocLinkPos(caretPos()) },
     { label: "Link a record", keywords: "plan client booking record link mjg", icon: Boxes, run: () => setRecordOpen(true) },
     { label: "Columns", keywords: "layout two column split", icon: Columns2, run: insertColumns },
     { label: "HTML embed", keywords: "html iframe render", icon: FileCode2, run: () => setHtmlOpen(true) },
@@ -1064,8 +1090,7 @@ export function WorkspaceEditorSurface({
                 const before = (sel.anchorNode?.textContent ?? "").slice(0, sel.anchorOffset ?? 0);
                 if (before === "" || /\s$/.test(before)) {
                   ev.preventDefault();
-                  const r = rect();
-                  setDocLinkPos({ top: (r?.bottom ?? 220) + 4, left: r?.left ?? 240 });
+                  setDocLinkPos(caretPos());
                 }
               }
             }}
