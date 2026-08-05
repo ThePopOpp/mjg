@@ -405,14 +405,29 @@ function DocLinkMenu({ pos, onClose, onPick, onTab }: { pos: { top: number; left
 }
 
 // Record audio in-browser, then upload + hand back a URL to insert as an audio block.
-function RecorderDialog({ open, onOpenChange, actionToken, onInsert }: { open: boolean; onOpenChange: (v: boolean) => void; actionToken: string; onInsert: (url: string) => void }) {
-  const [status, setStatus] = useState<"idle" | "recording" | "recorded" | "uploading">("idle");
+function RecorderDialog({ open, onOpenChange, actionToken, onInsert, onTranscript }: { open: boolean; onOpenChange: (v: boolean) => void; actionToken: string; onInsert: (url: string) => void; onTranscript: (text: string) => void }) {
+  const [status, setStatus] = useState<"idle" | "recording" | "recorded" | "uploading" | "transcribing">("idle");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const mr = useRef<any>(null);
   const chunks = useRef<Blob[]>([]);
   const blob = useRef<Blob | null>(null);
 
-  function reset() { setStatus("idle"); setPreviewUrl(null); blob.current = null; chunks.current = []; }
+  function reset() { setStatus("idle"); setPreviewUrl(null); setError(null); blob.current = null; chunks.current = []; }
+
+  async function transcribe() {
+    if (!blob.current) return;
+    setStatus("transcribing"); setError(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", new File([blob.current], `recording-${Date.now()}.webm`, { type: "audio/webm" }));
+      const res = await fetch("/api/workspace/transcribe", { method: "POST", headers: { "x-mjg-action-token": actionToken }, body: fd });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Transcription failed."); setStatus("recorded"); return; }
+      if (data.text) onTranscript(data.text);
+      onOpenChange(false); reset();
+    } catch { setError("Transcription failed. Please try again."); setStatus("recorded"); }
+  }
   async function start() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -439,21 +454,24 @@ function RecorderDialog({ open, onOpenChange, actionToken, onInsert }: { open: b
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
       <DialogContent>
-        <DialogHeader><DialogTitle>Record audio</DialogTitle><DialogDescription>Record a voice note, preview it, then insert it into the document.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>Record audio</DialogTitle><DialogDescription>Record a voice note, then insert the audio or transcribe it to text.</DialogDescription></DialogHeader>
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             {status === "recording" ? (
               <Button variant="destructive" onClick={stop}>■ Stop</Button>
             ) : (
-              <Button onClick={start} disabled={status === "uploading"}><Mic className="mr-2 h-4 w-4" /> {status === "recorded" ? "Re-record" : "Record"}</Button>
+              <Button onClick={start} disabled={status === "uploading" || status === "transcribing"}><Mic className="mr-2 h-4 w-4" /> {status === "recorded" ? "Re-record" : "Record"}</Button>
             )}
             {status === "recording" ? <span className="text-sm text-muted-foreground">Recording…</span> : null}
+            {status === "transcribing" ? <span className="text-sm text-muted-foreground">Transcribing…</span> : null}
           </div>
           {previewUrl ? <audio controls src={previewUrl} className="w-full" /> : null}
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => { reset(); onOpenChange(false); }}>Cancel</Button>
-          <Button onClick={insert} disabled={!blob.current || status === "uploading"}>{status === "uploading" ? "Inserting…" : "Insert"}</Button>
+          <Button variant="outline" onClick={transcribe} disabled={!blob.current || status === "uploading" || status === "transcribing"}><FileText className="mr-2 h-4 w-4" /> {status === "transcribing" ? "Transcribing…" : "Transcribe to text"}</Button>
+          <Button onClick={insert} disabled={!blob.current || status === "uploading" || status === "transcribing"}>{status === "uploading" ? "Inserting…" : "Insert audio"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -1111,7 +1129,7 @@ export function WorkspaceEditorSurface({
       <CommandMenu open={menu.open} pos={{ top: menu.top, left: menu.left }} commands={menu.cmds} onClose={closeMenu} />
       {docLinkPos ? <DocLinkMenu pos={docLinkPos} onClose={() => setDocLinkPos(null)} onPick={(d) => { insertDocLink(d); setDocLinkPos(null); }} onTab={() => { insertText("#"); setDocLinkPos(null); }} /> : null}
       <HtmlEmbedDialog open={htmlOpen} onOpenChange={setHtmlOpen} onInsert={insertHtml} />
-      <RecorderDialog open={recorderOpen} onOpenChange={setRecorderOpen} actionToken={actionToken} onInsert={insertRecordedAudio} />
+      <RecorderDialog open={recorderOpen} onOpenChange={setRecorderOpen} actionToken={actionToken} onInsert={insertRecordedAudio} onTranscript={insertAiText} />
       <RecordPickerDialog open={recordOpen} onOpenChange={setRecordOpen} onInsert={insertRecordLink} />
       <AiDialog open={aiOpen} onOpenChange={setAiOpen} getText={getDocText} onInsert={insertAiText} />
       <FindReplaceDialog open={findOpen} onOpenChange={setFindOpen} editor={editor} />
