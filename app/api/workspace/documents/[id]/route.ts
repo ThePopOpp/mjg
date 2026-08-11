@@ -11,7 +11,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       await restoreDocument(id, actor.id);
       return NextResponse.json({ ok: true });
     }
-    await updateDocument(
+    const result = await updateDocument(
       id,
       {
         title: typeof body.title === "string" ? body.title : undefined,
@@ -19,10 +19,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         folderId: body.folderId !== undefined ? (body.folderId || null) : undefined,
         scope: body.scope === "shared" || body.scope === "personal" ? body.scope : undefined,
         status: typeof body.status === "string" ? body.status : undefined,
+        expectedUpdatedAt: typeof body.expectedUpdatedAt === "string" ? body.expectedUpdatedAt : undefined,
+        force: body.force === true,
       },
       actor.id,
     );
-    return NextResponse.json({ ok: true });
+    // Stale-write guard: the doc changed on another device since this editor loaded.
+    if (result.conflict) return NextResponse.json({ conflict: true, serverUpdatedAt: result.serverUpdatedAt }, { status: 409 });
+    return NextResponse.json({ ok: true, updatedAt: result.updatedAt });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to save document.";
     const status = message.includes("permission") ? 403 : 500;

@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { ArrowLeft, Check, Loader2, AlertTriangle, Plus, Star, FileText, Folder } from "lucide-react";
+import { ArrowLeft, Check, Loader2, AlertTriangle, Plus, Star, FileText, Folder, History, RotateCcw } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { CommentsPanel } from "@/components/workspace/comments-panel";
 import { ShareControl } from "@/components/workspace/share-control";
 import type { WorkspaceScope } from "@/lib/workspace/types";
@@ -39,25 +41,36 @@ export function WorkspaceEditor({
   const router = useRouter();
   const [title, setTitle] = useState(doc.title);
   const [state, setState] = useState<SaveState>("idle");
+  const [conflict, setConflict] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const latest = useRef<{ title: string; content: unknown }>({ title: doc.title, content: doc.content_json });
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const baseUpdatedAt = useRef<string>(doc.updated_at);
+  const conflictRef = useRef(false);
+  const saving = useRef(false);
 
-  const save = useCallback(async () => {
+  const save = useCallback(async (force = false) => {
+    if (saving.current) return;
+    saving.current = true;
     setState("saving");
     try {
       const res = await fetch(`/api/workspace/documents/${doc.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ actionToken, title: latest.current.title, content: latest.current.content }),
+        body: JSON.stringify({ actionToken, title: latest.current.title, content: latest.current.content, expectedUpdatedAt: baseUpdatedAt.current, force }),
       });
-      setState(res.ok ? "saved" : "error");
-    } catch { setState("error"); }
+      if (res.status === 409) { conflictRef.current = true; setConflict(true); setState("idle"); return; }
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) { if (data.updatedAt) baseUpdatedAt.current = data.updatedAt; conflictRef.current = false; setConflict(false); setState("saved"); }
+      else setState("error");
+    } catch { setState("error"); } finally { saving.current = false; }
   }, [actionToken, doc.id]);
 
   const scheduleSave = useCallback(() => {
+    if (conflictRef.current) return; // paused until the conflict is resolved
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(save, 900);
+    timer.current = setTimeout(() => save(), 900);
   }, [save]);
 
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
@@ -102,6 +115,7 @@ export function WorkspaceEditor({
         </div>
         <p>Scope: <span className="capitalize text-foreground">{doc.scope === "shared" ? "Public" : doc.scope}</span></p>
         <p>Updated: {new Date(doc.updated_at).toLocaleString()}</p>
+        <button type="button" onClick={() => setHistoryOpen(true)} className="mt-2 inline-flex items-center gap-1.5 rounded-md border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"><History className="h-3.5 w-3.5" /> Version history</button>
       </div>
     </div>
   );
@@ -114,6 +128,15 @@ export function WorkspaceEditor({
         </Link>
         <SaveStatus state={state} />
       </div>
+      {conflict ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
+          <span className="flex items-center gap-2 text-amber-700 dark:text-amber-400"><AlertTriangle className="h-4 w-4" /> This document was changed on another device. To avoid overwriting those edits, saving is paused.</span>
+          <span className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => window.location.reload()}>Reload latest</Button>
+            <Button size="sm" onClick={() => save(true)}>Overwrite with mine</Button>
+          </span>
+        </div>
+      ) : null}
       <WorkspaceEditorSurface
         initialValue={doc.content_json}
         onChange={(value) => { latest.current.content = value; scheduleSave(); }}
@@ -130,7 +153,51 @@ export function WorkspaceEditor({
           />
         }
       />
+      <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} documentId={doc.id} actionToken={actionToken} />
     </div>
+  );
+}
+
+function VersionHistoryDialog({ open, onOpenChange, documentId, actionToken }: { open: boolean; onOpenChange: (v: boolean) => void; documentId: string; actionToken: string }) {
+  const [versions, setVersions] = useState<{ id: string; created_at: string; created_by_name: string | null; char_count: number }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    setLoading(true);
+    fetch(`/api/workspace/documents/${documentId}/versions`).then((r) => r.json()).then((d) => { if (d.ok) setVersions(d.versions); }).finally(() => setLoading(false));
+  }, [open, documentId]);
+  async function restore(versionId: string) {
+    setBusy(versionId);
+    try {
+      const res = await fetch(`/api/workspace/documents/${documentId}/versions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actionToken, versionId }) });
+      if (res.ok) window.location.reload(); // reload the editor with the restored content
+      else setBusy(null);
+    } catch { setBusy(null); }
+  }
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader><DialogTitle className="flex items-center gap-2"><History className="h-4 w-4" /> Version history</DialogTitle><DialogDescription>Snapshots of this document are saved automatically as you edit. Restore any point in time — the current version is snapshotted first, so restoring is undoable.</DialogDescription></DialogHeader>
+        <div className="max-h-[55vh] overflow-y-auto">
+          {loading ? <p className="p-4 text-center text-sm text-muted-foreground">Loading…</p>
+            : versions.length ? (
+              <div className="divide-y">
+                {versions.map((v) => (
+                  <div key={v.id} className="flex items-center justify-between gap-3 px-1 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">{new Date(v.created_at).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">{v.created_by_name ?? "—"} · {v.char_count.toLocaleString()} chars</p>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => restore(v.id)} disabled={busy !== null}><RotateCcw className="mr-1.5 h-4 w-4" /> {busy === v.id ? "Restoring…" : "Restore"}</Button>
+                  </div>
+                ))}
+              </div>
+            ) : <p className="p-4 text-center text-sm text-muted-foreground">No earlier versions yet — snapshots appear here as the document is edited.</p>}
+        </div>
+        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>Close</Button></DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

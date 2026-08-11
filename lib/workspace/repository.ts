@@ -179,27 +179,84 @@ export async function listLinkableDocuments(profileId: string, q: string, worksp
   return rows;
 }
 
+const SNAPSHOT_THROTTLE_MS = 60_000; // at most one version snapshot per document per ~60s
+const MAX_VERSIONS = 60;
+
+export type UpdateResult = { id: string; updatedAt?: string; conflict?: boolean; serverUpdatedAt?: string; serverContent?: unknown };
+
+// Snapshot the CURRENT (pre-save) content as a version, throttled + pruned. Never blocks a save.
+async function snapshotIfDue(supabase: any, documentId: string, cur: any, profileId: string) {
+  try {
+    const { data: last } = await supabase.from("workspace_document_versions").select("created_at").eq("document_id", documentId).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const lastMs = last?.created_at ? new Date(last.created_at).getTime() : 0;
+    if (Date.now() - lastMs < SNAPSHOT_THROTTLE_MS) return;
+    if (!(cur.plain_text ?? "").length) return; // skip empty
+    await supabase.from("workspace_document_versions").insert({ document_id: documentId, title: cur.title ?? null, content_json: cur.content_json ?? [], char_count: (cur.plain_text ?? "").length, created_by: profileId });
+    const { data: extras } = await supabase.from("workspace_document_versions").select("id").eq("document_id", documentId).order("created_at", { ascending: false }).range(MAX_VERSIONS, MAX_VERSIONS + 300);
+    const ids = (extras ?? []).map((r: any) => r.id);
+    if (ids.length) await supabase.from("workspace_document_versions").delete().in("id", ids);
+  } catch { /* snapshotting must never block a save */ }
+}
+
 export async function updateDocument(
   id: string,
-  input: { title?: string; content?: unknown; folderId?: string | null; scope?: WorkspaceScope; status?: string },
+  input: { title?: string; content?: unknown; folderId?: string | null; scope?: WorkspaceScope; status?: string; expectedUpdatedAt?: string | null; force?: boolean },
   profileId: string,
-) {
+): Promise<UpdateResult> {
   const supabase = createSupabaseAdminClient();
+  const writingContent = input.content !== undefined;
+
+  if (writingContent) {
+    const { data: cur } = await supabase.from("workspace_documents").select("content_json, plain_text, title, updated_at").eq("id", id).maybeSingle();
+    if (!cur) throw new Error("Document not found.");
+    // Conflict guard: refuse to overwrite if the doc changed since the client's baseline (e.g. another device).
+    if (!input.force && input.expectedUpdatedAt && cur.updated_at && String(cur.updated_at) !== String(input.expectedUpdatedAt)) {
+      return { id, conflict: true, serverUpdatedAt: cur.updated_at as string, serverContent: cur.content_json };
+    }
+    await snapshotIfDue(supabase, id, cur, profileId);
+  }
+
   const patch: Record<string, unknown> = { updated_by: profileId, updated_at: new Date().toISOString() };
   if (typeof input.title === "string" && input.title.trim()) patch.title = input.title.trim();
-  if (input.content !== undefined) {
-    patch.content_json = input.content;
-    patch.plain_text = extractPlainText(input.content);
-  }
+  if (writingContent) { patch.content_json = input.content; patch.plain_text = extractPlainText(input.content); }
   if (input.folderId !== undefined) patch.folder_id = input.folderId || null;
   if (input.scope) patch.scope = input.scope;
   if (input.status) {
     patch.status = input.status;
     patch.archived_at = input.status === "archived" ? new Date().toISOString() : null;
   }
-  const { error } = await supabase.from("workspace_documents").update(patch).eq("id", id);
+  const { data: upd, error } = await supabase.from("workspace_documents").update(patch).eq("id", id).select("updated_at").maybeSingle();
   if (error) throw error;
-  return { id };
+  return { id, updatedAt: (upd?.updated_at as string) ?? (patch.updated_at as string) };
+}
+
+export type DocVersion = { id: string; created_at: string; created_by_name: string | null; char_count: number };
+
+export async function listDocumentVersions(documentId: string): Promise<DocVersion[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase
+    .from("workspace_document_versions")
+    .select("id, created_at, char_count, creator:profiles!workspace_document_versions_created_by_fkey(full_name,first_name,last_name,email)")
+    .eq("document_id", documentId).order("created_at", { ascending: false }).limit(60);
+  return (data ?? []).map((v: any) => ({ id: v.id, created_at: v.created_at, created_by_name: personName(v.creator), char_count: v.char_count ?? 0 }));
+}
+
+export async function getDocumentVersionContent(versionId: string, documentId: string): Promise<unknown | null> {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase.from("workspace_document_versions").select("content_json").eq("id", versionId).eq("document_id", documentId).maybeSingle();
+  return data?.content_json ?? null;
+}
+
+export async function restoreDocumentVersion(documentId: string, versionId: string, profileId: string) {
+  const supabase = createSupabaseAdminClient();
+  const { data: v } = await supabase.from("workspace_document_versions").select("content_json, title").eq("id", versionId).eq("document_id", documentId).maybeSingle();
+  if (!v) throw new Error("Version not found.");
+  // Snapshot the current content first so restoring is itself undoable.
+  const { data: cur } = await supabase.from("workspace_documents").select("content_json, plain_text, title").eq("id", documentId).maybeSingle();
+  if (cur && (cur.plain_text ?? "").length) await supabase.from("workspace_document_versions").insert({ document_id: documentId, title: cur.title ?? null, content_json: cur.content_json ?? [], char_count: (cur.plain_text ?? "").length, created_by: profileId });
+  const content = v.content_json ?? [];
+  const { data: upd } = await supabase.from("workspace_documents").update({ content_json: content, plain_text: extractPlainText(content), updated_by: profileId, updated_at: new Date().toISOString() }).eq("id", documentId).select("updated_at").maybeSingle();
+  return { id: documentId, updatedAt: upd?.updated_at as string };
 }
 
 export async function deleteDocument(id: string) {
