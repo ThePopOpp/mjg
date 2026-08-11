@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import { requireSuperAdmin } from "@/lib/user-management/auth";
-import { updateDocument, deleteDocument } from "@/lib/workspace/repository";
+import { updateDocument, deleteDocument, restoreDocument, purgeDocument } from "@/lib/workspace/repository";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
     const actor = await requireSuperAdmin(request, body.actionToken);
+    if (body.restore === true) {
+      await restoreDocument(id, actor.id);
+      return NextResponse.json({ ok: true });
+    }
     await updateDocument(
       id,
       {
@@ -31,7 +35,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
     await requireSuperAdmin(request, body.actionToken);
-    await deleteDocument(id);
+    if (body.purge === true) await purgeDocument(id); // permanent delete from the trash
+    else await deleteDocument(id); // soft delete → trash
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to delete document.";

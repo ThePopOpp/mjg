@@ -209,6 +209,51 @@ export async function deleteDocument(id: string) {
   return { id };
 }
 
+export type ArchivedDoc = WorkspaceDocListItem & { state: "archived" | "trashed"; deleted_at: string | null; archived_at: string | null };
+
+const ARCHIVED_SELECT = "id,title,description,scope,folder_id,owner_id,status,updated_at,deleted_at,archived_at, folder:workspace_folders(name), owner:profiles!workspace_documents_owner_id_fkey(full_name,first_name,last_name,email), updater:profiles!workspace_documents_updated_by_fkey(full_name,first_name,last_name,email)";
+const mapArchived = (d: any, state: "archived" | "trashed"): ArchivedDoc => ({
+  id: d.id, title: d.title, description: d.description, scope: d.scope, folder_id: d.folder_id, folder_name: d.folder?.name ?? null,
+  owner_id: d.owner_id, owner_name: personName(d.owner), status: d.status, updated_at: d.updated_at, updated_by_name: personName(d.updater),
+  is_favorite: false, state, deleted_at: d.deleted_at ?? null, archived_at: d.archived_at ?? null,
+});
+
+/** Archived (status=archived) + trashed (soft-deleted) documents the actor can restore. */
+export async function listArchivedDocuments(profileId: string, workspaceId?: string): Promise<ArchivedDoc[]> {
+  const supabase = createSupabaseAdminClient();
+  const base = () => supabase.from("workspace_documents").select(ARCHIVED_SELECT).order("updated_at", { ascending: false }).limit(200);
+  let aq = base().eq("status", "archived").is("deleted_at", null);
+  let tq = base().not("deleted_at", "is", null);
+  if (workspaceId) { aq = aq.eq("workspace_id", workspaceId); tq = tq.eq("workspace_id", workspaceId); }
+  const [{ data: archived }, { data: trashed }] = await Promise.all([aq, tq]);
+  const seen = new Set<string>();
+  const out: ArchivedDoc[] = [];
+  const accept = (d: any, state: "archived" | "trashed") => {
+    if (seen.has(d.id)) return;
+    if (d.scope === "personal" && d.owner_id !== profileId) return; // personal → owner only
+    seen.add(d.id); out.push(mapArchived(d, state));
+  };
+  for (const d of trashed ?? []) accept(d, "trashed");
+  for (const d of archived ?? []) accept(d, "archived");
+  return out.sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1));
+}
+
+/** Restore an archived or trashed document back to active. */
+export async function restoreDocument(id: string, profileId: string) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.from("workspace_documents").update({ status: "active", archived_at: null, deleted_at: null, updated_by: profileId, updated_at: new Date().toISOString() }).eq("id", id);
+  if (error) throw error;
+  return { id };
+}
+
+/** Permanently delete a document (hard delete — cascades collaborators/favorites). */
+export async function purgeDocument(id: string) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.from("workspace_documents").delete().eq("id", id);
+  if (error) throw error;
+  return { id };
+}
+
 export type WorkspaceCollaborator = { id: string; user_id: string; name: string; email: string | null; permission: string };
 export type ShareableUser = { id: string; name: string; email: string | null };
 

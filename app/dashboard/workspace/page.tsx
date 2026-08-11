@@ -3,7 +3,7 @@ import { SectionHeader } from "@/components/dashboard/section-header";
 import { WorkspaceHome } from "@/components/workspace/workspace-home";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
-import { listDocuments, listFolders, listWorkspaces, listHiddenTemplateIds, listFavoriteTemplateIds, DEFAULT_WORKSPACE_ID } from "@/lib/workspace/repository";
+import { listDocuments, listFolders, listWorkspaces, listHiddenTemplateIds, listFavoriteTemplateIds, listArchivedDocuments, DEFAULT_WORKSPACE_ID } from "@/lib/workspace/repository";
 import { WORKSPACE_TEMPLATES } from "@/lib/workspace/templates";
 
 export const dynamic = "force-dynamic";
@@ -17,11 +17,12 @@ export default async function WorkspacePage({ searchParams }: { searchParams: Pr
   const workspaces = await listWorkspaces();
   const currentWorkspaceId = ws && workspaces.some((w) => w.id === ws) ? ws : (workspaces[0]?.id ?? DEFAULT_WORKSPACE_ID);
 
-  const [{ mine, shared }, folders, hiddenTemplateIds, favoriteTemplateIds] = await Promise.all([
+  const [{ mine, shared }, folders, hiddenTemplateIds, favoriteTemplateIds, archived] = await Promise.all([
     listDocuments(profile.id, currentWorkspaceId),
     listFolders(profile.id, currentWorkspaceId),
     listHiddenTemplateIds(),
     listFavoriteTemplateIds(profile.id),
+    listArchivedDocuments(profile.id, currentWorkspaceId),
   ]);
 
   return (
@@ -34,6 +35,7 @@ export default async function WorkspacePage({ searchParams }: { searchParams: Pr
         templates={WORKSPACE_TEMPLATES.map((t) => ({ id: t.id, name: t.name, description: t.description, category: t.category }))}
         hiddenTemplateIds={hiddenTemplateIds}
         favoriteTemplateIds={favoriteTemplateIds}
+        archived={archived}
         workspaces={workspaces}
         currentWorkspaceId={currentWorkspaceId}
       />

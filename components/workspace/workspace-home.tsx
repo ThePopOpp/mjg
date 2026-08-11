@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Plus, FolderPlus, LayoutGrid, Table as TableIcon, LayoutList, Columns3, CalendarDays, ChevronLeft, ChevronRight, Star, Pencil, Archive, Trash2, FileText, Search, LayoutTemplate, LayoutDashboard, ChevronDown, Eye } from "lucide-react";
+import { Plus, FolderPlus, LayoutGrid, Table as TableIcon, LayoutList, Columns3, CalendarDays, ChevronLeft, ChevronRight, Star, Pencil, Archive, Trash2, FileText, Search, LayoutTemplate, LayoutDashboard, ChevronDown, Eye, RotateCcw } from "lucide-react";
 import { getTemplateContent } from "@/lib/workspace/templates";
 
 const WorkspaceReadOnlyPreview = dynamic(() => import("@/components/workspace/plate-editor").then((m) => m.WorkspaceReadOnlyPreview), {
@@ -26,7 +26,8 @@ import { ShareControl } from "@/components/workspace/share-control";
 import type { WorkspaceDocListItem, WorkspaceFolder } from "@/lib/workspace/types";
 
 type View = "list" | "cards" | "table" | "kanban" | "calendar";
-type Tab = "mine" | "shared" | "favorites" | "templates";
+type Tab = "mine" | "shared" | "favorites" | "templates" | "archived";
+type ArchivedItem = WorkspaceDocListItem & { state: "archived" | "trashed" };
 
 const VIEWS: { key: View; icon: typeof LayoutGrid }[] = [
   { key: "list", icon: LayoutList },
@@ -40,7 +41,7 @@ type TemplateItem = { id: string; name: string; description: string; category: s
 type SearchHit = { id: string; title: string; folder_name: string | null; snippet: string | null; updated_at: string };
 type Space = { id: string; name: string; icon: string | null };
 
-export function WorkspaceHome({ mine, shared, folders, templates, hiddenTemplateIds = [], favoriteTemplateIds = [], workspaces = [], currentWorkspaceId }: { mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[]; folders: WorkspaceFolder[]; templates: TemplateItem[]; hiddenTemplateIds?: string[]; favoriteTemplateIds?: string[]; workspaces?: Space[]; currentWorkspaceId?: string }) {
+export function WorkspaceHome({ mine, shared, folders, templates, hiddenTemplateIds = [], favoriteTemplateIds = [], archived = [], workspaces = [], currentWorkspaceId }: { mine: WorkspaceDocListItem[]; shared: WorkspaceDocListItem[]; folders: WorkspaceFolder[]; templates: TemplateItem[]; hiddenTemplateIds?: string[]; favoriteTemplateIds?: string[]; archived?: ArchivedItem[]; workspaces?: Space[]; currentWorkspaceId?: string }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
   const [newSpaceOpen, setNewSpaceOpen] = useState(false);
@@ -112,6 +113,8 @@ export function WorkspaceHome({ mine, shared, folders, templates, hiddenTemplate
   async function deleteTemplate(id: string) { await post("/api/workspace/templates", { templateId: id }); router.refresh(); }
   async function restoreTemplate(id: string) { await post("/api/workspace/templates", { templateId: id }, "DELETE"); router.refresh(); }
   async function favoriteTemplate(id: string, on: boolean) { await post("/api/workspace/templates", { templateId: id, favorite: on }, "PATCH"); router.refresh(); }
+  async function restoreDoc(id: string) { await post(`/api/workspace/documents/${id}`, { restore: true }, "PATCH"); router.refresh(); }
+  async function purgeDoc(id: string) { await post(`/api/workspace/documents/${id}`, { purge: true }, "DELETE"); router.refresh(); }
 
   return (
     <div className="space-y-4">
@@ -148,6 +151,7 @@ export function WorkspaceHome({ mine, shared, folders, templates, hiddenTemplate
             <TabsTrigger value="shared">Shared</TabsTrigger>
             <TabsTrigger value="favorites">Favorites</TabsTrigger>
             <TabsTrigger value="templates"><LayoutTemplate className="mr-1.5 h-4 w-4" /> Templates</TabsTrigger>
+            <TabsTrigger value="archived"><Archive className="mr-1.5 h-4 w-4" /> Archived{archived.length ? ` (${archived.length})` : ""}</TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="flex items-center gap-2">
@@ -176,6 +180,8 @@ export function WorkspaceHome({ mine, shared, folders, templates, hiddenTemplate
         <SearchResults hits={hits} />
       ) : tab === "templates" ? (
         <TemplatesGallery templates={visibleTemplates} hidden={hiddenTemplates} onUse={newFromTemplate} onDelete={deleteTemplate} onRestore={restoreTemplate} onFavorite={favoriteTemplate} busy={busy} />
+      ) : tab === "archived" ? (
+        <ArchivedView archived={archived} onRestore={restoreDoc} onPurge={purgeDoc} busy={busy} />
       ) : (
       <Tabs value={tab}>
         <TabsContent value={tab} className="mt-0">
@@ -244,6 +250,42 @@ function SearchResults({ hits }: { hits: SearchHit[] }) {
         </Link>
       ))}
     </CardContent></Card>
+  );
+}
+
+function ArchivedView({ archived, onRestore, onPurge, busy }: { archived: ArchivedItem[]; onRestore: (id: string) => void; onPurge: (id: string) => void; busy: boolean }) {
+  const [confirmPurge, setConfirmPurge] = useState<ArchivedItem | null>(null);
+  if (!archived.length) return <Card><CardContent className="p-10 text-center text-sm text-muted-foreground">Nothing archived or in the trash. Archived and deleted documents show up here so you can restore them.</CardContent></Card>;
+  return (
+    <>
+      <Card><CardContent className="divide-y p-0">
+        {archived.map((d) => (
+          <div key={d.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <span className="truncate font-medium">{d.title}</span>
+                <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium", d.state === "trashed" ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground")}>{d.state === "trashed" ? "Trashed" : "Archived"}</span>
+              </div>
+              <p className="truncate pl-6 text-xs text-muted-foreground">{d.owner_name ?? ""}{d.folder_name ? ` · ${d.folder_name}` : ""} · {new Date(d.updated_at).toLocaleDateString()}</p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Button size="sm" variant="outline" onClick={() => onRestore(d.id)} disabled={busy}><RotateCcw className="mr-1.5 h-4 w-4" /> Restore</Button>
+              <button type="button" onClick={() => setConfirmPurge(d)} disabled={busy} title="Delete permanently" aria-label={`Delete ${d.title} permanently`} className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
+            </div>
+          </div>
+        ))}
+      </CardContent></Card>
+      <Dialog open={!!confirmPurge} onOpenChange={(v) => { if (!v) setConfirmPurge(null); }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Delete permanently?</DialogTitle><DialogDescription>“{confirmPurge?.title}” will be permanently removed. This can&apos;t be undone.</DialogDescription></DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmPurge(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => { if (confirmPurge) onPurge(confirmPurge.id); setConfirmPurge(null); }}>Delete permanently</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
