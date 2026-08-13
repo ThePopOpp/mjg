@@ -17,10 +17,10 @@ export default async function SendEmailPage() {
       .order("full_name", { ascending: true }),
     supabase
       .from("email_templates")
-      .select("id,name,subject,status,html_body")
+      .select("id,name,subject,status,category,html_body")
       .neq("status", "archived")
       .order("updated_at", { ascending: false })
-      .limit(100),
+      .limit(300),
   ]);
 
   return (

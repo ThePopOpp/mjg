@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   Bold, Check, Copy, Eye, EyeOff, Image, Italic,
-  LayoutTemplate, Link as LinkIcon, List, Paperclip, Send, Square, Type, Underline, X,
+  Link as LinkIcon, List, Paperclip, Send, Square, Type, Underline, X,
 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { TemplatePicker } from "@/components/emails/template-picker";
 import { DEFAULT_EMAIL_FIELDS } from "@/lib/email/constants";
 
 type UserOption = { id: string; full_name: string | null; email: string; role: string };
-type TemplateOption = { id: string; name: string; subject: string; status: string; html_body?: string | null };
+type TemplateOption = { id: string; name: string; subject: string; status: string; category?: string | null; html_body?: string | null };
 
 const NONE = "__none__";
 
@@ -263,23 +264,11 @@ export function ManualEmailComposer({
             required
             className="flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
           />
-          <Select value={selectedTemplate?.id ?? NONE} onValueChange={pickTemplate}>
-            <SelectTrigger
-              className={`w-auto max-w-[200px] shrink-0 gap-1.5 text-sm ${selectedTemplate ? "border-primary/60 bg-primary/5 text-primary" : "text-muted-foreground"}`}
-            >
-              <LayoutTemplate className="h-3.5 w-3.5 shrink-0" />
-              <SelectValue placeholder="Template" />
-            </SelectTrigger>
-            <SelectContent align="end" className="max-w-xs">
-              <SelectItem value={NONE}>No template (manual)</SelectItem>
-              {activeTemplates.map((t) => (
-                <SelectItem key={t.id} value={t.id}>
-                  {t.name}
-                  <span className="ml-1.5 text-xs text-muted-foreground">({t.status})</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TemplatePicker
+            templates={activeTemplates}
+            value={selectedTemplate?.id ?? null}
+            onSelect={(id) => pickTemplate(id ?? NONE)}
+          />
         </div>
       </div>
 
