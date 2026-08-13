@@ -81,7 +81,7 @@ function anchorFrom(el: HTMLElement): MenuPos {
   return { right, top: r.bottom + 4 };
 }
 
-export function EmailTemplateManager({ templates, mappings }: { templates: EmailTemplateRow[]; mappings: MappingRow[] }) {
+export function EmailTemplateManager({ templates, mappings, defaultEmail = "" }: { templates: EmailTemplateRow[]; mappings: MappingRow[]; defaultEmail?: string }) {
   const actionToken = useDashboardActionToken();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("all");
@@ -386,9 +386,81 @@ export function EmailTemplateManager({ templates, mappings }: { templates: Email
                 <iframe className="h-[80vh] w-full bg-white" sandbox="" srcDoc={previewTemplate.html_body} title="Email template preview" />
               </div>
             </div>
+            {/* Send bar — send this template straight from the preview */}
+            <PreviewSendBar key={previewTemplate.id} template={previewTemplate} defaultEmail={defaultEmail} actionToken={actionToken} />
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+// Send bar inside the preview modal: fire the previewed template to one or more emails.
+// Uses the same test-send endpoint (renders with sample merge data, e.g. {{first_name}} → "there").
+function PreviewSendBar({ template, defaultEmail, actionToken }: { template: EmailTemplateRow; defaultEmail: string; actionToken: string }) {
+  const [to, setTo] = useState(defaultEmail);
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const emails = to.split(/[,\s;]+/).map((e) => e.trim()).filter(Boolean);
+  const allValid = emails.length > 0 && emails.every((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e));
+
+  async function send() {
+    if (!allValid) { setResult({ ok: false, text: "Enter at least one valid email address." }); return; }
+    setSending(true);
+    setResult(null);
+    const failures: string[] = [];
+    for (const email of emails) {
+      try {
+        const res = await fetch("/api/admin/email/templates/test-send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+          body: JSON.stringify({ templateId: template.id, to: email, actionToken }),
+        });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) failures.push(`${email}: ${payload.error ?? "failed"}`);
+      } catch {
+        failures.push(`${email}: network error`);
+      }
+    }
+    setSending(false);
+    if (failures.length === 0) {
+      setResult({ ok: true, text: `Sent to ${emails.length} recipient${emails.length === 1 ? "" : "s"}.` });
+    } else {
+      setResult({ ok: false, text: failures.join("  ·  ") });
+    }
+  }
+
+  return (
+    <div className="border-t bg-card px-4 py-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <span className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-muted-foreground">
+          <Send className="h-4 w-4" /> Send this email
+        </span>
+        <Input
+          value={to}
+          onChange={(e) => { setTo(e.target.value); setResult(null); }}
+          onKeyDown={(e) => { if (e.key === "Enter" && !sending) send(); }}
+          placeholder="recipient@example.com, another@example.com"
+          className="flex-1"
+          type="text"
+        />
+        <Button type="button" onClick={send} disabled={sending || !allValid} className="shrink-0">
+          <Send className="h-4 w-4" /> {sending ? "Sending…" : emails.length > 1 ? `Send to ${emails.length}` : "Send"}
+        </Button>
+      </div>
+      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+        {result ? (
+          <span className={result.ok ? "text-primary" : "text-destructive"}>{result.text}</span>
+        ) : (
+          <span className="text-muted-foreground">
+            Sends the live template with sample values (e.g. <code className="rounded bg-muted px-1">{"{{first_name}}"}</code> → &ldquo;there&rdquo;). Separate multiple emails with commas.
+          </span>
+        )}
+        <Link href="/dashboard/emails/send" className="ml-auto text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+          Deploy to an audience →
+        </Link>
+      </div>
     </div>
   );
 }
