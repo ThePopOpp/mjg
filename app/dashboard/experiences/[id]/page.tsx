@@ -8,6 +8,7 @@ import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { getExperienceById, getFacilitators } from "@/lib/experiences/repository";
 import { ExperienceActions } from "@/components/experiences/experience-actions";
+import { ExperienceSchedule } from "@/components/experiences/experience-schedule";
 import { FREQUENCY_LABELS, OFFSET_UNIT_LABELS } from "@/lib/experiences/types";
 
 function cadenceLabel(exp: any) {
@@ -18,11 +19,6 @@ function cadenceLabel(exp: any) {
 }
 
 export const dynamic = "force-dynamic";
-
-function fmt(d: string | null) {
-  if (!d) return "-";
-  return new Date(d).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
-}
 
 export default async function ExperienceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -106,34 +102,24 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Schedule</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Schedule</CardTitle>
+          <p className="text-sm text-muted-foreground">Reschedule any email that hasn&apos;t gone out, or send one now. Changing the experience start date/time (edit, above) re-times every pending email at once.</p>
+        </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Week</TableHead>
-                <TableHead>Recipient</TableHead>
-                <TableHead>Scheduled</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Sent</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sendEvents.map((e: any) => {
-                const a = attendeeById.get(e.attendee_id);
-                return (
-                  <TableRow key={e.id}>
-                    <TableCell>Week {e.step_number}</TableCell>
-                    <TableCell>{a?.email ?? "-"}</TableCell>
-                    <TableCell>{fmt(e.scheduled_at)}</TableCell>
-                    <TableCell className="capitalize">{e.status}{e.error_message ? ` — ${e.error_message}` : ""}</TableCell>
-                    <TableCell>{fmt(e.sent_at)}</TableCell>
-                  </TableRow>
-                );
-              })}
-              {!sendEvents.length ? <TableRow><TableCell colSpan={5}>Nothing scheduled yet.</TableCell></TableRow> : null}
-            </TableBody>
-          </Table>
+          <ExperienceSchedule
+            experienceId={experience.id}
+            rows={sendEvents.map((e: any) => ({
+              id: e.id,
+              step_number: e.step_number,
+              email: attendeeById.get(e.attendee_id)?.email ?? null,
+              label: e.label ?? null,
+              scheduled_at: e.scheduled_at,
+              status: e.status,
+              sent_at: e.sent_at,
+              error_message: e.error_message ?? null,
+            }))}
+          />
         </CardContent>
       </Card>
     </div>

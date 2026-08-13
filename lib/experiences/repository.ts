@@ -144,15 +144,19 @@ export async function getExperienceById(id: string) {
   if (error) throw error;
   if (!experience) return null;
 
-  const [{ data: attendees }, { data: sendEvents }] = await Promise.all([
+  const [{ data: attendees }, { data: sendEvents }, { data: steps }] = await Promise.all([
     supabase.from("experience_attendees").select("*").eq("experience_id", id).order("created_at", { ascending: true }),
     supabase.from("experience_send_events").select("*").eq("experience_id", id).order("scheduled_at", { ascending: true }),
+    supabase.from("experience_steps").select("step_number,label").eq("experience_id", id),
   ]);
+
+  const labelByStep = new Map<number, string>();
+  for (const s of steps ?? []) if (s.label) labelByStep.set(s.step_number, s.label);
 
   return {
     experience,
     attendees: attendees ?? [],
-    sendEvents: sendEvents ?? [],
+    sendEvents: (sendEvents ?? []).map((e: any) => ({ ...e, label: labelByStep.get(e.step_number) ?? null })),
   };
 }
 
@@ -421,6 +425,31 @@ export async function deleteExperience(id: string) {
   const { error } = await supabase.from("experiences").delete().eq("id", id);
   if (error) throw error;
   return { id };
+}
+
+/**
+ * Reschedule a single not-yet-sent email to a new date/time. `scheduledAt` is an ISO
+ * timestamp. Only "scheduled" events can be moved; sent/skipped/failed ones are left alone
+ * (re-fire a failed/skipped one with Send now instead).
+ */
+export async function rescheduleSendEvent(experienceId: string, eventId: string, scheduledAt: string) {
+  const supabase = createSupabaseAdminClient();
+  const when = new Date(scheduledAt);
+  if (Number.isNaN(when.getTime())) throw new Error("Invalid date/time.");
+  const { data: event } = await supabase
+    .from("experience_send_events")
+    .select("id,status")
+    .eq("id", eventId)
+    .eq("experience_id", experienceId)
+    .maybeSingle();
+  if (!event) throw new Error("Scheduled email not found.");
+  if (event.status !== "scheduled") throw new Error("Only emails that haven't sent yet can be rescheduled.");
+  const { error } = await supabase
+    .from("experience_send_events")
+    .update({ scheduled_at: when.toISOString() })
+    .eq("id", eventId);
+  if (error) throw error;
+  return { id: eventId, scheduledAt: when.toISOString() };
 }
 
 // ── Types editor ───────────────────────────────────────────────────────────────

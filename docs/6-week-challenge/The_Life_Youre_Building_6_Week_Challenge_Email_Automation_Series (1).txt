@@ -1,0 +1,670 @@
+The Life You're Building
+6-Week Challenge Participant Email Automation Series
+A ready-to-load sequence for men who have accepted the invitation. Built for transformation, community, accountability, and multiplication.
+
+Prepared for: Michael J. Gauthier / Stewardship Blueprint
+Primary audience: A participant who has already said yes to The Life You're Building 6-Week Challenge
+Core question: What kind of life am I actually building?
+Primary transformation: From drift and private intention to honest stewardship, brotherhood, concrete action, and a Personal Blueprint
+How to Use This Series
+This automation is written for a participant after he has accepted the invitation. It assumes he is part of a live group, cohort, church, or men's challenge. The copy can be adapted for a fully digital challenge by changing meeting language to cohort, group call, or app check-in.
+The cadence intentionally uses more than one touchpoint per week, but each email has a single job: prepare, prompt action, gather feedback, deepen community, or help the participant multiply the experience. The tone is pastoral, encouraging, direct, and practical.
+* Use the Weekly Launch emails three to five days before each session, especially if participants need pre-work time.
+* Use the Action Follow-Up emails within 24 hours after each session to keep the transformation moving between meetings.
+* Use the simple reminders only when needed; avoid overwhelming men who are already engaging.
+* Keep reply-to personal. The phrase “I want to hear from you” is part of the ministry posture, not merely a feedback tactic.
+* For every public story, testimonial, quote, or example, ask separately and get explicit permission after the emotional moment has passed.
+Source-Grounded Strategy
+This series is designed around the Stewardship Blueprint ecosystem: The Life You're Building is the public invitation and teaching narrative, Stewardship Blueprint is the framework, Created for More Check-In is the front-door assessment, and ForgedLife supports accountability, habits, challenges, prayer, and group follow-through.
+The emails emphasize the seven layers of the Blueprint: Bedrock, Foundation, Four Pillars, Guardrails, Keystone Habits, Energy, and Legacy. They also keep the movement from becoming information-only by requiring one faithful step, one conversation, and one rhythm at multiple points in the challenge.
+Core Placeholders to Set Up Before Loading
+PlaceholderUse[First Name]Participant first name[Group Start Date]Date of first meeting[Group Day/Time]Weekly meeting day and time[Location or Link]Physical address or virtual meeting link[Participant Guide Link]Download link for guide[Created for More Check-In Link]Assessment link or PDF download[Invite Video Link]Placeholder until invite video is recorded[Week 1 Video Link]Placeholder: Wake Up[Week 2 Video Link]Placeholder: See the Blueprint[Week 3 Video Link]Placeholder: Evaluate the Pillars[Week 4 Video Link]Placeholder: Install the Guardrails[Week 5 Video Link]Placeholder: Strengthen the Structure[Week 6 Video Link]Placeholder: Design My Life[Closing Video Link]Placeholder: What's Next[Book Waitlist Link]The Life You're Building book waitlist or updates list[ForgedLife Link]ForgedLife early access or app waitlist[Invite-A-Man Link]Future group invitation / interest link[Feedback Form Link]Optional midpoint or final feedback form[30-Day Follow-Up Link]Follow-up meeting registration or calendar link[Michael Email]Direct reply or contact emailRecommended Automation Rules and Tags
+* Trigger the full sequence when the tag “Accepted Challenge” is applied or when a participant submits a confirmation form.
+* Suppress book-waitlist CTAs for anyone already tagged “Book Waitlist - Yes.” Replace with “Share this with a man who should read it next.”
+* Send the Check-In reminder only to participants who have not completed the BEFORE column or baseline assessment by 48 hours before Week 1.
+* Send midpoint feedback automatically after Week 3, but also invite direct replies because personal response builds trust.
+* Send final survey reminders only to non-completers. Keep the first final thank-you relational, not administrative.
+* After the 30-day follow-up, tag participants by next pathway: Personal 30-Day Plan, Join Next Group, Lead/Host, Book Updates, ForgedLife, or Church/Ministry Interest.
+Sequence Overview
+#TimingEmailPrimary CTA0Immediately after yesChallenge AcceptedProtect the six dates; reply with one hope; invite one man17 days before Week 1Welcome and What to ExpectDownload guide; watch invite video; start Check-In248 hours before Week 1Start Strong ReminderComplete BEFORE Check-In and Week 1 pre-work3Day of Week 1 or day beforeWeek 1 Launch: Wake UpBring one word for current season4Within 24 hours after Week 1Week 1 Action Follow-UpKeep intention visible; have one honest conversation53-5 days before Week 2Week 2 Launch: See the BlueprintDraft Bedrock and Foundation6Within 24 hours after Week 2Week 2 Action Follow-UpPut one value or sentence where you will see it73-5 days before Week 3Week 3 Launch: Evaluate the PillarsScore pillars; choose one focus pillar8Within 24 hours after Week 3Week 3 Action Follow-UpTake the first seven-day step9After Week 3Midpoint PulseReply with resonance, confusion, and what would help103-5 days before Week 4Week 4 Launch: Install the GuardrailsDraft one specific guardrail11Within 24 hours after Week 4Week 4 Action Follow-UpTell one trusted person your guardrail123-5 days before Week 5Week 5 Launch: Strengthen the StructureChoose one habit and one renewal rhythm13Within 24 hours after Week 5Week 5 Action Follow-UpTest the habit; protect one energy rhythm143-5 days before Week 6Week 6 Launch: Design My LifeComplete Personal Blueprint and AFTER Check-In1524 hours before Week 6Finish Strong ReminderPrepare three-minute share and 30-day commitment16Within 24 hours after Week 6Final Thank-You and Next StepWatch closing video; complete final reflection; reply with story177 days after Week 6Keep BuildingSchedule 30-day review; stay connected1821 days after Week 6Do Not Drift Back QuietlyCheck commitment; recover if needed1930 days after Week 630-Day Check-InRetake Check-In; update Blueprint Snapshot2035-45 days after Week 6Multiply ItInvite, lead, join waitlist, or keep going
+
+Complete Email Copy
+Email 0: Challenge Accepted: You Said Yes
+Timing: Immediately after a participant accepts the invitation.
+Purpose: Confirm the commitment, build anticipation, create a personal reply loop, and encourage early multiplication.
+Subject line options:
+* You said yes. Let's build.
+* You're in: The Life You're Building 6-Week Challenge
+* Challenge accepted: protect these six weeks
+Preview text: This is not about polished answers. It is about honest men building on purpose.
+Body copy
+Hi [First Name],
+I am grateful you said yes to The Life You're Building 6-Week Challenge.
+This is not another thing to impress anyone with. It is an honest six-week journey for men who are willing to slow down, look at the life they are actually building, and begin stewarding it with more purpose.
+Over the next six weeks we will look at the whole structure: faith and identity, purpose, family, fitness, fun, finances, guardrails, keystone habits, energy, and legacy. The point is not to redesign your whole life overnight. The point is to begin with enough honesty to take one faithful next step.
+Here are three things to do now:
+1. Add all six dates to your calendar: [Group Day/Time], beginning [Group Start Date] at [Location or Link].
+2. Reply to this email with one sentence: “My hope for these six weeks is…” I really do want to hear from you.
+3. Think of one man who may need this next. You do not need to push him. Just begin praying or thinking about who should be invited into a future group.
+Add the six dates to my calendar: [Calendar Link]
+I am glad you are in. Bring honesty. Bring courage. Bring a willingness to be challenged and encouraged. Let's build something that lasts.
+- Michael
+P.S. If you have not joined the book updates list yet, join here: [Book Waitlist Link]. I will be sharing updates, tools, and behind-the-scenes pieces from The Life You're Building as we go.
+CTA stack:
+* Reply with one hope
+* Add dates to calendar
+* Join book waitlist if not already
+* Begin thinking of one man to invite
+Automation note: Apply “Book Waitlist - Yes” suppression so the P.S. can change to “Forward this to one man who should be in the next group.”
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 1: Welcome and What to Expect
+Timing: 7 days before Week 1.
+Purpose: Equip the participant with the guide, assessment, covenant, video placeholder, and expectations.
+Subject line options:
+* Welcome to The Life You're Building
+* Your guide is here. Start here.
+* Before Week 1: your first steps
+Preview text: Take 20 honest minutes before we begin. Awareness is where stewardship starts.
+Body copy
+Hi [First Name],
+One week from now, we begin The Life You're Building 6-Week Challenge.
+Attached / linked below is your Participant Guide. Before our first meeting, take 15 to 20 quiet minutes and complete the first steps. Do not rush them. The goal is not to look impressive. The goal is to tell the truth about the life that is actually being built.
+Before Week 1, please complete these four steps:
+1. Watch the short invite video: [Invite Video Link].
+2. Download your Participant Guide: [Participant Guide Link].
+3. Read the opening pages and group covenant.
+4. Complete the BEFORE column of the Created for More Check-In: [Created for More Check-In Link].
+The Check-In is not a grade. It is a mirror and a map. It helps you see where you are aligned, where you may be drifting, and what needs attention next.
+Our first meeting is [Group Day/Time] at [Location or Link]. Come ready to share one word that describes your current season and one hope you have for the next six weeks.
+Download the Participant Guide: [Participant Guide Link]
+Confidentiality matters. Share your own story outside the group, never another man's. We are building trust because honest change happens best in a safe room.
+I am grateful you are part of this.
+- Michael
+P.S. This is a challenge, but it is not about pressure. You do not need to fix everything. Begin with one faithful step.
+CTA stack:
+* Download guide
+* Watch invite video
+* Complete BEFORE Check-In
+* Reply with one word for current season
+Automation note: Use this as the main onboarding email if you only send one pre-week email.
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 2: Start Strong Reminder
+Timing: 48 hours before Week 1, only if the participant has not completed the baseline tasks.
+Purpose: Reduce friction and get the participant prepared without shame.
+Subject line options:
+* Two days before we begin
+* Your first 20 minutes matter
+* Before we meet: finish this one step
+Preview text: Do not overthink it. Just answer what is actually true right now.
+Body copy
+Hi [First Name],
+We begin The Life You're Building in two days. This is your friendly reminder to complete the BEFORE column of the Created for More Check-In and the Week 1 pre-work.
+Set a timer for 20 minutes. Put your phone away. Answer from current reality, not from what you wish were true.
+The first question is simple, but do not rush past it:
+What kind of life am I actually building?
+Bring one word that describes your current season and one hope for these six weeks.
+Complete the Created for More Check-In: [Created for More Check-In Link]
+You are not behind. You are beginning. And beginning with honesty is already a meaningful step.
+- Michael
+CTA stack:
+* Complete Check-In
+* Finish Week 1 pre-work
+* Prepare one-word check-in
+Automation note: Only send to incomplete participants, or send as a light reminder to all.
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 3: Week 1 Launch: Wake Up
+Timing: Day before or morning of Week 1.
+Purpose: Frame Week 1 around awareness, drift, and the central question.
+Subject line options:
+* Week 1: Wake Up
+* What kind of life am I actually building?
+* Tonight we begin: drift or design?
+Preview text: Drift is subtle. Design is intentional. Tonight we start telling the truth.
+Body copy
+Hi [First Name],
+Tonight we begin Week 1: Wake Up.
+This week is not about shame, panic, or a dramatic overhaul. It is about awareness. Most men do not wake up and decide to neglect what matters. Drift usually happens quietly. One busy week becomes a busy season. One postponed conversation becomes distance. One overloaded calendar becomes a normal pace.
+The first step is not to fix everything. The first step is to see clearly.
+Watch this week's video before we meet, or we will watch it together depending on the group plan: [Week 1 Video Link].
+Come ready to share:
+1. One word that describes your current season.
+2. One hope you have for these six weeks.
+3. One area where you sense drift may be showing up.
+Watch Week 1 Video: [Week 1 Video Link]
+You cannot steward what you refuse to examine. But when you examine honestly, change can begin without shame.
+- Michael
+CTA stack:
+* Watch Week 1 video
+* Attend Week 1
+* Bring current-season word
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 4: Week 1 Action Follow-Up: Keep the Intention Visible
+Timing: Within 24 hours after Week 1.
+Purpose: Move awareness into one visible intention and one honest conversation.
+Subject line options:
+* Week 1 follow-up: one sentence, one conversation
+* Do not let your intention disappear
+* Your first faithful step this week
+Preview text: Keep your six-week intention where you can see it. Then have the conversation you named.
+Body copy
+Hi [First Name],
+Thank you for showing up with honesty this week.
+Week 1 asked us to wake up to the life being built. Now the work moves from the room into real life.
+This week, take two simple actions:
+1. Put your six-week intention somewhere visible: your desk, mirror, phone lock screen, Bible, journal, or calendar.
+2. Have one honest conversation with a spouse, friend, mentor, family member, or accountability partner about the area that needs attention.
+Do not make the conversation perfect. Make it honest.
+Reply to this email with your one-sentence intention. I want to hear from you, and I will be praying that it moves from an idea to a real step.
+Reply with my six-week intention
+This is how transformation begins: not with a total life rebuild, but with one honest step taken in the open.
+- Michael
+P.S. If someone came to mind during Week 1, write his name down. There may be a man in your life who needs this challenge next.
+CTA stack:
+* Reply with intention
+* Have one honest conversation
+* Write down one man to invite later
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 5: Week 2 Launch: See the Blueprint
+Timing: 3-5 days before Week 2.
+Purpose: Prepare participant to clarify identity, values, mission, life verse, and daily purpose.
+Subject line options:
+* Week 2: See the Blueprint
+* A strong life is built from the inside out
+* Identity before strategy
+Preview text: Before we fix the visible structure, we ask what the life is rooted in.
+Body copy
+Hi [First Name],
+This week we move from awareness to foundation. Week 2 is See the Blueprint: Bedrock and Foundation.
+A blueprint can show where the walls go, but it cannot tell you why the house is being built. That question comes first.
+This week we will ask:
+What is my life rooted in?
+Where do I receive worth?
+What values am I willing to protect?
+What mission or daily purpose should guide this season?
+Watch the Week 2 video here: [Week 2 Video Link]. Then complete the Week 2 pre-work in your Participant Guide.
+Do not wait for perfect language. A rough, honest mission statement is more useful than a polished sentence that never shapes a decision.
+Watch Week 2 Video: [Week 2 Video Link]
+Bring one value or sentence you want to carry into this season.
+- Michael
+CTA stack:
+* Watch Week 2 video
+* Complete Week 2 pre-work
+* Bring one value or sentence
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 6: Week 2 Action Follow-Up: Put It Where You Can See It
+Timing: Within 24 hours after Week 2.
+Purpose: Help the participant make mission and values visible and practical.
+Subject line options:
+* Week 2 follow-up: make it visible
+* Your values need a place to live
+* One sentence that can guide real decisions
+Preview text: A value you never protect may be more preference than priority.
+Body copy
+Hi [First Name],
+This week you began drafting the foundation beneath your life: bedrock, mission, values, life verse, and daily purpose.
+Now make it visible.
+Choose one value, verse, phrase, or sentence from your pre-work and put it somewhere you will see it every day this week. Then use it as a decision filter.
+Ask: What would change if I lived from this instead of reaction, pressure, approval, or urgency?
+Reply with the sentence or value you chose. I want to hear what is becoming clearer.
+Reply with my sentence or value
+You do not need your whole future mapped out. You need enough clarity to take the next faithful step.
+- Michael
+P.S. The book goes deeper into this framework through story, Scripture, reflection, and practical action. If you have not joined the update list yet, here is the link: [Book Waitlist Link].
+CTA stack:
+* Place value/statement visibly
+* Reply with value or sentence
+* Join book waitlist if not already
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 7: Week 3 Launch: Evaluate the Pillars
+Timing: 3-5 days before Week 3.
+Purpose: Prepare participant to assess Family, Fitness, Fun, and Finances and choose one focus pillar.
+Subject line options:
+* Week 3: Evaluate the Pillars
+* Which pillar needs attention now?
+* Family. Fitness. Fun. Finances. One next step.
+Preview text: The goal is not perfect balance. The goal is faithful alignment.
+Body copy
+Hi [First Name],
+This week we move into the four visible pillars of the life you are building: Family, Fitness, Fun, and Finances.
+These are not four unrelated categories. They are everyday areas of stewardship that support the whole structure. Neglect in one area eventually affects the rest.
+Watch the Week 3 video here: [Week 3 Video Link]. Then complete the pillar evaluation in your guide.
+As you prepare, ask honestly:
+Where are the people closest to me receiving presence rather than leftovers?
+Is my body supporting the life I am called to build?
+Am I making room for joy, rest, and meaningful experiences?
+Are my resources serving purpose, or carrying fear, comparison, or identity?
+Before we meet, choose one focus pillar for the next 90 days. Do not choose all four. Choose the one that would create the most positive ripple if strengthened.
+Watch Week 3 Video: [Week 3 Video Link]
+Bring one win, one concern, and one focus pillar.
+- Michael
+CTA stack:
+* Watch Week 3 video
+* Complete pillar scores
+* Choose one focus pillar
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 8: Week 3 Action Follow-Up: One Pillar, Seven Days
+Timing: Within 24 hours after Week 3.
+Purpose: Move from pillar assessment to a small seven-day action.
+Subject line options:
+* Week 3 follow-up: choose the first seven-day step
+* One pillar. One action. Seven days.
+* Focused attention creates a ripple
+Preview text: Trying to fix everything usually fixes nothing. Choose the next faithful step.
+Body copy
+Hi [First Name],
+This week you named one pillar that needs focused attention: Family, Fitness, Fun, or Finances.
+Now make the first step small enough to take this week.
+If your focus is Family, schedule one conversation, walk, meal, apology, encouragement, or act of presence.
+If your focus is Fitness, choose one capacity rhythm: walk, workout, bedtime, medical appointment, meal plan, or recovery practice.
+If your focus is Fun, schedule one life-giving experience this week and one larger experience to plan.
+If your focus is Finances, review one spending, saving, giving, or planning pattern and name what money should serve.
+Reply with your focus pillar and first seven-day action. I want to hear what you are putting into motion.
+Reply with my focus pillar and first step
+Do not underestimate a small faithful action. Repeated faithfulness becomes the architecture of character.
+- Michael
+CTA stack:
+* Reply with focus pillar and step
+* Take first seven-day action
+Automation note: This email integrates the Created for More next-step language for pillar-specific actions.
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 9: Midpoint Pulse: Tell Me the Truth
+Timing: After Week 3, ideally 24-48 hours after the Week 3 follow-up.
+Purpose: Gather feedback, reinforce community, and invite honest response.
+Subject line options:
+* We're halfway through. Tell me the truth.
+* Midpoint check-in: what is landing?
+* Halfway point: I want to hear from you
+Preview text: Honest feedback is a gift. What is helping, what is unclear, and what would make the next three weeks stronger?
+Body copy
+Hi [First Name],
+We are halfway through The Life You're Building.
+Thank you for the honesty, effort, and courage you have brought so far. This is not meant to be a lecture series. It is meant to create reflection, conversation, action, and transformation.
+I would be grateful if you would reply with a few lines:
+1. What has resonated most so far?
+2. What has been least clear or hardest to apply?
+3. What would make the next three weeks more useful?
+4. Who is one man who may need this kind of challenge in the future?
+Reply with midpoint feedback
+Please tell me the truth. Encouragement helps. Friction helps too. I want this to become something that genuinely serves men, families, churches, and communities.
+- Michael
+P.S. Nothing personal you share is used publicly without separate written permission. Feedback helps us build better; your story remains yours.
+CTA stack:
+* Reply with feedback
+* Name one ideal future participant
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 10: Week 4 Launch: Install the Guardrails
+Timing: 3-5 days before Week 4.
+Purpose: Prepare participant to build a specific boundary that protects what matters.
+Subject line options:
+* Week 4: Install the Guardrails
+* Good intentions are not guardrails
+* What boundary would protect what matters?
+Preview text: A guardrail is a decision made before pressure, not after regret.
+Body copy
+Hi [First Name],
+This week is Week 4: Install the Guardrails.
+A guardrail is not restriction for restriction's sake. It is protection. It is a decision made before the moment of pressure, exhaustion, temptation, fear, comparison, or drift.
+Watch the Week 4 video here: [Week 4 Video Link]. Then complete the guardrail reflection in your guide.
+Ask yourself:
+Where am I most vulnerable to drift right now?
+What matters enough to protect before regret arrives?
+What specific boundary would help me become the man I say I want to become?
+Good intentions are not enough. A guardrail should be specific enough that you know whether you kept it.
+Watch Week 4 Video: [Week 4 Video Link]
+Bring one draft guardrail. You decide how much detail to share, but come prepared to be honest.
+- Michael
+CTA stack:
+* Watch Week 4 video
+* Draft one specific guardrail
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 11: Week 4 Action Follow-Up: Tell One Trusted Person
+Timing: Within 24 hours after Week 4.
+Purpose: Move guardrail from private intention to accountable protection.
+Subject line options:
+* Week 4 follow-up: guardrails need witnesses
+* Tell one trusted person
+* Your guardrail protects something valuable
+Preview text: Boundaries become stronger when someone else knows what they protect.
+Body copy
+Hi [First Name],
+This week you drafted a guardrail.
+Now strengthen it by telling one trusted person what it is and what it protects. This may be your spouse, a close friend, your accountability partner, a mentor, or someone from the group.
+Use this simple sentence:
+“I am putting this guardrail in place because I want to protect ________.”
+That last blank matters. Guardrails are not merely about avoiding failure. They are about protecting the life, relationships, purpose, and legacy God has entrusted to you.
+Reply if you want to share your guardrail with me or if there is a place you would like prayer. I want to hear from you.
+Reply with my guardrail or prayer request
+A meaningful life is usually built one intentional decision at a time.
+- Michael
+CTA stack:
+* Tell one trusted person
+* Reply with guardrail/prayer request
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 12: Week 5 Launch: Strengthen the Structure
+Timing: 3-5 days before Week 5.
+Purpose: Prepare participant to select one keystone habit and one renewal rhythm.
+Subject line options:
+* Week 5: Strengthen the Structure
+* What small rhythm would create the biggest ripple?
+* Keystone habits and energy: this week's focus
+Preview text: The life you are building will be shaped less by occasional intention and more by repeated rhythms.
+Body copy
+Hi [First Name],
+This week is Week 5: Strengthen the Structure.
+We will focus on two things that make change sustainable: keystone habits and energy.
+A keystone habit is a small rhythm that pulls more than one part of life toward alignment. It may be a morning prayer rhythm, a weekly planning time, a workout, a family dinner, a monthly financial review, a phone-free evening, or a check-in with another man.
+Energy matters because you cannot faithfully steward what matters while constantly running on empty. Physical, emotional, mental, and spiritual energy all need renewal.
+Watch the Week 5 video here: [Week 5 Video Link]. Then complete the habit and energy snapshot in your guide.
+Bring one habit and one renewal rhythm you are willing to test for seven days.
+Watch Week 5 Video: [Week 5 Video Link]
+Make the habit obvious, easy, and small enough to begin. Do not build a fantasy routine. Build a rhythm you can actually practice.
+- Michael
+CTA stack:
+* Watch Week 5 video
+* Choose one keystone habit
+* Choose one renewal rhythm
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 13: Week 5 Action Follow-Up: One Habit, One Renewal Rhythm
+Timing: Within 24 hours after Week 5.
+Purpose: Reinforce habit design and energy stewardship.
+Subject line options:
+* Week 5 follow-up: test the rhythm
+* One habit. One renewal rhythm.
+* Do not run on empty this week
+Preview text: The goal is not intensity. The goal is a repeatable rhythm that strengthens the structure.
+Body copy
+Hi [First Name],
+This week you named one keystone habit and one renewal rhythm.
+Now test them for seven days.
+Use this structure:
+After I ________, I will ________.
+Minimum version: If the full habit feels too big, I will at least ________.
+For energy, choose one drain to reduce and one renewal rhythm to protect. This may be sleep, movement, prayer, solitude, a walk, a Sabbath block, a phone boundary, or a conversation that restores perspective.
+Reply with the habit and renewal rhythm you are testing. I want to hear what you are building.
+Reply with my habit and renewal rhythm
+If you miss once, do not spiral. Recover quickly. One miss does not have to become drift.
+- Michael
+CTA stack:
+* Reply with habit and energy rhythm
+* Test for seven days
+Automation note: This email borrows the habit-stacking logic without making the email feel like a habit book summary.
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 14: Week 6 Launch: Design My Life
+Timing: 3-5 days before Week 6.
+Purpose: Prepare participant to assemble Personal Blueprint, retake Check-In, and name legacy and 30-day commitment.
+Subject line options:
+* Week 6: Design My Life
+* Bring your Personal Blueprint
+* Legacy starts now
+Preview text: The blueprint was never meant to sit in a drawer. It is meant to guide what you keep building.
+Body copy
+Hi [First Name],
+This week is Week 6: Design My Life.
+You have named current reality, drafted a foundation, evaluated the pillars, built a guardrail, and chosen habits and energy rhythms. Now you bring the structure together into one Personal Blueprint.
+Watch the Week 6 video here: [Week 6 Video Link]. Then complete these steps before we meet:
+1. Review Weeks 1 through 5.
+2. Complete your Personal Blueprint page.
+3. Retake the Created for More Check-In and complete the AFTER column.
+4. Choose your next 30-day commitment.
+5. Prepare a three-minute share: what woke me up, what I am choosing, and my next faithful step.
+Legacy is not only what happens after you are gone. Legacy is what your life is multiplying right now in people, faith, generosity, influence, and future impact.
+Watch Week 6 Video: [Week 6 Video Link]
+Finish strong. This week is not an ending. It is a commissioning.
+- Michael
+CTA stack:
+* Watch Week 6 video
+* Complete Personal Blueprint
+* Complete AFTER Check-In
+* Choose 30-day commitment
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 15: Finish Strong Reminder
+Timing: 24 hours before Week 6.
+Purpose: Ensure readiness for final session and reduce last-minute friction.
+Subject line options:
+* Tomorrow: finish strong
+* Bring your Blueprint tomorrow
+* One last meeting. One clear next step.
+Preview text: Come ready to share what changed, what you are choosing, and who will help you keep going.
+Body copy
+Hi [First Name],
+Tomorrow is our final meeting of The Life You're Building 6-Week Challenge.
+Before we gather, please complete your Personal Blueprint and the AFTER column of the Created for More Check-In.
+Come ready to share three things in about three minutes:
+1. What woke me up.
+2. What I am choosing.
+3. My next 30-day step and who will help me keep it.
+Do not worry about making it polished. Honest is better than impressive.
+Complete my AFTER Check-In: [Created for More Check-In Link]
+I am grateful for the work you have put in. Finish strong.
+- Michael
+CTA stack:
+* Complete AFTER Check-In
+* Complete Personal Blueprint
+* Prepare three-minute share
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 16: Final Thank-You and Next Step
+Timing: Within 24 hours after Week 6.
+Purpose: Celebrate completion, invite feedback, guide next steps, and offer CTAs for book, app, and invitation.
+Subject line options:
+* You finished. Now keep building.
+* Thank you for six weeks of honest work
+* Your blueprint was made to be lived
+Preview text: The question now is not “Did I finish the study?” It is “How do I keep building?”
+Body copy
+Hi [First Name],
+Thank you for the honesty, courage, and effort you brought to these six weeks.
+You did something many men never slow down long enough to do: you looked honestly at the life you are building. You named drift. You clarified what matters. You chose guardrails, habits, and a next faithful step. That matters.
+Now watch the closing video: [Closing Video Link].
+Then take these next steps:
+1. Complete your Final Reflection and Feedback: [Feedback Form Link].
+2. Schedule your 30-day commitment and review date.
+3. Share your Blueprint with someone close to you.
+4. Reply to this email with one sentence: “The biggest thing that changed for me was…” I want to hear from you.
+The blueprint was never meant to sit in a drawer. It is meant to guide what you keep building.
+Watch Closing Video: [Closing Video Link]
+Complete Final Feedback: [Feedback Form Link]
+Your next step may be a personal 30-day plan, staying connected with this group, leading or hosting the next group, joining ForgedLife, joining the book updates list, or bringing this to your church or ministry.
+You were not created merely to keep up. You were created to steward a life that matters.
+- Michael
+P.S. If you would be willing to share more about what changed, reply and let me know. Nothing you share is used publicly without a separate conversation and written permission.
+CTA stack:
+* Watch closing video
+* Complete feedback
+* Reply with what changed
+* Join book waitlist
+* Join ForgedLife
+* Invite/lead next group
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 17: Keep Building: Week 1 After Completion
+Timing: 7 days after Week 6.
+Purpose: Prevent drop-off and reinforce 30-day commitment.
+Subject line options:
+* One week later: keep the Blueprint visible
+* Do not put the Blueprint in a drawer
+* Your 30-day commitment starts here
+Preview text: The first week after a challenge is where many men go quiet. Do not drift back quietly.
+Body copy
+Hi [First Name],
+It has been one week since we finished the six-week challenge.
+This is the moment when a blueprint either becomes a lived structure or gets put in a drawer.
+Pull out your Personal Blueprint today. Read your 30-day commitment. Then do one of these before the day ends:
+Text your accountability person.
+Schedule your protected rhythm.
+Take the next step you named.
+Have the conversation you postponed.
+Move your guardrail from idea to practice.
+Reply with one word: building. That lets me know you are still in motion.
+Reply “building”
+You do not need to prove anything. You need to keep practicing faithfulness.
+- Michael
+P.S. Know a man who should go through this next? Send him this link: [Invite-A-Man Link].
+CTA stack:
+* Review Blueprint
+* Text accountability person
+* Reply “building”
+* Invite another man
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 18: Do Not Drift Back Quietly
+Timing: 21 days after Week 6.
+Purpose: Help participant recover from missed commitments and recommit without shame.
+Subject line options:
+* Three weeks later: recover quickly
+* Do not let one miss become drift
+* How is your 30-day commitment holding up?
+Preview text: A miss is not failure. Quietly disappearing is where drift starts again.
+Body copy
+Hi [First Name],
+You are about three weeks into your 30-day commitment.
+This is usually where real life tests the plan. Travel happens. Work expands. Energy dips. The guardrail gets inconvenient. The habit gets interrupted. The conversation feels easier to delay.
+So here is the reminder: a miss is not failure.
+The question is what you do next.
+Take five minutes today and answer honestly:
+What is working?
+What is resisting change?
+What needs to be redesigned, not abandoned?
+Who needs to hear from me?
+Reply with one phrase: still building, need prayer, or need to redesign. I want to hear from you either way.
+Reply with my status
+Transformation is not about pretending the plan never gets interrupted. It is about recovering quickly and refusing to drift back quietly.
+- Michael
+CTA stack:
+* Reply with status
+* Redesign commitment if needed
+* Reconnect with accountability partner
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 19: 30-Day Check-In: What Lasted?
+Timing: 30 days after Week 6, ideally 2-3 days before the 30-day follow-up meeting.
+Purpose: Measure durability, invite honest reflection, and prepare for follow-up.
+Subject line options:
+* 30-Day Check-In: what lasted?
+* Retake the Check-In before we meet
+* Your 30-day review starts here
+Preview text: Movement is seen over time, not in a single score.
+Body copy
+Hi [First Name],
+It is time for your 30-day follow-up.
+Before we meet, retake the Created for More Check-In and complete the 30-DAY column. Update your Blueprint Snapshot and review your 30-day commitment.
+Do not only look at the number. Compare it with the actions you took, conversations you had, guardrails you built, habits you tested, and rhythms that lasted.
+Come ready to share:
+1. What lasted?
+2. What needed redesign?
+3. Who noticed a difference?
+4. What is one story of change?
+5. What is the next faithful step?
+Complete 30-DAY Check-In: [Created for More Check-In Link]
+Confirm 30-Day Follow-Up: [30-Day Follow-Up Link]
+A lower score after reflection does not automatically mean failure. Sometimes deeper honesty creates a more accurate mirror. The real evidence is what changed and what is still being practiced.
+- Michael
+CTA stack:
+* Complete 30-DAY Check-In
+* Update Blueprint Snapshot
+* Attend 30-day follow-up
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+Email 20: Multiply It: Who Needs This Next?
+Timing: 35-45 days after Week 6 or after the 30-day follow-up.
+Purpose: Turn transformation into community, invitation, book waitlist, ForgedLife, and future leadership.
+Subject line options:
+* Who needs this next?
+* A well-built life overflows
+* Your next step: invite, lead, or keep building
+Preview text: The work you did was not only for you. A well-built life begins to overflow.
+Body copy
+Hi [First Name],
+You have walked through the six-week challenge and a 30-day follow-up. Now the question is not only what changed in you. It is what your life will multiply from here.
+There may be a man in your life who is quietly drifting, succeeding on a scoreboard that feels too small, or carrying pressure alone. Your invitation may be the thing that helps him begin.
+Choose one next step:
+Invite one man to the next challenge: [Invite-A-Man Link].
+Stay connected with your group and schedule a 90-day Blueprint review.
+Join the book updates list for The Life You're Building: [Book Waitlist Link].
+Join ForgedLife for habits, prayer, challenges, and group follow-through: [ForgedLife Link].
+Explore leading or hosting a future group: [Leader Interest Link].
+Bring this to your church or ministry: [Church/Ministry Interest Link].
+Invite one man: [Invite-A-Man Link]
+You do not need to be an expert to encourage another man. You simply need to be honest about what helped you and willing to open the door.
+A well-built life overflows. Keep building.
+- Michael
+P.S. Reply and tell me which next step you are choosing. I want to hear where this is going from here.
+CTA stack:
+* Invite one man
+* Join book waitlist
+* Join ForgedLife
+* Explore leading/hosting
+* Bring to church/ministry
+Suggested footer: You are receiving this because you accepted an invitation to The Life You're Building 6-Week Challenge. This content is educational and spiritual in nature and is not medical, mental-health, legal, tax, or individualized financial advice. Need help or want to share feedback? Reply directly to this email.
+
+
+
+Optional Short Reminder Emails
+Use these when you need a lighter touch or when an email platform benefits from shorter messages. They can also be adapted into texts or app push notifications.
+Week 1 Reminder
+Subject: Tonight we wake up
+Looking forward to our first meeting tonight at [Group Day/Time]. Come ready to share one word for your current season and one hope for the next six weeks. If you have not completed the BEFORE Check-In yet, take 15 minutes today. The goal is not perfection. The goal is honesty.
+Week 2 Reminder
+Subject: Bring one value or sentence
+This week we focus on Bedrock and Foundation: faith, identity, values, mission, life verse, and daily purpose. Complete the Week 2 pre-work and bring one value or sentence you want to carry into this season.
+Week 3 Reminder
+Subject: Which pillar needs attention?
+This week we evaluate Family, Fitness, Fun, and Finances. Complete the pillar table honestly and choose the one pillar that most needs attention over the next 90 days.
+Week 4 Reminder
+Subject: Draft one guardrail
+This week we build guardrails. Complete the risk and trigger reflection, then draft one specific boundary that protects something important. You decide how much detail to share.
+Week 5 Reminder
+Subject: One habit. One renewal rhythm.
+This week we focus on keystone habits and energy. Complete the short habit and energy snapshot and bring one habit plus one renewal rhythm you want to test for seven days.
+Week 6 Reminder
+Subject: Bring your Personal Blueprint
+For our final meeting, review Weeks 1 through 5 and complete a first draft of your Personal Blueprint. Prepare a three-minute share: what woke me up, what I am choosing, and my next 30-day step.
+Survey Reminder
+Subject: One last favor
+Your feedback will help shape future groups. Please complete the final reflection here: [Feedback Form Link]. Tell me what worked, what confused you, what should change, and what actually moved in your life. Honest feedback is a gift.
+Community-Building CTA Bank
+* Reply with one sentence: “My hope for these six weeks is…”
+* Reply with the one word that describes your current season.
+* Reply with your six-week intention so I can pray for you.
+* Reply with your focus pillar and first seven-day action.
+* Reply with what is resonating, what is unclear, and what would help.
+* Reply with your guardrail or prayer request.
+* Reply with your keystone habit and renewal rhythm.
+* Reply with the biggest thing that changed for you.
+* Forward this to one man who may need the next group.
+* Join the book updates list for The Life You're Building.
+* Join ForgedLife early access for habits, prayer, challenges, and accountability.
+* Explore leading, hosting, or bringing the challenge to a church or ministry.
+Recommended Persistent Footer Links
+* Book updates: [Book Waitlist Link]
+* ForgedLife early access: [ForgedLife Link]
+* Invite a man to the next group: [Invite-A-Man Link]
+* Direct reply: [Michael Email]
+* Website: MichaelJGauthier.com
+Implementation Notes for the Email Platform
+1. Build the sequence relative to the group start date rather than calendar dates so future cohorts can reuse it.
+2. Create a “Meeting Day” field and schedule weekly launch emails three to five days before the group session.
+3. Use conditional content for book waitlist and ForgedLife CTAs so participants are not asked to join lists they have already joined.
+4. Route replies to a real inbox that Michael or a group leader checks. The relational invitation is central to the strategy.
+5. After Week 3 and Week 6, capture feedback both through forms and replies. Forms create data; replies create relationship.
+6. Track opens and clicks, but the more important outcomes are replies, completed Check-Ins, actions named, conversations started, guardrails built, habits tested, and 30-day durability.
+7. After the 30-day follow-up, segment men into next pathways: personal plan, continue group, lead/host, book updates, ForgedLife, church/ministry interest, or invite another man.
+Source Materials Integrated
+This automation was built from the current Stewardship Blueprint / The Life You're Building resources, including the v.4 Participant Study Guide, v.4 Leader Campaign Guide, Video Scripts, Created for More Check-In, Master Branding Document, and The Life You're Building book draft. It also integrates the research themes already present in the supporting dossiers: guardrails, keystone habits, habit loops, energy stewardship, money as a tool, holistic wealth, and legacy multiplication.
+The Life You're Building - Email Automation Series
+

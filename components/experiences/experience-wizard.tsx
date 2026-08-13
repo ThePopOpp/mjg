@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { computeStepDate, defaultStepOffsets } from "@/lib/experiences/schedule";
 import { FREQUENCY_LABELS, OFFSET_UNIT_LABELS, OFFSET_UNITS, type ExperienceFrequency, type OffsetUnit } from "@/lib/experiences/types";
 
-type TypeStep = { stepNumber: number; emailTemplateId: string | null };
+type TypeStep = { stepNumber: number; emailTemplateId: string | null; offsetValue?: number | null; offsetUnit?: OffsetUnit | null };
 type TypeOption = {
   id: string;
   name: string;
@@ -98,8 +98,22 @@ export function ExperienceWizard({
     setCustomName("");
     setFrequency(t.defaultFrequency === "custom" ? "weekly" : t.defaultFrequency);
     setFreqCustom(t.defaultFrequency === "custom");
+    const ordered = t.steps.slice().sort((a, b) => a.stepNumber - b.stepNumber);
+    // If the type defines its own sequence (with per-step offsets), honor it verbatim — this
+    // preserves non-uniform schedules like the 6-Week Challenge. Otherwise fall back to the
+    // uniform cadence pre-fill from the default duration.
+    if (ordered.length && ordered.some((s) => s.offsetValue != null)) {
+      setSteps(
+        ordered.map((s) => ({
+          emailTemplateId: s.emailTemplateId ?? "",
+          offsetValue: Math.max(0, s.offsetValue ?? 0),
+          offsetUnit: s.offsetUnit ?? "day",
+        })),
+      );
+      return;
+    }
     const count = Math.max(1, t.defaultDurationWeeks);
-    const tmpls = Array.from({ length: count }, (_, i) => t.steps.find((s) => s.stepNumber === i + 1)?.emailTemplateId ?? null);
+    const tmpls = Array.from({ length: count }, (_, i) => ordered.find((s) => s.stepNumber === i + 1)?.emailTemplateId ?? null);
     setSteps(buildSteps(count, t.defaultFrequency, null, [], tmpls));
   }
 

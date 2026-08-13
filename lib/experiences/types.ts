@@ -45,6 +45,8 @@ export type ExperienceTypeStep = {
   label: string | null;
   email_template_id: string | null;
   subject_override: string | null;
+  offset_value: number | null;
+  offset_unit: OffsetUnit | null;
 };
 
 export type ExperienceAttendee = {

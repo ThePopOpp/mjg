@@ -32,7 +32,12 @@ export default async function NewExperiencePage({ searchParams }: { searchParams
           steps: t.steps
             .slice()
             .sort((a, b) => a.step_number - b.step_number)
-            .map((s) => ({ stepNumber: s.step_number, emailTemplateId: s.email_template_id })),
+            .map((s) => ({
+              stepNumber: s.step_number,
+              emailTemplateId: s.email_template_id,
+              offsetValue: s.offset_value,
+              offsetUnit: s.offset_unit,
+            })),
         }))}
         templates={templates.map((tpl: any) => ({ id: tpl.id, name: tpl.name }))}
         facilitators={facilitators.map((f: any) => ({
