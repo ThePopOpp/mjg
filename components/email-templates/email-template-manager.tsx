@@ -282,7 +282,7 @@ export function EmailTemplateManager({ templates, mappings, defaultEmail = "" }:
                         </div>
                       </TableCell>
                       <TableCell className="max-w-[22rem] truncate text-muted-foreground">{t.subject}</TableCell>
-                      <TableCell><Badge variant="secondary">{catLabel(t.category || "general")}</Badge></TableCell>
+                      <TableCell className="whitespace-nowrap"><Badge variant="secondary" className="whitespace-nowrap">{catLabel(t.category || "general")}</Badge></TableCell>
                       <TableCell>
                         {autos.length === 0 ? (
                           <span className="text-xs text-muted-foreground">— Manual</span>
