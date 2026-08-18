@@ -27,9 +27,11 @@ type PilotShellProps = {
   // "split" (default): headline left, video-placeholder right.
   // "centered": single centered column, no hero media (used by the video pages).
   heroVariant?: "split" | "centered";
+  // Replaces the right-hand VideoPlaceholder in the split hero (e.g. an embedded video).
+  heroMedia?: React.ReactNode;
 };
 
-export function PilotShell({ eyebrow, title, description, children, cta, heroVariant = "split" }: PilotShellProps) {
+export function PilotShell({ eyebrow, title, description, children, cta, heroVariant = "split", heroMedia }: PilotShellProps) {
   const centered = heroVariant === "centered";
   return (
     <main className="pilot-page min-h-screen">
@@ -93,7 +95,7 @@ export function PilotShell({ eyebrow, title, description, children, cta, heroVar
               </Button>
             ) : null}
           </div>
-          <VideoPlaceholder />
+          {heroMedia ?? <VideoPlaceholder />}
         </section>
       )}
 
