@@ -115,12 +115,13 @@ async function sendResultsEmail({ to, name, score }: { to: string; name: string 
     <p style="margin:0 0 4px;"><strong>Strongest layer:</strong> ${escapeHtml(score.strongestLayer)}</p>
     <p style="margin:0 0 18px;"><strong>Lowest layer${score.lowestPillar ? ` · ${escapeHtml(score.lowestPillar)}` : ""}:</strong> ${escapeHtml(score.lowestLayer)}</p>
     <table role="presentation" width="100%" style="border-collapse:collapse;border-top:1px solid #e7e1d5;margin:0 0 22px;">${layerRows}</table>
-    <p style="text-align:center;margin:0 0 8px;"><a href="${site}/created-for-more-check-in" style="display:inline-block;background:${ink};color:#fff;text-decoration:none;padding:12px 22px;border-radius:6px;font-size:14px;font-weight:700;">Revisit your Check-In</a></p>
+    <p style="text-align:center;margin:0 0 10px;"><a href="${site}/dashboard" style="display:inline-block;background:${ink};color:#fff;text-decoration:none;padding:13px 28px;border-radius:6px;font-size:14px;font-weight:700;">Go to your dashboard &rarr;</a></p>
+    <p style="text-align:center;margin:0 0 8px;"><a href="${site}/created-for-more-check-in" style="display:inline-block;background:${gold};color:${ink};text-decoration:none;padding:13px 28px;border-radius:6px;font-size:14px;font-weight:700;">Try the Created for More Check-In Again</a></p>
     <p style="font-size:12px;color:#9a948b;margin:22px 0 0;">The goal isn't a perfect score — it's greater awareness. This is a mirror and a map, not a pass/fail test.</p>
     <p style="font-size:13px;color:#7a736a;margin:14px 0 0;">— Michael J. Gauthier</p>
   </div>`;
 
-  const text = `Your Created for More Check-In\n\nHi ${first}, thank you for taking the Check-In.\n\nScore: ${score.total} / ${MAX_SCORE} — ${score.stage}\n${score.stageMeaning}\n\nSuggested next step: ${score.stageNextStep}\nStrongest layer: ${score.strongestLayer}\nLowest layer${score.lowestPillar ? ` · ${score.lowestPillar}` : ""}: ${score.lowestLayer}\n\nLayers:\n${score.layerScores.map((l) => `- ${l.title} · ${l.subtitle}: ${l.score}/20`).join("\n")}\n\nRevisit: ${site}/created-for-more-check-in\n\n— Michael J. Gauthier`;
+  const text = `Your Created for More Check-In\n\nHi ${first}, thank you for taking the Check-In.\n\nScore: ${score.total} / ${MAX_SCORE} — ${score.stage}\n${score.stageMeaning}\n\nSuggested next step: ${score.stageNextStep}\nStrongest layer: ${score.strongestLayer}\nLowest layer${score.lowestPillar ? ` · ${score.lowestPillar}` : ""}: ${score.lowestLayer}\n\nLayers:\n${score.layerScores.map((l) => `- ${l.title} · ${l.subtitle}: ${l.score}/20`).join("\n")}\n\nGo to your dashboard: ${site}/dashboard\nTry the Created for More Check-In again: ${site}/created-for-more-check-in\n\n— Michael J. Gauthier`;
 
   return sendSmtpEmail({ to, subject: "Your Created for More Check-In results", html, text });
 }

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { PilotShell } from "@/components/pilot/pilot-shell";
 import { CreatedForMoreAssessment } from "@/components/check-in/created-for-more-assessment";
+import { getCurrentProfile } from "@/lib/auth/server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Created for More Check-In | A Stewardship Blueprint Assessment",
@@ -11,6 +14,10 @@ export default async function CreatedForMoreCheckInPage({ searchParams }: { sear
   const { next } = await searchParams;
   // Only honor internal redirect targets (invite flow passes ?next=/dashboard).
   const redirectTo = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+  // Show a "Go to your dashboard" button to invited users (redirectTo) and to anyone
+  // already signed in. Anonymous public visitors don't have a dashboard, so no button.
+  const profile = await getCurrentProfile();
+  const dashboardHref = redirectTo ?? (profile ? "/dashboard" : null);
   return (
     <PilotShell
       heroVariant="centered"
@@ -32,7 +39,7 @@ export default async function CreatedForMoreCheckInPage({ searchParams }: { sear
         <p>Your answers will help you look across seven interconnected areas of your life — from your faith and identity at the bedrock to the legacy your life is ultimately producing.</p>
       </div>
 
-      <CreatedForMoreAssessment redirectTo={redirectTo} />
+      <CreatedForMoreAssessment redirectTo={redirectTo} dashboardHref={dashboardHref} />
     </PilotShell>
   );
 }

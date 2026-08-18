@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LAYERS, SCALE, MAX_SCORE, TOTAL_STATEMENTS, PATHWAYS, NEXT_STEP_OPTIONS, LOWEST_LAYER_GUIDANCE, PILLAR_GUIDANCE, scoreCheckIn, type CheckInScore } from "@/lib/check-in/created-for-more";
 
-export function CreatedForMoreAssessment({ redirectTo }: { redirectTo?: string | null } = {}) {
+export function CreatedForMoreAssessment({ redirectTo, dashboardHref }: { redirectTo?: string | null; dashboardHref?: string | null } = {}) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -82,12 +82,12 @@ export function CreatedForMoreAssessment({ redirectTo }: { redirectTo?: string |
         <Button onClick={seeResults} disabled={!complete}>See my results <ArrowRight className="ml-2 h-4 w-4" /></Button>
       </div>
 
-      {showResults && score ? <Results ref={resultsRef} score={score} answers={answers} onRetake={retake} redirectTo={redirectTo} /> : null}
+      {showResults && score ? <Results ref={resultsRef} score={score} answers={answers} onRetake={retake} redirectTo={redirectTo} dashboardHref={dashboardHref} /> : null}
     </div>
   );
 }
 
-const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Record<string, number>; onRetake: () => void; redirectTo?: string | null }>(function Results({ score, answers, onRetake, redirectTo }, ref) {
+const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Record<string, number>; onRetake: () => void; redirectTo?: string | null; dashboardHref?: string | null }>(function Results({ score, answers, onRetake, redirectTo, dashboardHref }, ref) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pathways, setPathways] = useState<string[]>([]);
@@ -174,7 +174,9 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
       {sent ? (
         <Card><CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-3 text-sm"><Check className="h-5 w-5 shrink-0 text-primary" /><span>Thank you — your results have been saved{emailed ? " and a copy is on its way to your inbox" : email ? " and we'll be in touch" : ""}.{redirectTo ? " Taking you to your dashboard…" : ""}</span></p>
-          {redirectTo ? <Button className="shrink-0" onClick={() => window.location.assign(redirectTo)}>Continue to your dashboard <ArrowRight className="ml-2 h-4 w-4" /></Button> : null}
+          <Button className="shrink-0" onClick={() => window.location.assign(dashboardHref ?? "/login?next=/dashboard")}>
+            {dashboardHref ? "Go to your dashboard" : "Log in to your dashboard"} <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </CardContent></Card>
       ) : (
         <Card><CardContent className="space-y-3 p-5">
