@@ -30,8 +30,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
       "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
     youtubeId: "t5NyHOG5XHI",
     videoUrl: null,
-    // Dark-mode poster provided; light-mode variant pending — falls back to the dark one for now.
-    thumbnailUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/invitation-light.png",
     thumbnailDark: "/6-week-challenge/thumbnails/invitation-dark.png",
     durationLabel: null,
   },
