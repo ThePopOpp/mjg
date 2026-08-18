@@ -1,5 +1,8 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { computeStepDate, defaultStepOffsets } from "@/lib/experiences/schedule";
+import { createExperience, sendExperience } from "@/lib/experiences/repository";
+import { createUserInvitation } from "@/lib/user-management/repository";
+import { ROLES } from "@/lib/rbac/roles";
 import type { EmailEvent, ExperienceFrequency, OffsetUnit } from "@/lib/experiences/types";
 
 export type FacilitatorExperience = {
@@ -78,6 +81,78 @@ export async function getFacilitatorExperiences(profileId: string): Promise<{ ex
     })),
     emailEvents,
   };
+}
+
+export type StartChallengeInput = {
+  attendees: { name?: string; email: string }[];
+  frequency: "weekly" | "biweekly"; // weekly = 6 weeks, biweekly = 12 weeks (same emails)
+  startDate: string; // yyyy-mm-dd
+  startTime?: string;
+  sendInvitations: boolean; // send account invitations to participants now
+  startChallenge: boolean; // generate the drip send events now (released per schedule)
+};
+
+/** The facilitator "Start 6-Week Challenge" launcher: creates the 6WC experience for their
+ * group with the CORRECT per-step schedule (× pace for biweekly), optionally sends account
+ * invitations to participants, and optionally starts the email drip. */
+export async function startChallengeForFacilitator(profileId: string, input: StartChallengeInput) {
+  const supabase = createSupabaseAdminClient();
+
+  const { data: type } = await supabase.from("experience_types").select("id,name").eq("slug", "six-week-challenge").maybeSingle();
+  if (!type) throw new Error("6-Week Challenge type not found.");
+  const { data: typeSteps } = await supabase
+    .from("experience_type_steps")
+    .select("step_number,email_template_id,offset_value,offset_unit")
+    .eq("experience_type_id", type.id)
+    .order("step_number", { ascending: true });
+  if (!typeSteps?.length) throw new Error("The 6-Week Challenge sequence isn't configured yet.");
+
+  const pace = input.frequency === "biweekly" ? 2 : 1;
+
+  // Clean + dedupe attendees by email.
+  const seen = new Set<string>();
+  const attendees = input.attendees
+    .map((a) => ({ name: (a.name ?? "").trim(), email: (a.email ?? "").trim().toLowerCase() }))
+    .filter((a) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a.email))
+    .filter((a) => (seen.has(a.email) ? false : (seen.add(a.email), true)));
+  if (!attendees.length) throw new Error("Add at least one participant with a valid email.");
+
+  const steps = typeSteps.map((s: any) => ({
+    emailTemplateId: (s.email_template_id ?? null) as string | null,
+    offsetValue: Math.max(0, Math.round((s.offset_value ?? 0) * pace)),
+    offsetUnit: (s.offset_unit ?? "day") as OffsetUnit,
+  }));
+
+  const experience = await createExperience(
+    {
+      experienceTypeId: type.id,
+      startDate: input.startDate,
+      startTime: input.startTime || "09:00",
+      frequency: pace === 2 ? "biweekly" : "weekly",
+      durationWeeks: steps.length,
+      facilitatorId: profileId,
+      attendees: attendees.map((a) => ({ name: a.name || undefined, email: a.email })),
+      steps,
+    },
+    profileId,
+  );
+
+  let invited = 0;
+  if (input.sendInvitations) {
+    for (const a of attendees) {
+      await createUserInvitation({ email: a.email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: profileId })
+        .then(() => { invited += 1; })
+        .catch((e) => console.error("[start-challenge] invite failed", a.email, e instanceof Error ? e.message : e));
+    }
+  }
+
+  let started = false;
+  if (input.startChallenge) {
+    await sendExperience(experience.id, profileId); // generates scheduled send events from the start date
+    started = true;
+  }
+
+  return { experienceId: experience.id, attendees: attendees.length, invited, started };
 }
 
 /** Facilitator self-assigns an experience type: creates a DRAFT experience for their

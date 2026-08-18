@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { EmailCalendar } from "@/components/experiences/experiences-list";
 import { TeamResultsTabs } from "@/components/facilitator/team-results-tabs";
+import { StartChallengeLauncher } from "@/components/facilitator/start-challenge-modal";
 import { cn } from "@/lib/utils";
 import { FREQUENCY_LABELS, type EmailEvent } from "@/lib/experiences/types";
 import type { FacilitatorExperience } from "@/lib/facilitator/experiences";
@@ -37,11 +38,13 @@ export function FacilitatorExperiences({
   emailEvents,
   types,
   results,
+  teamMembers,
 }: {
   experiences: FacilitatorExperience[];
   emailEvents: EmailEvent[];
   types: TypeOption[];
   results: { checkIns: any[]; surveys: any[]; submissions: any[] };
+  teamMembers: { name: string; email: string }[];
 }) {
   const [active, setActive] = useState<FacilitatorExperience | null>(null);
 
@@ -57,8 +60,20 @@ export function FacilitatorExperiences({
         <TabsContent value="experiences" className="mt-4">
           <ExperienceViews experiences={experiences} emailEvents={emailEvents} onOpen={setActive} />
         </TabsContent>
-        <TabsContent value="new" className="mt-4">
-          <NewExperiencesGrid types={types} />
+        <TabsContent value="new" className="mt-4 space-y-6">
+          <div className="rounded-xl border border-primary/30 bg-primary/[0.03] p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold">Launch the 6-Week Challenge for your group</p>
+                <p className="text-sm text-muted-foreground">Add participants, choose weekly or bi-weekly, invite them, and start the series.</p>
+              </div>
+              <StartChallengeLauncher teamMembers={teamMembers} />
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Other experiences</p>
+            <NewExperiencesGrid types={types} />
+          </div>
         </TabsContent>
         <TabsContent value="results" className="mt-4">
           <TeamResultsTabs checkIns={results.checkIns} surveys={results.surveys} submissions={results.submissions as any} />
