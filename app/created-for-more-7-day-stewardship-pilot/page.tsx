@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PilotShell } from "@/components/pilot/pilot-shell";
-import { InvitationHeroVideo } from "@/components/six-week-challenge/invitation-hero-video";
 
 export default function CreatedForMorePilotPage() {
   return (
@@ -9,7 +8,6 @@ export default function CreatedForMorePilotPage() {
       title="Help Me Test a 7-Day Journey to Stop Drifting and Build a Life That Matters"
       description="I am writing a book called The Life You're Building and building a larger framework called The Stewardship Blueprint. Before I take it further, I am inviting a small group of people I trust to help me test a 7-day reflection journey called Created for More."
       cta={{ href: "/check-in?source=direct_text", label: "Start the Created for More Check-In" }}
-      heroMedia={<InvitationHeroVideo />}
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
         <Card>

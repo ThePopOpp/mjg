@@ -1,6 +1,5 @@
 import { PilotShell } from "@/components/pilot/pilot-shell";
 import { SurveyForm } from "@/components/pilot/survey-form";
-import { InvitationHeroVideo } from "@/components/six-week-challenge/invitation-hero-video";
 import { resolveSurveyFields } from "@/lib/pilot/forms-data";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +11,6 @@ export default async function GeneralSurveyPage() {
       eyebrow="Final feedback"
       title="Created for More 7-Day Stewardship Pilot Feedback"
       description="Thank you for walking through the pilot. Please be honest. Encouragement is helpful, but honest feedback is even more valuable."
-      heroMedia={<InvitationHeroVideo />}
     >
       <SurveyForm surveyType="general" fields={fields} />
     </PilotShell>
