@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { upsertParticipant } from "@/lib/pilot/repository";
+import { getCheckInSubmissionsForEmails } from "@/lib/check-in/submissions";
 
 export type TeamParticipant = {
   id: string;
@@ -86,11 +87,17 @@ export async function getFacilitatorTeam(profileId: string): Promise<{
     }));
   }
 
+  // Count Created for More Check-Ins from team members (matched by email), in addition
+  // to any legacy check_in_status flag.
+  const teamEmails = participants.map((p) => p.email).filter((e): e is string => Boolean(e));
+  const subs = teamEmails.length ? await getCheckInSubmissionsForEmails(teamEmails) : [];
+  const submittedEmails = new Set(subs.map((s) => (s.email ?? "").toLowerCase()));
+
   const stats: TeamStats = {
     total: participants.length,
     surveys: participants.filter((p) => DONE(p.survey_status)).length,
     journey: participants.filter((p) => DONE(p.journey_status)).length,
-    checkIns: participants.filter((p) => DONE(p.check_in_status)).length,
+    checkIns: participants.filter((p) => DONE(p.check_in_status) || (p.email && submittedEmails.has(p.email.toLowerCase()))).length,
   };
 
   return { participants, touchpoints, stats };

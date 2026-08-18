@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
+import { getCheckInSubmissionStats } from "@/lib/check-in/submissions";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
@@ -24,7 +25,7 @@ export default async function DashboardPage() {
     return <ParticipantDashboard profile={profileForRole} />;
   }
 
-  const [data, profile] = await Promise.all([getPilotDashboardData(), getCurrentProfile()]);
+  const [data, profile, checkInStats] = await Promise.all([getPilotDashboardData(), getCurrentProfile(), getCheckInSubmissionStats()]);
   const pilotMetrics = getPilotMetrics(data);
   const myTasks = profile
     ? await getMyOpenTasks({ id: profile.id, role: profile.role, email: profile.email })
@@ -38,7 +39,7 @@ export default async function DashboardPage() {
   ];
   const metrics = [
     { label: "Total participants", value: String(data.participants.length), detail: "Created for More records", icon: UsersRound },
-    { label: "Check-In completed", value: String(pilotMetrics.checkInCompleted), detail: `Average score ${pilotMetrics.averageScore || "-"}`, icon: CheckCircle2 },
+    { label: "Check-In completed", value: String(checkInStats.count), detail: checkInStats.averageScore != null ? `Average score ${checkInStats.averageScore}` : "Created for More", icon: CheckCircle2 },
     { label: "7-day journey started", value: String(pilotMetrics.journeyStarted), detail: "Email journey records", icon: MailCheck },
     { label: "Pastor/Elder responses", value: String(pilotMetrics.pastorElderResponses), detail: "Reviewer survey responses", icon: Church },
     { label: "Inner Circle accepted", value: String(pilotMetrics.innerCircle), detail: "Accepted invitations", icon: CircleUserRound },

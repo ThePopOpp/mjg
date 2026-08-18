@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendSmtpEmail } from "@/lib/email/smtp";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
+import { upsertParticipant } from "@/lib/pilot/repository";
+import { PARTICIPANT_TYPES } from "@/lib/pilot/constants";
 import { scoreCheckIn, MAX_SCORE, type CheckInScore } from "@/lib/check-in/created-for-more";
 
 // Public endpoint: saves a Created for More Check-In submission, emails the taker their
@@ -20,12 +22,37 @@ export async function POST(request: Request) {
 
     const name = typeof body.name === "string" ? body.name.trim().slice(0, 200) || null : null;
     const email = typeof body.email === "string" ? body.email.trim().slice(0, 200) || null : null;
+    const validEmail = email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email.toLowerCase() : null;
+    const pathways = Array.isArray(body.chosenPathways)
+      ? body.chosenPathways.filter((p: unknown) => typeof p === "string").map((p: string) => p.slice(0, 60)).slice(0, 12)
+      : typeof body.chosenPathway === "string" && body.chosenPathway ? [body.chosenPathway.slice(0, 60)] : [];
     const score = scoreCheckIn(answers);
     const supabase = createSupabaseAdminClient();
+
+    // Attach the taker as a participant (so they show in the participant list + stats),
+    // linked by email — the same key the rest of the pilot uses. Best-effort.
+    let participantId: string | null = null;
+    if (validEmail && name) {
+      const parts = name.split(/\s+/);
+      const firstName = parts[0] || name;
+      const lastName = parts.slice(1).join(" ");
+      participantId = await upsertParticipant({
+        firstName,
+        lastName,
+        email: validEmail,
+        waveSource: "created_for_more_check_in",
+        participantType: PARTICIPANT_TYPES.GENERAL,
+        consent: { futureUpdatesOptIn: true, followUpPermission: true },
+      })
+        .then((p) => p.id)
+        .catch((e) => { console.error("[created-for-more] participant upsert failed", e instanceof Error ? e.message : e); return null; });
+    }
+
     const { error } = await supabase.from("check_in_submissions").insert({
       assessment: "created-for-more",
       name,
-      email,
+      email: validEmail ?? email,
+      participant_id: participantId,
       answers,
       layer_scores: score.layerScores,
       total_score: score.total,
@@ -33,7 +60,8 @@ export async function POST(request: Request) {
       strongest_layer: score.strongestLayer,
       lowest_layer: score.lowestLayer,
       lowest_pillar: score.lowestPillar,
-      chosen_pathway: typeof body.chosenPathway === "string" ? body.chosenPathway.slice(0, 60) || null : null,
+      chosen_pathway: pathways[0] ?? null,
+      chosen_pathways: pathways,
     });
     if (error) throw error;
 
@@ -71,6 +99,10 @@ async function sendResultsEmail({ to, name, score }: { to: string; name: string 
     .join("");
 
   const html = `<div style="max-width:600px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#3a3632;line-height:1.6;">
+    <div style="text-align:center;padding:8px 0 20px;">
+      <img src="https://michaeljgauthier.com/mjg-logos/mjg_black_white.png" width="96" alt="Michael J. Gauthier" style="display:block;width:96px;max-width:100%;height:auto;margin:0 auto 6px;" />
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;letter-spacing:0.22em;color:${ink};">MICHAEL J. GAUTHIER</div>
+    </div>
     <p style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:${gold};font-weight:700;margin:0 0 4px;">A Stewardship Blueprint Assessment</p>
     <h1 style="font-family:Georgia,serif;font-size:24px;color:${ink};margin:0 0 16px;">Your Created for More Check-In</h1>
     <p style="margin:0 0 16px;">Hi ${escapeHtml(first)}, thank you for taking the Check-In. Here is your Blueprint Snapshot.</p>

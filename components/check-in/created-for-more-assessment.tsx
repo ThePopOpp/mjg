@@ -90,7 +90,8 @@ export function CreatedForMoreAssessment() {
 const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Record<string, number>; onRetake: () => void }>(function Results({ score, answers, onRetake }, ref) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [pathway, setPathway] = useState("");
+  const [pathways, setPathways] = useState<string[]>([]);
+  const togglePathway = (key: string) => setPathways((p) => (p.includes(key) ? p.filter((k) => k !== key) : [...p, key]));
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [emailed, setEmailed] = useState(false);
@@ -100,7 +101,7 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
   async function send() {
     setBusy(true); setError(null);
     try {
-      const res = await fetch("/api/check-in/created-for-more", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, answers, chosenPathway: pathway }) });
+      const res = await fetch("/api/check-in/created-for-more", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, answers, chosenPathways: pathways }) });
       const data = await res.json();
       if (!res.ok) setError(data.error || "Something went wrong."); else { setSent(true); setEmailed(Boolean(data.emailed)); }
     } catch { setError("Something went wrong. Please try again."); } finally { setBusy(false); }
@@ -173,11 +174,26 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" />
           </div>
           <div className="space-y-1.5">
-            <p className="text-xs text-muted-foreground">Which next step feels most helpful right now?</p>
+            <p className="text-xs text-muted-foreground">Which next steps feel most helpful right now? <span className="italic">Select all that apply.</span></p>
             <div className="grid gap-1.5">
-              {NEXT_STEP_OPTIONS.map((o) => (
-                <button key={o.key} type="button" onClick={() => setPathway(o.key)} className={cn("rounded-md border px-3 py-2 text-left text-sm transition-colors", pathway === o.key ? "border-primary bg-primary/5" : "hover:bg-accent")}>{o.label}</button>
-              ))}
+              {NEXT_STEP_OPTIONS.map((o) => {
+                const checked = pathways.includes(o.key);
+                return (
+                  <button
+                    key={o.key}
+                    type="button"
+                    role="checkbox"
+                    aria-checked={checked}
+                    onClick={() => togglePathway(o.key)}
+                    className={cn("flex items-center gap-3 rounded-md border px-3 py-2 text-left text-sm transition-colors", checked ? "border-primary bg-primary/10" : "hover:bg-accent")}
+                  >
+                    <span className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded border", checked ? "border-primary bg-primary text-primary-foreground" : "border-input")}>
+                      {checked ? <Check className="h-3.5 w-3.5" /> : null}
+                    </span>
+                    <span>{o.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
           {error ? <p className="text-sm text-destructive">{error}</p> : null}

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getParticipantCheckIns } from "@/lib/pilot/portal-data";
+import { getCheckInSubmissionsByEmail } from "@/lib/check-in/submissions";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,15 @@ function formatDate(iso: string) {
 export default async function PortalHomePage() {
   const profile = await getCurrentProfile();
   const email = profile?.email ?? "";
-  const history = email ? await getParticipantCheckIns(email) : [];
+  const [legacy, submissions] = email
+    ? await Promise.all([getParticipantCheckIns(email), getCheckInSubmissionsByEmail(email)])
+    : [[], []];
+  // Merge the current Created for More assessment with any legacy pilot check-ins,
+  // newest first, into one progress list.
+  const history = [
+    ...submissions.map((s) => ({ id: s.id, created_at: s.created_at, total_score: s.total_score ?? 0, stage: s.stage ?? "—", lowest: s.lowest_layer ?? "—" })),
+    ...legacy.map((r) => ({ id: r.id, created_at: r.created_at, total_score: r.total_score, stage: r.score_range_category ?? "—", lowest: r.lowest_area_label ?? "—" })),
+  ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   const firstName = profile?.firstName?.trim();
 
   const checkInHref =
@@ -75,8 +84,8 @@ export default async function PortalHomePage() {
                   <tr key={r.id}>
                     <td className="px-4 py-2.5 text-muted-foreground">{formatDate(r.created_at)}</td>
                     <td className="px-4 py-2.5 font-semibold tabular-nums">{r.total_score} <span className="font-normal text-muted-foreground">/ 140</span></td>
-                    <td className="px-4 py-2.5">{r.score_range_category ?? "—"}</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">{r.lowest_area_label ?? "—"}</td>
+                    <td className="px-4 py-2.5">{r.stage}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">{r.lowest}</td>
                   </tr>
                 ))}
               </tbody>
