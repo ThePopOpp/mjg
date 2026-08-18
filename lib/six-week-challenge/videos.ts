@@ -36,7 +36,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     description:
       "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
     youtubeId: null,
-    driveId: "19cxy_A-IbP674i9ykbLFhl2RdgBUSRxh",
+    driveId: "1i0gWqob7C3bZA8WEBKgdTXNQ7gyChQen",
     videoUrl: null,
     posterEyebrow: "6-Week Challenge Introduction Video",
     posterTitle: "The Life You're Building 6-Week Challenge",
