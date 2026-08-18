@@ -58,7 +58,7 @@ export function PilotShell({ eyebrow, title, description, children, cta, heroVar
 
       {centered ? (
         <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16 lg:py-20">
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto max-w-5xl text-center">
             {eyebrow ? (
               <div className="flex justify-center">
                 <div className="pilot-eyebrow">

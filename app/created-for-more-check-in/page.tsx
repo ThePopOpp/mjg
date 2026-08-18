@@ -15,8 +15,8 @@ export default function CreatedForMoreCheckInPage() {
       title="Created for More Check-In"
       description="A 15-minute check-in on the life you're actually building."
     >
-      {/* Intro copy */}
-      <div className="mx-auto mb-8 max-w-3xl space-y-4 text-[15px] leading-7 text-muted-foreground">
+      {/* Intro copy — full width to match the form fields below */}
+      <div className="mb-12 space-y-4 text-[15px] leading-7 text-muted-foreground">
         <p>You were created for more than simply getting through the week, meeting expectations, and checking off the next task. But even when we know what matters most, it is remarkably easy for life to drift.</p>
         <p>The Created for More Check-In is a 28-question whole-life reflection tool designed to help you slow down long enough to see where your life is aligned with what matters most, where you may be drifting, and what deserves your attention next.</p>
         <p>It is built around <strong className="text-foreground">The Stewardship Blueprint</strong> — a framework for intentionally building a life around what God has entrusted to you and what He has called you toward.</p>
