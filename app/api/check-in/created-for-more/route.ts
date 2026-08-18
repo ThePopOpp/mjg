@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { scoreCheckIn } from "@/lib/check-in/created-for-more";
+import { sendSmtpEmail } from "@/lib/email/smtp";
+import { publicSiteUrl } from "@/lib/public-site/static-pages";
+import { scoreCheckIn, MAX_SCORE, type CheckInScore } from "@/lib/check-in/created-for-more";
 
-// Public endpoint: saves a Created for More Check-In submission and returns the score.
+// Public endpoint: saves a Created for More Check-In submission, emails the taker their
+// results (if they gave an email), notifies the team, and returns the score.
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
@@ -15,12 +18,14 @@ export async function POST(request: Request) {
     }
     if (!Object.keys(answers).length) return NextResponse.json({ error: "No answers were provided." }, { status: 400 });
 
+    const name = typeof body.name === "string" ? body.name.trim().slice(0, 200) || null : null;
+    const email = typeof body.email === "string" ? body.email.trim().slice(0, 200) || null : null;
     const score = scoreCheckIn(answers);
     const supabase = createSupabaseAdminClient();
     const { error } = await supabase.from("check_in_submissions").insert({
       assessment: "created-for-more",
-      name: typeof body.name === "string" ? body.name.trim().slice(0, 200) || null : null,
-      email: typeof body.email === "string" ? body.email.trim().slice(0, 200) || null : null,
+      name,
+      email,
       answers,
       layer_scores: score.layerScores,
       total_score: score.total,
@@ -31,9 +36,88 @@ export async function POST(request: Request) {
       chosen_pathway: typeof body.chosenPathway === "string" ? body.chosenPathway.slice(0, 60) || null : null,
     });
     if (error) throw error;
-    return NextResponse.json({ ok: true, score });
+
+    // Emails are non-fatal: the submission is already saved, so a mail failure must not
+    // turn into "something went wrong" for the visitor. We report emailed:false instead.
+    let emailed = false;
+    if (email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      const sent = await sendResultsEmail({ to: email, name, score }).catch((e) => {
+        console.error("[created-for-more] results email failed", e instanceof Error ? e.message : e);
+        return null;
+      });
+      emailed = Boolean(sent && sent.ok && !sent.skipped);
+    }
+    await notifyTeam({ name, email, score }).catch(() => undefined);
+
+    return NextResponse.json({ ok: true, score, emailed });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to save your Check-In.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+
+async function sendResultsEmail({ to, name, score }: { to: string; name: string | null; score: CheckInScore }) {
+  const site = publicSiteUrl();
+  const first = (name ?? "").trim().split(/\s+/)[0] || "there";
+  const gold = "#C9A46E";
+  const ink = "#191815";
+  const layerRows = score.layerScores
+    .map(
+      (l) => `<tr>
+        <td style="padding:6px 0;font-family:Arial,sans-serif;font-size:14px;color:#3a3632;">${escapeHtml(l.title)} <span style="color:#7a736a;">· ${escapeHtml(l.subtitle)}</span></td>
+        <td style="padding:6px 0;text-align:right;font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:${ink};white-space:nowrap;">${l.score}/20</td>
+      </tr>`,
+    )
+    .join("");
+
+  const html = `<div style="max-width:600px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#3a3632;line-height:1.6;">
+    <p style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:${gold};font-weight:700;margin:0 0 4px;">A Stewardship Blueprint Assessment</p>
+    <h1 style="font-family:Georgia,serif;font-size:24px;color:${ink};margin:0 0 16px;">Your Created for More Check-In</h1>
+    <p style="margin:0 0 16px;">Hi ${escapeHtml(first)}, thank you for taking the Check-In. Here is your Blueprint Snapshot.</p>
+    <div style="text-align:center;border:1px solid #e7e1d5;border-radius:8px;padding:22px;margin:0 0 20px;">
+      <div style="font-size:40px;font-weight:700;color:${ink};">${score.total}<span style="font-size:18px;color:#7a736a;"> / ${MAX_SCORE}</span></div>
+      <div style="font-size:16px;font-weight:700;color:${ink};margin-top:4px;">${escapeHtml(score.stage)}</div>
+      <p style="font-size:14px;color:#7a736a;margin:8px 0 0;">${escapeHtml(score.stageMeaning)}</p>
+    </div>
+    <p style="margin:0 0 6px;"><strong>Suggested next step:</strong> ${escapeHtml(score.stageNextStep)}</p>
+    <p style="margin:0 0 4px;"><strong>Strongest layer:</strong> ${escapeHtml(score.strongestLayer)}</p>
+    <p style="margin:0 0 18px;"><strong>Lowest layer${score.lowestPillar ? ` · ${escapeHtml(score.lowestPillar)}` : ""}:</strong> ${escapeHtml(score.lowestLayer)}</p>
+    <table role="presentation" width="100%" style="border-collapse:collapse;border-top:1px solid #e7e1d5;margin:0 0 22px;">${layerRows}</table>
+    <p style="text-align:center;margin:0 0 8px;"><a href="${site}/created-for-more-check-in" style="display:inline-block;background:${ink};color:#fff;text-decoration:none;padding:12px 22px;border-radius:6px;font-size:14px;font-weight:700;">Revisit your Check-In</a></p>
+    <p style="font-size:12px;color:#9a948b;margin:22px 0 0;">The goal isn't a perfect score — it's greater awareness. This is a mirror and a map, not a pass/fail test.</p>
+    <p style="font-size:13px;color:#7a736a;margin:14px 0 0;">— Michael J. Gauthier</p>
+  </div>`;
+
+  const text = `Your Created for More Check-In\n\nHi ${first}, thank you for taking the Check-In.\n\nScore: ${score.total} / ${MAX_SCORE} — ${score.stage}\n${score.stageMeaning}\n\nSuggested next step: ${score.stageNextStep}\nStrongest layer: ${score.strongestLayer}\nLowest layer${score.lowestPillar ? ` · ${score.lowestPillar}` : ""}: ${score.lowestLayer}\n\nLayers:\n${score.layerScores.map((l) => `- ${l.title} · ${l.subtitle}: ${l.score}/20`).join("\n")}\n\nRevisit: ${site}/created-for-more-check-in\n\n— Michael J. Gauthier`;
+
+  return sendSmtpEmail({ to, subject: "Your Created for More Check-In results", html, text });
+}
+
+async function notifyTeam({ name, email, score }: { name: string | null; email: string | null; score: CheckInScore }) {
+  const supabase = createSupabaseAdminClient();
+  const { data: admins } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("role", "super_admin")
+    .eq("status", "active")
+    .not("email", "is", null);
+  const recipients = Array.from(new Set((admins ?? []).map((a) => a.email).filter(Boolean)));
+  if (!recipients.length) return;
+
+  await sendSmtpEmail({
+    to: recipients as string[],
+    subject: `New Created for More Check-In — ${score.total}/${MAX_SCORE} (${score.stage})`,
+    html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#111;">
+      <h2>New Created for More Check-In</h2>
+      <p><strong>Name:</strong> ${escapeHtml(name || "-")}</p>
+      <p><strong>Email:</strong> ${escapeHtml(email || "-")}</p>
+      <p><strong>Score:</strong> ${score.total}/${MAX_SCORE} — ${escapeHtml(score.stage)}</p>
+      <p><strong>Strongest:</strong> ${escapeHtml(score.strongestLayer)}<br><strong>Lowest:</strong> ${escapeHtml(score.lowestLayer)}${score.lowestPillar ? ` (${escapeHtml(score.lowestPillar)})` : ""}</p>
+    </div>`,
+    text: `New Created for More Check-In\nName: ${name || "-"}\nEmail: ${email || "-"}\nScore: ${score.total}/${MAX_SCORE} — ${score.stage}\nStrongest: ${score.strongestLayer}\nLowest: ${score.lowestLayer}${score.lowestPillar ? ` (${score.lowestPillar})` : ""}`,
+  });
+}
+
+function escapeHtml(value: string) {
+  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 }

@@ -93,6 +93,7 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
   const [pathway, setPathway] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
+  const [emailed, setEmailed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const guidance = LOWEST_LAYER_GUIDANCE[score.lowestLayerKey];
 
@@ -101,7 +102,7 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
     try {
       const res = await fetch("/api/check-in/created-for-more", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, answers, chosenPathway: pathway }) });
       const data = await res.json();
-      if (!res.ok) setError(data.error || "Something went wrong."); else setSent(true);
+      if (!res.ok) setError(data.error || "Something went wrong."); else { setSent(true); setEmailed(Boolean(data.emailed)); }
     } catch { setError("Something went wrong. Please try again."); } finally { setBusy(false); }
   }
 
@@ -163,7 +164,7 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
 
       {/* Capture */}
       {sent ? (
-        <Card><CardContent className="flex items-center gap-3 p-5"><Check className="h-5 w-5 text-primary" /><p className="text-sm">Thank you — your results have been saved{email ? " and we'll be in touch" : ""}.</p></CardContent></Card>
+        <Card><CardContent className="flex items-center gap-3 p-5"><Check className="h-5 w-5 text-primary" /><p className="text-sm">Thank you — your results have been saved{emailed ? " and a copy is on its way to your inbox" : email ? " and we'll be in touch" : ""}.</p></CardContent></Card>
       ) : (
         <Card><CardContent className="space-y-3 p-5">
           <p className="text-sm font-semibold">Send me my results and next step</p>
