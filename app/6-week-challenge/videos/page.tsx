@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PlayCircle } from "lucide-react";
 import { PilotShell } from "@/components/pilot/pilot-shell";
+import { ChallengeVideoPoster } from "@/components/six-week-challenge/video-player";
 import { CHALLENGE_VIDEOS_BY_ORDER } from "@/lib/six-week-challenge/videos";
 
 export const metadata: Metadata = {
@@ -24,8 +25,10 @@ export default function ChallengeVideoLibraryPage() {
             href={`/6-week-challenge/videos/${v.slug}`}
             className="group overflow-hidden rounded-xl border border-black/10 bg-card no-underline transition-colors hover:border-primary/50 dark:border-white/10"
           >
-            <div className="relative flex aspect-video items-center justify-center bg-muted">
-              {v.thumbnailUrl || v.thumbnailDark ? (
+            <div className="relative flex aspect-video items-center justify-center overflow-hidden bg-[#0e1622] dark:bg-[#efe9dd]">
+              {v.posterTitle ? (
+                <ChallengeVideoPoster eyebrow={v.posterEyebrow ?? ""} title={v.posterTitle} preview />
+              ) : v.thumbnailUrl || v.thumbnailDark ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={v.thumbnailUrl ?? v.thumbnailDark ?? undefined} alt="" className="h-full w-full object-cover dark:hidden" />

@@ -17,8 +17,12 @@ export type ChallengeVideo = {
   youtubeId: string | null;
   driveId?: string | null;
   videoUrl: string | null; // optional alternative: a self-hosted mp4/hls URL
-  thumbnailUrl: string | null; // custom poster (used in light mode); falls back to a branded placeholder
-  thumbnailDark?: string | null; // optional dark-mode poster; swapped in when the site is in dark theme
+  // Code-rendered branded poster (preferred): Mike's photo + this text + a play button,
+  // theme-aware. Set both to use it; leave null to fall back to a thumbnail image / panel.
+  posterEyebrow?: string | null;
+  posterTitle?: string | null;
+  thumbnailUrl: string | null; // custom poster image (used in light mode) if no poster text
+  thumbnailDark?: string | null; // optional dark-mode poster image
   durationLabel: string | null; // e.g. "11 min"
 };
 
@@ -34,8 +38,10 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     youtubeId: null,
     driveId: "19cxy_A-IbP674i9ykbLFhl2RdgBUSRxh",
     videoUrl: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/invitation-light.png",
-    thumbnailDark: "/6-week-challenge/thumbnails/invitation-dark.png",
+    posterEyebrow: "6-Week Challenge Introduction Video",
+    posterTitle: "The Life You're Building 6-Week Challenge",
+    thumbnailUrl: null,
+    thumbnailDark: null,
     durationLabel: null,
   },
   {
