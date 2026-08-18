@@ -35,6 +35,9 @@ export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] 
   const [startDate, setStartDate] = useState(todayISO());
   const [startTime, setStartTime] = useState("09:00");
   const [sendInvitations, setSendInvitations] = useState(true);
+  const [inviteSchedule, setInviteSchedule] = useState<"now" | "schedule">("now");
+  const [inviteDate, setInviteDate] = useState(todayISO());
+  const [inviteTime, setInviteTime] = useState("09:00");
   const [startChallenge, setStartChallenge] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +51,9 @@ export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] 
     setStartDate(todayISO());
     setStartTime("09:00");
     setSendInvitations(true);
+    setInviteSchedule("now");
+    setInviteDate(todayISO());
+    setInviteTime("09:00");
     setStartChallenge(true);
     setError(null);
     setDone(null);
@@ -57,10 +63,12 @@ export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] 
     setBusy(true);
     setError(null);
     try {
+      const invitationSendAt =
+        sendInvitations && inviteSchedule === "schedule" ? new Date(`${inviteDate}T${inviteTime}:00`).toISOString() : null;
       const res = await fetch("/api/facilitator/experiences/start-challenge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ actionToken, attendees, frequency, startDate, startTime, sendInvitations, startChallenge }),
+        body: JSON.stringify({ actionToken, attendees, frequency, startDate, startTime, sendInvitations, invitationSendAt, startChallenge }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
@@ -92,7 +100,7 @@ export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] 
                 <Check className="h-5 w-5 shrink-0 text-primary" />
                 <span>
                   Challenge created for <strong>{done.attendees}</strong> participant{done.attendees === 1 ? "" : "s"}.
-                  {done.invited ? ` Sent ${done.invited} account invitation${done.invited === 1 ? "" : "s"}.` : ""}
+                  {done.invited ? (inviteSchedule === "schedule" ? ` Scheduled ${done.invited} invitation${done.invited === 1 ? "" : "s"} for ${inviteDate}.` : ` Sent ${done.invited} account invitation${done.invited === 1 ? "" : "s"}.`) : ""}
                   {done.started ? " The email series is scheduled and will send on its cadence." : " Saved as a draft — you can start it later."}
                 </span>
               </div>
@@ -137,9 +145,23 @@ export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] 
               {/* Actions */}
               <div className="space-y-3 rounded-lg border p-3">
                 <label className="flex items-start justify-between gap-3">
-                  <span><span className="text-sm font-medium">Send account invitations now</span><span className="block text-xs text-muted-foreground">Emails each participant a create-your-account invite.</span></span>
+                  <span><span className="text-sm font-medium">Send account invitations</span><span className="block text-xs text-muted-foreground">Emails each participant a create-your-account invite.</span></span>
                   <Switch checked={sendInvitations} onCheckedChange={setSendInvitations} />
                 </label>
+                {sendInvitations ? (
+                  <div className="space-y-2 border-t pt-3">
+                    <div className="inline-flex rounded-md border p-0.5">
+                      <button type="button" onClick={() => setInviteSchedule("now")} className={cn("rounded px-3 py-1 text-xs font-medium transition-colors", inviteSchedule === "now" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent")}>Send now</button>
+                      <button type="button" onClick={() => setInviteSchedule("schedule")} className={cn("rounded px-3 py-1 text-xs font-medium transition-colors", inviteSchedule === "schedule" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent")}>Schedule</button>
+                    </div>
+                    {inviteSchedule === "schedule" ? (
+                      <div className="flex gap-2">
+                        <div className="flex-1"><DatePicker value={inviteDate} onChange={setInviteDate} /></div>
+                        <div className="flex-1"><TimePicker value={inviteTime} onChange={setInviteTime} /></div>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
                 <label className="flex items-start justify-between gap-3 border-t pt-3">
                   <span><span className="text-sm font-medium">Start the challenge</span><span className="block text-xs text-muted-foreground">Schedules the email series from the start date. Turn off to save as a draft.</span></span>
                   <Switch checked={startChallenge} onCheckedChange={setStartChallenge} />

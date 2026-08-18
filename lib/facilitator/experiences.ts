@@ -88,7 +88,8 @@ export type StartChallengeInput = {
   frequency: "weekly" | "biweekly"; // weekly = 6 weeks, biweekly = 12 weeks (same emails)
   startDate: string; // yyyy-mm-dd
   startTime?: string;
-  sendInvitations: boolean; // send account invitations to participants now
+  sendInvitations: boolean; // send account invitations to participants
+  invitationSendAt?: string | null; // ISO; when set (future), invitations go out then, not now
   startChallenge: boolean; // generate the drip send events now (released per schedule)
 };
 
@@ -150,7 +151,7 @@ export async function startChallengeForFacilitator(profileId: string, input: Sta
   let invited = 0;
   if (input.sendInvitations) {
     for (const a of attendees) {
-      await createUserInvitation({ email: a.email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: profileId })
+      await createUserInvitation({ email: a.email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: profileId, scheduledSendAt: input.invitationSendAt ?? null })
         .then(() => { invited += 1; })
         .catch((e) => console.error("[start-challenge] invite failed", a.email, e instanceof Error ? e.message : e));
     }

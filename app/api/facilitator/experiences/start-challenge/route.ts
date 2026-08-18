@@ -17,6 +17,7 @@ export async function POST(request: Request) {
       startDate: String(body.startDate),
       startTime: typeof body.startTime === "string" ? body.startTime : "09:00",
       sendInvitations: body.sendInvitations !== false,
+      invitationSendAt: typeof body.invitationSendAt === "string" ? body.invitationSendAt : null,
       startChallenge: body.startChallenge !== false,
     });
     return NextResponse.json({ ok: true, ...result });

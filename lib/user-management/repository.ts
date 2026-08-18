@@ -64,6 +64,7 @@ export async function createUserInvitation(input: {
   inviteMethod: "email" | "sms" | "manual";
   invitedBy?: string;
   siteUrl?: string;
+  scheduledSendAt?: string | null; // ISO; when in the future, the invite email is sent later by the cron
 }) {
   if (!input.email && !input.phone) {
     throw new Error("Email or phone is required.");
@@ -76,6 +77,10 @@ export async function createUserInvitation(input: {
   const inviteToken = crypto.randomBytes(32).toString("hex");
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 14);
+  const scheduleFor =
+    input.scheduledSendAt && new Date(input.scheduledSendAt).getTime() > Date.now()
+      ? new Date(input.scheduledSendAt).toISOString()
+      : null;
 
   const { data: invitation, error } = await supabase
     .from("user_invitations")
@@ -88,6 +93,7 @@ export async function createUserInvitation(input: {
       invite_status: "pending",
       invite_token: inviteToken,
       sent_at: null,
+      scheduled_send_at: scheduleFor,
       expires_at: expiresAt.toISOString(),
     })
     .select("*")
@@ -95,7 +101,8 @@ export async function createUserInvitation(input: {
 
   if (error) throw error;
 
-  if (input.email && input.inviteMethod === "email") {
+  // Scheduled or non-email invites: store the accept URL and defer the send.
+  if (input.email && input.inviteMethod === "email" && !scheduleFor) {
     const inviteUrl = `${input.siteUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? ""}/accept-invite?token=${inviteToken}`;
     try {
       const emailResult = await sendTemplateForEvent({
@@ -172,6 +179,61 @@ export async function createUserInvitation(input: {
   });
 
   return invitation;
+}
+
+/** Send invitation emails that were scheduled for a future time and are now due. Called by
+ * the invitations cron. Returns per-invite results. */
+export async function sendDueInvitations(input: { limit?: number } = {}) {
+  const supabase = createSupabaseAdminClient();
+  const now = new Date().toISOString();
+  const limit = Math.min(Math.max(Number(input.limit ?? 50), 1), 200);
+
+  const { data: due } = await supabase
+    .from("user_invitations")
+    .select("*")
+    .eq("invite_status", "pending")
+    .eq("invite_method", "email")
+    .not("scheduled_send_at", "is", null)
+    .lte("scheduled_send_at", now)
+    .is("sent_at", null)
+    .order("scheduled_send_at", { ascending: true })
+    .limit(limit);
+
+  const results: { id: string; status: string; error?: string }[] = [];
+  for (const inv of due ?? []) {
+    if (!inv.email) { results.push({ id: inv.id, status: "skipped" }); continue; }
+    const inviteUrl =
+      (inv.metadata as any)?.inviteUrl ||
+      `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/accept-invite?token=${inv.invite_token}`;
+    try {
+      const emailResult = await sendTemplateForEvent({
+        eventKey: "user_invitation",
+        actorUserId: inv.invited_by ?? undefined,
+        recipient: { email: inv.email, role: inv.role, status: "invited", merge_data: { invite_url: inviteUrl } },
+        fallback: {
+          subject: "You have been invited to the MJG Dashboard",
+          html: `<p>You have been invited to the MJG Dashboard.</p><p><a href="{{invite_url}}">Accept your invitation</a></p>`,
+          text: `You have been invited to the MJG Dashboard. Accept your invitation: {{invite_url}}`,
+        },
+      });
+      await supabase
+        .from("user_invitations")
+        .update({
+          invite_status: emailResult.skipped ? "pending" : "sent",
+          sent_at: emailResult.skipped ? null : new Date().toISOString(),
+          metadata: { ...(inv.metadata ?? {}), inviteUrl, emailSkipped: emailResult.skipped, emailReason: emailResult.reason ?? null },
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", inv.id);
+      results.push({ id: inv.id, status: emailResult.skipped ? "skipped" : "sent" });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Send failed.";
+      await supabase.from("user_invitations").update({ invite_status: "failed", metadata: { ...(inv.metadata ?? {}), emailError: message }, updated_at: new Date().toISOString() }).eq("id", inv.id);
+      results.push({ id: inv.id, status: "failed", error: message });
+    }
+  }
+
+  return { processed: results.length, sent: results.filter((r) => r.status === "sent").length, results };
 }
 
 export async function acceptUserInvitation(input: {
