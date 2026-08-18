@@ -96,11 +96,11 @@ export function ChallengeVideoPoster({
       {...(interactive ? { type: "button" as const, onClick: onPlay, "aria-label": `Play ${title}` } : {})}
       className="group absolute inset-0 block w-full text-left"
     >
-      {/* Giant faint MJG watermark on the right */}
+      {/* Giant faint MJG watermark on the right (actual brand logo, single-tone) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/mjg-logos/mjg_white.png" alt="" aria-hidden className="pointer-events-none absolute -right-10 top-1/2 h-[150%] w-auto -translate-y-1/2 opacity-[0.05] dark:hidden" />
+      <img src="/mjg-logos/mjg-logo-white.svg" alt="" aria-hidden className="pointer-events-none absolute -right-16 top-1/2 h-[135%] w-auto -translate-y-1/2 opacity-[0.06] dark:hidden" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/mjg-logos/mjg_black_white.png" alt="" aria-hidden className="pointer-events-none absolute -right-10 top-1/2 hidden h-[150%] w-auto -translate-y-1/2 opacity-[0.06] dark:block" />
+      <img src="/mjg-logos/mjg-logo-black.svg" alt="" aria-hidden className="pointer-events-none absolute -right-16 top-1/2 hidden h-[135%] w-auto -translate-y-1/2 opacity-[0.06] dark:block" />
 
       {/* Mike — a full-frame 16:9 cut-out, already positioned bottom-left */}
       {/* eslint-disable-next-line @next/next/no-img-element */}

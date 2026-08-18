@@ -38,8 +38,12 @@ export default async function ChallengeVideoPage({ params }: { params: Promise<{
         {/* Branded player — YouTube-hosted but never looks like YouTube (facade + privacy embed). */}
         <ChallengeVideoPlayer
           youtubeId={video.youtubeId}
+          driveId={video.driveId}
           videoUrl={video.videoUrl}
+          posterEyebrow={video.posterEyebrow}
+          posterTitle={video.posterTitle}
           thumbnailUrl={video.thumbnailUrl}
+          thumbnailDark={video.thumbnailDark}
           title={video.title}
           badge={video.badge}
         />
