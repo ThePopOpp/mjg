@@ -76,6 +76,9 @@ export function ExperienceWizard({
   const [attendees, setAttendees] = useState<Attendee[]>([{ name: "", email: "" }]);
   const [facilitatorId, setFacilitatorId] = useState("");
   const [steps, setSteps] = useState<Step[]>([{ emailTemplateId: "", offsetValue: 0, offsetUnit: "week" }]);
+  // Program pace: 1 = standard (e.g. 6 weeks / weekly), 2 = stretched (12 weeks / biweekly).
+  // Only offered for types with a fixed per-step schedule (the 6-Week Challenge).
+  const [pace, setPace] = useState(1);
   const [testEmail, setTestEmail] = useState("");
   const [testMsg, setTestMsg] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
@@ -85,6 +88,20 @@ export function ExperienceWizard({
   const selectedType = useMemo(() => types.find((t) => t.id === typeId) ?? null, [types, typeId]);
   const customInterval = freqCustom || frequency === "custom" ? { value: Math.max(1, intervalValue), unit: intervalUnit } : null;
   const effectiveFrequency: ExperienceFrequency = customInterval ? "custom" : frequency;
+  // Types like the 6-Week Challenge carry their own per-step schedule → offer 6/12-week pace.
+  const hasFixedSchedule = Boolean(selectedType?.steps.some((s) => s.offsetValue != null));
+
+  // 6-Week Challenge: 6 weeks (weekly) vs 12 weeks (biweekly). Same emails, spacing scaled
+  // by `newPace` from the type's base offsets — a per-group choice baked into the saved steps.
+  function setProgramPace(newPace: number) {
+    setPace(newPace);
+    const ordered = (selectedType?.steps ?? []).slice().sort((a, b) => a.stepNumber - b.stepNumber);
+    setSteps((prev) => prev.map((s, i) => ({
+      ...s,
+      offsetValue: Math.max(0, Math.round((ordered[i]?.offsetValue ?? 0) * newPace)),
+      offsetUnit: (ordered[i]?.offsetUnit ?? s.offsetUnit) as OffsetUnit,
+    })));
+  }
 
   const grouped = useMemo(() => {
     const g: Record<string, TypeOption[]> = {};
@@ -96,6 +113,7 @@ export function ExperienceWizard({
     setCustom(false);
     setTypeId(t.id);
     setCustomName("");
+    setPace(1);
     setFrequency(t.defaultFrequency === "custom" ? "weekly" : t.defaultFrequency);
     setFreqCustom(t.defaultFrequency === "custom");
     const ordered = t.steps.slice().sort((a, b) => a.stepNumber - b.stepNumber);
@@ -360,6 +378,16 @@ export function ExperienceWizard({
           {/* Step 5 — Program */}
           {step === 4 && (
             <div className="space-y-4">
+              {hasFixedSchedule && (
+                <div className="max-w-md space-y-1.5 rounded-lg border border-primary/30 bg-primary/[0.03] p-3">
+                  <Label>Program length <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">Per group</span></Label>
+                  <p className="text-sm text-muted-foreground">Same emails, wider spacing. Choose the pace for this group.</p>
+                  <div className="mt-1 inline-flex rounded-md border p-0.5">
+                    <button type="button" onClick={() => setProgramPace(1)} className={`rounded px-3 py-1.5 text-sm font-medium transition-colors ${pace === 1 ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}>6 weeks · weekly</button>
+                    <button type="button" onClick={() => setProgramPace(2)} className={`rounded px-3 py-1.5 text-sm font-medium transition-colors ${pace === 2 ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}>12 weeks · biweekly</button>
+                  </div>
+                </div>
+              )}
               <div className="max-w-xs space-y-1.5">
                 <Label>Number of emails (steps)</Label>
                 <p className="text-sm text-muted-foreground">How many touchpoints. Assign a template + timing to each under Selections.</p>
@@ -437,6 +465,7 @@ export function ExperienceWizard({
                   <Review label="Experience" value={custom ? customName : selectedType?.name ?? "-"} />
                   <Review label="Start" value={startDate ? `${startDate} ${startTime}` : "-"} />
                   <Review label="Cadence" value={customInterval ? `Every ${customInterval.value} ${OFFSET_UNIT_LABELS[customInterval.unit].toLowerCase()}` : FREQUENCY_LABELS[frequency]} />
+                  {hasFixedSchedule ? <Review label="Program length" value={pace === 2 ? "12 weeks · biweekly" : "6 weeks · weekly"} /> : null}
                   <Review label="Steps" value={String(steps.length)} />
                   <Review label="Attendees" value={String(validEmails.length)} />
                   <Review label="Facilitator" value={facilitators.find((f) => f.id === facilitatorId)?.name ?? "Unassigned"} />

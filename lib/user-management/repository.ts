@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { sendTemplateForEvent } from "@/lib/email/templates";
+import { sendTemplateForEvent, sendTemplateEmail } from "@/lib/email/templates";
 import { ROLES, type AppRole, isAppRole } from "@/lib/rbac/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants";
@@ -264,6 +264,32 @@ export async function acceptUserInvitation(input: {
     actor_user_id: invitation.invited_by ?? null,
     metadata: { invitationId: invitation.id },
   });
+
+  // Auto-responder: participants AND facilitators receive the "Challenge Accepted" email
+  // the moment they accept their 6-Week Challenge invite. Best-effort — never fail the
+  // acceptance over a mail error.
+  if (invitation.role === ROLES.PARTICIPANT || invitation.role === ROLES.FACILITATOR) {
+    try {
+      const { data: tpl } = await supabase
+        .from("email_templates")
+        .select("id")
+        .eq("slug", "6wc-participant-00-challenge-accepted")
+        .maybeSingle();
+      if (tpl?.id) {
+        await sendTemplateEmail({
+          templateId: tpl.id,
+          recipient: {
+            email,
+            first_name: input.firstName,
+            last_name: input.lastName,
+            full_name: `${input.firstName} ${input.lastName}`.trim(),
+          },
+        });
+      }
+    } catch (e) {
+      console.error("[accept-invite] Challenge Accepted auto-responder failed", e instanceof Error ? e.message : e);
+    }
+  }
 
   return { email, profile };
 }
