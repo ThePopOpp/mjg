@@ -14,13 +14,10 @@ export const metadata = {
 export default async function LoginPage() {
   const profile = await getCurrentProfile();
 
-  if (isActiveDashboardProfile(profile)) {
+  // Dashboard roles AND participants land on the dashboard (participants get a scoped,
+  // sidebar dashboard — the layout + shell render their nav and ParticipantDashboard).
+  if (profile?.status === "active" && (isActiveDashboardProfile(profile) || profile.role === ROLES.PARTICIPANT)) {
     redirect("/dashboard");
-  }
-
-  // Signed-in participants go to their portal, not the admin dashboard.
-  if (profile?.status === "active" && profile.role === ROLES.PARTICIPANT) {
-    redirect("/portal");
   }
 
   return (

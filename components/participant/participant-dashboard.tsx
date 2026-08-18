@@ -1,20 +1,29 @@
 import Link from "next/link";
-import { UsersRound, ClipboardCheck, HeartHandshake, MessageSquareText, MessagesSquare, CornerUpLeft } from "lucide-react";
+import { UsersRound, ClipboardCheck, HeartHandshake, MessageSquareText, MessagesSquare, CornerUpLeft, ArrowRight } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { MyTasksCard } from "@/components/dashboard/my-tasks-card";
+import { Button } from "@/components/ui/button";
 import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
 import { getParticipantTeam } from "@/lib/participant/team";
+import { getCheckInSubmissionsByEmail } from "@/lib/check-in/submissions";
+import { MAX_SCORE } from "@/lib/check-in/created-for-more";
 import type { DashboardProfile } from "@/lib/auth/server";
+
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
 
 export async function ParticipantDashboard({ profile }: { profile: DashboardProfile }) {
   const myName = [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim();
-  const [myTasks, dmStats, team] = await Promise.all([
+  const [myTasks, dmStats, team, checkIns] = await Promise.all([
     getMyOpenTasks({ id: profile.id, role: profile.role, email: profile.email }),
     getDmStats(profile.id),
     getParticipantTeam(profile.email),
+    getCheckInSubmissionsByEmail(profile.email),
   ]);
+  const latestCheckIn = checkIns[0];
 
   const dmCards = [
     { label: "Unread messages", value: dmStats.unread, detail: dmStats.unread ? "New for you" : "All caught up", icon: MessageSquareText },
@@ -37,6 +46,44 @@ export async function ParticipantDashboard({ profile }: { profile: DashboardProf
       />
 
       <MyTasksCard tasks={myTasks} name={myName} />
+
+      {/* Your Created for More Check-In — take it, and see your results */}
+      <div className="space-y-4 border-t pt-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight">Your Check-In</h2>
+          <Button asChild size="sm" variant={latestCheckIn ? "outline" : "default"}>
+            <Link href="/created-for-more-check-in">{latestCheckIn ? "Take it again" : "Take the Check-In"} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+          </Button>
+        </div>
+        {checkIns.length ? (
+          <div className="overflow-hidden rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/40 text-left">
+                  <th className="px-4 py-2.5 font-medium text-muted-foreground">Date</th>
+                  <th className="px-4 py-2.5 font-medium text-muted-foreground">Score</th>
+                  <th className="px-4 py-2.5 font-medium text-muted-foreground">Stage</th>
+                  <th className="px-4 py-2.5 font-medium text-muted-foreground">Lowest layer</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {checkIns.map((r) => (
+                  <tr key={r.id}>
+                    <td className="px-4 py-2.5 text-muted-foreground">{fmtDate(r.created_at)}</td>
+                    <td className="px-4 py-2.5 font-semibold tabular-nums">{r.total_score ?? "—"} <span className="font-normal text-muted-foreground">/ {MAX_SCORE}</span></td>
+                    <td className="px-4 py-2.5">{r.stage ?? "—"}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">{r.lowest_layer ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+            No check-ins yet. Take the Created for More Check-In and your results will appear here.
+          </p>
+        )}
+      </div>
 
       <div className="space-y-4 border-t pt-6">
         <div className="flex items-center justify-between">

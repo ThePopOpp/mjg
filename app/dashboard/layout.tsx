@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { ReviewFab } from "@/components/cms/review/review-fab";
 import { createAdminActionToken } from "@/lib/auth/action-token";
-import { getCurrentProfile, isActiveDashboardProfile } from "@/lib/auth/server";
-import { ROLES } from "@/lib/rbac/roles";
+import { getCurrentProfile } from "@/lib/auth/server";
+import { ROLES, canAccessPortal } from "@/lib/rbac/roles";
 
 export default async function DashboardLayout({
   children,
@@ -16,12 +16,10 @@ export default async function DashboardLayout({
     redirect("/login?next=/dashboard");
   }
 
-  // Active participants have their own portal, not the admin dashboard.
-  if (profile.status === "active" && profile.role === ROLES.PARTICIPANT) {
-    redirect("/portal");
-  }
-
-  if (!isActiveDashboardProfile(profile)) {
+  // Admit active dashboard roles AND active participants (who get a scoped, sidebar
+  // dashboard with their own nav — see participantNav + ParticipantDashboard). Per-page
+  // guards still restrict admin surfaces by permission.
+  if (!(profile.status === "active" && canAccessPortal(profile.role))) {
     redirect("/access-restricted");
   }
 
