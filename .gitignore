@@ -10,3 +10,8 @@ dist/
 npm-debug.log*
 next-dev*.log
 tsconfig.tsbuildinfo
+
+# Large video source files (host on Drive/CDN, never in git — GitHub caps at 100MB)
+*.mp4
+*.mov
+docs/assets/video/**/*.mp4

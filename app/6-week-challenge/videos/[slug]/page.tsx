@@ -39,6 +39,7 @@ export default async function ChallengeVideoPage({ params }: { params: Promise<{
         <ChallengeVideoPlayer
           youtubeId={video.youtubeId}
           driveId={video.driveId}
+          embedDirect={video.embedDirect}
           videoUrl={video.videoUrl}
           posterEyebrow={video.posterEyebrow}
           posterTitle={video.posterTitle}

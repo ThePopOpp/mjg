@@ -16,6 +16,9 @@ export type ChallengeVideo = {
   //               shared "Anyone with the link". Player order of preference: youtube → drive → url.
   youtubeId: string | null;
   driveId?: string | null;
+  // Show the host's player directly (no facade poster) so it plays on a single click.
+  // Used as a stopgap for Drive (which can't autoplay behind our poster). Reversible.
+  embedDirect?: boolean;
   videoUrl: string | null; // optional alternative: a self-hosted mp4/hls URL
   // Code-rendered branded poster (preferred): Mike's photo + this text + a play button,
   // theme-aware. Set both to use it; leave null to fall back to a thumbnail image / panel.
@@ -36,7 +39,8 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     description:
       "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
     youtubeId: null,
-    driveId: "1i0gWqob7C3bZA8WEBKgdTXNQ7gyChQen",
+    driveId: "1ANS8mbOmyR5C8NHVw1n0WksmLqHHC_Oj",
+    embedDirect: true,
     videoUrl: null,
     posterEyebrow: "6-Week Challenge Introduction Video",
     posterTitle: "The Life You're Building 6-Week Challenge",

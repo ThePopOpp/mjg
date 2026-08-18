@@ -12,6 +12,7 @@ const MIKE_PHOTO = "/6-week-challenge/mike-intro.png";
 export function ChallengeVideoPlayer({
   youtubeId,
   driveId,
+  embedDirect,
   videoUrl,
   posterEyebrow,
   posterTitle,
@@ -22,6 +23,7 @@ export function ChallengeVideoPlayer({
 }: {
   youtubeId?: string | null;
   driveId?: string | null;
+  embedDirect?: boolean;
   videoUrl?: string | null;
   posterEyebrow?: string | null;
   posterTitle?: string | null;
@@ -32,6 +34,22 @@ export function ChallengeVideoPlayer({
 }) {
   const [playing, setPlaying] = useState(false);
   const hasVideo = Boolean(youtubeId || driveId || videoUrl);
+
+  // Direct embed: skip our facade and show the host's player from the start, so it plays
+  // on a single click (their play button is the only one). Loses the branded poster.
+  if (embedDirect && (driveId || youtubeId)) {
+    return (
+      <div className="relative aspect-video overflow-hidden rounded-xl border border-black/10 bg-black shadow-sm dark:border-white/10">
+        <iframe
+          className="absolute inset-0 h-full w-full"
+          src={driveId ? `https://drive.google.com/file/d/${driveId}/preview` : `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1&playsinline=1`}
+          title={title}
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
   const hasDesignedPoster = Boolean(posterTitle);
   // Per-theme poster images (used only when there's no code-rendered poster).
   const lightSrc = thumbnailUrl ?? thumbnailDark ?? null;
