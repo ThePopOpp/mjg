@@ -11,17 +11,23 @@ export function ChallengeVideoPlayer({
   youtubeId,
   videoUrl,
   thumbnailUrl,
+  thumbnailDark,
   title,
   badge,
 }: {
   youtubeId?: string | null;
   videoUrl?: string | null;
   thumbnailUrl?: string | null;
+  thumbnailDark?: string | null;
   title: string;
   badge: string;
 }) {
   const [playing, setPlaying] = useState(false);
   const hasVideo = Boolean(youtubeId || videoUrl);
+  // Per-theme posters. If only one is supplied, it's used in both themes.
+  const lightSrc = thumbnailUrl ?? thumbnailDark ?? null;
+  const darkSrc = thumbnailDark ?? thumbnailUrl ?? null;
+  const hasPoster = Boolean(lightSrc || darkSrc);
 
   return (
     <div className="relative aspect-video overflow-hidden rounded-xl border border-black/10 bg-[#ece7dd] shadow-sm dark:border-white/10 dark:bg-[#1b1a17]">
@@ -38,10 +44,14 @@ export function ChallengeVideoPlayer({
         <video className="absolute inset-0 h-full w-full bg-black" src={videoUrl} poster={thumbnailUrl ?? undefined} autoPlay controls />
       ) : (
         <>
-          {/* Poster: custom thumbnail if provided, otherwise a branded panel. */}
-          {thumbnailUrl ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={thumbnailUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          {/* Poster: custom thumbnail (theme-swapped) if provided, otherwise a branded panel. */}
+          {hasPoster ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={lightSrc ?? undefined} alt="" className="absolute inset-0 h-full w-full object-cover dark:hidden" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={darkSrc ?? undefined} alt="" aria-hidden className="absolute inset-0 hidden h-full w-full object-cover dark:block" />
+            </>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-b from-[#f3efe6] to-[#e4ddcd] text-center dark:from-[#211f1b] dark:to-[#14130f]">
               {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -25,13 +25,17 @@ export default function ChallengeVideoLibraryPage() {
             className="group overflow-hidden rounded-xl border border-black/10 bg-card no-underline transition-colors hover:border-primary/50 dark:border-white/10"
           >
             <div className="relative flex aspect-video items-center justify-center bg-muted">
-              {v.thumbnailUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={v.thumbnailUrl} alt="" className="h-full w-full object-cover" />
+              {v.thumbnailUrl || v.thumbnailDark ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={v.thumbnailUrl ?? v.thumbnailDark ?? undefined} alt="" className="h-full w-full object-cover dark:hidden" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={v.thumbnailDark ?? v.thumbnailUrl ?? undefined} alt="" aria-hidden className="hidden h-full w-full object-cover dark:block" />
+                </>
               ) : (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <PlayCircle className="h-10 w-10 text-primary/70" />
-                  <span className="text-xs uppercase tracking-widest">{v.videoUrl ? "Watch" : "Coming soon"}</span>
+                  <span className="text-xs uppercase tracking-widest">{v.youtubeId || v.videoUrl ? "Watch" : "Coming soon"}</span>
                 </div>
               )}
             </div>

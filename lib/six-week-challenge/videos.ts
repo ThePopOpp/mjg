@@ -14,7 +14,8 @@ export type ChallengeVideo = {
   // to the 11-char video ID (from the watch URL, e.g. youtu.be/<ID> or watch?v=<ID>).
   youtubeId: string | null;
   videoUrl: string | null; // optional alternative: a self-hosted mp4/hls URL
-  thumbnailUrl: string | null; // optional custom poster; falls back to a branded placeholder
+  thumbnailUrl: string | null; // custom poster (used in light mode); falls back to a branded placeholder
+  thumbnailDark?: string | null; // optional dark-mode poster; swapped in when the site is in dark theme
   durationLabel: string | null; // e.g. "11 min"
 };
 
@@ -29,7 +30,9 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
       "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
     youtubeId: "t5NyHOG5XHI",
     videoUrl: null,
+    // Dark-mode poster provided; light-mode variant pending — falls back to the dark one for now.
     thumbnailUrl: null,
+    thumbnailDark: "/6-week-challenge/thumbnails/invitation-dark.png",
     durationLabel: null,
   },
   {
