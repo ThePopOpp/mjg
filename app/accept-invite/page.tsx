@@ -3,7 +3,7 @@ import { AcceptInviteForm } from "@/components/user-management/accept-invite-for
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata = {
-  title: "Accept Invitation | MJG Dashboard",
+  title: "Accept MJG 6-Week Challenge",
 };
 
 export default async function AcceptInvitePage({
@@ -17,8 +17,8 @@ export default async function AcceptInvitePage({
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <Card className="w-full max-w-md rounded-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Accept MJG Dashboard Invitation</CardTitle>
-          <CardDescription>Create your secure dashboard account.</CardDescription>
+          <CardTitle className="text-2xl">Accept MJG 6-Week Challenge</CardTitle>
+          <CardDescription>Create your secure MJG &ldquo;Participant&rdquo; account.</CardDescription>
         </CardHeader>
         <CardContent>
           {token ? (
