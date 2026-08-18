@@ -4,13 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserProfileEditor } from "@/components/user-management/user-profile-editor";
 import { DeleteUserButton } from "@/components/user-management/delete-user-button";
-import { ROLE_LABELS, isAppRole } from "@/lib/rbac/roles";
+import { FacilitatorChallengeAccess } from "@/components/user-management/facilitator-challenge-access";
+import { ROLE_LABELS, ROLES, isAppRole } from "@/lib/rbac/roles";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getUserManagementProfile } from "@/lib/user-management/repository";
+import { getFacilitatorChallengeAccess } from "@/lib/facilitator/access";
 
 export default async function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [data, currentProfile] = await Promise.all([getUserManagementProfile(id), getCurrentProfile()]);
+  const isFacilitator = data.profile?.role === ROLES.FACILITATOR;
+  const challengeAccess = isFacilitator ? await getFacilitatorChallengeAccess(id) : null;
 
   if (!data.profile) {
     return (
@@ -45,6 +49,22 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           <UserProfileEditor profile={profile} currentUserRole={currentProfile?.role} />
         </CardContent>
       </Card>
+
+      {isFacilitator && challengeAccess ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Challenge access</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FacilitatorChallengeAccess
+              facilitatorId={profile.id}
+              types={challengeAccess.types}
+              allowedIds={challengeAccess.allowedIds}
+              canEdit={currentProfile?.role === ROLES.SUPER_ADMIN}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
 
       {canDelete ? (
         <Card className="border-destructive/40">

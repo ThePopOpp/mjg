@@ -39,12 +39,14 @@ export function FacilitatorExperiences({
   types,
   results,
   teamMembers,
+  canStartChallenge,
 }: {
   experiences: FacilitatorExperience[];
   emailEvents: EmailEvent[];
   types: TypeOption[];
   results: { checkIns: any[]; surveys: any[]; submissions: any[] };
   teamMembers: { name: string; email: string }[];
+  canStartChallenge: boolean;
 }) {
   const [active, setActive] = useState<FacilitatorExperience | null>(null);
 
@@ -61,19 +63,25 @@ export function FacilitatorExperiences({
           <ExperienceViews experiences={experiences} emailEvents={emailEvents} onOpen={setActive} />
         </TabsContent>
         <TabsContent value="new" className="mt-4 space-y-6">
-          <div className="rounded-xl border border-primary/30 bg-primary/[0.03] p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-semibold">Launch the 6-Week Challenge for your group</p>
-                <p className="text-sm text-muted-foreground">Add participants, choose weekly or bi-weekly, invite them, and start the series.</p>
+          {canStartChallenge ? (
+            <div className="rounded-xl border border-primary/30 bg-primary/[0.03] p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold">Launch the 6-Week Challenge for your group</p>
+                  <p className="text-sm text-muted-foreground">Add participants, choose weekly or bi-weekly, invite them, and start the series.</p>
+                </div>
+                <StartChallengeLauncher teamMembers={teamMembers} />
               </div>
-              <StartChallengeLauncher teamMembers={teamMembers} />
             </div>
-          </div>
-          <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Other experiences</p>
-            <NewExperiencesGrid types={types} />
-          </div>
+          ) : null}
+          {types.length ? (
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Other experiences</p>
+              <NewExperiencesGrid types={types} />
+            </div>
+          ) : !canStartChallenge ? (
+            <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">No challenges have been assigned to you yet. Ask a Super Admin to grant access under User Management.</CardContent></Card>
+          ) : null}
         </TabsContent>
         <TabsContent value="results" className="mt-4">
           <TeamResultsTabs checkIns={results.checkIns} surveys={results.surveys} submissions={results.submissions as any} />

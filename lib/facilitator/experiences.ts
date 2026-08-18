@@ -100,6 +100,16 @@ export async function startChallengeForFacilitator(profileId: string, input: Sta
 
   const { data: type } = await supabase.from("experience_types").select("id,name").eq("slug", "six-week-challenge").maybeSingle();
   if (!type) throw new Error("6-Week Challenge type not found.");
+
+  // Governance: a facilitator may only start challenges a Super Admin granted them.
+  const { data: access } = await supabase
+    .from("facilitator_challenge_access")
+    .select("id")
+    .eq("facilitator_id", profileId)
+    .eq("experience_type_id", type.id)
+    .maybeSingle();
+  if (!access) throw new Error("You don't have access to this challenge. Ask a Super Admin to grant it.");
+
   const { data: typeSteps } = await supabase
     .from("experience_type_steps")
     .select("step_number,email_template_id,offset_value,offset_unit")
