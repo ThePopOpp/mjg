@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LAYERS, SCALE, MAX_SCORE, TOTAL_STATEMENTS, PATHWAYS, NEXT_STEP_OPTIONS, LOWEST_LAYER_GUIDANCE, PILLAR_GUIDANCE, scoreCheckIn, type CheckInScore } from "@/lib/check-in/created-for-more";
 
-export function CreatedForMoreAssessment() {
+export function CreatedForMoreAssessment({ redirectTo }: { redirectTo?: string | null } = {}) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -82,12 +82,12 @@ export function CreatedForMoreAssessment() {
         <Button onClick={seeResults} disabled={!complete}>See my results <ArrowRight className="ml-2 h-4 w-4" /></Button>
       </div>
 
-      {showResults && score ? <Results ref={resultsRef} score={score} answers={answers} onRetake={retake} /> : null}
+      {showResults && score ? <Results ref={resultsRef} score={score} answers={answers} onRetake={retake} redirectTo={redirectTo} /> : null}
     </div>
   );
 }
 
-const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Record<string, number>; onRetake: () => void }>(function Results({ score, answers, onRetake }, ref) {
+const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Record<string, number>; onRetake: () => void; redirectTo?: string | null }>(function Results({ score, answers, onRetake, redirectTo }, ref) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pathways, setPathways] = useState<string[]>([]);
@@ -103,7 +103,14 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
     try {
       const res = await fetch("/api/check-in/created-for-more", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, answers, chosenPathways: pathways }) });
       const data = await res.json();
-      if (!res.ok) setError(data.error || "Something went wrong."); else { setSent(true); setEmailed(Boolean(data.emailed)); }
+      if (!res.ok) setError(data.error || "Something went wrong.");
+      else {
+        setSent(true);
+        setEmailed(Boolean(data.emailed));
+        // Invite flow: after completing the Check-In, continue to their dashboard (which
+        // requires a login first). Brief pause so they see the confirmation.
+        if (redirectTo) setTimeout(() => window.location.assign(redirectTo), 1600);
+      }
     } catch { setError("Something went wrong. Please try again."); } finally { setBusy(false); }
   }
 
@@ -165,7 +172,10 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
 
       {/* Capture */}
       {sent ? (
-        <Card><CardContent className="flex items-center gap-3 p-5"><Check className="h-5 w-5 text-primary" /><p className="text-sm">Thank you — your results have been saved{emailed ? " and a copy is on its way to your inbox" : email ? " and we'll be in touch" : ""}.</p></CardContent></Card>
+        <Card><CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-center gap-3 text-sm"><Check className="h-5 w-5 shrink-0 text-primary" /><span>Thank you — your results have been saved{emailed ? " and a copy is on its way to your inbox" : email ? " and we'll be in touch" : ""}.{redirectTo ? " Taking you to your dashboard…" : ""}</span></p>
+          {redirectTo ? <Button className="shrink-0" onClick={() => window.location.assign(redirectTo)}>Continue to your dashboard <ArrowRight className="ml-2 h-4 w-4" /></Button> : null}
+        </CardContent></Card>
       ) : (
         <Card><CardContent className="space-y-3 p-5">
           <p className="text-sm font-semibold">Send me my results and next step</p>

@@ -4,7 +4,6 @@ import { FormEvent, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/browser";
 
 export function AcceptInviteForm({ token }: { token: string }) {
   const [firstName, setFirstName] = useState("");
@@ -37,15 +36,10 @@ export function AcceptInviteForm({ token }: { token: string }) {
     }
 
     setEmail(payload.email);
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email: payload.email, password });
-    if (signInError) {
-      setMessage("Account created. Sign in from the login page with your new password.");
-      setLoading(false);
-      return;
-    }
-
-    window.location.assign("/dashboard");
+    // Don't auto-admit into the dashboard. Send them to the Created for More Check-In; when
+    // that's complete it routes to /dashboard, which requires a fresh login before entering
+    // their Participant/Facilitator dashboard.
+    window.location.assign("/created-for-more-check-in?next=/dashboard");
   }
 
   return (

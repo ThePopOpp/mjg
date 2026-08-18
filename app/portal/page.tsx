@@ -25,14 +25,8 @@ export default async function PortalHomePage() {
   ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   const firstName = profile?.firstName?.trim();
 
-  const checkInHref =
-    "/check-in?" +
-    new URLSearchParams({
-      firstName: profile?.firstName ?? "",
-      lastName: profile?.lastName ?? "",
-      email,
-      source: "direct_email",
-    }).toString();
+  // The portal Check-In button opens the Created for More Check-In (the current assessment).
+  const checkInHref = "/created-for-more-check-in";
 
   const latest = history[0];
 

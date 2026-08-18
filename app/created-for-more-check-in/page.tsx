@@ -7,7 +7,10 @@ export const metadata: Metadata = {
   description: "A 15-minute check-in on the life you're actually building. See where you're aligned, where you may be drifting, and what deserves your attention next.",
 };
 
-export default function CreatedForMoreCheckInPage() {
+export default async function CreatedForMoreCheckInPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
+  // Only honor internal redirect targets (invite flow passes ?next=/dashboard).
+  const redirectTo = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
   return (
     <PilotShell
       heroVariant="centered"
@@ -29,7 +32,7 @@ export default function CreatedForMoreCheckInPage() {
         <p>Your answers will help you look across seven interconnected areas of your life — from your faith and identity at the bedrock to the legacy your life is ultimately producing.</p>
       </div>
 
-      <CreatedForMoreAssessment />
+      <CreatedForMoreAssessment redirectTo={redirectTo} />
     </PilotShell>
   );
 }
