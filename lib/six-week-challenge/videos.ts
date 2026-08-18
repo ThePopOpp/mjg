@@ -9,8 +9,12 @@ export type ChallengeVideo = {
   title: string;
   subtitle: string;
   description: string;
-  videoUrl: string | null; // set when the recording is ready (mp4/hls/YouTube/Vimeo embed URL)
-  thumbnailUrl: string | null; // set when the thumbnail is ready
+  // Videos are hosted (privately/unlisted) on YouTube to save VPS space, but played
+  // through our own branded facade so the page never looks like YouTube. Set `youtubeId`
+  // to the 11-char video ID (from the watch URL, e.g. youtu.be/<ID> or watch?v=<ID>).
+  youtubeId: string | null;
+  videoUrl: string | null; // optional alternative: a self-hosted mp4/hls URL
+  thumbnailUrl: string | null; // optional custom poster; falls back to a branded placeholder
   durationLabel: string | null; // e.g. "11 min"
 };
 
@@ -23,6 +27,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "What The Life You're Building is — and who it's for.",
     description:
       "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
+    youtubeId: null,
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,
@@ -35,6 +40,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "Name your current reality and notice the drift.",
     description:
       "Week 1 isn't about shame or a dramatic overhaul — it's about awareness. We slow down and tell the truth about the life we're actually building.",
+    youtubeId: null,
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,
@@ -47,6 +53,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "Clarify bedrock, identity, values, mission, and daily purpose.",
     description:
       "A blueprint shows where the walls go, but not why the house is being built. Week 2 gets clear on what your life is rooted in and built toward.",
+    youtubeId: null,
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,
@@ -59,6 +66,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "Assess family, fitness, fun, and finances; choose one focus.",
     description:
       "The four visible pillars carry the weight of everyday life. Week 3 assesses each honestly and chooses the one focus pillar for the next 90 days.",
+    youtubeId: null,
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,
@@ -71,6 +79,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "Build one specific boundary that protects what matters.",
     description:
       "A guardrail is a decision made before the moment of pressure — not after regret. Week 4 builds one boundary specific enough to actually keep.",
+    youtubeId: null,
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,
@@ -83,6 +92,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "Choose one keystone habit and one renewal rhythm.",
     description:
       "Change is sustained by rhythm, not intensity. Week 5 focuses on keystone habits and the energy needed to steward what matters without running empty.",
+    youtubeId: null,
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,
@@ -95,6 +105,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "Assemble your Personal Blueprint and retake the Check-In.",
     description:
       "Week 6 brings the whole structure together into one Personal Blueprint, retakes the Created for More Check-In, and names the next 30-day commitment.",
+    youtubeId: null,
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,
@@ -107,6 +118,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "Keep building — and help another man begin.",
     description:
       "A closing word after Week 6: how to keep the Blueprint from sitting in a drawer, protect your 30-day commitment, and multiply what you built.",
+    youtubeId: null,
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,

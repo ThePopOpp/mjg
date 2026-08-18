@@ -24,9 +24,13 @@ type PilotShellProps = {
     href: string;
     label: string;
   };
+  // "split" (default): headline left, video-placeholder right.
+  // "centered": single centered column, no hero media (used by the video pages).
+  heroVariant?: "split" | "centered";
 };
 
-export function PilotShell({ eyebrow, title, description, children, cta }: PilotShellProps) {
+export function PilotShell({ eyebrow, title, description, children, cta, heroVariant = "split" }: PilotShellProps) {
+  const centered = heroVariant === "centered";
   return (
     <main className="pilot-page min-h-screen">
       <header className="pilot-topbar sticky top-0 z-30">
@@ -50,24 +54,48 @@ export function PilotShell({ eyebrow, title, description, children, cta }: Pilot
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20">
-        <div className="max-w-3xl">
-          {eyebrow ? (
-            <div className="pilot-eyebrow">
-              <span aria-hidden="true">✦</span>
-              {eyebrow}
-            </div>
-          ) : null}
-          <h1 className="pilot-heading mt-6 text-5xl sm:text-6xl lg:text-7xl">{formatPilotTitle(title)}</h1>
-          <p className="pilot-hero-copy mt-6 max-w-2xl">{description}</p>
-          {cta ? (
-            <Button asChild size="lg" className="mt-8 h-12 rounded-md px-6 text-base">
-              <Link href={cta.href}>{cta.label}</Link>
-            </Button>
-          ) : null}
-        </div>
-        <VideoPlaceholder />
-      </section>
+      {centered ? (
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16 lg:py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            {eyebrow ? (
+              <div className="flex justify-center">
+                <div className="pilot-eyebrow">
+                  <span aria-hidden="true">✦</span>
+                  {eyebrow}
+                </div>
+              </div>
+            ) : null}
+            <h1 className="pilot-heading mt-6 text-5xl sm:text-6xl lg:text-7xl">{formatPilotTitle(title)}</h1>
+            <p className="pilot-hero-copy mx-auto mt-6 max-w-2xl">{description}</p>
+            {cta ? (
+              <div className="mt-8 flex justify-center">
+                <Button asChild size="lg" className="h-12 rounded-md px-6 text-base">
+                  <Link href={cta.href}>{cta.label}</Link>
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : (
+        <section className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20">
+          <div className="max-w-3xl">
+            {eyebrow ? (
+              <div className="pilot-eyebrow">
+                <span aria-hidden="true">✦</span>
+                {eyebrow}
+              </div>
+            ) : null}
+            <h1 className="pilot-heading mt-6 text-5xl sm:text-6xl lg:text-7xl">{formatPilotTitle(title)}</h1>
+            <p className="pilot-hero-copy mt-6 max-w-2xl">{description}</p>
+            {cta ? (
+              <Button asChild size="lg" className="mt-8 h-12 rounded-md px-6 text-base">
+                <Link href={cta.href}>{cta.label}</Link>
+              </Button>
+            ) : null}
+          </div>
+          <VideoPlaceholder />
+        </section>
+      )}
 
       <div className="mx-auto max-w-7xl px-4 pb-14 sm:px-6">{children}</div>
 
