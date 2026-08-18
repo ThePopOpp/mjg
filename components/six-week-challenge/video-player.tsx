@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
 
-const MIKE_PHOTO = "/media/mike-gauthier-profile-photo.png";
+// Pre-composed 16:9 transparent cut-out — Mike is already scaled/positioned in the frame.
+const MIKE_PHOTO = "/6-week-challenge/mike-intro.png";
 
 // A branded video player. Videos are hosted off-site (YouTube/Drive) to save VPS space,
 // but the page never shows the host's chrome up front: we render our own poster + play
@@ -101,11 +102,9 @@ export function ChallengeVideoPoster({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/mjg-logos/mjg_black_white.png" alt="" aria-hidden className="pointer-events-none absolute -right-10 top-1/2 hidden h-[150%] w-auto -translate-y-1/2 opacity-[0.06] dark:block" />
 
-      {/* Mike, clipped bottom-left */}
+      {/* Mike — a full-frame 16:9 cut-out, already positioned bottom-left */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={MIKE_PHOTO} alt="Michael J. Gauthier" className="absolute bottom-0 left-0 h-[96%] w-auto object-contain object-left-bottom" />
-      {/* Fade the photo's right edge into the poster background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0e1622]/50 to-[#0e1622] dark:via-[#efe9dd]/50 dark:to-[#efe9dd]" />
+      <img src={MIKE_PHOTO} alt="Michael J. Gauthier" className="absolute inset-0 h-full w-full object-cover" />
 
       {/* Content, shifted right to clear the photo */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 px-4 pl-[36%] text-center sm:gap-3">
