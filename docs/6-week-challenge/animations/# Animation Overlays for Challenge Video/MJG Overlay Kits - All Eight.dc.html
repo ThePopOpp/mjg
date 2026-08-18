@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0C0C0C; height: 100%; }
+  a { color: #C9A96E; text-decoration: none; }
+  a:hover { color: #DCC084; }
+</style>
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <rect width="240" height="240" fill="#0C0C0C" />
+    <rect x="72" y="150" width="96" height="18" fill="#C9A96E" />
+    <rect x="82" y="124" width="76" height="12" fill="#F4F1EA" />
+    <rect x="88" y="86" width="14" height="30" fill="#F4F1EA" />
+    <rect x="113" y="86" width="14" height="30" fill="#F4F1EA" />
+    <rect x="138" y="86" width="14" height="30" fill="#F4F1EA" />
+    <rect x="82" y="72" width="76" height="9" fill="#DCC084" />
+    <text x="120" y="200" fill="#C9A96E" font-family="Georgia, serif" font-size="26" text-anchor="middle">MJG</text>
+  </svg>
+</template>
+<script src="./image-slot.js"></script>
+<script>window.OM_PLAYBACK = '{"mode":"loop"}';</script>
+</helmet>
+<div style="position: fixed; inset: 0; display: flex; flex-direction: column; background: #0C0C0C;">
+  <div style="flex: 0 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px 18px; background: #111; border-bottom: 1px solid rgba(244,241,234,0.14);">
+    <span style="font-family: 'Figtree', system-ui, sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2.4px; text-transform: uppercase; color: #C9A96E; margin-right: 8px;">Overlay kit</span>
+    <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="8">
+      <button type="button" onClick="{{ tab.pick }}" style="{{ tab.style }}">{{ tab.label }}</button>
+    </sc-for>
+    <span style="flex: 1 1 auto;"></span>
+    <span style="font-family: 'Figtree', system-ui, sans-serif; font-size: 12px; letter-spacing: 1.6px; color: rgba(244,241,234,0.5);">{{ hint }}</span>
+  </div>
+  <div style="flex: 1 1 auto; position: relative; min-height: 0;">
+    <x-import component-from-global-scope="{{ current }}" from="./animations-v3.jsx ./tweaks-panel.jsx ./overlay-kit.jsx ./week1-kit.jsx ./week2-kit.jsx ./week3-kit.jsx ./week4-kit.jsx ./week5-kit.jsx ./week6-kit.jsx ./closing-kit.jsx" hint-size="100%,100%"></x-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const KITS = [
+  ['Invitation', 'OverlayKit'],
+  ['Week 1 · Wake Up', 'Week1Kit'],
+  ['Week 2 · See the Blueprint', 'Week2Kit'],
+  ['Week 3 · Evaluate the Pillars', 'Week3Kit'],
+  ['Week 4 · Install the Guardrails', 'Week4Kit'],
+  ['Week 5 · Strengthen the Structure', 'Week5Kit'],
+  ['Week 6 · Design My Life', 'Week6Kit'],
+  ['Closing · What\u2019s Next', 'ClosingKit'],
+];
+
+const DEFAULTS = {
+  OverlayKit: { plate: 'footage', bgColor: '#0C0C0C', bgOpacity: 0, keepScrims: false, captions: false, slate: false, motionEditor: true, presenter: 'Michael J. Gauthier', challengeTitle: "The Life You're Building Men's Challenge", subtitle: 'A 6-Week Stewardship Blueprint Experience', focusArea: 'Finances', weekLabel: 'Invitation', scriptureRef: 'Psalm 127:1', url: 'MichaelJGauthier.com' },
+  Week1Kit: { plate: 'footage', bgColor: '#0C0C0C', bgOpacity: 0, keepScrims: false, captions: false, slate: false, motionEditor: true, presenter: 'Michael J. Gauthier', weekLabel: 'Week One', episodeTitle: 'Wake Up', subtitle: "The Life You're Building Men's Challenge", scriptureRef: 'Psalm 90:12 (NIV)', nextUp: 'Week Two — See the Blueprint', url: 'MichaelJGauthier.com' },
+  Week2Kit: { plate: 'footage', bgColor: '#0C0C0C', bgOpacity: 0, keepScrims: false, captions: false, slate: false, motionEditor: true, presenter: 'Michael J. Gauthier', weekLabel: 'Week Two', episodeTitle: 'See the Blueprint', subtitle: "The Life You're Building Men's Challenge", scriptureRef: 'Proverbs 4:23 (NIV)', nextUp: 'Week Three — Evaluate the Pillars', url: 'MichaelJGauthier.com' },
+  Week3Kit: { plate: 'footage', bgColor: '#0C0C0C', bgOpacity: 0, keepScrims: false, captions: false, slate: false, motionEditor: true, presenter: 'Michael J. Gauthier', weekLabel: 'Week Three', episodeTitle: 'Evaluate the Pillars', subtitle: "The Life You're Building Men's Challenge", focusPillar: 'Fitness', scriptureRef: 'Luke 16:10 (NIV)', nextUp: 'Week Four — Install the Guardrails', url: 'MichaelJGauthier.com' },
+  Week4Kit: { plate: 'footage', bgColor: '#0C0C0C', bgOpacity: 0, keepScrims: false, captions: false, slate: false, motionEditor: true, presenter: 'Michael J. Gauthier', weekLabel: 'Week Four', episodeTitle: 'Install the Guardrails', subtitle: "The Life You're Building Men's Challenge", scriptureRef: 'Proverbs 27:12 (NIV)', nextUp: 'Week Five — Strengthen the Structure', url: 'MichaelJGauthier.com' },
+  Week5Kit: { plate: 'footage', bgColor: '#0C0C0C', bgOpacity: 0, keepScrims: false, captions: false, slate: false, motionEditor: true, presenter: 'Michael J. Gauthier', weekLabel: 'Week Five', episodeTitle: 'Strengthen the Structure', subtitle: "The Life You're Building Men's Challenge", scriptureRef1: 'Galatians 6:9 (NIV)', scriptureRef2: 'Mark 6:31 (NIV)', nextUp: 'Week Six — Design My Life', url: 'MichaelJGauthier.com' },
+  Week6Kit: { plate: 'footage', bgColor: '#0C0C0C', bgOpacity: 0, keepScrims: false, captions: false, slate: false, motionEditor: true, presenter: 'Michael J. Gauthier', weekLabel: 'Week Six', episodeTitle: 'Design My Life', subtitle: "The Life You're Building Men's Challenge", scriptureRef: '2 Timothy 2:2 (NIV)', nextUp: 'Watch the closing video', url: 'MichaelJGauthier.com' },
+  ClosingKit: { plate: 'footage', bgColor: '#0C0C0C', bgOpacity: 0, keepScrims: false, captions: false, slate: false, motionEditor: true, presenter: 'Michael J. Gauthier', appUrl: 'theforged.life', url: 'MichaelJGauthier.com' },
+};
+
+const SCENES = {
+  OverlayKit: '[{"name":"Question","dur":17},{"name":"NotPaper","dur":18},{"name":"Witnesses","dur":18},{"name":"StopMark","dur":17},{"name":"Drift","dur":20},{"name":"LowerThird","dur":17},{"name":"TitleCard","dur":18},{"name":"Structure","dur":26},{"name":"Domains","dur":22},{"name":"NotThis","dur":19},{"name":"ItIs","dur":20},{"name":"Scripture","dur":17},{"name":"Bring","dur":18},{"name":"SixWeeks","dur":18},{"name":"EndCard","dur":19}]',
+  Week1Kit: '[{"name":"LowerThird","dur":18},{"name":"TitleCard","dur":18},{"name":"DriftStack","dur":22},{"name":"Busyness","dur":17},{"name":"Motion","dur":19},{"name":"Scoreboard","dur":23},{"name":"Scripture","dur":19},{"name":"Blueprint","dur":28},{"name":"StrongThin","dur":18},{"name":"TheWork","dur":22},{"name":"Questions","dur":21},{"name":"Awareness","dur":18},{"name":"Prayer","dur":17},{"name":"NextUp","dur":19}]',
+  Week2Kit: '[{"name":"LowerThird","dur":18},{"name":"TitleCard","dur":18},{"name":"WhereWhy","dur":19},{"name":"BedrockCard","dur":18},{"name":"RootedIn","dur":24},{"name":"Received","dur":19},{"name":"Scripture","dur":19},{"name":"Center","dur":21},{"name":"Foundation","dur":22},{"name":"MessyTrue","dur":18},{"name":"Filters","dur":18},{"name":"Audit","dur":21},{"name":"TheWork","dur":22},{"name":"OpenDoor","dur":19},{"name":"Prayer","dur":17},{"name":"NextUp","dur":19}]',
+  Week3Kit: '[{"name":"LowerThird","dur":18},{"name":"TitleCard","dur":18},{"name":"PillarsCard","dur":21},{"name":"Uneven","dur":20},{"name":"Connected","dur":23},{"name":"Scripture","dur":19},{"name":"Rhythm","dur":20},{"name":"Touches","dur":19},{"name":"Rate","dur":22},{"name":"TheWork","dur":22},{"name":"NotBalance","dur":18},{"name":"Prayer","dur":17},{"name":"NextUp","dur":19}]',
+  Week4Kit: '[{"name":"LowerThird","dur":18},{"name":"TitleCard","dur":18},{"name":"Road","dur":21},{"name":"GuardrailCard","dur":18},{"name":"AheadOfTime","dur":22},{"name":"Intentions","dur":19},{"name":"Scripture","dur":19},{"name":"Protects","dur":22},{"name":"Becoming","dur":21},{"name":"FourParts","dur":21},{"name":"TheWork","dur":21},{"name":"Regret","dur":19},{"name":"Prayer","dur":17},{"name":"NextUp","dur":19}]',
+  Week5Kit: '[{"name":"LowerThird","dur":18},{"name":"TitleCard","dur":18},{"name":"Repeat","dur":20},{"name":"KeystoneCard","dur":18},{"name":"Domino","dur":21},{"name":"DesignHabit","dur":22},{"name":"Scripture1","dur":19},{"name":"EnergyCard","dur":20},{"name":"Pulse","dur":20},{"name":"Debt","dur":21},{"name":"Scripture2","dur":19},{"name":"Rest","dur":18},{"name":"TheWork","dur":21},{"name":"Prayer","dur":17},{"name":"NextUp","dur":19}]',
+  Week6Kit: '[{"name":"LowerThird","dur":18},{"name":"TitleCard","dur":18},{"name":"LookBack","dur":22},{"name":"PersonalBlueprint","dur":23},{"name":"LegacyNow","dur":23},{"name":"Scripture","dur":19},{"name":"Movement","dur":20},{"name":"ThirtyDays","dur":21},{"name":"TheWork","dur":21},{"name":"TheMan","dur":20},{"name":"Prayer","dur":17},{"name":"NextUp","dur":20}]',
+  ClosingKit: '[{"name":"LowerThird","dur":18},{"name":"Finished","dur":19},{"name":"Drawer","dur":20},{"name":"KeepBuilding","dur":18},{"name":"Steps","dur":23},{"name":"PulseKeep","dur":19},{"name":"Links","dur":19},{"name":"Overflow","dur":21},{"name":"Prayer","dur":17},{"name":"SeriesCard","dur":21}]',
+};
+
+class Component extends DCLogic {
+  state = { active: 0 };
+
+  sync(i) {
+    const key = KITS[i][1];
+    window.OM_SCENES = SCENES[key];
+    window.TWEAK_DEFAULTS = DEFAULTS[key];
+  }
+
+  componentDidMount() { this.sync(this.state.active); }
+
+  pick(i) {
+    this.sync(i);
+    this.setState({ active: i });
+  }
+
+  renderVals() {
+    const active = this.state.active;
+    this.sync(active);
+    return {
+      current: KITS[active][1],
+      hint: 'Tweaks → Background plate → black, then Screen blend in your editor',
+      tabs: KITS.map(([label], i) => ({
+        label,
+        pick: () => this.pick(i),
+        style: [
+          'font-family: Figtree, system-ui, sans-serif',
+          'font-size: 12px',
+          'font-weight: ' + (i === active ? '700' : '500'),
+          'letter-spacing: 1px',
+          'padding: 8px 14px',
+          'cursor: pointer',
+          'border: 1px solid ' + (i === active ? '#C9A96E' : 'rgba(244,241,234,0.2)'),
+          'background: ' + (i === active ? '#C9A96E' : 'transparent'),
+          'color: ' + (i === active ? '#0C0C0C' : 'rgba(244,241,234,0.8)'),
+        ].join(';'),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

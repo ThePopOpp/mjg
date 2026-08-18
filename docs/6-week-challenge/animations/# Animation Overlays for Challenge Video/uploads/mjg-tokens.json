@@ -1,0 +1,115 @@
+{
+  "$meta": {
+    "name": "Michael J. Gauthier Design System",
+    "brand": "The Stewardship Blueprint",
+    "mission": "Encouraging others to use their God-given resources for God-given purposes",
+    "version": "2.0.0",
+    "matchedTo": "my.michaeljgauthier.com (light + dark)",
+    "description": "Machine-readable design tokens for Hermes, Claude, and ChatGPT agents producing landing pages, email, social, blog, print, and branding for MJG.",
+    "usage": "Apply data-theme=\"light\" or \"dark\" on the root. Reference CSS vars (mjg-tokens.css) or these raw values."
+  },
+  "designLanguage": {
+    "summary": "Warm editorial. Cream paper + near-black ink in light; true near-black in dark. GOLD is an accent — used for italic display words, eyebrows, and a single gold CTA — never the default button color.",
+    "primaryAction": "Solid near-black button (light) / cream button (dark). Gold is the secondary 'movement' CTA.",
+    "headings": "High-contrast serif (Playfair Display), often with a gold italic emphasis word.",
+    "backgrounds": "Light = warm paper #F4F1EA with faint blueprint grid. Dark = near-black #0C0C0C."
+  },
+  "brand": {
+    "gold":     "#C9A96E",
+    "goldDeep": "#B6924F",
+    "ink":      "#141414",
+    "paper":    "#F4F1EA",
+    "teal":     "#1A2E3B"
+  },
+  "scales": {
+    "gold": { "50":"#FBF7EF","100":"#F4EAD4","200":"#E9D6AC","300":"#DCC084","400":"#D0B074","500":"#C9A96E","600":"#B6924F","700":"#8E7139","800":"#61502B","900":"#3B301B" },
+    "neutral": { "50":"#FBFAF6","100":"#F4F1EA","200":"#E9E4D8","300":"#D8D2C4","400":"#B0A99B","500":"#84806F","600":"#605C52","700":"#423F39","800":"#242321","900":"#141414","950":"#0C0C0C" }
+  },
+  "semantic": {
+    "light": {
+      "background":"#F4F1EA","foreground":"#141414",
+      "card":"#FFFFFF","cardForeground":"#141414",
+      "popover":"#FFFFFF","popoverForeground":"#141414",
+      "primary":"#161616","primaryForeground":"#F8F6F0",
+      "secondary":"#E9E4D8","secondaryForeground":"#1A1A1A",
+      "muted":"#ECE8DF","mutedForeground":"#6B675E",
+      "accent":"#EFE7D6","accentForeground":"#1A1A1A",
+      "gold":"#C5A468","goldForeground":"#FBFAF6",
+      "destructive":"#B3261E","success":"#2F7D5B","warning":"#B5821E",
+      "border":"#E2DCD0","input":"#E2DCD0","ring":"#C9A96E",
+      "playerBar":"#161513","playerForeground":"#E7E1D3"
+    },
+    "dark": {
+      "background":"#0C0C0C","foreground":"#F4F1EA",
+      "card":"#161616","cardForeground":"#F4F1EA",
+      "popover":"#161616","popoverForeground":"#F4F1EA",
+      "primary":"#F4F1EA","primaryForeground":"#141414",
+      "secondary":"#1E1E1E","secondaryForeground":"#F4F1EA",
+      "muted":"#1A1A1A","mutedForeground":"#9C968A",
+      "accent":"#2A261E","accentForeground":"#F4F1EA",
+      "gold":"#C9A96E","goldForeground":"#141414",
+      "destructive":"#E5564B","success":"#4FB286","warning":"#E0B65A",
+      "border":"#262626","input":"#262626","ring":"#C9A96E",
+      "playerBar":"#1B1A17","playerForeground":"#E7E1D3"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "display": "\"Playfair Display\", Georgia, serif",
+      "sans": "\"Figtree\", system-ui, sans-serif",
+      "mono": "\"Geist Mono\", \"JetBrains Mono\", monospace"
+    },
+    "usage": {
+      "display": "Headlines, titles, dollar figures. High contrast. Use italic + gold for the emphasis word (The Stewardship *Blueprint*, $1 *Billion*).",
+      "sans": "Body copy, UI, labels, buttons, eyebrows (uppercase + letter-spaced).",
+      "mono": "Code, tokens, data."
+    },
+    "scale": { "xs":"0.75rem","sm":"0.875rem","base":"1rem","lg":"1.125rem","xl":"1.375rem","2xl":"1.75rem","3xl":"2.25rem","4xl":"3rem","5xl":"4.5rem" },
+    "weights": { "display": [400,700,900], "sans": [400,500,600,700] },
+    "lineHeight": { "tight":1.05, "snug":1.2, "normal":1.6, "relaxed":1.75 },
+    "eyebrow": "0.75rem, 600, uppercase, letter-spacing 0.16em, gold or muted-foreground."
+  },
+  "radius": { "sm":"0.375rem","md":"0.625rem","lg":"1rem","xl":"1.5rem","full":"9999px" },
+  "spacing": { "1":"0.25rem","2":"0.5rem","3":"0.75rem","4":"1rem","5":"1.25rem","6":"1.5rem","8":"2rem","10":"2.5rem","12":"3rem","16":"4rem" },
+  "shadows": {
+    "xs":"0 1px 2px rgba(20,20,20,0.05)",
+    "sm":"0 1px 3px rgba(20,20,20,0.07), 0 1px 2px rgba(20,20,20,0.04)",
+    "md":"0 6px 18px rgba(20,20,20,0.08), 0 2px 5px rgba(20,20,20,0.05)",
+    "lg":"0 18px 48px rgba(20,20,20,0.12), 0 6px 12px rgba(20,20,20,0.06)",
+    "gold":"0 6px 28px rgba(201,169,110,0.45)"
+  },
+  "buttons": {
+    "primary": "background primary (#161616 light / #F4F1EA dark), foreground primary-foreground. Radius full or md. The main CTA.",
+    "gold": "background gold #C5A468, white text. The 'Join the Movement' / 'Contact Us' CTA. Use sparingly, one per view.",
+    "outline": "transparent, 1px border, foreground text.",
+    "secondary": "secondary bg, foreground text.",
+    "ghost": "transparent, hover muted."
+  },
+  "components": {
+    "audioPlayer": "Eyebrow label, thin scrubber with gold dot handle + times, a dark rounded pill bar holding bookmark / rewind-10 / large gold play-pause circle / forward-10 / restart icons, and a gold volume slider below-right. Credit line beneath: 'By Michael J. Gauthier · Life Design · Stewardship · Faith'."
+  },
+  "logos": {
+    "monogramTeal":  "assets/mjg-logo-teal.svg",
+    "monogramGold":  "assets/mjg-logo-gold.svg",
+    "monogramBlack": "assets/mjg-logo-black.svg",
+    "monogramWhite": "assets/mjg-logo-white.svg",
+    "lockup": "Monogram + 'Michael J. Gauthier' set in italic Playfair, with a gold 'J.'",
+    "rules": [
+      "Light backgrounds: black or teal monogram. Dark backgrounds: white or gold monogram.",
+      "Maintain clear space equal to the height of the 'M'.",
+      "Never recolor, stretch, add shadows, or place the mark on low-contrast fields."
+    ]
+  },
+  "voice": {
+    "personality": ["Grounded","Warm","Intentional","Faith-rooted","Premium but humble"],
+    "principles": [
+      "Speak to design, not accident — 'living by design, not by default'.",
+      "Integrate faith, family, finances, and legacy; never preachy.",
+      "Clarity over cleverness. Short, declarative sentences.",
+      "Invite, don't push — 'Join the journey', not 'Buy now'.",
+      "Stewardship framing: resources are entrusted, to be used on purpose."
+    ],
+    "do": ["Use building/blueprint metaphors (bedrock, foundation, pillars, guardrails, legacy)","Be encouraging and specific","Write in first person for Michael's voice"],
+    "dont": ["No hype, urgency-bait, or prosperity-gospel language","No jargon-heavy finance speak","Avoid exclamation overload and emoji in formal contexts"]
+  }
+}

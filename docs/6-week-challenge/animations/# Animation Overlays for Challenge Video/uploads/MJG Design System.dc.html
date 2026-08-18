@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&family=Figtree:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  ::selection { background: rgba(201,169,110,0.32); }
+  [data-theme] {
+    --gold-50:#FBF7EF;--gold-100:#F4EAD4;--gold-200:#E9D6AC;--gold-300:#DCC084;--gold-400:#D0B074;--gold-500:#C9A96E;--gold-600:#B6924F;--gold-700:#8E7139;--gold-800:#61502B;--gold-900:#3B301B;
+    --neutral-50:#FBFAF6;--neutral-100:#F4F1EA;--neutral-200:#E9E4D8;--neutral-300:#D8D2C4;--neutral-400:#B0A99B;--neutral-500:#84806F;--neutral-600:#605C52;--neutral-700:#423F39;--neutral-800:#242321;--neutral-900:#141414;--neutral-950:#0C0C0C;
+    --font-display:"Playfair Display",Georgia,serif;
+    --font-sans:"Figtree",system-ui,sans-serif;
+    --font-mono:"Geist Mono","JetBrains Mono",monospace;
+    --radius-sm:0.375rem;--radius-md:0.625rem;--radius-lg:1rem;--radius-xl:1.5rem;--radius-full:9999px;
+  }
+  [data-theme="light"]{
+    --background:#F4F1EA;--foreground:#141414;--card:#FFFFFF;--card-foreground:#141414;--popover:#FFFFFF;
+    --primary:#161616;--primary-foreground:#F8F6F0;--secondary:#E9E4D8;--secondary-foreground:#1A1A1A;
+    --muted:#ECE8DF;--muted-foreground:#6B675E;--accent:#EFE7D6;--accent-foreground:#1A1A1A;
+    --gold:#C5A468;--gold-foreground:#FBFAF6;--destructive:#B3261E;--success:#2F7D5B;--warning:#B5821E;
+    --border:#E2DCD0;--input:#E2DCD0;--ring:#C9A96E;--player-bar:#161513;--player-foreground:#E7E1D3;
+    --shadow-xs:0 1px 2px rgba(20,20,20,0.05);
+    --shadow-sm:0 1px 3px rgba(20,20,20,0.07),0 1px 2px rgba(20,20,20,0.04);
+    --shadow-md:0 6px 18px rgba(20,20,20,0.08),0 2px 5px rgba(20,20,20,0.05);
+    --shadow-lg:0 18px 48px rgba(20,20,20,0.12),0 6px 12px rgba(20,20,20,0.06);
+    --shadow-gold:0 6px 28px rgba(201,169,110,0.45);
+    --grid-line:rgba(20,20,20,0.04);
+  }
+  [data-theme="dark"]{
+    --background:#0C0C0C;--foreground:#F4F1EA;--card:#161616;--card-foreground:#F4F1EA;--popover:#161616;
+    --primary:#F4F1EA;--primary-foreground:#141414;--secondary:#1E1E1E;--secondary-foreground:#F4F1EA;
+    --muted:#1A1A1A;--muted-foreground:#9C968A;--accent:#2A261E;--accent-foreground:#F4F1EA;
+    --gold:#C9A96E;--gold-foreground:#141414;--destructive:#E5564B;--success:#4FB286;--warning:#E0B65A;
+    --border:#262626;--input:#262626;--ring:#C9A96E;--player-bar:#1B1A17;--player-foreground:#E7E1D3;
+    --shadow-xs:0 1px 2px rgba(0,0,0,0.40);
+    --shadow-sm:0 1px 3px rgba(0,0,0,0.50),0 1px 2px rgba(0,0,0,0.40);
+    --shadow-md:0 6px 18px rgba(0,0,0,0.55),0 2px 5px rgba(0,0,0,0.40);
+    --shadow-lg:0 18px 48px rgba(0,0,0,0.65),0 6px 12px rgba(0,0,0,0.45);
+    --shadow-gold:0 6px 28px rgba(201,169,110,0.30);
+    --grid-line:rgba(255,255,255,0.035);
+  }
+  @keyframes mjgGlow { 0%,100%{box-shadow:0 6px 28px rgba(201,169,110,0.45)} 50%{box-shadow:0 6px 40px rgba(201,169,110,0.65)} }
+  html{ scroll-behavior:smooth; }
+  .mjg-mark-dark{ display:none; }
+  [data-theme="dark"] .mjg-mark-light{ display:none; }
+  [data-theme="dark"] .mjg-mark-dark{ display:inline; }
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="display:flex; min-height:100vh; background:var(--background); color:var(--foreground); font-family:var(--font-sans); font-size:16px; line-height:1.6;">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside style="position:sticky; top:0; align-self:flex-start; width:256px; height:100vh; flex:none; border-right:1px solid var(--border); background:var(--card); padding:28px 20px; overflow-y:auto;">
+    <div style="display:flex; align-items:center; gap:11px; margin-bottom:5px;">
+      <img class="mjg-mark mjg-mark-light" src="assets/mjg-logo-black.svg" alt="MJG" style="height:24px; width:auto;" />
+      <img class="mjg-mark mjg-mark-dark" src="assets/mjg-logo-white.svg" alt="MJG" style="height:24px; width:auto;" />
+      <span style="font-family:var(--font-display); font-style:italic; font-weight:500; font-size:15px; letter-spacing:.01em;">Michael <span style="color:var(--gold);">J.</span> Gauthier</span>
+    </div>
+    <div style="font-family:var(--font-mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted-foreground); margin:6px 0 24px 1px;">Design System v2.0</div>
+
+    <nav style="display:flex; flex-direction:column; gap:2px;">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="12">
+        <a href="{{ item.href }}" style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius-sm); color:var(--foreground); text-decoration:none; font-size:14px; font-weight:500;" style-hover="background:var(--muted);">
+          <span style="width:5px; height:5px; border-radius:9999px; background:var(--gold); flex:none;"></span>
+          {{ item.label }}
+        </a>
+      </sc-for>
+    </nav>
+
+    <button onClick="{{ toggleTheme }}" style="margin-top:28px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; border:1px solid var(--border); border-radius:var(--radius-full); background:var(--background); color:var(--foreground); font-family:var(--font-sans); font-size:13px; font-weight:500; cursor:pointer;" style-hover="background:var(--muted);">
+      {{ themeLabel }}
+    </button>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main style="flex:1; min-width:0; max-width:1100px; padding:0 64px 120px; background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px); background-size:44px 44px;">
+
+    <!-- HERO -->
+    <header style="padding:72px 0 64px;">
+      <div style="display:inline-flex; align-items:center; gap:8px; padding:7px 16px; border:1px solid var(--border); border-radius:9999px; background:var(--card); font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:28px;">
+        <span style="width:6px;height:6px;border-radius:9999px;background:var(--gold);"></span>
+        The Stewardship Blueprint
+      </div>
+      <h1 style="font-family:var(--font-display); font-weight:900; font-size:clamp(48px,6.5vw,84px); line-height:1.0; letter-spacing:-0.01em; margin:0 0 22px;">
+        The Michael J. Gauthier<br><span style="font-style:italic; font-weight:700; color:var(--gold);">Design System</span>
+      </h1>
+      <p style="max-width:640px; font-size:18px; color:var(--muted-foreground); margin:0;">
+        A faithful, premium system matched to michaeljgauthier.com — warm paper, near-black ink, and signature gold. Built to guide Hermes, Claude &amp; ChatGPT in creating on-brand content across landing pages, email, social, blog, print, and brand.
+      </p>
+    </header>
+
+    <!-- ============ LOGOS ============ -->
+    <section id="logos" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">01 — Brand</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Logo &amp; Usage</h2>
+      <p style="color:var(--muted-foreground); max-width:600px; margin:0 0 28px;">The MJG monogram, four approved lockups. Pair with “Michael <span style="font-style:italic; color:var(--gold);">J.</span> Gauthier” in italic Playfair.</p>
+
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:20px;">
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:center; height:150px; background:#0C0C0C;"><img src="assets/mjg-logo-white.svg" alt="White monogram" style="width:170px;"/></div>
+          <div style="padding:14px 18px; background:var(--card);"><div style="font-weight:600; font-size:14px;">White on Black</div><div style="font-size:13px; color:var(--muted-foreground);">Dark backgrounds &amp; photography.</div></div>
+        </div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:center; height:150px; background:#F4F1EA;"><img src="assets/mjg-logo-black.svg" alt="Black monogram" style="width:170px;"/></div>
+          <div style="padding:14px 18px; background:var(--card);"><div style="font-weight:600; font-size:14px;">Black on Paper</div><div style="font-size:13px; color:var(--muted-foreground);">Primary light-mode lockup.</div></div>
+        </div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:center; height:150px; background:#0C0C0C;"><img src="assets/mjg-logo-gold.svg" alt="Gold monogram" style="width:170px;"/></div>
+          <div style="padding:14px 18px; background:var(--card);"><div style="font-weight:600; font-size:14px;">Gold on Black</div><div style="font-size:13px; color:var(--muted-foreground);">Premium / accent contexts.</div></div>
+        </div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:center; height:150px; background:#F4F1EA;"><img src="assets/mjg-logo-teal.svg" alt="Teal monogram" style="width:170px;"/></div>
+          <div style="padding:14px 18px; background:var(--card);"><div style="font-weight:600; font-size:14px;">Teal on Paper</div><div style="font-size:13px; color:var(--muted-foreground);">Supporting / heritage variant.</div></div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px;">
+        <div style="border:1px solid var(--border); border-left:3px solid var(--success); border-radius:var(--radius-md); padding:16px 18px; background:var(--card);">
+          <div style="font-weight:600; font-size:13px; color:var(--success); margin-bottom:8px;">DO</div>
+          <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--muted-foreground); line-height:1.7;">
+            <li>Keep clear space ≥ the height of the “M”.</li>
+            <li>Black/teal on light, white/gold on dark.</li>
+            <li>Scale proportionally only.</li>
+          </ul>
+        </div>
+        <div style="border:1px solid var(--border); border-left:3px solid var(--destructive); border-radius:var(--radius-md); padding:16px 18px; background:var(--card);">
+          <div style="font-weight:600; font-size:13px; color:var(--destructive); margin-bottom:8px;">DON'T</div>
+          <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--muted-foreground); line-height:1.7;">
+            <li>Recolor, add shadows, or outline.</li>
+            <li>Place on low-contrast fields.</li>
+            <li>Stretch, rotate, or crowd the mark.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COLORS ============ -->
+    <section id="colors" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">02 — Foundations</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Color</h2>
+      <p style="color:var(--muted-foreground); max-width:600px; margin:0 0 28px;">Warm paper and near-black neutrals carry the page. Gold is the accent — distinction, never default.</p>
+
+      <div style="margin-bottom:14px;">
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--muted-foreground); margin-bottom:6px;">GOLD</div>
+        <div style="display:grid; grid-template-columns:repeat(10,1fr); gap:6px;">
+          <sc-for list="{{ goldScale }}" as="c" hint-placeholder-count="10">
+            <div>
+              <div style="height:52px; border-radius:var(--radius-sm); border:1px solid var(--border); background:{{ c.hex }}"></div>
+              <div style="font-family:var(--font-mono); font-size:10px; margin-top:5px; color:var(--muted-foreground);">{{ c.step }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="margin-bottom:32px;">
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--muted-foreground); margin-bottom:6px;">NEUTRAL (WARM)</div>
+        <div style="display:grid; grid-template-columns:repeat(11,1fr); gap:6px;">
+          <sc-for list="{{ neutralScale }}" as="c" hint-placeholder-count="11">
+            <div>
+              <div style="height:52px; border-radius:var(--radius-sm); border:1px solid var(--border); background:{{ c.hex }}"></div>
+              <div style="font-family:var(--font-mono); font-size:10px; margin-top:5px; color:var(--muted-foreground);">{{ c.step }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <h3 style="font-size:14px; font-weight:600; margin:0 0 14px;">Semantic tokens <span style="font-weight:400; color:var(--muted-foreground);">— live in current theme</span></h3>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px;">
+        <sc-for list="{{ semanticTokens }}" as="t" hint-placeholder-count="12">
+          <div style="border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; background:var(--card);">
+            <div style="height:56px; background:{{ t.var }}"></div>
+            <div style="padding:10px 12px;">
+              <div style="font-family:var(--font-mono); font-size:12px;">{{ t.name }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- ============ TYPOGRAPHY ============ -->
+    <section id="type" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">02 — Foundations</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Typography</h2>
+      <p style="color:var(--muted-foreground); max-width:600px; margin:0 0 28px;">Playfair Display for high-contrast editorial headlines, Figtree for clean body &amp; UI.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:32px;">
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; background:var(--card);">
+          <div style="font-family:var(--font-mono); font-size:11px; color:var(--muted-foreground); margin-bottom:10px;">DISPLAY — Playfair Display</div>
+          <div style="font-family:var(--font-display); font-size:60px; line-height:1; font-weight:900;">Aa</div>
+          <div style="font-family:var(--font-display); font-size:26px; margin-top:10px; font-weight:700;">The Stewardship <span style="font-style:italic; color:var(--gold);">Blueprint</span></div>
+        </div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; background:var(--card);">
+          <div style="font-family:var(--font-mono); font-size:11px; color:var(--muted-foreground); margin-bottom:10px;">SANS — Figtree</div>
+          <div style="font-family:var(--font-sans); font-size:60px; line-height:1; font-weight:600;">Aa</div>
+          <div style="font-family:var(--font-sans); font-size:15px; margin-top:10px; color:var(--muted-foreground);">A framework for living with intention — aligning faith, family, finances, and future.</div>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+        <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="6">
+          <div style="display:flex; align-items:baseline; gap:24px; padding:16px 24px; border-bottom:1px solid var(--border); background:var(--card);">
+            <div style="width:120px; flex:none; font-family:var(--font-mono); font-size:12px; color:var(--muted-foreground);">{{ t.token }}</div>
+            <div style="font-family:var(--font-display); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:{{ t.size }}">The Stewardship Blueprint</div>
+            <div style="margin-left:auto; flex:none; font-family:var(--font-mono); font-size:12px; color:var(--muted-foreground);">{{ t.px }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- ============ SPACING & RADII ============ -->
+    <section id="spacing" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">02 — Foundations</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Spacing, Radii &amp; Shadows</h2>
+      <p style="color:var(--muted-foreground); max-width:600px; margin:0 0 28px;">A 4px base grid. Generous, soft radii. Quiet shadows that lift, never shout.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; background:var(--card);">
+          <div style="font-weight:600; font-size:14px; margin-bottom:16px;">Spacing</div>
+          <sc-for list="{{ spacing }}" as="s" hint-placeholder-count="6">
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+              <div style="font-family:var(--font-mono); font-size:12px; color:var(--muted-foreground); width:64px;">{{ s.token }}</div>
+              <div style="height:14px; background:var(--gold); border-radius:2px; width:{{ s.px }}"></div>
+              <div style="font-family:var(--font-mono); font-size:12px; color:var(--muted-foreground);">{{ s.px }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; background:var(--card);">
+          <div style="font-weight:600; font-size:14px; margin-bottom:16px;">Radii</div>
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px;">
+            <sc-for list="{{ radii }}" as="r" hint-placeholder-count="4">
+              <div>
+                <div style="height:56px; background:var(--accent); border:1px solid var(--border); border-radius:{{ r.val }}"></div>
+                <div style="font-family:var(--font-mono); font-size:11px; color:var(--muted-foreground); margin-top:6px;">{{ r.token }} · {{ r.val }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:16px;">
+        <sc-for list="{{ shadows }}" as="sh" hint-placeholder-count="4">
+          <div style="text-align:center;">
+            <div style="height:80px; background:var(--card); border-radius:var(--radius-lg); margin-bottom:10px; box-shadow:{{ sh.val }}"></div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--muted-foreground);">{{ sh.token }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- ============ BUTTONS ============ -->
+    <section id="buttons" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">03 — Components</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Buttons</h2>
+      <p style="color:var(--muted-foreground); max-width:620px; margin:0 0 28px;">Near-black (or cream in dark) primary for the main action. Gold is the single “movement” CTA — use one per view.</p>
+
+      <div style="border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; background:var(--card); display:flex; flex-wrap:wrap; gap:14px; align-items:center;">
+        <button style="font-family:var(--font-sans); font-size:14px; font-weight:600; padding:13px 26px; border-radius:var(--radius-full); border:none; cursor:pointer; background:var(--primary); color:var(--primary-foreground);" style-hover="filter:brightness(1.15);">Join the Journey</button>
+        <button style="font-family:var(--font-sans); font-size:14px; font-weight:600; padding:13px 26px; border-radius:var(--radius-full); border:none; cursor:pointer; background:var(--gold); color:var(--gold-foreground); box-shadow:var(--shadow-gold);" style-hover="filter:brightness(1.05);">Join the Movement →</button>
+        <button style="font-family:var(--font-sans); font-size:14px; font-weight:600; padding:13px 26px; border-radius:var(--radius-full); cursor:pointer; background:transparent; color:var(--foreground); border:1px solid var(--border);" style-hover="background:var(--muted);">See the Blueprint</button>
+        <button style="font-family:var(--font-sans); font-size:14px; font-weight:600; padding:13px 26px; border-radius:var(--radius-full); cursor:pointer; background:var(--secondary); color:var(--secondary-foreground); border:none;" style-hover="filter:brightness(0.96);">Secondary</button>
+        <button style="font-family:var(--font-sans); font-size:14px; font-weight:600; padding:13px 26px; border-radius:var(--radius-full); cursor:pointer; background:transparent; color:var(--foreground); border:none;" style-hover="background:var(--muted);">Ghost</button>
+        <button style="font-family:var(--font-sans); font-size:14px; font-weight:600; padding:13px 26px; border-radius:var(--radius-full); border:none; background:var(--muted); color:var(--muted-foreground); cursor:not-allowed; opacity:.6;">Disabled</button>
+        <a href="#" style="font-family:var(--font-sans); font-size:14px; font-weight:600; color:var(--foreground); text-decoration:none; border-bottom:1px solid var(--gold); padding-bottom:1px;">Text link →</a>
+      </div>
+      <div style="display:flex; gap:14px; align-items:center; margin-top:16px;">
+        <button style="font-family:var(--font-sans); font-size:12px; font-weight:600; padding:8px 16px; border-radius:var(--radius-full); border:none; cursor:pointer; background:var(--primary); color:var(--primary-foreground);">Small</button>
+        <button style="font-family:var(--font-sans); font-size:14px; font-weight:600; padding:13px 26px; border-radius:var(--radius-full); border:none; cursor:pointer; background:var(--primary); color:var(--primary-foreground);">Default</button>
+        <button style="font-family:var(--font-sans); font-size:16px; font-weight:600; padding:16px 34px; border-radius:var(--radius-full); border:none; cursor:pointer; background:var(--primary); color:var(--primary-foreground);">Large</button>
+      </div>
+    </section>
+
+    <!-- ============ BADGES ============ -->
+    <section id="badges" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">03 — Components</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Badges &amp; Eyebrows</h2>
+      <div style="border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; background:var(--card); display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:8px;">
+        <span style="display:inline-flex; align-items:center; gap:7px; font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; padding:7px 16px; border-radius:9999px; border:1px solid var(--border); color:var(--muted-foreground);"><span style="width:6px;height:6px;border-radius:9999px;background:var(--gold);"></span>You Were Created For More</span>
+        <span style="font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--gold);">✦ Walk With Me</span>
+        <span style="font-size:12px; font-weight:600; padding:5px 13px; border-radius:9999px; background:var(--primary); color:var(--primary-foreground);">Primary</span>
+        <span style="font-size:12px; font-weight:600; padding:5px 13px; border-radius:9999px; background:var(--gold); color:var(--gold-foreground);">Gold</span>
+        <span style="font-size:12px; font-weight:600; padding:5px 13px; border-radius:9999px; background:var(--accent); color:var(--accent-foreground);">Accent</span>
+        <span style="font-size:12px; font-weight:600; padding:5px 13px; border-radius:9999px; background:transparent; color:var(--foreground); border:1px solid var(--border);">Outline</span>
+        <span style="font-size:12px; font-weight:600; padding:5px 13px; border-radius:9999px; background:rgba(47,125,91,.14); color:var(--success);">Success</span>
+        <span style="font-size:12px; font-weight:600; padding:5px 13px; border-radius:9999px; background:rgba(181,130,30,.16); color:var(--warning);">Warning</span>
+      </div>
+    </section>
+
+    <!-- ============ CARDS ============ -->
+    <section id="cards" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">03 — Components</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 24px;">Cards</h2>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--card); box-shadow:var(--shadow-sm); overflow:hidden;">
+          <div style="height:108px; background:#0C0C0C; display:flex; align-items:flex-end; padding:16px;"><span style="font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.14em; color:var(--gold);">01 — BEDROCK</span></div>
+          <div style="padding:22px;">
+            <h3 style="font-family:var(--font-display); font-weight:700; font-size:25px; margin:0 0 8px;">Created for More</h3>
+            <p style="font-size:14px; color:var(--muted-foreground); margin:0 0 16px; line-height:1.6;">Life is often lived by default, not design. An honest look at how easily we drift.</p>
+            <a href="#" style="font-size:13px; font-weight:600; color:var(--foreground); text-decoration:none; border-bottom:1px solid var(--gold); padding-bottom:1px;">Read chapter →</a>
+          </div>
+        </div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--card); box-shadow:var(--shadow-sm); padding:24px;">
+          <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--gold);font-family:var(--font-display);font-size:24px;font-weight:700;font-style:italic;">F</div>
+          <h3 style="font-family:var(--font-display); font-weight:700; font-size:25px; margin:0 0 8px;">Finances</h3>
+          <p style="font-size:14px; color:var(--muted-foreground); margin:0; line-height:1.6;">A financial blueprint built on purpose, not accumulation.</p>
+        </div>
+        <div style="border-radius:var(--radius-lg); background:#0C0C0C; box-shadow:var(--shadow-md); padding:26px; display:flex; flex-direction:column;">
+          <span style="align-self:flex-start; font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); margin-bottom:14px;">Featured</span>
+          <h3 style="font-family:var(--font-display); font-weight:700; font-size:25px; margin:0 0 8px; color:#F4F1EA;">Join the <span style="font-style:italic; color:var(--gold);">Journey</span></h3>
+          <p style="font-size:14px; color:#A8A296; margin:0 0 18px; line-height:1.6;">Early chapter drafts, worksheets, and live Q&amp;A invites.</p>
+          <button style="margin-top:auto; align-self:flex-start; font-family:var(--font-sans); font-size:13px; font-weight:600; padding:11px 22px; border-radius:var(--radius-full); border:none; cursor:pointer; background:var(--gold); color:#141414;">Get Early Access</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ALERTS ============ -->
+    <section id="alerts" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">03 — Components</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 24px;">Alerts &amp; Callouts</h2>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div style="border:1px solid var(--border); border-left:3px solid var(--gold); border-radius:var(--radius-md); padding:16px 20px; background:var(--card);">
+          <div style="font-weight:600; font-size:14px; margin-bottom:3px;">Reflection Prompt</div>
+          <div style="font-size:14px; color:var(--muted-foreground);">When was the last time you slowed down to think about your life?</div>
+        </div>
+        <div style="border:1px solid rgba(47,125,91,.3); border-left:3px solid var(--success); border-radius:var(--radius-md); padding:16px 20px; background:rgba(47,125,91,.07);">
+          <div style="font-weight:600; font-size:14px; color:var(--success); margin-bottom:3px;">Saved</div>
+          <div style="font-size:14px; color:var(--muted-foreground);">Your reflection has been added to the journey.</div>
+        </div>
+        <div style="border:1px solid rgba(181,130,30,.3); border-left:3px solid var(--warning); border-radius:var(--radius-md); padding:16px 20px; background:rgba(181,130,30,.08);">
+          <div style="font-weight:600; font-size:14px; color:var(--warning); margin-bottom:3px;">Heads up</div>
+          <div style="font-size:14px; color:var(--muted-foreground);">Draft chapters are early and may change before release.</div>
+        </div>
+        <div style="border:1px solid rgba(179,38,30,.3); border-left:3px solid var(--destructive); border-radius:var(--radius-md); padding:16px 20px; background:rgba(179,38,30,.07);">
+          <div style="font-weight:600; font-size:14px; color:var(--destructive); margin-bottom:3px;">Something went wrong</div>
+          <div style="font-size:14px; color:var(--muted-foreground);">We couldn't submit the form. Please try again.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FORM INPUTS ============ -->
+    <section id="inputs" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">03 — Components</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 24px;">Form Inputs</h2>
+      <div style="border:1px solid var(--border); border-radius:var(--radius-lg); padding:30px; background:var(--card); max-width:620px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+          <div>
+            <label style="display:block; font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:8px;">First Name *</label>
+            <input placeholder="Michael" style="width:100%; font-family:var(--font-sans); font-size:15px; padding:12px 14px; border:1px solid var(--input); border-radius:var(--radius-md); background:var(--background); color:var(--foreground);" />
+          </div>
+          <div>
+            <label style="display:block; font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:8px;">Last Name *</label>
+            <input placeholder="Gauthier" style="width:100%; font-family:var(--font-sans); font-size:15px; padding:12px 14px; border:1px solid var(--input); border-radius:var(--radius-md); background:var(--background); color:var(--foreground);" />
+          </div>
+        </div>
+        <div style="margin-top:18px;">
+          <label style="display:block; font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:8px;">Email Address *</label>
+          <input placeholder="you@example.com" style="width:100%; font-family:var(--font-sans); font-size:15px; padding:12px 14px; border:1px solid var(--input); border-radius:var(--radius-md); background:var(--background); color:var(--foreground);" />
+        </div>
+        <div style="margin-top:18px;">
+          <label style="display:block; font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:8px;">Questions or Comments</label>
+          <textarea placeholder="Share your thoughts…" rows="3" style="width:100%; font-family:var(--font-sans); font-size:15px; padding:12px 14px; border:1px solid var(--input); border-radius:var(--radius-md); background:var(--background); color:var(--foreground); resize:vertical;"></textarea>
+        </div>
+        <button style="margin-top:20px; width:100%; font-family:var(--font-sans); font-size:15px; font-weight:600; padding:14px; border-radius:var(--radius-full); border:none; cursor:pointer; background:var(--gold); color:var(--gold-foreground);">Join the Journey →</button>
+      </div>
+    </section>
+
+    <!-- ============ AUDIO PLAYER ============ -->
+    <section id="audio" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">03 — Components</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Audio Player</h2>
+      <p style="color:var(--muted-foreground); max-width:600px; margin:0 0 28px;">The audiobook player, matched to the site: scrubber, dark control pill with a gold center, and volume.</p>
+
+      <div style="border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--card); box-shadow:var(--shadow-md); padding:36px 40px; text-align:center;">
+        <div style="font-family:var(--font-sans); font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:28px;">The Stewardship Blueprint</div>
+
+        <!-- scrubber -->
+        <div style="display:flex; align-items:center; gap:14px; max-width:620px; margin:0 auto 22px;">
+          <span style="font-family:var(--font-mono); font-size:12px; color:var(--muted-foreground); flex:none;">{{ elapsed }}</span>
+          <div style="position:relative; flex:1; height:3px; border-radius:9999px; background:var(--border);">
+            <div style="position:absolute; left:0; top:0; height:100%; border-radius:9999px; background:var(--gold); width:{{ progressWidth }}"></div>
+            <div style="position:absolute; top:50%; left:{{ progressWidth }}; transform:translate(-50%,-50%); width:14px; height:14px; border-radius:9999px; background:var(--gold); box-shadow:0 1px 4px rgba(0,0,0,.3);"></div>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:12px; color:var(--muted-foreground); flex:none;">1:26</span>
+        </div>
+
+        <!-- control pill -->
+        <div style="position:relative; display:flex; align-items:center; justify-content:space-between; max-width:620px; margin:0 auto; height:88px; padding:0 34px; border-radius:9999px; background:var(--player-bar); color:var(--player-foreground);">
+          <button title="Bookmark" style="background:none; border:none; cursor:pointer; color:var(--player-foreground); opacity:.85; display:flex;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          </button>
+          <button title="Back 10s" style="background:none; border:none; cursor:pointer; color:var(--player-foreground); opacity:.85; position:relative; display:flex;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4 5 9l6 5"></path><path d="M5 9h7a7 7 0 1 1-7 7"></path></svg>
+            <span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:8px; font-weight:500; padding-top:2px;">10</span>
+          </button>
+          <button onClick="{{ togglePlay }}" title="Play / Pause" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:84px; height:84px; border-radius:9999px; border:4px solid var(--card); cursor:pointer; background:var(--gold); color:#141414; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow:var(--shadow-gold);">
+            <span style="font-size:17px; line-height:1;">▶</span><span style="font-size:15px; line-height:1; opacity:.55;">❚❚</span>
+          </button>
+          <button title="Forward 10s" style="background:none; border:none; cursor:pointer; color:var(--player-foreground); opacity:.85; position:relative; display:flex; margin-left:auto; margin-right:0;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4l6 5-6 5"></path><path d="M19 9h-7a7 7 0 1 0 7 7"></path></svg>
+            <span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:8px; font-weight:500; padding-top:2px;">10</span>
+          </button>
+          <button title="Restart" style="background:none; border:none; cursor:pointer; color:var(--player-foreground); opacity:.85; display:flex;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path></svg>
+          </button>
+        </div>
+
+        <!-- volume -->
+        <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; max-width:620px; margin:18px auto 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+          <div style="position:relative; width:120px; height:3px; border-radius:9999px; background:var(--border);">
+            <div style="position:absolute; left:0; top:0; height:100%; width:62%; border-radius:9999px; background:var(--gold);"></div>
+            <div style="position:absolute; top:50%; left:62%; transform:translate(-50%,-50%); width:12px; height:12px; border-radius:9999px; background:var(--gold);"></div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        </div>
+      </div>
+      <div style="text-align:center; font-size:14px; color:var(--muted-foreground); margin-top:18px;">By Michael J. Gauthier <span style="color:var(--gold);">•</span> Life Design · Stewardship · Faith</div>
+    </section>
+
+    <!-- ============ ICONOGRAPHY ============ -->
+    <section id="icons" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">03 — Components</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Iconography</h2>
+      <p style="color:var(--muted-foreground); max-width:620px; margin:0 0 24px;">Line icons, <strong>1.5px stroke</strong>, rounded caps/joins, 24px grid. Lucide is the reference set — <span style="font-family:var(--font-mono); font-size:13px;">currentColor</span> stroke, never filled.</p>
+      <div style="border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; background:var(--card); display:flex; gap:28px; flex-wrap:wrap; align-items:center; color:var(--foreground);">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:72px; color:var(--gold);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--muted-foreground);">compass</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:72px; color:var(--gold);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--muted-foreground);">home</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:72px; color:var(--gold);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--muted-foreground);">book</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:72px; color:var(--gold);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path></svg>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--muted-foreground);">users</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:72px; color:var(--gold);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--muted-foreground);">trending</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:72px; color:var(--gold);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--muted-foreground);">shield</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:72px; color:var(--gold);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--muted-foreground);">heart</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:72px; color:var(--gold);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--muted-foreground);">play</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VOICE ============ -->
+    <section id="voice" style="margin-bottom:80px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">04 — For the agents</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Voice &amp; Tone</h2>
+      <p style="color:var(--muted-foreground); max-width:620px; margin:0 0 24px;">Guidance for Hermes, Claude &amp; ChatGPT when writing as Michael J. Gauthier.</p>
+
+      <div style="border-radius:var(--radius-lg); padding:36px; background:#0C0C0C; margin-bottom:16px;">
+        <div style="font-family:var(--font-display); font-style:italic; font-weight:500; font-size:28px; line-height:1.35; max-width:720px; color:#F4F1EA;">“Encouraging others to use their God-given resources for <span style="color:var(--gold);">God-given purposes</span>.”</div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;">
+        <sc-for list="{{ voiceTraits }}" as="v" hint-placeholder-count="5">
+          <span style="font-size:13px; font-weight:500; padding:8px 18px; border-radius:9999px; background:var(--accent); color:var(--accent-foreground);">{{ v }}</span>
+        </sc-for>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div style="border:1px solid var(--border); border-left:3px solid var(--success); border-radius:var(--radius-md); padding:20px; background:var(--card);">
+          <div style="font-weight:600; font-size:13px; color:var(--success); margin-bottom:12px;">DO</div>
+          <ul style="margin:0; padding-left:18px; font-size:14px; color:var(--muted-foreground); line-height:1.8;">
+            <li>Use building metaphors: bedrock, foundation, pillars, guardrails, legacy.</li>
+            <li>Write in first person for Michael's voice; warm and grounded.</li>
+            <li>Invite, don't push — “Join the journey.”</li>
+            <li>Clarity over cleverness; short declarative sentences.</li>
+          </ul>
+        </div>
+        <div style="border:1px solid var(--border); border-left:3px solid var(--destructive); border-radius:var(--radius-md); padding:20px; background:var(--card);">
+          <div style="font-weight:600; font-size:13px; color:var(--destructive); margin-bottom:12px;">DON'T</div>
+          <ul style="margin:0; padding-left:18px; font-size:14px; color:var(--muted-foreground); line-height:1.8;">
+            <li>No hype, urgency-bait, or prosperity-gospel language.</li>
+            <li>No dense finance jargon.</li>
+            <li>Avoid exclamation overload and emoji in formal contexts.</li>
+            <li>Never preachy — integrate faith, don't sermonize.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TOKENS / IMPORT ============ -->
+    <section id="tokens" style="margin-bottom:40px;">
+      <div style="font-family:var(--font-sans); font-weight:600; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">04 — For the agents</div>
+      <h2 style="font-family:var(--font-display); font-weight:700; font-size:38px; margin:0 0 8px;">Tokens &amp; Import</h2>
+      <p style="color:var(--muted-foreground); max-width:620px; margin:0 0 24px;">Two machine-readable files ship with this system. Import either into the WebApp or feed to the agents.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--card); padding:22px;">
+          <div style="font-family:var(--font-mono); font-size:13px; font-weight:500; margin-bottom:8px;">tokens/mjg-tokens.css</div>
+          <div style="font-size:13px; color:var(--muted-foreground); margin-bottom:14px;">CSS custom properties, light + dark. Drop-in for the WebApp.</div>
+          <pre style="margin:0; font-family:var(--font-mono); font-size:12px; background:var(--background); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; overflow:auto; color:var(--foreground);">&lt;html data-theme="dark"&gt;
+color: var(--foreground);
+background: var(--gold);</pre>
+        </div>
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--card); padding:22px;">
+          <div style="font-family:var(--font-mono); font-size:13px; font-weight:500; margin-bottom:8px;">tokens/mjg-tokens.json</div>
+          <div style="font-size:13px; color:var(--muted-foreground); margin-bottom:14px;">Structured tokens, logo rules, and voice guidance for AI agents.</div>
+          <pre style="margin:0; font-family:var(--font-mono); font-size:12px; background:var(--background); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; overflow:auto; color:var(--foreground);">brand.gold   → #C9A96E
+brand.ink    → #141414
+voice.principles[]</pre>
+        </div>
+      </div>
+    </section>
+
+    <footer style="border-top:1px solid var(--border); padding-top:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div style="font-family:var(--font-mono); font-size:12px; color:var(--muted-foreground);">© MichaelJ.Gauthier.com — Design System v2.0</div>
+      <div style="font-family:var(--font-mono); font-size:12px; color:var(--muted-foreground);">The Stewardship Blueprint</div>
+    </footer>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { theme: "light", playing: false };
+
+  renderVals() {
+    const dark = this.state.theme === "dark";
+    return {
+      theme: this.state.theme,
+      themeLabel: dark ? "☾  Dark mode" : "☀  Light mode",
+      toggleTheme: () => this.setState(s => ({ theme: s.theme === "dark" ? "light" : "dark" })),
+
+      togglePlay: () => this.setState(s => ({ playing: !s.playing })),
+      progressWidth: this.state.playing ? "38%" : "6%",
+      elapsed: this.state.playing ? "0:32" : "0:00",
+
+      nav: [
+        { label: "Logo & Usage", href: "#logos" },
+        { label: "Color", href: "#colors" },
+        { label: "Typography", href: "#type" },
+        { label: "Spacing & Shadows", href: "#spacing" },
+        { label: "Buttons", href: "#buttons" },
+        { label: "Badges & Eyebrows", href: "#badges" },
+        { label: "Cards", href: "#cards" },
+        { label: "Alerts", href: "#alerts" },
+        { label: "Form Inputs", href: "#inputs" },
+        { label: "Audio Player", href: "#audio" },
+        { label: "Iconography", href: "#icons" },
+        { label: "Voice & Tone", href: "#voice" },
+        { label: "Tokens & Import", href: "#tokens" },
+      ],
+
+      goldScale: [["50","#FBF7EF"],["100","#F4EAD4"],["200","#E9D6AC"],["300","#DCC084"],["400","#D0B074"],["500","#C9A96E"],["600","#B6924F"],["700","#8E7139"],["800","#61502B"],["900","#3B301B"]].map(([step,hex])=>({step,hex})),
+      neutralScale: [["50","#FBFAF6"],["100","#F4F1EA"],["200","#E9E4D8"],["300","#D8D2C4"],["400","#B0A99B"],["500","#84806F"],["600","#605C52"],["700","#423F39"],["800","#242321"],["900","#141414"],["950","#0C0C0C"]].map(([step,hex])=>({step,hex})),
+
+      semanticTokens: ["background","foreground","card","primary","secondary","muted","muted-foreground","accent","gold","border","destructive","success"].map(n=>({ name:n, var:`var(--${n})` })),
+
+      typeScale: [
+        { token:"text-5xl", size:"72px", px:"72 / 4.5rem" },
+        { token:"text-4xl", size:"48px", px:"48 / 3rem" },
+        { token:"text-3xl", size:"36px", px:"36 / 2.25rem" },
+        { token:"text-2xl", size:"28px", px:"28 / 1.75rem" },
+        { token:"text-xl",  size:"22px", px:"22 / 1.375rem" },
+        { token:"text-lg",  size:"18px", px:"18 / 1.125rem" },
+        { token:"text-base",size:"16px", px:"16 / 1rem" },
+      ],
+
+      spacing: [["space-1","4px"],["space-2","8px"],["space-3","12px"],["space-4","16px"],["space-6","24px"],["space-8","32px"],["space-12","48px"]].map(([token,px])=>({token,px})),
+      radii: [["sm","0.375rem"],["md","0.625rem"],["lg","1rem"],["xl","1.5rem"]].map(([token,val])=>({token,val})),
+      shadows: [
+        ["shadow-xs", dark?"0 1px 2px rgba(0,0,0,0.40)":"0 1px 2px rgba(20,20,20,0.05)"],
+        ["shadow-sm", dark?"0 1px 3px rgba(0,0,0,0.50),0 1px 2px rgba(0,0,0,0.40)":"0 1px 3px rgba(20,20,20,0.07),0 1px 2px rgba(20,20,20,0.04)"],
+        ["shadow-md", dark?"0 6px 18px rgba(0,0,0,0.55),0 2px 5px rgba(0,0,0,0.40)":"0 6px 18px rgba(20,20,20,0.08),0 2px 5px rgba(20,20,20,0.05)"],
+        ["shadow-gold","0 6px 28px rgba(201,169,110,0.45)"],
+      ].map(([token,val])=>({token,val})),
+
+      voiceTraits: ["Grounded","Warm","Intentional","Faith-rooted","Premium but humble"],
+    };
+  }
+}
+</script>
+</body>
+</html>

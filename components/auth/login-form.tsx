@@ -117,7 +117,7 @@ export function LoginForm() {
                 className="pr-10"
                 name="password"
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="Supabase Auth password"
+                placeholder="Password"
                 type={showPassword ? "text" : "password"}
                 value={password}
               />
