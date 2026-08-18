@@ -37,6 +37,8 @@ type MappingRow = {
 
 const CATEGORY_LABELS: Record<string, string> = {
   six_week_challenge: "The 6 Week Challenge",
+  six_week_challenge_participant: "6WC · Participant",
+  six_week_challenge_facilitator: "6WC · Facilitator",
   general: "General",
   new_user_signup: "New User Sign-Up",
   login: "Login / Auth",
@@ -51,7 +53,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   blog_posts: "Blog Posts",
 };
 const CATEGORY_ORDER = [
-  "six_week_challenge", "email_journey", "surveys", "inner_circle", "new_user_signup", "login",
+  "six_week_challenge", "six_week_challenge_participant", "six_week_challenge_facilitator",
+  "email_journey", "surveys", "inner_circle", "new_user_signup", "login",
   "participants", "waves", "check_in_results", "pastor_elder_review", "notifications",
   "blog_posts", "general",
 ];
@@ -108,7 +111,10 @@ export function EmailTemplateManager({ templates, mappings, defaultEmail = "" }:
 
   const categories = useMemo(() => {
     const present = new Set(templates.map((t) => t.category || "general"));
-    present.add("six_week_challenge"); // always show the 6 Week Challenge filter — program is being prepared
+    // Always show the 6-Week Challenge tags (program is being prepared).
+    present.add("six_week_challenge");
+    present.add("six_week_challenge_participant");
+    present.add("six_week_challenge_facilitator");
     return CATEGORY_ORDER.filter((c) => present.has(c)).concat(
       [...present].filter((c) => !CATEGORY_ORDER.includes(c)).sort(),
     );
