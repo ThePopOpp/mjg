@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 export default function ChallengeVideoLibraryPage() {
   return (
     <PilotShell
+      heroVariant="centered"
       eyebrow="The Life You're Building"
       title="The Video Library"
       description="Every teaching video for the 6-Week Challenge, in order — from the invitation through the closing word. Watch each week's video before your session."
