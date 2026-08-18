@@ -134,7 +134,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {[
-              ["Check-In completed", pilotMetrics.checkInCompleted],
+              ["Check-In completed", checkInStats.count],
               ["Survey completed", pilotMetrics.surveyCompleted],
               ["Inner Circle accepted", pilotMetrics.innerCircle],
               ["Follow-up permission", pilotMetrics.followUpPermission],

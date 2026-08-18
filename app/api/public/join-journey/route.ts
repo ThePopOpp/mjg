@@ -88,11 +88,19 @@ export async function POST(request: NextRequest) {
       firstName,
       tempPassword: profileResult.tempPassword,
       existingAccount: profileResult.existingAccount,
-    }).catch((emailError: unknown) => {
-      const reason = emailError instanceof Error ? emailError.message : "Unknown email error.";
-      console.error("[join-journey] welcome email failed", { email, reason });
-      return { failed: true as const, reason };
-    });
+    })
+      .then((result) =>
+        // A skipped send (no email provider configured) is NOT an exception, but it still
+        // means the participant never got their sign-in credentials — treat it as a failure.
+        result && (result.skipped || !result.ok)
+          ? { failed: true as const, reason: result.reason ?? "Email provider not configured." }
+          : null,
+      )
+      .catch((emailError: unknown) => {
+        const reason = emailError instanceof Error ? emailError.message : "Unknown email error.";
+        console.error("[join-journey] welcome email failed", { email, reason });
+        return { failed: true as const, reason };
+      });
 
     if (welcomeEmail && "failed" in welcomeEmail) {
       await supabase
@@ -347,7 +355,7 @@ async function sendWelcomeAccessEmail(input: {
     ? `<p>Your temporary password is:</p><p style="font-size:18px;font-weight:700;letter-spacing:.04em;">${escapeHtml(input.tempPassword)}</p><p>Please sign in and update your password when you are ready.</p>`
     : "<p>Your account is already connected. Please sign in with your existing password or use the secure email sign-in link.</p>";
 
-  await sendSmtpEmail({
+  return sendSmtpEmail({
     to: input.email,
     subject: "Welcome to The Journey",
     html: `

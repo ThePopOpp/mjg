@@ -4,19 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Activity, CheckCircle2, CircleUserRound, MailCheck, MessageSquareText, TrendingUp, UsersRound } from "lucide-react";
 import { getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
+import { listCheckInSubmissions, getCheckInSubmissionStats } from "@/lib/check-in/submissions";
 
 export default async function ReportsPage() {
-  const data = await getPilotDashboardData();
+  const [data, submissions, checkInStats] = await Promise.all([
+    getPilotDashboardData(),
+    listCheckInSubmissions(),
+    getCheckInSubmissionStats(),
+  ]);
   const metrics = getPilotMetrics(data);
   const funnel = [
     { label: "Invited", value: metrics.invited },
     { label: "Opted in", value: metrics.optedIn },
-    { label: "Check-In completed", value: metrics.checkInCompleted },
+    { label: "Check-In completed", value: checkInStats.count },
     { label: "Survey completed", value: metrics.surveyCompleted },
     { label: "Inner Circle accepted", value: metrics.innerCircle },
   ];
-  const waveRows = getWaveRows(data.participants as any[], data.checkIns as any[], data.surveys as any[]);
-  const lowestAreaRows = getDistribution((data.checkIns as any[]).map((row) => row.lowest_area_label).filter(Boolean));
+  // Created for More check-ins live in check_in_submissions (they carry participant_id).
+  const waveRows = getWaveRows(data.participants as any[], submissions as any[], data.surveys as any[]);
+  const lowestAreaRows = getDistribution(submissions.map((row) => row.lowest_layer).filter(Boolean) as string[]);
   const tagRows = (data.tags as any[])
     .map((tag) => ({ name: tag.name, category: tag.category, count: tag.participant_tags?.length ?? 0 }))
     .sort((a, b) => b.count - a.count)
@@ -34,7 +40,7 @@ export default async function ReportsPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <MetricCard label="Number invited" value={String(metrics.invited)} detail="Has wave/source" icon={UsersRound} />
         <MetricCard label="Number opted in" value={String(metrics.optedIn)} detail="7-day journey permission" icon={MailCheck} />
-        <MetricCard label="Check-In completed" value={String(metrics.checkInCompleted)} detail={`Average score ${metrics.averageScore || "-"}`} icon={CheckCircle2} />
+        <MetricCard label="Check-In completed" value={String(checkInStats.count)} detail={`Average score ${checkInStats.averageScore ?? "-"}`} icon={CheckCircle2} />
         <MetricCard label="Survey completed" value={String(metrics.surveyCompleted)} detail="General and Pastor/Elder" icon={MessageSquareText} />
         <MetricCard label="Inner Circle accepted" value={String(metrics.innerCircle)} detail="Accepted invitation" icon={CircleUserRound} />
         <MetricCard label="Follow-up permission" value={String(metrics.followUpPermission)} detail="Ready for personal follow-up" icon={Activity} />
