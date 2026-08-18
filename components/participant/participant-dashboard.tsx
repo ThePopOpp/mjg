@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { UsersRound, ClipboardCheck, HeartHandshake, MessageSquareText, MessagesSquare, CornerUpLeft, ArrowRight } from "lucide-react";
+import { UsersRound, ClipboardCheck, HeartHandshake, MessageSquareText, MessagesSquare, CornerUpLeft, ArrowRight, FileText } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
-import { MyTasksCard } from "@/components/dashboard/my-tasks-card";
 import { Button } from "@/components/ui/button";
-import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
 import { getParticipantTeam } from "@/lib/participant/team";
+import { getParticipantSubmissions } from "@/lib/participant/history";
 import { getCheckInSubmissionsByEmail } from "@/lib/check-in/submissions";
 import { MAX_SCORE } from "@/lib/check-in/created-for-more";
 import type { DashboardProfile } from "@/lib/auth/server";
@@ -17,11 +16,11 @@ function fmtDate(iso: string) {
 
 export async function ParticipantDashboard({ profile }: { profile: DashboardProfile }) {
   const myName = [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim();
-  const [myTasks, dmStats, team, checkIns] = await Promise.all([
-    getMyOpenTasks({ id: profile.id, role: profile.role, email: profile.email }),
+  const [dmStats, team, checkIns, submissions] = await Promise.all([
     getDmStats(profile.id),
     getParticipantTeam(profile.email),
     getCheckInSubmissionsByEmail(profile.email),
+    getParticipantSubmissions(profile.email),
   ]);
   const latestCheckIn = checkIns[0];
 
@@ -44,8 +43,6 @@ export async function ParticipantDashboard({ profile }: { profile: DashboardProf
         title={`Welcome${myName ? `, ${myName}` : ""}`}
         description="Your group, your conversations, and your next steps at a glance."
       />
-
-      <MyTasksCard tasks={myTasks} name={myName} />
 
       {/* Your Created for More Check-In — take it, and see your results */}
       <div className="space-y-4 border-t pt-6">
@@ -81,6 +78,37 @@ export async function ParticipantDashboard({ profile }: { profile: DashboardProf
         ) : (
           <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
             No check-ins yet. Take the Created for More Check-In and your results will appear here.
+          </p>
+        )}
+      </div>
+
+      {/* Your Surveys & Forms — everything this participant has completed */}
+      <div className="space-y-4 border-t pt-6">
+        <h2 className="text-lg font-semibold tracking-tight">Your Surveys &amp; Forms</h2>
+        {submissions.length ? (
+          <div className="overflow-hidden rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/40 text-left">
+                  <th className="px-4 py-2.5 font-medium text-muted-foreground">Completed</th>
+                  <th className="px-4 py-2.5 font-medium text-muted-foreground">Form</th>
+                  <th className="px-4 py-2.5 font-medium text-muted-foreground">Type</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {submissions.map((s) => (
+                  <tr key={`${s.kind}-${s.id}`}>
+                    <td className="px-4 py-2.5 text-muted-foreground">{fmtDate(s.created_at)}</td>
+                    <td className="px-4 py-2.5 font-medium">{s.label}</td>
+                    <td className="px-4 py-2.5 capitalize text-muted-foreground">{s.kind}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="flex items-center gap-2 rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+            <FileText className="h-4 w-4" /> No surveys or forms completed yet. Anything you submit will be listed here.
           </p>
         )}
       </div>

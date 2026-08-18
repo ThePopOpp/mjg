@@ -2,16 +2,13 @@ import Link from "next/link";
 import { UsersRound, ClipboardCheck, Route, HeartHandshake, MessageSquareText, MessagesSquare, CornerUpLeft } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
-import { MyTasksCard } from "@/components/dashboard/my-tasks-card";
-import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
 import { getFacilitatorTeam } from "@/lib/facilitator/team";
 import type { DashboardProfile } from "@/lib/auth/server";
 
 export async function FacilitatorDashboard({ profile }: { profile: DashboardProfile }) {
   const myName = [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim();
-  const [myTasks, dmStats, team] = await Promise.all([
-    getMyOpenTasks({ id: profile.id, role: profile.role, email: profile.email }),
+  const [dmStats, team] = await Promise.all([
     getDmStats(profile.id),
     getFacilitatorTeam(profile.id),
   ]);
@@ -34,12 +31,10 @@ export async function FacilitatorDashboard({ profile }: { profile: DashboardProf
       <SectionHeader
         eyebrow="Facilitator"
         title={`Welcome${myName ? `, ${myName}` : ""}`}
-        description="Your team, your conversations, and your tasks at a glance."
+        description="Your team and your conversations at a glance."
       />
 
-      <MyTasksCard tasks={myTasks} name={myName} />
-
-      <div className="space-y-4 border-t pt-6">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Direct Messages</h2>
           <Link href="/dashboard/direct-messages" className="text-xs font-medium text-primary hover:underline">Open Messages</Link>
