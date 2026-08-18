@@ -9,6 +9,7 @@ import { Play } from "lucide-react";
 // end-screen suggestions to this channel only, and youtube-nocookie avoids tracking cookies.
 export function ChallengeVideoPlayer({
   youtubeId,
+  driveId,
   videoUrl,
   thumbnailUrl,
   thumbnailDark,
@@ -16,6 +17,7 @@ export function ChallengeVideoPlayer({
   badge,
 }: {
   youtubeId?: string | null;
+  driveId?: string | null;
   videoUrl?: string | null;
   thumbnailUrl?: string | null;
   thumbnailDark?: string | null;
@@ -23,7 +25,7 @@ export function ChallengeVideoPlayer({
   badge: string;
 }) {
   const [playing, setPlaying] = useState(false);
-  const hasVideo = Boolean(youtubeId || videoUrl);
+  const hasVideo = Boolean(youtubeId || driveId || videoUrl);
   // Per-theme posters. If only one is supplied, it's used in both themes.
   const lightSrc = thumbnailUrl ?? thumbnailDark ?? null;
   const darkSrc = thumbnailDark ?? thumbnailUrl ?? null;
@@ -37,6 +39,14 @@ export function ChallengeVideoPlayer({
           src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&color=white`}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      ) : playing && driveId ? (
+        <iframe
+          className="absolute inset-0 h-full w-full"
+          src={`https://drive.google.com/file/d/${driveId}/preview`}
+          title={title}
+          allow="autoplay; fullscreen"
           allowFullScreen
         />
       ) : playing && videoUrl ? (

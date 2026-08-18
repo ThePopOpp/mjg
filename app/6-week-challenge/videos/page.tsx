@@ -35,7 +35,7 @@ export default function ChallengeVideoLibraryPage() {
               ) : (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <PlayCircle className="h-10 w-10 text-primary/70" />
-                  <span className="text-xs uppercase tracking-widest">{v.youtubeId || v.videoUrl ? "Watch" : "Coming soon"}</span>
+                  <span className="text-xs uppercase tracking-widest">{v.youtubeId || v.driveId || v.videoUrl ? "Watch" : "Coming soon"}</span>
                 </div>
               )}
             </div>

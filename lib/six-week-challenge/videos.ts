@@ -9,10 +9,13 @@ export type ChallengeVideo = {
   title: string;
   subtitle: string;
   description: string;
-  // Videos are hosted (privately/unlisted) on YouTube to save VPS space, but played
-  // through our own branded facade so the page never looks like YouTube. Set `youtubeId`
-  // to the 11-char video ID (from the watch URL, e.g. youtu.be/<ID> or watch?v=<ID>).
+  // Videos are hosted off the VPS and played through our own branded facade so the page
+  // never looks like the host. Provide ONE source:
+  //   youtubeId — 11-char id from a YouTube watch URL (youtu.be/<ID> or watch?v=<ID>)
+  //   driveId   — Google Drive file id (drive.google.com/file/d/<ID>/view); file must be
+  //               shared "Anyone with the link". Player order of preference: youtube → drive → url.
   youtubeId: string | null;
+  driveId?: string | null;
   videoUrl: string | null; // optional alternative: a self-hosted mp4/hls URL
   thumbnailUrl: string | null; // custom poster (used in light mode); falls back to a branded placeholder
   thumbnailDark?: string | null; // optional dark-mode poster; swapped in when the site is in dark theme
@@ -28,7 +31,8 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "What The Life You're Building is — and who it's for.",
     description:
       "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
-    youtubeId: "t5NyHOG5XHI",
+    youtubeId: null,
+    driveId: "19cxy_A-IbP674i9ykbLFhl2RdgBUSRxh",
     videoUrl: null,
     thumbnailUrl: "/6-week-challenge/thumbnails/invitation-light.png",
     thumbnailDark: "/6-week-challenge/thumbnails/invitation-dark.png",
