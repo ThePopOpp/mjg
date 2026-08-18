@@ -69,6 +69,45 @@ export default function TeamGuidePage() {
         </div>
       </div>
 
+      {/* Testing the 6-Week Challenge */}
+      <section className="space-y-5">
+        <div>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">Experiences</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-[1.75rem]" style={serif}>Testing the 6-Week Challenge</h2>
+          <p className="mt-2 max-w-2xl text-[15px] leading-6 text-muted-foreground">
+            How to run a full test of the 6-Week Challenge email automation end to end — plus a <b>fast path</b> to see it working in minutes for a live demo.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card icon={ClipboardCheck} title="Standard test">
+            <Bullets items={[
+              <>Go to <b>Experiences → New Experience</b> and pick <b>6 Week Challenge</b>.</>,
+              <>Set a <b>Start date/time</b> — this is the kickoff/enrollment day; Week 1 lands about <b>7 days</b> later, and the rest follow the built-in schedule.</>,
+              <>Add <b>1–2 test attendees</b> (name + a real inbox you can check).</>,
+              <>The <b>21-step sequence pre-fills</b> with its send offsets — click <b>Send</b> to create the scheduled emails.</>,
+              <>Open the experience to see the <b>Schedule</b> (every email × attendee, with times). The Coolify <b>experiences</b> task releases due emails every ~10 min.</>,
+            ]} />
+          </Card>
+
+          <Card icon={SendHorizonal} title="Expedited test" badge="Fast">
+            <Bullets items={[
+              <><b>See an email now:</b> open the experience → <b>Schedule</b> → click <b>Send now</b> on any row to email the test attendee immediately (no waiting).</>,
+              <><b>Prove the automation:</b> click <b>Reschedule</b> on an email, set it a few minutes in the <b>past</b>, then in Coolify open the <b>experiences</b> scheduled task → <b>Execute now</b>. It fires on its own.</>,
+              <><b>Compress the whole run:</b> when creating, set <b>Frequency → Custom → every 1 minute</b> so all 21 emails come due within minutes instead of weeks.</>,
+              <><b>Clean up:</b> <b>delete</b> the test experience when done — that removes its attendees and scheduled emails.</>,
+            ]} />
+          </Card>
+        </div>
+
+        <Link href="/dashboard/experiences" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+          Open Experiences <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </section>
+
       {/* Media Studio → Resources */}
       <section className="space-y-5">
         <div>
