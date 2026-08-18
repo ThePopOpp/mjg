@@ -27,7 +27,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     subtitle: "What The Life You're Building is — and who it's for.",
     description:
       "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
-    youtubeId: null,
+    youtubeId: "t5NyHOG5XHI",
     videoUrl: null,
     thumbnailUrl: null,
     durationLabel: null,
