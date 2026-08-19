@@ -1,4 +1,5 @@
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -34,12 +35,12 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
     <div className="space-y-6">
       <SectionHeader title={displayName} description="Profile, role, permissions, status, activity, and linked participant records." />
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-4">
         <Summary label="Role" value={roleLabel(profile.role)} />
         <Summary label="Status" value={<StatusBadge status={profile.status} />} />
         <Summary label="Email" value={profile.email} />
         <Summary label="Phone" value={profile.phone ?? "-"} />
-      </div>
+      </StatCardRow>
 
       <Card>
         <CardHeader>

@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { pathwayLabels, type CheckInSubmission } from "@/lib/check-in/submissions";
 import { LAYERS, MAX_SCORE } from "@/lib/check-in/created-for-more";
 
@@ -58,11 +59,11 @@ export function CreatedForMoreResults({ submissions }: { submissions: CheckInSub
           <Download className="mr-2 h-4 w-4" /> Export CSV
         </Button>
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <StatCardRow className="grid gap-4 sm:grid-cols-3">
         <Stat label="Check-Ins completed" value={String(stats.count)} detail="Created for More" />
         <Stat label="Average score" value={stats.avg != null ? `${stats.avg} / ${MAX_SCORE}` : "—"} detail="Across all submissions" />
         <Stat label="With contact info" value={String(stats.named)} detail="Provided an email" />
-      </div>
+      </StatCardRow>
 
       <Card>
         <CardContent className="p-0">

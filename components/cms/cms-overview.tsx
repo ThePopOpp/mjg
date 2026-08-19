@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type { CmsPage } from "@/lib/cms/types";
 
@@ -155,7 +156,7 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <StatCardRow className="grid gap-3 md:grid-cols-4">
         {stats.map((st) => (
           <button key={st.label} onClick={st.onClick} className="rounded-xl border border-border bg-card p-4 text-left transition hover:border-primary/40 hover:shadow-sm">
             <div className="flex items-center justify-between">
@@ -166,7 +167,7 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
             <div className="text-[11px] text-muted-foreground">{st.sub}</div>
           </button>
         ))}
-      </div>
+      </StatCardRow>
 
       {/* Recent activity + requesters (Activity-by-day lives in the button's modal) */}
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">

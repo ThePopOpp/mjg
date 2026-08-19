@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getCurrentProfile } from "@/lib/auth/server";
@@ -62,19 +63,19 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
         description={`${cadenceLabel(experience)} · ${experience.duration_weeks} steps · starts ${new Date(`${experience.start_date}T00:00:00Z`).toLocaleDateString([], { timeZone: "UTC", dateStyle: "medium" })} ${(experience.start_time ?? "").slice(0, 5)}`}
       />
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-4">
         <Stat label="Status" value={experience.status} />
         <Stat label="Facilitator" value={facilitatorName} />
         <Stat label="Attendees" value={String(attendees.length)} />
         <Stat label="Scheduled sends" value={String(sendEvents.length)} />
-      </div>
+      </StatCardRow>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-4">
         <Stat label="Sent" value={String(counts.sent ?? 0)} />
         <Stat label="Scheduled" value={String(counts.scheduled ?? 0)} />
         <Stat label="Skipped" value={String(counts.skipped ?? 0)} />
         <Stat label="Failed" value={String(counts.failed ?? 0)} />
-      </div>
+      </StatCardRow>
 
       <Card>
         <CardHeader><CardTitle>Attendees</CardTitle></CardHeader>

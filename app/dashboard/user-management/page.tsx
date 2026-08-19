@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -22,25 +23,39 @@ export default async function UserManagementPage() {
     { label: "Pastor/Elders", value: roleCount(ROLES.PASTOR_ELDER_REVIEWER) },
     { label: "Team Members (Team Leaders)", value: roleCount(ROLES.TEAM_MEMBER) },
     { label: "Facilitators", value: roleCount(ROLES.FACILITATOR) },
-    { label: "Content Reviewers", value: roleCount(ROLES.CONTENT_REVIEWER) },
   ];
+
+  // Link each participant to its user account (if any) — matched by the profile's
+  // related_participant_id or a shared email — so the Participants table can show the
+  // account's role, status, and last login alongside the participant's own fields.
+  const accountByParticipant = new Map<string, any>();
+  for (const p of data.profiles as any[]) {
+    if (p.related_participant_id) accountByParticipant.set(p.related_participant_id, p);
+    if (p.email) accountByParticipant.set(`email:${String(p.email).toLowerCase()}`, p);
+  }
+  const accountFor = (pt: any) =>
+    accountByParticipant.get(pt.id) ||
+    (pt.email ? accountByParticipant.get(`email:${String(pt.email).toLowerCase()}`) : null) ||
+    null;
+  const prettify = (value?: string | null) =>
+    value ? value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "-";
 
   return (
     <div className="space-y-6">
       <SectionHeader title="User Management" description="Invite admins, team members, content reviewers, Pastor/Elder reviewers, and future participants." />
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-4">
         {roleCards.map((card) => (
           <SummaryCard key={card.label} label={card.label} value={card.value} />
         ))}
-      </div>
+      </StatCardRow>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-4">
         <SummaryCard label="Profiles" value={data.profiles.length} />
         <SummaryCard label="Invitations" value={data.invitations.length} />
         <SummaryCard label="Form submissions" value={data.submissions.length} />
         <SummaryCard label="Participant links" value={data.links.length} />
-      </div>
+      </StatCardRow>
 
       <div className="flex gap-3">
         <Link href="/dashboard/user-management/communications" className="inline-flex items-center gap-2 rounded-md border bg-card px-4 py-2 text-sm font-medium hover:bg-accent transition-colors">
@@ -106,6 +121,56 @@ export default async function UserManagementPage() {
               {!data.profiles.length ? <TableRow><TableCell colSpan={8}>No Supabase profiles found yet.</TableCell></TableRow> : null}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Participants</CardTitle>
+          <p className="text-sm text-muted-foreground">Everyone in the participant records — Role, Status, and Last login come from their linked account when they have one.</p>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Participant</TableHead>
+                  <TableHead>Last login</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(data.participants as any[]).map((pt) => {
+                  const account = accountFor(pt);
+                  const name = `${pt.first_name ?? ""} ${pt.last_name ?? ""}`.trim() || "-";
+                  return (
+                    <TableRow key={pt.id}>
+                      <TableCell className="font-medium">{name}</TableCell>
+                      <TableCell>{pt.email ?? "-"}</TableCell>
+                      <TableCell>{pt.phone ?? "-"}</TableCell>
+                      <TableCell>{account ? roleLabel(account.role) : ROLE_LABELS[ROLES.PARTICIPANT]}</TableCell>
+                      <TableCell>
+                        {account ? <StatusBadge status={account.status} /> : <StatusBadge status={pt.check_in_status ?? "no account"} />}
+                      </TableCell>
+                      <TableCell>{prettify(pt.participant_type)}</TableCell>
+                      <TableCell>{account?.last_login_at ? new Date(account.last_login_at).toLocaleDateString() : "-"}</TableCell>
+                      <TableCell className="text-right">
+                        <Link className="text-sm font-medium text-primary hover:underline" href={`/dashboard/participants/${pt.id}`}>
+                          View
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {!data.participants.length ? <TableRow><TableCell colSpan={8}>No participants yet.</TableCell></TableRow> : null}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

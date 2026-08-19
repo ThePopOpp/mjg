@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type { BusinessCard, CardStats } from "@/lib/business-cards/types";
 import type { StaffOption } from "@/lib/business-cards/data";
@@ -177,7 +178,7 @@ export function BusinessCardsClient() {
       ) : (
       <div>
         {/* Stats */}
-        <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-8">
+        <StatCardRow className="mb-5 grid gap-3 sm:grid-cols-4 xl:grid-cols-8">
           {STAT_TILES.map((t) => (
             <div key={t.key} className="rounded-xl border border-border bg-card px-4 py-3">
               <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t.label}</div>
@@ -185,7 +186,7 @@ export function BusinessCardsClient() {
               <div className="mt-0.5 text-[10px] text-muted-foreground">{t.hint}</div>
             </div>
           ))}
-        </div>
+        </StatCardRow>
 
         {/* Status filter */}
         <div className="mb-4 flex items-center gap-2">

@@ -6,6 +6,7 @@ import { AlertTriangle, CalendarClock, CalendarDays, CheckCircle2 } from "lucide
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import type { MyTask } from "@/lib/project-manager/my-tasks";
 
 type Bucket = "overdue" | "today" | "next7";
@@ -124,7 +125,7 @@ export function MyTasksCard({ tasks, name }: { tasks: MyTask[]; name?: string })
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const count = grouped[tab.key].length;
@@ -149,7 +150,7 @@ export function MyTasksCard({ tasks, name }: { tasks: MyTask[]; name?: string })
             </button>
           );
         })}
-      </div>
+      </StatCardRow>
 
       <Dialog open={open !== null} onOpenChange={(v) => !v && setOpen(null)}>
         <DialogContent className="max-h-[80vh] overflow-hidden sm:max-w-lg">

@@ -7,7 +7,7 @@ import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants"
 export async function getUserManagementData() {
   try {
     const supabase = createSupabaseAdminClient();
-    const [profiles, invitations, activity, preferences, links, submissions, notifications] = await Promise.all([
+    const [profiles, invitations, activity, preferences, links, submissions, notifications, participants] = await Promise.all([
       supabase
         .from("profiles")
         .select("*, participants:related_participant_id(id,first_name,last_name,email,phone,wave,participant_type)")
@@ -23,6 +23,11 @@ export async function getUserManagementData() {
         .limit(100),
       supabase.from("form_submissions").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase
+        .from("participants")
+        .select("id,first_name,last_name,email,phone,participant_type,wave,check_in_status,journey_status,created_at")
+        .order("created_at", { ascending: false })
+        .limit(500),
     ]);
 
     return {
@@ -33,6 +38,7 @@ export async function getUserManagementData() {
       links: links.data ?? [],
       submissions: submissions.data ?? [],
       notifications: notifications.data ?? [],
+      participants: participants.data ?? [],
       error:
         profiles.error?.message ??
         invitations.error?.message ??
@@ -41,6 +47,7 @@ export async function getUserManagementData() {
         links.error?.message ??
         submissions.error?.message ??
         notifications.error?.message ??
+        participants.error?.message ??
         null,
     };
   } catch (error) {
@@ -52,6 +59,7 @@ export async function getUserManagementData() {
       links: [],
       submissions: [],
       notifications: [],
+      participants: [],
       error: error instanceof Error ? error.message : "Unable to load user management data.",
     };
   }

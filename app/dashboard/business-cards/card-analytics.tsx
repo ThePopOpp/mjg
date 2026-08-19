@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import type { BusinessCard } from "@/lib/business-cards/types";
 import type { CardAnalytics } from "@/lib/business-cards/data";
 
@@ -67,14 +68,14 @@ export function CardAnalyticsView({ card, actionToken, onClose }: { card: Busine
         {error && <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</div>}
 
         {/* Tiles */}
-        <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-8">
+        <StatCardRow className="mb-5 grid gap-3 sm:grid-cols-4 xl:grid-cols-8">
           {tiles.map((t) => (
             <div key={t.label} className="rounded-xl border border-border bg-card px-4 py-3">
               <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"><t.icon className={cn("h-3.5 w-3.5", t.tint)} />{t.label}</div>
               <div className="mt-1 text-2xl font-semibold tabular-nums">{loading ? "—" : (t.value ?? 0)}</div>
             </div>
           ))}
-        </div>
+        </StatCardRow>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
           {/* Activity chart */}

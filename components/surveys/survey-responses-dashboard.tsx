@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { cn } from "@/lib/utils";
 
 type SurveyRow = {
@@ -95,12 +96,12 @@ export function SurveyResponsesDashboard({ surveys }: { surveys: SurveyRow[] }) 
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard title="Survey responses" value={filtered.length} detail={`${generalCount} general, ${pastorElderCount} pastor/elder`} />
         <SummaryCard title="Follow-up ready" value={followUpCount} detail="Gave follow-up permission" />
         <SummaryCard title="Story/interview" value={storyCount} detail="Permission or possible permission" />
         <SummaryCard title="Interest signals" value={innerCircleInterestCount + churchInterestCount} detail={`${innerCircleInterestCount} Inner Circle, ${churchInterestCount} church`} />
-      </div>
+      </StatCardRow>
 
       <Card>
         <CardHeader className="space-y-4">

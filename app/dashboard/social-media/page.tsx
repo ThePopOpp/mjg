@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarClock, Inbox, Send, Share2, TrendingUp } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { SocialTabs } from "@/components/social-media/social-tabs";
 import { getSocialDashboardData } from "@/lib/social-media/data";
 import { platformLabel } from "@/lib/social-media/constants";
@@ -35,14 +36,14 @@ export default async function SocialMediaPage() {
       />
       <SocialTabs active="overview" />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <StatCardRow className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {stats.map((s) => (
           <div key={s.label} className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><s.icon className="h-4 w-4" /></div>
             <div><div className="text-lg font-semibold leading-none">{s.value}</div><div className="mt-1 text-[11px] text-muted-foreground">{s.label}</div></div>
           </div>
         ))}
-      </div>
+      </StatCardRow>
 
       {data.stats.connectedAccounts === 0 && (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm">

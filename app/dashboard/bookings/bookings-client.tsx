@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FieldSelect, type FieldSelectOption } from "@/components/ui/field-select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { zonedToUtc, utcToZonedDate } from "@/lib/booking/availability";
 import type {
@@ -165,12 +166,12 @@ export function BookingsClient({ initialData, staffOptions }: { initialData: Boo
   return (
     <div>
       {/* Stat cards */}
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <StatCardRow className="mb-4 grid gap-3 sm:grid-cols-4">
         <Stat icon={SlidersHorizontal} label="Active types" value={stats.activeTypes} />
         <Stat icon={CalendarClock} label="Upcoming" value={stats.upcoming} />
         <Stat icon={Clock} label="Pending" value={stats.pending} />
         <Stat icon={CalendarDays} label="Live events" value={stats.events} />
-      </div>
+      </StatCardRow>
 
       {/* Tabs */}
       <div className="mb-4 flex flex-wrap items-center gap-2">

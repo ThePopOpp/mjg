@@ -210,7 +210,9 @@ export async function createExperience(input: CreateExperienceInput, actorUserId
     step_number: i + 1,
     label: s.label?.trim() || null,
     email_template_id: s.emailTemplateId || null,
-    offset_value: Math.max(0, Math.floor(Number(s.offsetValue) || 0)),
+    // Negative offsets are allowed — pre-start reminders (e.g. 48h/24h before the
+    // challenge start) fire before the anchor. Only integer-truncate, don't clamp.
+    offset_value: Math.trunc(Number(s.offsetValue) || 0),
     offset_unit: s.offsetUnit,
   }));
   if (stepRows.length) {

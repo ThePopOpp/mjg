@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CalendarClock, FileText, Plus, Send } from "lucide-react";
 import { BlogPostViews, type BlogPostRow } from "@/components/blog-posts/blog-post-views";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getBlogAdminData, normalizePostTags } from "@/lib/content/blog";
@@ -39,12 +40,12 @@ export default async function BlogPostsPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard title="Published" value={published} icon={FileText} detail="Live on Resources" />
         <SummaryCard title="Drafts" value={drafts} icon={FileText} detail="Needs review" />
         <SummaryCard title="Scheduled" value={scheduled} icon={CalendarClock} detail="Future publish dates" />
         <SummaryCard title="Email-ready" value={emailLinked} icon={Send} detail="Linked templates" />
-      </div>
+      </StatCardRow>
 
       {posts.length ? <BlogPostViews posts={rows} /> : null}
 

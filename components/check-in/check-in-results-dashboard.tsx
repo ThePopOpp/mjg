@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 
 type CheckInRow = {
   id: string;
@@ -78,12 +79,12 @@ export function CheckInResultsDashboard({ checkIns }: { checkIns: CheckInRow[] }
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard title="Results" value={filtered.length} detail={`${checkIns.length} total Check-Ins`} />
         <SummaryCard title="Average score" value={averageScore || "-"} detail="Out of 125" />
         <SummaryCard title="Completed this week" value={completedThisWeek} detail="Recent pilot momentum" />
         <SummaryCard title="Most common lowest area" value={lowestDistribution[0]?.label ?? "-"} detail={`${lowestDistribution[0]?.count ?? 0} participants`} />
-      </div>
+      </StatCardRow>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <DistributionCard title="Lowest area distribution" items={lowestDistribution} total={filtered.length} />

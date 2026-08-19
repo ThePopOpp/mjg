@@ -11,6 +11,7 @@ import { getCurrentProfile } from "@/lib/auth/server";
 import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
 import { MyTasksCard } from "@/components/dashboard/my-tasks-card";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { FacilitatorDashboard } from "@/components/facilitator/facilitator-dashboard";
 import { ParticipantDashboard } from "@/components/participant/participant-dashboard";
 import { ROLES } from "@/lib/rbac/roles";
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
           <h2 className="text-lg font-semibold tracking-tight">Direct Messages</h2>
           <Link href="/dashboard/direct-messages" className="text-xs font-medium text-primary hover:underline">Open Messages</Link>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {dmCards.map((c) => (
             <Link
               key={c.label}
@@ -85,16 +86,16 @@ export default async function DashboardPage() {
               </span>
             </Link>
           ))}
-        </div>
+        </StatCardRow>
       </div>
 
       <div className="space-y-4 border-t pt-6">
         <h2 className="text-lg font-semibold tracking-tight">Community</h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {metrics.map((metric) => (
             <MetricCard key={metric.label} {...metric} />
           ))}
-        </div>
+        </StatCardRow>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">

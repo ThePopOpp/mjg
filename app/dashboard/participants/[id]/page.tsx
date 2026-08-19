@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,12 +30,12 @@ export default async function ParticipantDetailPage({ params }: { params: Promis
     <div className="space-y-6">
       <SectionHeader title={displayName} description="Contact info, Check-In results, journey status, consent, notes, tags, and related activity." />
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-4">
         <Summary label="Check-In" value={<StatusBadge status={participant.check_in_status ?? "not_started"} />} />
         <Summary label="Survey" value={<StatusBadge status={participant.survey_status ?? "not_sent"} />} />
         <Summary label="Inner Circle" value={<StatusBadge status={participant.inner_circle_status ?? "not_invited"} />} />
         <Summary label="Score" value={participant.check_in_total_score ? `${participant.check_in_total_score} / 125` : "-"} />
-      </div>
+      </StatCardRow>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <Card>

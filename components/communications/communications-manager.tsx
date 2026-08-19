@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { OptStatusBadge } from "./opt-status-badge";
 
 interface CommunicationsRecord {
@@ -117,12 +118,12 @@ export function CommunicationsManager({ participants: initialParticipants, profi
   return (
     <div className="space-y-6">
       {/* Stats cards */}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Participants SMS opted in" value={stats.participants.smsOptIn} total={stats.participants.total} />
         <StatCard label="Participants Email opted in" value={stats.participants.emailOptIn} total={stats.participants.total} />
         <StatCard label="Users SMS opted in" value={stats.profiles.smsOptIn} total={stats.profiles.total} />
         <StatCard label="Users Email opted in" value={stats.profiles.emailOptIn} total={stats.profiles.total} />
-      </div>
+      </StatCardRow>
 
       {/* Entity type tabs */}
       <div className="flex gap-2">

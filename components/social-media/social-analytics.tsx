@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { FieldSelect } from "@/components/ui/field-select";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { platformLabel } from "@/lib/social-media/constants";
 import type { SocialReport } from "@/lib/social-media/types";
 
@@ -42,14 +43,14 @@ export function SocialAnalytics({ initialReport }: { initialReport: SocialReport
         {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <StatCardRow className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {cards.map((c) => (
           <div key={c.label} className="rounded-xl border border-border bg-card px-4 py-3">
             <div className="text-lg font-semibold leading-none">{c.value}</div>
             <div className="mt-1 text-[11px] text-muted-foreground">{c.label}</div>
           </div>
         ))}
-      </div>
+      </StatCardRow>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-xl border border-border bg-card p-4">

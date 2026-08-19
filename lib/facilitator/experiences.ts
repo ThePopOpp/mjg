@@ -128,11 +128,17 @@ export async function startChallengeForFacilitator(profileId: string, input: Sta
     .filter((a) => (seen.has(a.email) ? false : (seen.add(a.email), true)));
   if (!attendees.length) throw new Error("Add at least one participant with a valid email.");
 
-  const steps = typeSteps.map((s: any) => ({
-    emailTemplateId: (s.email_template_id ?? null) as string | null,
-    offsetValue: Math.max(0, Math.round((s.offset_value ?? 0) * pace)),
-    offsetUnit: (s.offset_unit ?? "day") as OffsetUnit,
-  }));
+  const steps = typeSteps.map((s: any) => {
+    const raw = Math.trunc(s.offset_value ?? 0);
+    // Positive offsets (the weekly curriculum) stretch with the pace (×2 for biweekly);
+    // negative offsets are fixed pre-start reminders (48h/24h before the start) and keep
+    // their lead time regardless of cadence.
+    return {
+      emailTemplateId: (s.email_template_id ?? null) as string | null,
+      offsetValue: raw >= 0 ? Math.round(raw * pace) : raw,
+      offsetUnit: (s.offset_unit ?? "day") as OffsetUnit,
+    };
+  });
 
   const experience = await createExperience(
     {

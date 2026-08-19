@@ -1,5 +1,6 @@
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Activity, CheckCircle2, CircleUserRound, MailCheck, MessageSquareText, TrendingUp, UsersRound } from "lucide-react";
@@ -37,14 +38,14 @@ export default async function ReportsPage() {
   return (
     <div className="space-y-6">
       <SectionHeader title="Reports" description="Summarize invitations, opt-ins, Check-In scores, survey completions, interests, and referrals." />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <MetricCard label="Number invited" value={String(metrics.invited)} detail="Has wave/source" icon={UsersRound} />
         <MetricCard label="Number opted in" value={String(metrics.optedIn)} detail="7-day journey permission" icon={MailCheck} />
         <MetricCard label="Check-In completed" value={String(checkInStats.count)} detail={`Average score ${checkInStats.averageScore ?? "-"}`} icon={CheckCircle2} />
         <MetricCard label="Survey completed" value={String(metrics.surveyCompleted)} detail="General and Pastor/Elder" icon={MessageSquareText} />
         <MetricCard label="Inner Circle accepted" value={String(metrics.innerCircle)} detail="Accepted invitation" icon={CircleUserRound} />
         <MetricCard label="Follow-up permission" value={String(metrics.followUpPermission)} detail="Ready for personal follow-up" icon={Activity} />
-      </div>
+      </StatCardRow>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <Card>

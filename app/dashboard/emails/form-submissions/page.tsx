@@ -1,6 +1,7 @@
 import { FormSubmissionsTable } from "@/components/emails/form-submissions-table";
 import { EmailTabs } from "@/components/emails/email-tabs";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -23,11 +24,11 @@ export default async function EmailFormSubmissionsPage() {
       <SectionHeader title="Emails" description="Review public form submissions and reply from the email workflow." />
       <EmailTabs active="form-submissions" />
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <StatCardRow className="grid gap-4 md:grid-cols-3">
         <SummaryCard title="Contact forms" value={contactCount} />
         <SummaryCard title="Newsletter forms" value={newsletterCount} />
         <SummaryCard title="Journey signups" value={journeyCount} />
-      </div>
+      </StatCardRow>
 
       <Card>
         <CardHeader>

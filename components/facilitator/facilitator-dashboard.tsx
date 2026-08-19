@@ -2,6 +2,7 @@ import Link from "next/link";
 import { UsersRound, ClipboardCheck, Route, HeartHandshake, MessageSquareText, MessagesSquare, CornerUpLeft } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { getDmStats } from "@/lib/direct-messages/data";
 import { getFacilitatorTeam } from "@/lib/facilitator/team";
 import type { DashboardProfile } from "@/lib/auth/server";
@@ -39,7 +40,7 @@ export async function FacilitatorDashboard({ profile }: { profile: DashboardProf
           <h2 className="text-lg font-semibold tracking-tight">Direct Messages</h2>
           <Link href="/dashboard/direct-messages" className="text-xs font-medium text-primary hover:underline">Open Messages</Link>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {dmCards.map((c) => (
             <Link
               key={c.label}
@@ -56,7 +57,7 @@ export async function FacilitatorDashboard({ profile }: { profile: DashboardProf
               </span>
             </Link>
           ))}
-        </div>
+        </StatCardRow>
       </div>
 
       <div className="space-y-4 border-t pt-6">
@@ -64,11 +65,11 @@ export async function FacilitatorDashboard({ profile }: { profile: DashboardProf
           <h2 className="text-lg font-semibold tracking-tight">My Team</h2>
           <Link href="/dashboard/team" className="text-xs font-medium text-primary hover:underline">Open My Team</Link>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {teamCards.map((c) => (
             <MetricCard key={c.label} {...c} />
           ))}
-        </div>
+        </StatCardRow>
       </div>
     </div>
   );

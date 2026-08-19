@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 
 type Call = {
   id: string;
@@ -166,14 +167,14 @@ export function DialerDashboard() {
   return (
     <div className="space-y-6">
       {/* ── Stats ── */}
-      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <StatCardRow className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard icon={Phone}         label="Total calls"  value={loading ? "—" : stats.total} />
         <StatCard icon={PhoneIncoming} label="Inbound"      value={loading ? "—" : stats.inbound} />
         <StatCard icon={PhoneOutgoing} label="Outbound"     value={loading ? "—" : stats.outbound} />
         <StatCard icon={PhoneMissed}   label="Missed"       value={loading ? "—" : stats.missed} />
         <StatCard icon={Clock}         label="Talk time"    value={loading ? "—" : formatTalkTime(stats.talkTime)} />
         <StatCard icon={Voicemail}     label="Voicemails"   value={loading ? "—" : stats.voicemails} />
-      </div>
+      </StatCardRow>
 
       {/* ── Softphone + Call log ── */}
       <div className="grid gap-6 xl:grid-cols-[360px_1fr]">

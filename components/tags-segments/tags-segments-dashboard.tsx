@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { cn } from "@/lib/utils";
 
 type TagRow = {
@@ -74,12 +75,12 @@ export function TagsSegmentsDashboard({ tags, participants }: { tags: TagRow[]; 
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard title="Total tags" value={tags.length} detail="Available segment labels" />
         <SummaryCard title="Active tags" value={activeCount} detail="Assigned to participants" />
         <SummaryCard title="Unused tags" value={unusedCount} detail="Available but not assigned" />
         <SummaryCard title="Segment preview" value={matchingParticipants.length} detail="Matching participants" />
-      </div>
+      </StatCardRow>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
         <Card>

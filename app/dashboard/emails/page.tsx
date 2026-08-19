@@ -1,4 +1,5 @@
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { EmailTabs } from "@/components/emails/email-tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,12 +35,12 @@ export default async function EmailsPage() {
       <SectionHeader title="Emails" description="Email overview for templates, automations, journey sends, inbox sync, and history." />
       <EmailTabs active="overview" />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <StatCardRow className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard title="Delivery rate" value={`${sendSuccessRate}%`} detail={`${sentCount} sent from ${totalSendCount} logged sends`} />
         <SummaryCard title="Active templates" value={activeTemplateCount} detail={`${draftTemplateCount} drafts, ${archivedTemplateCount} archived`} />
         <SummaryCard title="Mapped automations" value={mappedAutomationCount} detail={`${unmappedAutomationCount} enabled steps need templates`} />
         <SummaryCard title="Inbox messages" value={inboundCount} detail={lastInbound} />
-      </div>
+      </StatCardRow>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <Card>
