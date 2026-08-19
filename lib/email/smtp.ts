@@ -45,12 +45,17 @@ async function sendViaResend(input: SendEmailInput): Promise<SmtpResult> {
   // sent under a different identity, from a domain that isn't even verified in
   // Resend. A misconfigured sender is worse than a bounced send, so refuse instead.
   // Trimmed and emptiness-checked because ?? alone treats "" as a real value.
-  const from = (process.env.RESEND_FROM_EMAIL ?? "").trim();
-  if (!from) {
+  const fromEmail = (process.env.RESEND_FROM_EMAIL ?? "").trim();
+  if (!fromEmail) {
     throw new Error(
       "RESEND_FROM_EMAIL is not set. Refusing to send under a fallback identity — set it to hello@michaeljgauthier.com.",
     );
   }
+  // Give the sender a display name so inboxes show "MJG" instead of the bare local
+  // part ("hello"). If RESEND_FROM_EMAIL already carries a name ("MJG <hello@…>"),
+  // respect it; otherwise wrap the address with RESEND_FROM_NAME (default "MJG").
+  const fromName = (process.env.RESEND_FROM_NAME ?? "MJG").trim();
+  const from = fromEmail.includes("<") || !fromName ? fromEmail : `${fromName} <${fromEmail}>`;
 
   const replyTo = input.replyTo?.trim() || process.env.RESEND_REPLY_TO?.trim() || from;
 
