@@ -103,6 +103,16 @@ export default function TeamGuidePage() {
           </Card>
         </div>
 
+        <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">Behind the scenes · automated sending</p>
+          <p className="mt-1">Emails go out on their own via three Coolify scheduled tasks (every ~10 min), all sharing one secret (<b>EXPERIENCE_CRON_SECRET</b>):</p>
+          <ul className="mt-2 space-y-1">
+            <li><b>experiences</b> — <code>node scripts/experiences-cron.mjs</code> — the 6-Week Challenge / experience drip.</li>
+            <li><b>journey-drip</b> — <code>node scripts/journey-cron.mjs</code> — the 7-Day Journey.</li>
+            <li><b>invitations-drip</b> — <code>node scripts/invitations-cron.mjs</code> — invitations that were <b>scheduled</b> for later (immediate invites don&apos;t need it).</li>
+          </ul>
+        </div>
+
         <Link href="/dashboard/experiences" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
           Open Experiences <ArrowRight className="h-3.5 w-3.5" />
         </Link>
