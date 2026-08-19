@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Archive, Trash2, Save, Plus } from "lucide-react";
+import { Pencil, Archive, Trash2, Save, Plus, Pause, Play } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ export type EditableExperience = {
   preview?: PreviewShape | null;
 };
 
-const STATUSES = ["draft", "scheduled", "active", "completed", "cancelled"];
+const STATUSES = ["draft", "scheduled", "active", "paused", "completed", "cancelled"];
 const FREQUENCIES = [
   ...Array.from({ length: 12 }, (_, i) => `${i + 1} week${i ? "s" : ""}`),
   ...Array.from({ length: 12 }, (_, i) => `${i + 1} month${i ? "s" : ""}`),
@@ -123,6 +123,13 @@ export function ExperienceActions({
   }
   async function archive() { if (await call("PATCH", { archived: true })) router.refresh(); }
   async function del() { if (await call("DELETE", {})) { setConfirmDelete(false); router.refresh(); } }
+  // Pause holds the drip (scheduler skips paused experiences but keeps their events);
+  // resuming returns it to "scheduled" so held/past-due emails go out on the next run.
+  const isPaused = status === "paused";
+  async function togglePause() {
+    const next = isPaused ? "scheduled" : "paused";
+    if (await call("PATCH", { status: next })) { setStatus(next); router.refresh(); }
+  }
 
   // Wrapper (icon buttons live inside a card <Link>): block the link's default nav.
   const stop = (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); };
@@ -133,6 +140,7 @@ export function ExperienceActions({
   return (
     <div className={variant === "overlay" ? "flex items-center gap-0.5" : "flex items-center justify-end gap-0.5"} onClick={stop}>
       <button type="button" onClick={() => setEditOpen(true)} className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Edit"><Pencil className="h-4 w-4" /></button>
+      <button type="button" onClick={togglePause} disabled={busy} className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label={isPaused ? "Resume" : "Pause"} title={isPaused ? "Resume" : "Pause"}>{isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}</button>
       <button type="button" onClick={archive} disabled={busy} className="rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground" aria-label="Archive"><Archive className="h-4 w-4" /></button>
       <button type="button" onClick={() => setConfirmDelete(true)} className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label="Delete"><Trash2 className="h-4 w-4" /></button>
 

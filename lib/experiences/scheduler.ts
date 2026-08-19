@@ -27,6 +27,12 @@ export async function sendDueExperienceEmails(input: { actorUserId?: string | nu
   const results: { id: string; status: string; reason?: string; messageId?: string | null; error?: string }[] = [];
 
   for (const event of events ?? []) {
+    // Paused experiences are HELD, not skipped: leave the event "scheduled" so it fires
+    // on a later run once the experience is resumed (past-due events go out then).
+    if (event.experiences?.status === "paused") {
+      results.push({ id: event.id, status: "held", reason: "Experience paused." });
+      continue;
+    }
     results.push(await processSendEvent(supabase, event, input.actorUserId ?? null, now));
   }
 

@@ -23,6 +23,7 @@ const STATUS_TONE: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
   scheduled: "bg-primary/15 text-primary",
   active: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  paused: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
   completed: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
   cancelled: "bg-destructive/15 text-destructive",
 };
@@ -31,6 +32,22 @@ function StatusChip({ s }: { s: string }) {
 }
 function freqLabel(f: string) {
   return FREQUENCY_LABELS[f as keyof typeof FREQUENCY_LABELS] ?? f;
+}
+
+// The outlined "Launch the 6-Week Challenge" CTA — shown on both the Experiences and
+// New Experiences tabs so a facilitator can start without switching tabs.
+function LaunchChallengeBanner({ teamMembers }: { teamMembers: { name: string; email: string }[] }) {
+  return (
+    <div className="rounded-xl border border-primary/30 bg-primary/[0.03] p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold">Launch the 6-Week Challenge for your group</p>
+          <p className="text-sm text-muted-foreground">Add participants, choose weekly or bi-weekly, invite them, and start the series.</p>
+        </div>
+        <StartChallengeLauncher teamMembers={teamMembers} />
+      </div>
+    </div>
+  );
 }
 
 export function FacilitatorExperiences({
@@ -59,21 +76,12 @@ export function FacilitatorExperiences({
           <TabsTrigger value="results"><ClipboardList className="mr-2 h-4 w-4" /> Results</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="experiences" className="mt-4">
+        <TabsContent value="experiences" className="mt-4 space-y-6">
+          {canStartChallenge ? <LaunchChallengeBanner teamMembers={teamMembers} /> : null}
           <ExperienceViews experiences={experiences} emailEvents={emailEvents} onOpen={setActive} />
         </TabsContent>
         <TabsContent value="new" className="mt-4 space-y-6">
-          {canStartChallenge ? (
-            <div className="rounded-xl border border-primary/30 bg-primary/[0.03] p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-semibold">Launch the 6-Week Challenge for your group</p>
-                  <p className="text-sm text-muted-foreground">Add participants, choose weekly or bi-weekly, invite them, and start the series.</p>
-                </div>
-                <StartChallengeLauncher teamMembers={teamMembers} />
-              </div>
-            </div>
-          ) : null}
+          {canStartChallenge ? <LaunchChallengeBanner teamMembers={teamMembers} /> : null}
           {types.length ? (
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Other experiences</p>

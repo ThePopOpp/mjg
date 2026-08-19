@@ -1,6 +1,6 @@
 export type ExperienceFrequency = "weekly" | "biweekly" | "custom";
 export type OffsetUnit = "minute" | "hour" | "day" | "week" | "month";
-export type ExperienceStatus = "draft" | "scheduled" | "active" | "completed" | "cancelled";
+export type ExperienceStatus = "draft" | "scheduled" | "active" | "paused" | "completed" | "cancelled";
 export type SendEventStatus = "scheduled" | "sent" | "skipped" | "failed";
 
 export const FREQUENCY_LABELS: Record<ExperienceFrequency, string> = {
