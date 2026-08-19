@@ -462,7 +462,14 @@ function injectLegalFooterColumn(html: string) {
 
 function injectFaviconLinks(html: string) {
   if (/<link[^>]+rel=["'](?:shortcut )?icon["']/i.test(html)) return html;
-  return html.replace(/<\/head>/i, `  ${renderFaviconLinks()}\n</head>`);
+  const tag = `${renderFaviconLinks()}\n`;
+  // Prefer just before </head>; but some exported pages (e.g. about-us.html) are
+  // head-less fragments with no </head> — there a plain replace would no-op and the
+  // tab would fall back to the browser's default icon. Fall back to just after the
+  // opening <head>, else prepend (the browser hoists leading <link> tags into <head>).
+  if (/<\/head>/i.test(html)) return html.replace(/<\/head>/i, `  ${tag}</head>`);
+  if (/<head[^>]*>/i.test(html)) return html.replace(/(<head[^>]*>)/i, `$1\n  ${tag}`);
+  return `${tag}${html}`;
 }
 
 // Client helper for the public site: registers the service worker (so the site is
