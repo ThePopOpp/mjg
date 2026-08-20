@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { getExperienceById, getFacilitators } from "@/lib/experiences/repository";
+import { getExperienceBacklog } from "@/lib/experiences/add-attendee";
 import { ExperienceActions } from "@/components/experiences/experience-actions";
 import { ExperienceSchedule } from "@/components/experiences/experience-schedule";
 import { AddAttendeeButton } from "@/components/experiences/add-attendee-button";
@@ -28,7 +29,7 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
   if (!profile) redirect(`/login?next=/dashboard/experiences/${id}`);
   if (!can(profile.role, PERMISSIONS.MANAGE_EXPERIENCES)) redirect("/access-restricted");
 
-  const [data, facilitators] = await Promise.all([getExperienceById(id), getFacilitators()]);
+  const [data, facilitators, backlog] = await Promise.all([getExperienceById(id), getFacilitators(), getExperienceBacklog(id)]);
   if (!data) notFound();
   const { experience, attendees, sendEvents } = data as any;
   const facilitatorOptions = facilitators.map((f: any) => ({ id: f.id, name: f.full_name || `${f.first_name ?? ""} ${f.last_name ?? ""}`.trim() || f.email }));
@@ -81,7 +82,7 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
           <CardTitle>Attendees</CardTitle>
-          <AddAttendeeButton experienceId={experience.id} />
+          <AddAttendeeButton experienceId={experience.id} backlog={backlog} />
         </CardHeader>
         <CardContent className="p-0">
           <Table>

@@ -10,7 +10,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const actor = await requireExperienceManager(request, body.actionToken);
     const result = await addAttendeeToExperience(
       id,
-      { name: typeof body.name === "string" ? body.name : undefined, email: String(body.email ?? ""), sendInvitation: body.sendInvitation === true },
+      {
+        name: typeof body.name === "string" ? body.name : undefined,
+        email: String(body.email ?? ""),
+        sendInvitation: body.sendInvitation === true,
+        sendBacklog: body.sendBacklog === true,
+      },
       actor.id,
     );
     return NextResponse.json({ ok: true, ...result });

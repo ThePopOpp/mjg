@@ -2,6 +2,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { createUserInvitation } from "@/lib/user-management/repository";
 import { computeStepDate } from "./schedule";
+import { sendExperienceEventNow } from "./scheduler";
 import { ROLES } from "@/lib/rbac/roles";
 import type { OffsetUnit } from "./types";
 
@@ -12,15 +13,42 @@ function splitName(name?: string | null): { firstName: string; lastName: string 
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
 }
 
+export type BacklogEmail = { stepNumber: number; templateName: string; scheduledAt: string };
+
+/** The emails a NEW participant would have missed: steps whose send time already passed
+ *  (and that actually have a template). Shown in the Add-participant wizard so the admin can
+ *  choose to send them. */
+export async function getExperienceBacklog(experienceId: string): Promise<BacklogEmail[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data: exp } = await supabase.from("experiences").select("start_date,start_time").eq("id", experienceId).maybeSingle();
+  if (!exp) return [];
+  const { data: steps } = await supabase
+    .from("experience_steps")
+    .select("step_number,offset_value,offset_unit, email_templates(name)")
+    .eq("experience_id", experienceId)
+    .order("step_number", { ascending: true });
+  const startDate = exp.start_date as string;
+  const startTime = (exp.start_time as string) || "09:00";
+  const now = Date.now();
+  const out: BacklogEmail[] = [];
+  for (const s of steps ?? []) {
+    const templateName = (s as any).email_templates?.name as string | undefined;
+    if (!templateName) continue; // skip "No email" steps
+    const when = computeStepDate(startDate, startTime, (s as any).offset_value, (s as any).offset_unit as OffsetUnit);
+    if (when.getTime() > now) continue; // still upcoming — not missed
+    out.push({ stepNumber: (s as any).step_number, templateName, scheduledAt: when.toISOString() });
+  }
+  return out;
+}
+
 /**
- * Add one participant to an experience that's already running. They join "where the group
- * is": we generate send events only for steps still in the FUTURE, so they get the rest of
- * the challenge — never a backlog of emails that already went out. Also upserts them as a
- * participant, links them to the facilitator's team, and (optionally) sends an invite.
+ * Add one participant to an experience that's already running. Upserts them as a participant,
+ * links them to the facilitator's team, and schedules the UPCOMING steps. If `sendBacklog` is
+ * set, it also sends the emails they missed (the already-past steps) right now.
  */
 export async function addAttendeeToExperience(
   experienceId: string,
-  input: { name?: string; email: string; sendInvitation?: boolean },
+  input: { name?: string; email: string; sendInvitation?: boolean; sendBacklog?: boolean },
   actorId?: string | null,
 ) {
   const supabase = createSupabaseAdminClient();
@@ -79,7 +107,7 @@ export async function addAttendeeToExperience(
     await supabase.from("facilitator_team_members").upsert({ team_id: teamId, participant_id: participant.id }, { onConflict: "team_id,participant_id" });
   }
 
-  // Generate send events for FUTURE steps only (no backlog of already-sent emails).
+  // Split the sequence into past (missed) and upcoming steps.
   const { data: steps } = await supabase
     .from("experience_steps")
     .select("step_number,email_template_id,offset_value,offset_unit")
@@ -88,22 +116,46 @@ export async function addAttendeeToExperience(
   const startDate = experience.start_date as string;
   const startTime = (experience.start_time as string) || "09:00";
   const now = Date.now();
-  const rows: any[] = [];
+  const futureRows: any[] = [];
+  const pastRows: any[] = [];
   for (const step of steps ?? []) {
     const when = computeStepDate(startDate, startTime, step.offset_value, step.offset_unit as OffsetUnit);
-    if (when.getTime() <= now) continue; // already passed — skip it for this late joiner
-    rows.push({
+    const row = {
       experience_id: experienceId,
       attendee_id: attendeeId,
       step_number: step.step_number,
       template_id: step.email_template_id,
       status: "scheduled",
       scheduled_at: when.toISOString(),
-    });
+    };
+    (when.getTime() <= now ? pastRows : futureRows).push(row);
   }
-  if (rows.length) {
-    const { error: seErr } = await supabase.from("experience_send_events").upsert(rows, { onConflict: "attendee_id,step_number", ignoreDuplicates: true });
+
+  // Always schedule upcoming emails. Only materialize the past ones when we're sending them.
+  const toInsert = input.sendBacklog ? [...pastRows, ...futureRows] : futureRows;
+  if (toInsert.length) {
+    const { error: seErr } = await supabase.from("experience_send_events").upsert(toInsert, { onConflict: "attendee_id,step_number", ignoreDuplicates: true });
     if (seErr) throw seErr;
+  }
+
+  // Send the missed emails now (out of schedule), reusing the scheduler's render/send logic.
+  let backlogSent = 0;
+  if (input.sendBacklog && pastRows.length) {
+    const { data: due } = await supabase
+      .from("experience_send_events")
+      .select("id")
+      .eq("attendee_id", attendeeId)
+      .eq("status", "scheduled")
+      .lte("scheduled_at", new Date().toISOString())
+      .order("scheduled_at", { ascending: true });
+    for (const ev of due ?? []) {
+      try {
+        const r = await sendExperienceEventNow((ev as any).id, actorId ?? null);
+        if (r.status === "sent") backlogSent += 1;
+      } catch (e) {
+        console.error("[add-attendee] backlog send failed", (ev as any).id, e instanceof Error ? e.message : e);
+      }
+    }
   }
 
   let invited = false;
@@ -113,5 +165,5 @@ export async function addAttendeeToExperience(
       .catch((e) => console.error("[add-attendee] invite failed", email, e instanceof Error ? e.message : e));
   }
 
-  return { attendeeId, alreadyOnList, upcomingEmails: rows.length, invited };
+  return { attendeeId, alreadyOnList, upcomingEmails: futureRows.length, backlogSent, invited };
 }
