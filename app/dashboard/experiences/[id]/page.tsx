@@ -10,6 +10,7 @@ import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { getExperienceById, getFacilitators } from "@/lib/experiences/repository";
 import { ExperienceActions } from "@/components/experiences/experience-actions";
 import { ExperienceSchedule } from "@/components/experiences/experience-schedule";
+import { AddAttendeeButton } from "@/components/experiences/add-attendee-button";
 import { FREQUENCY_LABELS, OFFSET_UNIT_LABELS } from "@/lib/experiences/types";
 
 function cadenceLabel(exp: any) {
@@ -78,7 +79,10 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
       </StatCardRow>
 
       <Card>
-        <CardHeader><CardTitle>Attendees</CardTitle></CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+          <CardTitle>Attendees</CardTitle>
+          <AddAttendeeButton experienceId={experience.id} />
+        </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
