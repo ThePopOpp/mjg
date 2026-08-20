@@ -14,7 +14,7 @@ const STEPS: Step[] = [
   {
     icon: Sparkles,
     title: "Click “Start New Challenge”",
-    body: "On the Experiences page, click the gold Start New Challenge button. A short form opens — you'll fill it out top to bottom.",
+    body: "On the Experiences page, click the Start New Challenge button. A short form opens — you'll fill it out top to bottom.",
   },
   {
     icon: CalendarDays,
@@ -64,7 +64,7 @@ export function SetupWalkthrough() {
   return (
     <>
       <Button type="button" variant="outline" onClick={start}>
-        <HelpCircle className="mr-2 h-4 w-4" /> How setup works
+        <HelpCircle className="mr-2 h-4 w-4" /> How to Start a New Challenge
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
