@@ -39,7 +39,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     description:
       "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
     youtubeId: null,
-    driveId: "1ANS8mbOmyR5C8NHVw1n0WksmLqHHC_Oj",
+    driveId: "1p9eEwKjA8tQ408-35cwtB2qyCgrNe-CU",
     embedDirect: true,
     videoUrl: null,
     posterEyebrow: "6-Week Challenge Introduction Video",
