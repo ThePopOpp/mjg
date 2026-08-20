@@ -11,6 +11,7 @@ import { dashboardNav, facilitatorNav, participantNav, type NavEntry, type NavGr
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { ROLES, ROLE_LABELS } from "@/lib/rbac/roles";
 import { can } from "@/lib/rbac/permissions";
 import { cn } from "@/lib/utils";
@@ -189,9 +190,15 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
                 <p className="text-sm font-medium">{displayName}</p>
                 <p className="text-xs text-muted-foreground">{ROLE_LABELS[profile.role]}</p>
               </div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                {displayName.slice(0, 2).toUpperCase()}
-              </div>
+              <Link href="/dashboard/profile" aria-label="My Profile">
+                <UserAvatar
+                  firstName={profile.firstName}
+                  lastName={profile.lastName}
+                  email={profile.email}
+                  avatarUrl={profile.avatarUrl}
+                  className="h-9 w-9 text-sm"
+                />
+              </Link>
               <form action="/auth/logout" method="post">
                 <Button type="submit" variant="ghost" size="icon" aria-label="Sign out">
                   <LogOut className="h-4 w-4" />

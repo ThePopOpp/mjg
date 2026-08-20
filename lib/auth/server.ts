@@ -11,6 +11,7 @@ export type DashboardProfile = {
   lastName: string;
   role: AppRole;
   status: "active" | "invited" | "pending" | "suspended" | "archived" | "inactive";
+  avatarUrl: string | null;
 };
 
 export async function getCurrentProfile(): Promise<DashboardProfile | null> {
@@ -24,6 +25,7 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
       lastName: "Admin",
       role: ROLES.SUPER_ADMIN,
       status: "active",
+      avatarUrl: null,
     };
   }
 
@@ -42,14 +44,14 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
   const admin = createSupabaseAdminClient();
   let { data: profile } = await admin
     .from("profiles")
-    .select("id,auth_user_id,email,first_name,last_name,role,status")
+    .select("id,auth_user_id,email,first_name,last_name,role,status,avatar_url")
     .or(`id.eq.${user.id},auth_user_id.eq.${user.id}`)
     .maybeSingle();
 
   if (!profile && user.email) {
     const byEmail = await admin
       .from("profiles")
-      .select("id,auth_user_id,email,first_name,last_name,role,status")
+      .select("id,auth_user_id,email,first_name,last_name,role,status,avatar_url")
       .eq("email", user.email.trim().toLowerCase())
       .maybeSingle();
     profile = byEmail.data;
@@ -72,6 +74,7 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
     lastName: profile?.last_name ?? "",
     role,
     status,
+    avatarUrl: profile?.avatar_url ?? null,
   };
 }
 
