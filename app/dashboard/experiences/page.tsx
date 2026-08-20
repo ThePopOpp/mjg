@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ExperiencesList } from "@/components/experiences/experiences-list";
 import { NewExperienceButton } from "@/components/experiences/new-experience-button";
 import { StartChallengeAdminLauncher } from "@/components/experiences/start-challenge-admin-modal";
+import { SetupWalkthrough } from "@/components/experiences/setup-walkthrough";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { getExperiencesData, getFacilitators } from "@/lib/experiences/repository";
@@ -44,7 +45,10 @@ export default async function ExperiencesPage() {
               <p className="text-sm font-semibold">Start a new challenge or series</p>
               <p className="text-sm text-muted-foreground">Pick a challenge, add recipients, invite them, choose the start date, and set who can see it.</p>
             </div>
-            <StartChallengeAdminLauncher types={typeOptions} facilitators={facilitatorOptions} />
+            <div className="flex items-center gap-2">
+              <SetupWalkthrough />
+              <StartChallengeAdminLauncher types={typeOptions} facilitators={facilitatorOptions} />
+            </div>
           </div>
         </div>
       ) : null}

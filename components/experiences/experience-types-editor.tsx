@@ -96,7 +96,10 @@ function TypeForm({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
-  const weeks = Array.from({ length: Math.max(1, durationWeeks) }, (_, i) => i + 1);
+  // Render enough rows for the default weeks AND every existing step, so a sequence longer
+  // than "Default weeks" (e.g. the bi-weekly challenge) is never hidden — or truncated on save.
+  const maxStep = (initial?.steps ?? []).reduce((m, s) => Math.max(m, s.step_number), 0);
+  const weeks = Array.from({ length: Math.max(1, durationWeeks, maxStep) }, (_, i) => i + 1);
 
   async function save() {
     setSaving(true);
