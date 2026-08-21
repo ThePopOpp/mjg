@@ -17,7 +17,7 @@ export async function getPilotDashboardData() {
         .select("*, participant_tags(tags(id,name,category))")
         .order("created_at", { ascending: false })
         .limit(100),
-      supabase.from("check_in_results").select("*, participants(first_name,last_name,email,wave,participant_type)").order("created_at", { ascending: false }).limit(50),
+      supabase.from("check_in_submissions").select("*, participants(first_name,last_name,email,wave,participant_type)").eq("assessment", "created-for-more").order("created_at", { ascending: false }).limit(1000),
       supabase.from("survey_responses").select("*, participants(first_name,last_name,email,wave,source,participant_type)").order("created_at", { ascending: false }).limit(100),
       supabase.from("email_journey_events").select("*, participants(first_name,last_name,email)").order("scheduled_at", { ascending: true }).limit(80),
       supabase.from("tags").select("id,name,category,participant_tags(participant_id)").order("name"),
@@ -54,7 +54,7 @@ export async function getParticipantDetail(id: string) {
     const supabase = createSupabaseAdminClient();
     const [participant, checkIns, surveys, emailEvents, tags, allTags, activity] = await Promise.all([
       supabase.from("participants").select("*").eq("id", id).maybeSingle(),
-      supabase.from("check_in_results").select("*").eq("participant_id", id).order("created_at", { ascending: false }),
+      supabase.from("check_in_submissions").select("*").eq("assessment", "created-for-more").eq("participant_id", id).order("created_at", { ascending: false }),
       supabase.from("survey_responses").select("*").eq("participant_id", id).order("created_at", { ascending: false }),
       supabase.from("email_journey_events").select("*").eq("participant_id", id).order("scheduled_at", { ascending: true }),
       supabase.from("participant_tags").select("tag_id,tags(id,name,category)").eq("participant_id", id),

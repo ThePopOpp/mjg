@@ -9,6 +9,7 @@ import { ParticipantEditor } from "@/components/participants/participant-editor"
 import { ParticipantTagEditor } from "@/components/participants/participant-tag-editor";
 import { ParticipantCommunicationsCard } from "@/components/participants/participant-communications-card";
 import { getParticipantDetail } from "@/lib/dashboard/pilot-data";
+import { pathwayLabels } from "@/lib/check-in/submissions";
 
 export default async function ParticipantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -31,10 +32,10 @@ export default async function ParticipantDetailPage({ params }: { params: Promis
       <SectionHeader title={displayName} description="Contact info, Check-In results, journey status, consent, notes, tags, and related activity." />
 
       <StatCardRow className="grid gap-4 md:grid-cols-4">
-        <Summary label="Check-In" value={<StatusBadge status={participant.check_in_status ?? "not_started"} />} />
+        <Summary label="Check-In" value={<StatusBadge status={latestCheckIn ? "completed" : (participant.check_in_status ?? "not_started")} />} />
         <Summary label="Survey" value={<StatusBadge status={participant.survey_status ?? "not_sent"} />} />
         <Summary label="Inner Circle" value={<StatusBadge status={participant.inner_circle_status ?? "not_invited"} />} />
-        <Summary label="Score" value={participant.check_in_total_score ? `${participant.check_in_total_score} / 125` : "-"} />
+        <Summary label="Score" value={latestCheckIn ? `${latestCheckIn.total_score} / 140` : "-"} />
       </StatCardRow>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
@@ -106,38 +107,33 @@ export default async function ParticipantDetailPage({ params }: { params: Promis
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-md border bg-background p-4">
                   <p className="text-sm text-muted-foreground">Total score</p>
-                  <p className="mt-2 text-3xl font-semibold">{latestCheckIn.total_score} / 125</p>
+                  <p className="mt-2 text-3xl font-semibold">{latestCheckIn.total_score} / 140</p>
+                </div>
+                <div className="rounded-md border bg-background p-4">
+                  <p className="text-sm text-muted-foreground">Stage</p>
+                  <p className="mt-2 text-lg font-semibold">{latestCheckIn.stage ?? "-"}</p>
                 </div>
                 <div className="rounded-md border bg-background p-4">
                   <p className="text-sm text-muted-foreground">Lowest area</p>
-                  <p className="mt-2 text-lg font-semibold">{latestCheckIn.lowest_area_label}</p>
-                </div>
-                <div className="rounded-md border bg-background p-4">
-                  <p className="text-sm text-muted-foreground">Score category</p>
-                  <p className="mt-2 text-lg font-semibold">{latestCheckIn.score_range_category}</p>
+                  <p className="mt-2 text-lg font-semibold">{latestCheckIn.lowest_layer ?? "-"}{latestCheckIn.lowest_pillar ? ` · ${latestCheckIn.lowest_pillar}` : ""}</p>
                 </div>
               </div>
             ) : null}
 
-            {latestCheckIn?.section_scores ? (
+            {Array.isArray(latestCheckIn?.layer_scores) && latestCheckIn.layer_scores.length ? (
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold">Section breakdown</h3>
-                {Object.entries(latestCheckIn.section_scores).map(([key, value]) => (
-                  <SectionScore key={key} label={formatValue(key)} value={Number(value)} />
+                <h3 className="text-sm font-semibold">Layer breakdown</h3>
+                {latestCheckIn.layer_scores.map((l: any) => (
+                  <SectionScore key={l.key ?? l.title} label={l.title ?? formatValue(String(l.key ?? ""))} value={Number(l.score)} />
                 ))}
               </div>
             ) : null}
 
-            {latestCheckIn?.reflections ? (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold">Reflection answers</h3>
-                <div className="grid gap-3 md:grid-cols-2">
-                  {Object.entries(latestCheckIn.reflections).map(([key, value]) => (
-                    <div key={key} className="rounded-md border bg-background p-3">
-                      <p className="text-xs font-semibold uppercase text-muted-foreground">{formatValue(key)}</p>
-                      <p className="mt-2 text-sm leading-6">{String(value || "-")}</p>
-                    </div>
-                  ))}
+            {Array.isArray(latestCheckIn?.chosen_pathways) && latestCheckIn.chosen_pathways.length ? (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">Chosen next steps</h3>
+                <div className="flex flex-wrap gap-2">
+                  {pathwayLabels(latestCheckIn.chosen_pathways).map((p) => <Badge key={p} variant="secondary">{p}</Badge>)}
                 </div>
               </div>
             ) : null}
@@ -146,17 +142,17 @@ export default async function ParticipantDetailPage({ params }: { params: Promis
               <TableHeader>
                 <TableRow>
                   <TableHead>Total</TableHead>
+                  <TableHead>Stage</TableHead>
                   <TableHead>Lowest area</TableHead>
-                  <TableHead>Category</TableHead>
                   <TableHead>Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.checkIns.map((checkIn: any) => (
                   <TableRow key={checkIn.id}>
-                    <TableCell className="font-medium">{checkIn.total_score}</TableCell>
-                    <TableCell>{checkIn.lowest_area_label}</TableCell>
-                    <TableCell>{checkIn.score_range_category}</TableCell>
+                    <TableCell className="font-medium">{checkIn.total_score} / 140</TableCell>
+                    <TableCell>{checkIn.stage ?? "-"}</TableCell>
+                    <TableCell>{checkIn.lowest_layer ?? "-"}</TableCell>
                     <TableCell>{new Date(checkIn.created_at).toLocaleDateString()}</TableCell>
                   </TableRow>
                 ))}
@@ -287,13 +283,13 @@ function ConsentFlag({ label, enabled }: { label: string; enabled?: boolean | nu
 }
 
 function SectionScore({ label, value }: { label: string; value: number }) {
-  const percent = Math.max(0, Math.min(100, Math.round((value / 25) * 100)));
+  const percent = Math.max(0, Math.min(100, Math.round((value / 20) * 100)));
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3 text-sm">
         <span className="font-medium">{label}</span>
-        <span className="text-muted-foreground">{value} / 25</span>
+        <span className="text-muted-foreground">{value} / 20</span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div className="h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />

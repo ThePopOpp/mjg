@@ -7,11 +7,16 @@ const MS: Record<Exclude<OffsetUnit, "month">, number> = {
   week: 604_800_000,
 };
 
-/** The experience anchor time = start date + start time, interpreted as UTC. */
+// The program runs on Arizona time (MST, UTC-7 year-round — Arizona doesn't observe DST),
+// so a start time of "09:00" means 9:00 AM Arizona, not UTC. A fixed -07:00 offset is correct
+// all year. (If per-group timezones are ever needed, add a column and swap this offset.)
+const PROGRAM_UTC_OFFSET = "-07:00";
+
+/** The experience anchor = start date + start time, interpreted as Arizona local time. */
 export function startAnchor(startDate: string, startTime = "09:00"): Date {
   const time = /^\d{2}:\d{2}(:\d{2})?$/.test(startTime) ? startTime : "09:00";
   const hms = time.length === 5 ? `${time}:00` : time;
-  return new Date(`${startDate}T${hms}.000Z`);
+  return new Date(`${startDate}T${hms}.000${PROGRAM_UTC_OFFSET}`);
 }
 
 /** Add an offset (value + unit) to a base date. Months are calendar months; others are fixed. */

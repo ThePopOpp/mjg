@@ -13,6 +13,7 @@ import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
 import { MyTasksCard } from "@/components/dashboard/my-tasks-card";
 import { StatCardRow } from "@/components/dashboard/stat-card-row";
+import { CollapsibleSection } from "@/components/dashboard/collapsible-section";
 import { FacilitatorDashboard } from "@/components/facilitator/facilitator-dashboard";
 import { ParticipantDashboard } from "@/components/participant/participant-dashboard";
 import { ROLES } from "@/lib/rbac/roles";
@@ -98,37 +99,35 @@ export default async function DashboardPage() {
           ))}
         </StatCardRow>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-            <CardTitle className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Recent Check-Ins</CardTitle>
-            <Link href="/dashboard/check-in-results" className="text-sm font-medium text-primary hover:underline">View all →</Link>
-          </CardHeader>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead>Stage</TableHead>
-                  <TableHead>When</TableHead>
+        <CollapsibleSection
+          title="Recent Check-Ins"
+          count={checkInStats.count}
+          right={<Link href="/dashboard/check-in-results" className="shrink-0 text-sm font-medium text-primary hover:underline">View all →</Link>}
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="pl-5">Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Score</TableHead>
+                <TableHead>Stage</TableHead>
+                <TableHead>When</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentCheckIns.map((ci) => (
+                <TableRow key={ci.id}>
+                  <TableCell className="pl-5 font-medium">{ci.name || "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{ci.email || "—"}</TableCell>
+                  <TableCell className="tabular-nums">{ci.total_score ?? "—"}</TableCell>
+                  <TableCell>{ci.stage || "—"}</TableCell>
+                  <TableCell className="whitespace-nowrap text-muted-foreground">{new Date(ci.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}</TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentCheckIns.map((ci) => (
-                  <TableRow key={ci.id}>
-                    <TableCell className="font-medium">{ci.name || "—"}</TableCell>
-                    <TableCell className="text-muted-foreground">{ci.email || "—"}</TableCell>
-                    <TableCell className="tabular-nums">{ci.total_score ?? "—"}</TableCell>
-                    <TableCell>{ci.stage || "—"}</TableCell>
-                    <TableCell className="whitespace-nowrap text-muted-foreground">{new Date(ci.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}</TableCell>
-                  </TableRow>
-                ))}
-                {!recentCheckIns.length ? <TableRow><TableCell colSpan={5} className="text-muted-foreground">No check-ins yet.</TableCell></TableRow> : null}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+              ))}
+              {!recentCheckIns.length ? <TableRow><TableCell colSpan={5} className="pl-5 text-muted-foreground">No check-ins yet.</TableCell></TableRow> : null}
+            </TableBody>
+          </Table>
+        </CollapsibleSection>
       </div>
 
       <div className="space-y-4 border-t pt-6">
@@ -144,41 +143,33 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>Wave summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Wave</TableHead>
-                  <TableHead>Invited</TableHead>
-                  <TableHead>Opted in</TableHead>
-                  <TableHead>Check-In</TableHead>
-                  <TableHead>Survey</TableHead>
+        <CollapsibleSection title="Wave summary" count={data.participants.length}>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="pl-5">Wave</TableHead>
+                <TableHead>Invited</TableHead>
+                <TableHead>Opted in</TableHead>
+                <TableHead>Check-In</TableHead>
+                <TableHead>Survey</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {waveRows.map((row) => (
+                <TableRow key={row.wave}>
+                  <TableCell className="pl-5 font-medium">{row.wave}</TableCell>
+                  <TableCell>{row.invited}</TableCell>
+                  <TableCell>{row.optedIn}</TableCell>
+                  <TableCell>{row.completed}</TableCell>
+                  <TableCell>{row.survey}</TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {waveRows.map((row) => (
-                  <TableRow key={row.wave}>
-                    <TableCell className="font-medium">{row.wave}</TableCell>
-                    <TableCell>{row.invited}</TableCell>
-                    <TableCell>{row.optedIn}</TableCell>
-                    <TableCell>{row.completed}</TableCell>
-                    <TableCell>{row.survey}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+              ))}
+            </TableBody>
+          </Table>
+        </CollapsibleSection>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Pipeline status</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+        <CollapsibleSection title="Pipeline status" count={checkInStats.count}>
+          <div className="space-y-3 px-5 pb-5">
             {[
               ["Check-In completed", checkInStats.count],
               ["Survey completed", pilotMetrics.surveyCompleted],
@@ -191,8 +182,8 @@ export default async function DashboardPage() {
               </div>
             ))}
             {data.error ? <p className="text-sm text-destructive">{data.error}</p> : null}
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleSection>
       </div>
     </div>
   );
