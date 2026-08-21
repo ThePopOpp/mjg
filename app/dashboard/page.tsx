@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
-import { getCheckInSubmissionStats } from "@/lib/check-in/submissions";
+import { getCheckInSubmissionStats, listCheckInSubmissions } from "@/lib/check-in/submissions";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
     return <ParticipantDashboard profile={profileForRole} />;
   }
 
-  const [data, profile, checkInStats] = await Promise.all([getPilotDashboardData(), getCurrentProfile(), getCheckInSubmissionStats()]);
+  const [data, profile, checkInStats, recentCheckIns] = await Promise.all([getPilotDashboardData(), getCurrentProfile(), getCheckInSubmissionStats(), listCheckInSubmissions(6)]);
   const pilotMetrics = getPilotMetrics(data);
   const myTasks = profile
     ? await getMyOpenTasks({ id: profile.id, role: profile.role, email: profile.email })
@@ -96,6 +96,38 @@ export default async function DashboardPage() {
             <MetricCard key={metric.label} {...metric} />
           ))}
         </StatCardRow>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+            <CardTitle className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Recent Check-Ins</CardTitle>
+            <Link href="/dashboard/check-in-results" className="text-sm font-medium text-primary hover:underline">View all →</Link>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Score</TableHead>
+                  <TableHead>Stage</TableHead>
+                  <TableHead>When</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentCheckIns.map((ci) => (
+                  <TableRow key={ci.id}>
+                    <TableCell className="font-medium">{ci.name || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{ci.email || "—"}</TableCell>
+                    <TableCell className="tabular-nums">{ci.total_score ?? "—"}</TableCell>
+                    <TableCell>{ci.stage || "—"}</TableCell>
+                    <TableCell className="whitespace-nowrap text-muted-foreground">{new Date(ci.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}</TableCell>
+                  </TableRow>
+                ))}
+                {!recentCheckIns.length ? <TableRow><TableCell colSpan={5} className="text-muted-foreground">No check-ins yet.</TableCell></TableRow> : null}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">

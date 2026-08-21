@@ -5,6 +5,7 @@ import { publicSiteUrl } from "@/lib/public-site/static-pages";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { PARTICIPANT_TYPES } from "@/lib/pilot/constants";
 import { scoreCheckIn, MAX_SCORE, type CheckInScore } from "@/lib/check-in/created-for-more";
+import { alertCheckIn } from "@/lib/notifications/check-in-alert";
 
 // Public endpoint: saves a Created for More Check-In submission, emails the taker their
 // results (if they gave an email), notifies the team, and returns the score.
@@ -75,7 +76,7 @@ export async function POST(request: Request) {
       });
       emailed = Boolean(sent && sent.ok && !sent.skipped);
     }
-    await notifyTeam({ name, email, score }).catch(() => undefined);
+    await alertCheckIn({ name, email: validEmail ?? email, score, participantId }).catch((e) => console.error("[created-for-more] alert failed", e instanceof Error ? e.message : e));
 
     return NextResponse.json({ ok: true, score, emailed });
   } catch (error) {
@@ -124,31 +125,6 @@ async function sendResultsEmail({ to, name, score }: { to: string; name: string 
   const text = `Your Created for More Check-In\n\nHi ${first}, thank you for taking the Check-In.\n\nScore: ${score.total} / ${MAX_SCORE} — ${score.stage}\n${score.stageMeaning}\n\nSuggested next step: ${score.stageNextStep}\nStrongest layer: ${score.strongestLayer}\nLowest layer${score.lowestPillar ? ` · ${score.lowestPillar}` : ""}: ${score.lowestLayer}\n\nLayers:\n${score.layerScores.map((l) => `- ${l.title} · ${l.subtitle}: ${l.score}/20`).join("\n")}\n\nGo to your dashboard: ${site}/dashboard\nTry the Created for More Check-In again: ${site}/created-for-more-check-in\n\n— Michael J. Gauthier`;
 
   return sendSmtpEmail({ to, subject: "Your Created for More Check-In results", html, text });
-}
-
-async function notifyTeam({ name, email, score }: { name: string | null; email: string | null; score: CheckInScore }) {
-  const supabase = createSupabaseAdminClient();
-  const { data: admins } = await supabase
-    .from("profiles")
-    .select("email")
-    .eq("role", "super_admin")
-    .eq("status", "active")
-    .not("email", "is", null);
-  const recipients = Array.from(new Set((admins ?? []).map((a) => a.email).filter(Boolean)));
-  if (!recipients.length) return;
-
-  await sendSmtpEmail({
-    to: recipients as string[],
-    subject: `New Created for More Check-In — ${score.total}/${MAX_SCORE} (${score.stage})`,
-    html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#111;">
-      <h2>New Created for More Check-In</h2>
-      <p><strong>Name:</strong> ${escapeHtml(name || "-")}</p>
-      <p><strong>Email:</strong> ${escapeHtml(email || "-")}</p>
-      <p><strong>Score:</strong> ${score.total}/${MAX_SCORE} — ${escapeHtml(score.stage)}</p>
-      <p><strong>Strongest:</strong> ${escapeHtml(score.strongestLayer)}<br><strong>Lowest:</strong> ${escapeHtml(score.lowestLayer)}${score.lowestPillar ? ` (${escapeHtml(score.lowestPillar)})` : ""}</p>
-    </div>`,
-    text: `New Created for More Check-In\nName: ${name || "-"}\nEmail: ${email || "-"}\nScore: ${score.total}/${MAX_SCORE} — ${score.stage}\nStrongest: ${score.strongestLayer}\nLowest: ${score.lowestLayer}${score.lowestPillar ? ` (${score.lowestPillar})` : ""}`,
-  });
 }
 
 function escapeHtml(value: string) {
