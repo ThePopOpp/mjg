@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendTemplateEmail } from "@/lib/email/templates";
+import { sendTemplateEmail, experienceMonitorBcc } from "@/lib/email/templates";
 
 /**
  * Release due Experience emails. Selects scheduled send events whose time has come,
@@ -102,6 +102,7 @@ async function processSendEvent(
           session_number: String(event.step_number),
         },
       },
+      bcc: experienceMonitorBcc(),
     });
 
     await supabase

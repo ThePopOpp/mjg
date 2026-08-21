@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { sendTemplateForEvent, sendTemplateEmail } from "@/lib/email/templates";
+import { sendTemplateForEvent, sendTemplateEmail, experienceMonitorBcc } from "@/lib/email/templates";
 import { ROLES, type AppRole, isAppRole } from "@/lib/rbac/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants";
@@ -116,6 +116,7 @@ export async function createUserInvitation(input: {
       const emailResult = await sendTemplateForEvent({
         eventKey: "user_invitation",
         actorUserId: input.invitedBy,
+        bcc: experienceMonitorBcc(),
         recipient: {
           email: input.email,
           phone: input.phone,
@@ -217,6 +218,7 @@ export async function sendDueInvitations(input: { limit?: number } = {}) {
       const emailResult = await sendTemplateForEvent({
         eventKey: "user_invitation",
         actorUserId: inv.invited_by ?? undefined,
+        bcc: experienceMonitorBcc(),
         recipient: { email: inv.email, role: inv.role, status: "invited", merge_data: { invite_url: inviteUrl } },
         fallback: {
           subject: "You have been invited to the MJG Dashboard",

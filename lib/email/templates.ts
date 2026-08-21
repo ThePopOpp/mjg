@@ -100,10 +100,23 @@ export async function deleteEmailTemplate(id: string) {
   return { id };
 }
 
+/**
+ * Optional silent BCC on 6-Week Challenge (experience) emails and account invitations, for
+ * delivery monitoring. Set EXPERIENCE_MONITOR_BCC to one or more addresses (comma-separated);
+ * leave it unset to disable. Applies only to challenge drip + invitation sends, not all mail.
+ */
+export function experienceMonitorBcc(): string[] | undefined {
+  const raw = (process.env.EXPERIENCE_MONITOR_BCC ?? "").trim();
+  if (!raw) return undefined;
+  const list = raw.split(",").map((s) => s.trim()).filter(Boolean);
+  return list.length ? list : undefined;
+}
+
 export async function sendTemplateEmail(input: {
   templateId: string;
   recipient: EmailRecipient;
   actorUserId?: string;
+  bcc?: string | string[];
 }) {
   const supabase = createSupabaseAdminClient();
   const { data: template, error } = await supabase.from("email_templates").select("*").eq("id", input.templateId).maybeSingle();
@@ -130,7 +143,7 @@ export async function sendTemplateEmail(input: {
   };
 
   try {
-    const result = await sendSmtpEmail({ to: input.recipient.email, subject, html, text });
+    const result = await sendSmtpEmail({ to: input.recipient.email, subject, html, text, bcc: input.bcc });
     const { data: log, error: logError } = await supabase
       .from("email_send_logs")
       .insert({
@@ -155,6 +168,7 @@ export async function sendTemplateForEvent(input: {
   eventKey: EmailEventKey;
   recipient: EmailRecipient;
   actorUserId?: string;
+  bcc?: string | string[];
   fallback?: {
     subject: string;
     html: string;
@@ -167,6 +181,7 @@ export async function sendTemplateForEvent(input: {
       templateId: mapping.template_id,
       recipient: input.recipient,
       actorUserId: input.actorUserId,
+      bcc: input.bcc,
     });
   }
 
@@ -183,7 +198,7 @@ export async function sendTemplateForEvent(input: {
   const subject = renderTemplate(input.fallback.subject, mergeData);
   const html = renderTemplate(input.fallback.html, mergeData);
   const text = renderTemplate(input.fallback.text || stripHtml(html), mergeData);
-  const result = await sendSmtpEmail({ to: input.recipient.email, subject, html, text });
+  const result = await sendSmtpEmail({ to: input.recipient.email, subject, html, text, bcc: input.bcc });
 
   const supabase = createSupabaseAdminClient();
   await supabase.from("email_send_logs").insert({
