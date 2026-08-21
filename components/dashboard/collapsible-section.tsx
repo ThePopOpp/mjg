@@ -1,23 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { cn } from "@/lib/utils";
 
 /**
- * A dashboard section that collapses/expands, with a numeric count badge in the header.
- * The badge is MJG gold by default; it turns red when the count has grown since the user
- * last viewed this section (new items). Viewing it (this render) marks it seen so it reverts
- * to gold on the next load. `right` renders a trailing action that stays clickable.
+ * A dashboard section that collapses/expands, with a numeric count badge in the top-right of
+ * the header. The badge is MJG gold by default and turns red when the count grew since the
+ * user last viewed the section. Clicking the badge opens a modal with the details and a link
+ * into the full page. Viewing marks the section seen (badge reverts to gold next load).
  */
 export function CollapsibleSection({
   title,
   count,
   sectionKey,
   isNew = false,
-  right,
+  detailHref,
+  detailLabel = "View full details",
   defaultOpen = true,
   children,
 }: {
@@ -25,14 +29,14 @@ export function CollapsibleSection({
   count: number;
   sectionKey?: string;
   isNew?: boolean;
-  right?: React.ReactNode;
+  detailHref?: string;
+  detailLabel?: string;
   defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
   const actionToken = useDashboardActionToken();
+  const [modalOpen, setModalOpen] = useState(false);
 
-  // The section is on screen (default-open) — record that the user has now seen this count,
-  // so the red "new" badge reverts to gold on the next load. Only writes when something's new.
   useEffect(() => {
     if (!isNew || !sectionKey) return;
     fetch("/api/me/dashboard-seen", {
@@ -42,29 +46,47 @@ export function CollapsibleSection({
     }).catch(() => {});
   }, [isNew, sectionKey, count, actionToken]);
 
+  const badgeClass = cn(
+    "inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-2 text-xs font-bold tabular-nums",
+    isNew ? "bg-red-600 text-white" : count > 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
+  );
+
   return (
     <Card className="overflow-hidden">
       <Accordion type="single" collapsible defaultValue={defaultOpen ? "section" : undefined}>
         <AccordionItem value="section" className="border-b-0">
-          <div className="flex items-center gap-2 pr-5">
+          <div className="flex items-center gap-2 pr-4">
             <AccordionTrigger className="flex-1 px-5 hover:no-underline">
-              <span className="flex items-center gap-2 text-base font-semibold">
-                {title}
-                <span
-                  className={cn(
-                    "inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-2 text-xs font-bold tabular-nums",
-                    isNew ? "bg-red-600 text-white" : count > 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
-                  )}
-                >
-                  {count}
-                </span>
-              </span>
+              <span className="text-base font-semibold">{title}</span>
             </AccordionTrigger>
-            {right}
+            {detailHref ? (
+              <button type="button" onClick={() => setModalOpen(true)} aria-label={`${title} details`} className={cn(badgeClass, "cursor-pointer transition hover:ring-2 hover:ring-primary/40")}>
+                {count}
+              </button>
+            ) : (
+              <span className={badgeClass}>{count}</span>
+            )}
           </div>
           <AccordionContent className="px-0 pb-0">{children}</AccordionContent>
         </AccordionItem>
       </Accordion>
+
+      {detailHref ? (
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+              <DialogDescription>{count} {count === 1 ? "item" : "items"}</DialogDescription>
+            </DialogHeader>
+            <div className="overflow-x-auto">{children}</div>
+            <DialogFooter>
+              <Link href={detailHref} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+                {detailLabel} <ArrowRight className="h-4 w-4" />
+              </Link>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      ) : null}
     </Card>
   );
 }

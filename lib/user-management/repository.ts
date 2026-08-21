@@ -9,21 +9,15 @@ import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants"
 export async function getInvitationCounts(): Promise<{ sent: number; pending: number; accepted: number; total: number }> {
   const supabase = createSupabaseAdminClient();
   const nowIso = new Date().toISOString();
-  // Exact server-side counts (head:true fetches no rows) so this stays cheap at scale.
-  const countFor = async (status?: string) => {
-    let q = supabase.from("user_invitations").select("*", { count: "exact", head: true });
-    if (status) q = q.eq("invite_status", status);
-    const { count } = await q;
-    return count ?? 0;
-  };
-  // "Pending" = queued and still actionable — an expired, never-sent invite isn't pending.
-  const pendingPromise = supabase
-    .from("user_invitations")
-    .select("*", { count: "exact", head: true })
-    .eq("invite_status", "pending")
-    .or(`expires_at.is.null,expires_at.gte.${nowIso}`)
-    .then(({ count }) => count ?? 0);
-  const [total, sent, pending, accepted] = await Promise.all([countFor(), countFor("sent"), pendingPromise, countFor("accepted")]);
+  const base = () => supabase.from("user_invitations").select("*", { count: "exact", head: true });
+  const [total, sent, pending, accepted] = await Promise.all([
+    base().then(({ count }) => count ?? 0),
+    // Sent = every invite that was emailed (accepted ones were sent too).
+    base().in("invite_status", ["sent", "accepted"]).then(({ count }) => count ?? 0),
+    // Pending = awaiting acceptance: sent (or queued) but not yet accepted, and not expired.
+    base().in("invite_status", ["pending", "sent"]).or(`expires_at.is.null,expires_at.gte.${nowIso}`).then(({ count }) => count ?? 0),
+    base().eq("invite_status", "accepted").then(({ count }) => count ?? 0),
+  ]);
   return { sent, pending, accepted, total };
 }
 

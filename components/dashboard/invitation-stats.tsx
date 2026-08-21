@@ -12,8 +12,8 @@ import type { DashboardInvitation } from "@/lib/user-management/repository";
 
 type StatusKey = "sent" | "pending" | "accepted";
 const CARDS: { key: StatusKey; label: string; detail: string; icon: LucideIcon }[] = [
-  { key: "sent", label: "Sent", detail: "Awaiting acceptance", icon: Send },
-  { key: "pending", label: "Pending", detail: "Queued to send", icon: Clock },
+  { key: "sent", label: "Sent", detail: "Total invites emailed", icon: Send },
+  { key: "pending", label: "Pending", detail: "Awaiting acceptance", icon: Clock },
   { key: "accepted", label: "Accepted", detail: "Joined the platform", icon: UserCheck },
 ];
 
@@ -33,12 +33,18 @@ export function InvitationStats({
 }) {
   const [open, setOpen] = useState<StatusKey | null>(null);
   const active = CARDS.find((c) => c.key === open) ?? null;
-  // Pending excludes expired (matches the count) — an expired, never-sent invite isn't pending.
-  const rows = open
-    ? invitations.filter((i) => i.status === open && (open !== "pending" || !i.expires_at || new Date(i.expires_at) >= new Date()))
-    : [];
-  const dateCol = open === "accepted" ? "Accepted" : open === "sent" ? "Sent" : "Created";
-  const dateVal = (i: DashboardInvitation) => (open === "accepted" ? i.accepted_at : open === "sent" ? i.sent_at ?? i.created_at : i.created_at);
+  const notExpired = (i: DashboardInvitation) => !i.expires_at || new Date(i.expires_at) >= new Date();
+  // Sent = everything emailed (sent + accepted); Pending = awaiting acceptance (sent/queued, not
+  // expired, not yet accepted); Accepted = accepted.
+  const rows = !open
+    ? []
+    : open === "sent"
+      ? invitations.filter((i) => i.status === "sent" || i.status === "accepted")
+      : open === "pending"
+        ? invitations.filter((i) => (i.status === "pending" || i.status === "sent") && notExpired(i))
+        : invitations.filter((i) => i.status === "accepted");
+  const dateCol = open === "accepted" ? "Accepted" : "Sent";
+  const dateVal = (i: DashboardInvitation) => (open === "accepted" ? i.accepted_at : i.sent_at ?? i.created_at);
 
   return (
     <>
@@ -66,7 +72,7 @@ export function InvitationStats({
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{active?.label} invitations</DialogTitle>
-            <DialogDescription>{rows.length} {open === "accepted" ? "people have accepted" : `invitation${rows.length === 1 ? "" : "s"} ${open === "sent" ? "awaiting acceptance" : "queued to send"}`}.</DialogDescription>
+            <DialogDescription>{rows.length} {open === "accepted" ? `${rows.length === 1 ? "person has" : "people have"} accepted` : open === "sent" ? `invitation${rows.length === 1 ? "" : "s"} emailed` : `awaiting acceptance`}.</DialogDescription>
           </DialogHeader>
 
           {rows.length ? (
@@ -88,7 +94,7 @@ export function InvitationStats({
                       <TableCell className="whitespace-nowrap text-muted-foreground">{fmt(dateVal(i))}</TableCell>
                       {open !== "accepted" ? (
                         <TableCell className="text-right">
-                          {i.inviteUrl ? <Link href={i.inviteUrl} className="text-sm font-medium text-primary hover:underline">Open</Link> : "—"}
+                          {i.status !== "accepted" && i.inviteUrl ? <Link href={i.inviteUrl} className="text-sm font-medium text-primary hover:underline">Open</Link> : "—"}
                         </TableCell>
                       ) : null}
                     </TableRow>
