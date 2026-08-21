@@ -48,11 +48,14 @@ export default async function DashboardPage() {
     { label: "Inner Circle accepted", value: String(pilotMetrics.innerCircle), detail: "Accepted invitations", icon: CircleUserRound },
     { label: "Follow-up permission", value: String(pilotMetrics.followUpPermission), detail: "Follow-up ready", icon: Activity },
   ];
+  // check_in_submissions has no PostgREST relationship to participants to embed, so resolve
+  // each check-in's wave from the participants we already loaded, keyed by participant_id.
+  const waveByParticipant = new Map<string, string | null>(data.participants.map((p: any) => [p.id, p.wave ?? p.source ?? null]));
   const waveRows = ["wave_0", "wave_1", "wave_2", "wave_3"].map((wave) => ({
     wave,
     invited: data.participants.filter((row: any) => row.wave === wave || row.source === wave).length,
     optedIn: data.participants.filter((row: any) => (row.wave === wave || row.source === wave) && row.email_journey_opt_in).length,
-    completed: data.checkIns.filter((row: any) => row.participants?.wave === wave).length,
+    completed: data.checkIns.filter((row: any) => waveByParticipant.get(row.participant_id) === wave).length,
     survey: data.surveys.filter((row: any) => row.participants?.wave === wave).length,
   }));
 
@@ -63,6 +66,18 @@ export default async function DashboardPage() {
         title="Dashboard overview"
         description="Track participant progress, stewardship check-ins, surveys, and follow-up interest from one admin workspace."
       />
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold tracking-tight">Invitations</h2>
+          <Link href="/dashboard/user-management" className="text-sm font-medium text-primary hover:underline">Manage →</Link>
+        </div>
+        <StatCardRow className="grid gap-4 sm:grid-cols-3">
+          <MetricCard label="Sent" value={String(invStats.sent)} detail="Awaiting acceptance" icon={Send} />
+          <MetricCard label="Pending" value={String(invStats.pending)} detail="Queued to send" icon={Clock} />
+          <MetricCard label="Accepted" value={String(invStats.accepted)} detail="Joined the platform" icon={UserCheck} />
+        </StatCardRow>
+      </div>
 
       <MyTasksCard tasks={myTasks} name={myName} />
 
@@ -128,18 +143,6 @@ export default async function DashboardPage() {
             </TableBody>
           </Table>
         </CollapsibleSection>
-      </div>
-
-      <div className="space-y-4 border-t pt-6">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">Invitations</h2>
-          <Link href="/dashboard/user-management" className="text-sm font-medium text-primary hover:underline">Manage →</Link>
-        </div>
-        <StatCardRow className="grid gap-4 sm:grid-cols-3">
-          <MetricCard label="Sent" value={String(invStats.sent)} detail="Awaiting acceptance" icon={Send} />
-          <MetricCard label="Pending" value={String(invStats.pending)} detail="Queued to send" icon={Clock} />
-          <MetricCard label="Accepted" value={String(invStats.accepted)} detail="Joined the platform" icon={UserCheck} />
-        </StatCardRow>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">

@@ -2,6 +2,7 @@
 
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 /**
  * A dashboard section that collapses/expands, with a live numeric count badge in the header.
@@ -28,7 +29,14 @@ export function CollapsibleSection({
             <AccordionTrigger className="flex-1 px-5 hover:no-underline">
               <span className="flex items-center gap-2 text-base font-semibold">
                 {title}
-                <span className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-primary/10 px-2 text-xs font-bold tabular-nums text-primary">{count}</span>
+                <span
+                className={cn(
+                  "inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-2 text-xs font-bold tabular-nums",
+                  count > 0 ? "bg-red-600 text-white" : "bg-muted text-muted-foreground",
+                )}
+              >
+                {count}
+              </span>
               </span>
             </AccordionTrigger>
             {right}

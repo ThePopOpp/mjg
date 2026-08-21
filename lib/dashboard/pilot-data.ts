@@ -17,7 +17,7 @@ export async function getPilotDashboardData() {
         .select("*, participant_tags(tags(id,name,category))")
         .order("created_at", { ascending: false })
         .limit(100),
-      supabase.from("check_in_submissions").select("*, participants(first_name,last_name,email,wave,participant_type)").eq("assessment", "created-for-more").order("created_at", { ascending: false }).limit(1000),
+      supabase.from("check_in_submissions").select("*").eq("assessment", "created-for-more").order("created_at", { ascending: false }).limit(1000),
       supabase.from("survey_responses").select("*, participants(first_name,last_name,email,wave,source,participant_type)").order("created_at", { ascending: false }).limit(100),
       supabase.from("email_journey_events").select("*, participants(first_name,last_name,email)").order("scheduled_at", { ascending: true }).limit(80),
       supabase.from("tags").select("id,name,category,participant_tags(participant_id)").order("name"),
