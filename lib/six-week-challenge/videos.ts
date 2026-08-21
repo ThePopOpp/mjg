@@ -57,8 +57,11 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     description:
       "Week 1 isn't about shame or a dramatic overhaul — it's about awareness. We slow down and tell the truth about the life we're actually building.",
     youtubeId: null,
+    driveId: "1yG2gVCiibEUrwZqxli-S250vsI_4qdaF",
+    embedDirect: true,
     videoUrl: null,
-    thumbnailUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/week1.svg",
+    thumbnailDark: "/6-week-challenge/thumbnails/week1.svg",
     durationLabel: null,
   },
   {
