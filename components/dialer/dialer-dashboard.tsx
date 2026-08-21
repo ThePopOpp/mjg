@@ -178,7 +178,7 @@ export function DialerDashboard() {
 
       {/* ── Softphone + Call log ── */}
       <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
-        <Card>
+        <Card className="min-w-0">
           <CardHeader><CardTitle>Softphone</CardTitle></CardHeader>
           <CardContent>
             <Softphone
@@ -189,7 +189,7 @@ export function DialerDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex min-w-0 flex-col">
           <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle>Call log</CardTitle>
             <div className="flex items-center gap-3">

@@ -3,33 +3,60 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronUp, X, type LucideIcon } from "lucide-react";
+import {
+  Home, Users, Phone, MailCheck, ClipboardList, NotebookPen, CalendarClock,
+  Sparkles, IdCard, Bot, UserCircle, Settings, BarChart3, ChevronUp, X,
+  type LucideIcon,
+} from "lucide-react";
 import type { NavEntry } from "@/components/layout/dashboard-nav";
+import { ROLES } from "@/lib/rbac/roles";
 import { cn } from "@/lib/utils";
 
 type FlatItem = { href: string; label: string; icon: LucideIcon };
+
+// Curated bottom bar for admins — a short, task-focused shortlist rather than every sidebar link.
+const ADMIN_ITEMS: FlatItem[] = [
+  { href: "/dashboard", label: "Dashboard", icon: Home },
+  { href: "/dashboard/participants", label: "Community", icon: Users },
+  { href: "/dashboard/dialer", label: "Dialer", icon: Phone },
+  { href: "/dashboard/emails", label: "Emails", icon: MailCheck },
+  { href: "/dashboard/plans", label: "Plans", icon: ClipboardList },
+  { href: "/dashboard/workspace", label: "Workspace", icon: NotebookPen },
+  { href: "/dashboard/bookings", label: "Booking", icon: CalendarClock },
+  { href: "/dashboard/experiences", label: "Experiences", icon: Sparkles },
+  { href: "/dashboard/business-cards", label: "Business Card", icon: IdCard },
+  { href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot },
+  { href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard/user-management", label: "User Management", icon: BarChart3 },
+];
 
 /**
  * Mobile-only bottom navigation: a fixed, horizontally-scrollable icon bar (lg:hidden). It is
  * visible by default and can be dismissed via a small tab on its top-left; when closed it
  * collapses to a "Menu" handle that reopens it.
  *
- * Items come from the same role-filtered nav the sidebar uses (`visibleEntries`), so each role
- * only ever sees the destinations it can actually reach. Groups are flattened into their leaves
- * since a bottom bar can't nest.
+ * Admins/super-admins get a curated shortlist (ADMIN_ITEMS). Every other role gets its own
+ * items derived from the same role-filtered nav the sidebar uses (`visibleEntries`), flattened
+ * since a bottom bar can't nest — so a role only ever sees destinations it can reach.
  */
-export function MobileBottomNav({ entries }: { entries: NavEntry[] }) {
+export function MobileBottomNav({ role, entries }: { role: string; entries: NavEntry[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
 
+  const isAdmin = role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN;
   const items: FlatItem[] = [];
-  const seen = new Set<string>();
-  for (const entry of entries) {
-    const leaves = entry.kind === "group" ? entry.items : [entry];
-    for (const leaf of leaves) {
-      if (seen.has(leaf.href)) continue;
-      seen.add(leaf.href);
-      items.push({ href: leaf.href, label: leaf.label, icon: leaf.icon });
+  if (isAdmin) {
+    items.push(...ADMIN_ITEMS);
+  } else {
+    const seen = new Set<string>();
+    for (const entry of entries) {
+      const leaves = entry.kind === "group" ? entry.items : [entry];
+      for (const leaf of leaves) {
+        if (seen.has(leaf.href)) continue;
+        seen.add(leaf.href);
+        items.push({ href: leaf.href, label: leaf.label, icon: leaf.icon });
+      }
     }
   }
 

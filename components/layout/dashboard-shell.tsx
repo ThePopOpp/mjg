@@ -218,11 +218,11 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
         </header>
 
         <DashboardActionTokenProvider token={actionToken}>
-          <main className="w-full px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
+          <main className="w-full overflow-x-clip px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
         </DashboardActionTokenProvider>
       </div>
 
-      <MobileBottomNav entries={visibleEntries} />
+      <MobileBottomNav role={profile.role} entries={visibleEntries} />
     </div>
     </DmUnreadProvider>
   );
