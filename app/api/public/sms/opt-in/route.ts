@@ -37,17 +37,38 @@ export async function POST(request: Request) {
         user_agent: ua,
       });
     } else {
-      await supabase.from("participants").insert({
-        first_name: firstName || "Unknown",
-        last_name: "",
-        email: `sms-${phone.replace(/\D/g, "")}@placeholder.invalid`,
-        phone,
-        sms_opt_in: true,
-        sms_opt_in_at: now,
-        sms_opt_in_source: "web_form",
-        participant_type: "general_participant",
-        source: "sms_opt_in_page",
-      });
+      // No participant with this phone. Do NOT mint a fake-email participant (participants are
+      // keyed by email, so it would be an orphan that can never link to their real record).
+      // Store the opt-in on a phone-only CONTACT; when they later join with a real email they
+      // become a proper participant.
+      const digits = phone.replace(/\D/g, "");
+      const { data: existingContact } = await supabase
+        .from("contacts")
+        .select("id")
+        .or(`phone.eq.${phone},phone.eq.+${digits}`)
+        .maybeSingle();
+      let contactId = existingContact?.id ?? null;
+      if (contactId) {
+        await supabase.from("contacts").update({ sms_opt_in: true, updated_at: now }).eq("id", contactId);
+      } else {
+        const { data: created } = await supabase
+          .from("contacts")
+          .insert({ type: "lead", status: "active", first_name: firstName || null, phone, sms_opt_in: true, email_opt_in: false, source: "sms_opt_in_page", tags: [], custom_fields: {} })
+          .select("id")
+          .maybeSingle();
+        contactId = created?.id ?? null;
+      }
+      if (contactId) {
+        await supabase.from("consent_events").insert({
+          entity_type: "contact",
+          entity_id: contactId,
+          channel: "sms",
+          event_type: "opt_in",
+          source: "web_form",
+          ip_address: ip,
+          user_agent: ua,
+        });
+      }
     }
 
     const profile = await supabase

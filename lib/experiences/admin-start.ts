@@ -76,11 +76,17 @@ export async function startChallengeForAdmin(actorId: string, input: AdminStartC
   );
 
   let invited = 0;
+  const failedInvites: { email: string; reason: string }[] = [];
   if (input.sendInvitations) {
     for (const a of attendees) {
-      await createUserInvitation({ email: a.email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: actorId, scheduledSendAt: input.invitationSendAt ?? null })
-        .then(() => { invited += 1; })
-        .catch((e) => console.error("[admin-start] invite failed", a.email, e instanceof Error ? e.message : e));
+      try {
+        await createUserInvitation({ email: a.email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: actorId, scheduledSendAt: input.invitationSendAt ?? null });
+        invited += 1;
+      } catch (e) {
+        const reason = e instanceof Error ? e.message : "Unknown error";
+        failedInvites.push({ email: a.email, reason });
+        console.error("[admin-start] invite failed", a.email, reason);
+      }
     }
   }
 
@@ -95,5 +101,5 @@ export async function startChallengeForAdmin(actorId: string, input: AdminStartC
     visibility = await grantChallengeTypeVisibility(type.id, input.visibility, actorId);
   }
 
-  return { experienceId: experience.id, attendees: attendees.length, invited, started, visibility };
+  return { experienceId: experience.id, attendees: attendees.length, invited, failedInvites, started, visibility };
 }

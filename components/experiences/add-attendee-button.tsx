@@ -27,7 +27,7 @@ export function AddAttendeeButton({ experienceId, backlog = [] }: { experienceId
   const [sendBacklog, setSendBacklog] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<{ upcomingEmails: number; backlogSent: number; invited: boolean; alreadyOnList: boolean } | null>(null);
+  const [done, setDone] = useState<{ upcomingEmails: number; backlogSent: number; invited: boolean; alreadyOnList: boolean; inviteError: string | null } | null>(null);
 
   const valid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim());
   const missedCount = backlog.length;
@@ -47,7 +47,7 @@ export function AddAttendeeButton({ experienceId, backlog = [] }: { experienceId
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
-      setDone({ upcomingEmails: data.upcomingEmails ?? 0, backlogSent: data.backlogSent ?? 0, invited: Boolean(data.invited), alreadyOnList: Boolean(data.alreadyOnList) });
+      setDone({ upcomingEmails: data.upcomingEmails ?? 0, backlogSent: data.backlogSent ?? 0, invited: Boolean(data.invited), alreadyOnList: Boolean(data.alreadyOnList), inviteError: typeof data.inviteError === "string" ? data.inviteError : null });
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
@@ -80,6 +80,9 @@ export function AddAttendeeButton({ experienceId, backlog = [] }: { experienceId
                   {done.invited ? " Invitation sent." : ""}
                 </span>
               </div>
+              {done.inviteError ? (
+                <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">Invitation failed to send: {done.inviteError}</div>
+              ) : null}
               <DialogFooter>
                 <Button variant="outline" onClick={reset}>Add another</Button>
                 <Button onClick={() => setOpen(false)}>Done</Button>

@@ -155,11 +155,17 @@ export async function startChallengeForFacilitator(profileId: string, input: Sta
   );
 
   let invited = 0;
+  const failedInvites: { email: string; reason: string }[] = [];
   if (input.sendInvitations) {
     for (const a of attendees) {
-      await createUserInvitation({ email: a.email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: profileId, scheduledSendAt: input.invitationSendAt ?? null })
-        .then(() => { invited += 1; })
-        .catch((e) => console.error("[start-challenge] invite failed", a.email, e instanceof Error ? e.message : e));
+      try {
+        await createUserInvitation({ email: a.email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: profileId, scheduledSendAt: input.invitationSendAt ?? null });
+        invited += 1;
+      } catch (e) {
+        const reason = e instanceof Error ? e.message : "Unknown error";
+        failedInvites.push({ email: a.email, reason });
+        console.error("[start-challenge] invite failed", a.email, reason);
+      }
     }
   }
 
@@ -169,7 +175,7 @@ export async function startChallengeForFacilitator(profileId: string, input: Sta
     started = true;
   }
 
-  return { experienceId: experience.id, attendees: attendees.length, invited, started };
+  return { experienceId: experience.id, attendees: attendees.length, invited, failedInvites, started };
 }
 
 /** Facilitator self-assigns an experience type: creates a DRAFT experience for their

@@ -159,11 +159,16 @@ export async function addAttendeeToExperience(
   }
 
   let invited = false;
+  let inviteError: string | null = null;
   if (input.sendInvitation) {
-    await createUserInvitation({ email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: actorId ?? undefined })
-      .then(() => { invited = true; })
-      .catch((e) => console.error("[add-attendee] invite failed", email, e instanceof Error ? e.message : e));
+    try {
+      await createUserInvitation({ email, role: ROLES.PARTICIPANT, inviteMethod: "email", invitedBy: actorId ?? undefined });
+      invited = true;
+    } catch (e) {
+      inviteError = e instanceof Error ? e.message : "Unknown error";
+      console.error("[add-attendee] invite failed", email, inviteError);
+    }
   }
 
-  return { attendeeId, alreadyOnList, upcomingEmails: futureRows.length, backlogSent, invited };
+  return { attendeeId, alreadyOnList, upcomingEmails: futureRows.length, backlogSent, invited, inviteError };
 }

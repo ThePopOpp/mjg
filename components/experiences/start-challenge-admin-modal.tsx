@@ -44,7 +44,7 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
   const [visibleFacilitators, setVisibleFacilitators] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<{ invited: number; attendees: number; started: boolean; visibility: number } | null>(null);
+  const [done, setDone] = useState<{ invited: number; attendees: number; started: boolean; visibility: number; failedInvites: { email: string; reason: string }[] } | null>(null);
 
   const validCount = useMemo(() => attendees.filter((a) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a.email.trim())).length, [attendees]);
 
@@ -90,7 +90,7 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
-      setDone({ invited: data.invited ?? 0, attendees: data.attendees ?? 0, started: Boolean(data.started), visibility: data.visibility ?? 0 });
+      setDone({ invited: data.invited ?? 0, attendees: data.attendees ?? 0, started: Boolean(data.started), visibility: data.visibility ?? 0, failedInvites: Array.isArray(data.failedInvites) ? data.failedInvites : [] });
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
@@ -123,6 +123,14 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
                   {done.visibility ? ` Visible to ${done.visibility} facilitator${done.visibility === 1 ? "" : "s"}.` : ""}
                 </span>
               </div>
+              {done.failedInvites.length ? (
+                <div className="space-y-1 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
+                  <p className="font-medium text-destructive">{done.failedInvites.length} invitation{done.failedInvites.length === 1 ? "" : "s"} failed to send:</p>
+                  <ul className="space-y-0.5 text-muted-foreground">
+                    {done.failedInvites.map((f) => <li key={f.email}><span className="font-medium text-foreground">{f.email}</span> — {f.reason}</li>)}
+                  </ul>
+                </div>
+              ) : null}
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
               </DialogFooter>
