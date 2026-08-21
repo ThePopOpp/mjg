@@ -29,14 +29,19 @@ function renderArchive(posts: any[], audioAssets: any[], siteUrl: string) {
     :root { --paper:#fbfaf7; --ink:#070807; --muted:#5f6d66; --line:#e4ded2; --green:#c9aa70; --card:#fff; }
     [data-theme="dark"] { --paper:#10110f; --ink:#f8f6f1; --muted:#b6bcb6; --line:#2b2a25; --card:#151713; }
     body { background:var(--paper); color:var(--ink); font-family:var(--font-body); line-height:1.6; }
-    main { width:min(1180px, calc(100% - 40px)); margin:0 auto; }
+    /* Match the nav bar's inner width so content lines up with the logo and theme toggle. */
+    main { width:100%; max-width:1160px; margin:0 auto; padding:0 2rem; }
     .hero { padding:80px 0 44px; text-align:center; }
     .eyebrow { color:var(--gold); font-weight:800; letter-spacing:.16em; text-transform:uppercase; font-size:13px; }
     h1 { font-family:var(--font-display); font-size:clamp(48px, 9vw, 90px); line-height:.95; margin:18px 0; }
     .hero p { color:var(--muted); font-size:20px; max-width:700px; margin:0 auto; line-height:1.7; }
     .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:22px; padding:28px 0 90px; }
-    article { border:1px solid var(--line); background:var(--card); border-radius:8px; overflow:hidden; }
+    article { border:1px solid var(--line); background:var(--card); border-radius:8px; overflow:hidden; height:100%; }
     article img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
+    /* Whole post card is a link. */
+    .post-link { display:block; text-decoration:none; color:inherit; }
+    .post-link article { transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+    .post-link:hover article { border-color:var(--green); transform:translateY(-2px); box-shadow:0 12px 32px rgba(0,0,0,.08); }
     .body { padding:22px; }
     .meta { color:var(--gold); font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
     h2 { font-family:var(--font-display); font-size:30px; line-height:1.1; margin:12px 0; }
@@ -99,16 +104,17 @@ function renderAudioCard(asset: any) {
 
 function renderPostCard(post: any, siteUrl: string) {
   const tags = normalizePostTags(post);
-  return `<article>
+  // The whole card is the link — the nested "Read post" is a span, not an anchor (no nested <a>).
+  return `<a class="post-link" href="${siteUrl}/resources/${post.slug}"><article>
     ${post.featured_image_url ? `<img src="${escapeHtml(post.featured_image_url)}" alt="" />` : ""}
     <div class="body">
       <div class="meta">${escapeHtml(post.category?.name ?? "Resource")}</div>
       <h2>${escapeHtml(post.title)}</h2>
       <p class="clamp-3">${escapeHtml(post.excerpt || "")}</p>
       <div class="tags">${tags.map((tag: any) => `<span class="tag">${escapeHtml(tag.name)}</span>`).join("")}</div>
-      <a class="read" href="${siteUrl}/resources/${post.slug}">Read post -></a>
+      <span class="read">Read post -></span>
     </div>
-  </article>`;
+  </article></a>`;
 }
 
 function renderAudioModal() {

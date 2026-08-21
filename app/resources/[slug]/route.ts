@@ -32,8 +32,10 @@ function renderPost(post: any) {
     :root { --paper:#fbfaf7; --ink:#070807; --muted:#5f6d66; --line:#e4ded2; --green:#c9aa70; --card:#fff; }
     [data-theme="dark"] { --paper:#10110f; --ink:#f8f6f1; --muted:#b6bcb6; --line:#2b2a25; --card:#151713; }
     body { background:var(--paper); color:var(--ink); font-family:var(--font-body); line-height:1.6; }
-    main { width:min(1180px, calc(100% - 40px)); margin:0 auto; }
-    article { max-width:800px; margin:0 auto; padding:70px 0 100px; }
+    /* Match the nav bar's inner width (max 1160px + 2rem gutters) so the content spans from
+       the logo on the left to the theme toggle on the right. */
+    main { width:100%; max-width:1160px; margin:0 auto; padding:0 2rem; }
+    article { max-width:none; margin:0; padding:70px 0 100px; }
     .meta { color:var(--gold); font-size:13px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; margin-bottom:18px; }
     h1 { font-family:var(--font-display); font-size:clamp(46px, 8vw, 86px); line-height:.95; margin-bottom:18px; }
     .excerpt { color:var(--muted); font-size:21px; line-height:1.65; margin-bottom:34px; }
