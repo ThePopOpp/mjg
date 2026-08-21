@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, CheckCircle2, Church, CircleUserRound, MailCheck, UsersRound, MessageSquareText, MessagesSquare, CornerUpLeft } from "lucide-react";
+import { Activity, CheckCircle2, Church, CircleUserRound, MailCheck, UsersRound, MessageSquareText, MessagesSquare, CornerUpLeft, Send, Clock, UserCheck } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatusBadge } from "@/components/dashboard/status-badge";
@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
 import { getCheckInSubmissionStats, listCheckInSubmissions } from "@/lib/check-in/submissions";
+import { getInvitationCounts } from "@/lib/user-management/repository";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
@@ -26,7 +27,7 @@ export default async function DashboardPage() {
     return <ParticipantDashboard profile={profileForRole} />;
   }
 
-  const [data, profile, checkInStats, recentCheckIns] = await Promise.all([getPilotDashboardData(), getCurrentProfile(), getCheckInSubmissionStats(), listCheckInSubmissions(6)]);
+  const [data, profile, checkInStats, recentCheckIns, invStats] = await Promise.all([getPilotDashboardData(), getCurrentProfile(), getCheckInSubmissionStats(), listCheckInSubmissions(6), getInvitationCounts()]);
   const pilotMetrics = getPilotMetrics(data);
   const myTasks = profile
     ? await getMyOpenTasks({ id: profile.id, role: profile.role, email: profile.email })
@@ -128,6 +129,18 @@ export default async function DashboardPage() {
             </Table>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="space-y-4 border-t pt-6">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold tracking-tight">Invitations</h2>
+          <Link href="/dashboard/user-management" className="text-sm font-medium text-primary hover:underline">Manage →</Link>
+        </div>
+        <StatCardRow className="grid gap-4 sm:grid-cols-3">
+          <MetricCard label="Sent" value={String(invStats.sent)} detail="Awaiting acceptance" icon={Send} />
+          <MetricCard label="Pending" value={String(invStats.pending)} detail="Queued to send" icon={Clock} />
+          <MetricCard label="Accepted" value={String(invStats.accepted)} detail="Joined the platform" icon={UserCheck} />
+        </StatCardRow>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">

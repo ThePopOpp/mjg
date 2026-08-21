@@ -4,6 +4,21 @@ import { ROLES, type AppRole, isAppRole } from "@/lib/rbac/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants";
 
+/** Invitation counts for the dashboard: sent (awaiting acceptance), pending (queued to
+ *  send), and accepted (joined). */
+export async function getInvitationCounts(): Promise<{ sent: number; pending: number; accepted: number; total: number }> {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase.from("user_invitations").select("invite_status");
+  const counts = { sent: 0, pending: 0, accepted: 0, total: 0 };
+  for (const r of data ?? []) {
+    counts.total += 1;
+    if (r.invite_status === "sent") counts.sent += 1;
+    else if (r.invite_status === "pending") counts.pending += 1;
+    else if (r.invite_status === "accepted") counts.accepted += 1;
+  }
+  return counts;
+}
+
 export async function getUserManagementData() {
   try {
     const supabase = createSupabaseAdminClient();
