@@ -19,6 +19,29 @@ export async function getInvitationCounts(): Promise<{ sent: number; pending: nu
   return { sent, pending, accepted, total };
 }
 
+/** Recent invitations for the dashboard stat modals (email, role, status, timestamps). */
+export async function getRecentInvitations(limit = 200) {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase
+    .from("user_invitations")
+    .select("id,email,phone,role,invite_status,created_at,sent_at,accepted_at,expires_at,metadata")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r: any) => ({
+    id: r.id as string,
+    email: (r.email ?? r.phone ?? "—") as string,
+    role: r.role as string,
+    status: r.invite_status as string,
+    created_at: r.created_at as string,
+    sent_at: r.sent_at as string | null,
+    accepted_at: r.accepted_at as string | null,
+    expires_at: r.expires_at as string | null,
+    inviteUrl: (r.metadata?.inviteUrl ?? null) as string | null,
+  }));
+}
+
+export type DashboardInvitation = Awaited<ReturnType<typeof getRecentInvitations>>[number];
+
 export async function getUserManagementData() {
   try {
     const supabase = createSupabaseAdminClient();
