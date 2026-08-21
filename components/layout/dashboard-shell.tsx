@@ -7,6 +7,7 @@ import { ChevronDown, LogOut, Menu, Search, PanelLeft, X, MessageSquareText } fr
 import { DashboardActionTokenProvider } from "@/components/layout/dashboard-action-token";
 import { DmUnreadProvider, useDmUnread } from "@/components/direct-messages/dm-unread";
 import { InstallAppButton } from "@/components/pwa/install-app-button";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { dashboardNav, facilitatorNav, participantNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,14 +92,14 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
           collapsed ? "lg:w-16" : "lg:w-72",
         ].join(" ")}
       >
-        <div className={`flex h-20 shrink-0 items-center border-b ${collapsed ? "lg:justify-center lg:px-2" : "px-6"}`}>
+        <div className={`flex h-24 shrink-0 items-center border-b ${collapsed ? "lg:justify-center lg:px-2" : "px-6"}`}>
           <Link
             href="/dashboard"
             className="flex flex-col items-start"
             aria-label="Michael J. Gauthier dashboard"
             onClick={() => setMobileOpen(false)}
           >
-            <span className={`relative block h-12 ${collapsed ? "lg:h-9 lg:w-9 w-28" : "w-28"}`}>
+            <span className={`relative block h-16 ${collapsed ? "lg:h-9 lg:w-9 w-44" : "w-44"}`}>
               <img
                 src="/mjg-logos/mjg_black_white.png"
                 alt="MJG"
@@ -155,17 +156,22 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
 
       <div className={`transition-all duration-200 ${collapsed ? "lg:pl-16" : "lg:pl-72"}`}>
         <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
-          <div className="flex h-16 w-full items-center gap-3 px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 w-full items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:px-8">
             {/* Mobile: open drawer */}
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="shrink-0 lg:hidden"
               aria-label="Open navigation"
               onClick={() => setMobileOpen(true)}
             >
               <Menu className="h-5 w-5" />
             </Button>
+            {/* Mobile: MJG mark (the sidebar logo covers desktop) */}
+            <Link href="/dashboard" aria-label="Dashboard" className="shrink-0 lg:hidden">
+              <img src="/mjg-logos/mjg_black_white.png" alt="MJG" className="h-7 w-auto object-contain dark:hidden" />
+              <img src="/mjg-logos/mjg_white.png" alt="MJG" className="hidden h-7 w-auto object-contain dark:block" />
+            </Link>
             {/* Desktop: collapse/expand */}
             <Button
               variant="ghost"
@@ -182,21 +188,24 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
               <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input className="pl-9" placeholder="Search participants, waves, tags..." />
             </div>
-            <div className="ml-auto flex items-center gap-3">
-              <InstallAppButton />
+            <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
+              {/* Install prompt takes room on small screens — desktop/tablet only */}
+              <span className="hidden sm:inline-flex">
+                <InstallAppButton />
+              </span>
               <MessagesBell />
               <ThemeToggle />
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-medium">{displayName}</p>
                 <p className="text-xs text-muted-foreground">{ROLE_LABELS[profile.role]}</p>
               </div>
-              <Link href="/dashboard/profile" aria-label="My Profile">
+              <Link href="/dashboard/profile" aria-label="My Profile" className="shrink-0">
                 <UserAvatar
                   firstName={profile.firstName}
                   lastName={profile.lastName}
                   email={profile.email}
                   avatarUrl={profile.avatarUrl}
-                  className="h-9 w-9 text-sm"
+                  className="h-9 w-9 shrink-0 text-sm"
                 />
               </Link>
               <form action="/auth/logout" method="post">
@@ -209,9 +218,13 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
         </header>
 
         <DashboardActionTokenProvider token={actionToken}>
-          <main className="w-full px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+          <main className="w-full px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
         </DashboardActionTokenProvider>
       </div>
+
+      {(profile.role === ROLES.SUPER_ADMIN || profile.role === ROLES.ADMIN) && (
+        <MobileBottomNav role={profile.role} />
+      )}
     </div>
     </DmUnreadProvider>
   );

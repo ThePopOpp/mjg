@@ -120,7 +120,7 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
     <>
       {/* Launcher — the numeric badge reflects unread Direct Messages */}
       <button data-fab-ignore onClick={() => setOpen((o) => !o)} aria-label="Review & messages"
-        className="fixed bottom-5 right-5 z-[100] flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition hover:scale-105 print:hidden">
+        className="fixed bottom-5 right-5 z-[100] hidden h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition hover:scale-105 md:flex print:hidden">
         {open ? <X className="h-5 w-5" /> : <MessageSquarePlus className="h-5 w-5" />}
         {!open && dmUnread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{dmUnread > 99 ? "99+" : dmUnread}</span>}
       </button>
