@@ -8,15 +8,15 @@ import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants"
  *  send), and accepted (joined). */
 export async function getInvitationCounts(): Promise<{ sent: number; pending: number; accepted: number; total: number }> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase.from("user_invitations").select("invite_status");
-  const counts = { sent: 0, pending: 0, accepted: 0, total: 0 };
-  for (const r of data ?? []) {
-    counts.total += 1;
-    if (r.invite_status === "sent") counts.sent += 1;
-    else if (r.invite_status === "pending") counts.pending += 1;
-    else if (r.invite_status === "accepted") counts.accepted += 1;
-  }
-  return counts;
+  // Exact server-side counts (head:true fetches no rows) so this stays cheap at scale.
+  const countFor = async (status?: string) => {
+    let q = supabase.from("user_invitations").select("*", { count: "exact", head: true });
+    if (status) q = q.eq("invite_status", status);
+    const { count } = await q;
+    return count ?? 0;
+  };
+  const [total, sent, pending, accepted] = await Promise.all([countFor(), countFor("sent"), countFor("pending"), countFor("accepted")]);
+  return { sent, pending, accepted, total };
 }
 
 export async function getUserManagementData() {

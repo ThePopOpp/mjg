@@ -13,15 +13,20 @@ export async function sendDueExperienceEmails(input: { actorUserId?: string | nu
   const limit = Math.min(Math.max(Number(input.limit ?? 25), 1), 100);
   const now = new Date().toISOString();
 
-  const { data: events, error } = await supabase
+  // Paused experiences HOLD their events (they stay "scheduled" with past-due times). Because
+  // the queue is ordered by scheduled_at ASC, those stale held events would otherwise sort to
+  // the front and consume every batch slot — starving all other groups. Exclude them at the
+  // query so a paused group can never block the rest.
+  const { data: pausedExps } = await supabase.from("experiences").select("id").eq("status", "paused");
+  const pausedIds = (pausedExps ?? []).map((e: any) => e.id as string);
+
+  let query = supabase
     .from("experience_send_events")
-    .select(
-      "*, experience_attendees(id,email,name,participant_id,opted_out), experiences(id,name,status)",
-    )
+    .select("*, experience_attendees(id,email,name,participant_id,opted_out), experiences(id,name,status)")
     .eq("status", "scheduled")
-    .lte("scheduled_at", now)
-    .order("scheduled_at", { ascending: true })
-    .limit(limit);
+    .lte("scheduled_at", now);
+  if (pausedIds.length) query = query.not("experience_id", "in", `(${pausedIds.join(",")})`);
+  const { data: events, error } = await query.order("scheduled_at", { ascending: true }).limit(limit);
   if (error) throw error;
 
   const results: { id: string; status: string; reason?: string; messageId?: string | null; error?: string }[] = [];

@@ -4,7 +4,7 @@ import { ClipboardList, ScrollText, HeartHandshake } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckInResultsDashboard } from "@/components/check-in/check-in-results-dashboard";
+import { CreatedForMoreResults } from "@/components/check-in/created-for-more-results";
 import { SurveyResponsesDashboard } from "@/components/surveys/survey-responses-dashboard";
 
 type Submission = {
@@ -75,7 +75,7 @@ export function TeamResultsTabs({
       </TabsContent>
 
       <TabsContent value="checkins" className="mt-4">
-        {checkIns.length ? <CheckInResultsDashboard checkIns={checkIns} /> : <Empty label="No check-in results from your team yet." />}
+        {checkIns.length ? <CreatedForMoreResults submissions={checkIns} /> : <Empty label="No check-in results from your team yet." />}
       </TabsContent>
     </Tabs>
   );

@@ -161,12 +161,15 @@ export async function getTeamResults(profileId: string) {
   if (!ids.length) return { checkIns: [], surveys: [], submissions: [] };
 
   const [checkIns, surveys, submissions] = await Promise.all([
+    // Created for More Check-Ins live in check_in_submissions (the legacy check_in_results
+    // table is empty for new groups). Shape matches CheckInSubmission for CreatedForMoreResults.
     supabase
-      .from("check_in_results")
-      .select("*, participants(first_name,last_name,email,wave,participant_type)")
+      .from("check_in_submissions")
+      .select("id,name,email,total_score,stage,strongest_layer,lowest_layer,lowest_pillar,layer_scores,chosen_pathway,chosen_pathways,participant_id,created_at")
+      .eq("assessment", "created-for-more")
       .in("participant_id", ids)
       .order("created_at", { ascending: false })
-      .limit(200),
+      .limit(500),
     supabase
       .from("survey_responses")
       .select("*, participants(first_name,last_name,email,wave,source,participant_type)")
