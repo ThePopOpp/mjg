@@ -92,14 +92,14 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
           collapsed ? "lg:w-16" : "lg:w-72",
         ].join(" ")}
       >
-        <div className={`flex h-24 shrink-0 items-center border-b ${collapsed ? "lg:justify-center lg:px-2" : "px-6"}`}>
+        <div className={`flex h-20 shrink-0 items-center border-b ${collapsed ? "lg:justify-center lg:px-2" : "px-6"}`}>
           <Link
             href="/dashboard"
             className="flex flex-col items-start"
             aria-label="Michael J. Gauthier dashboard"
             onClick={() => setMobileOpen(false)}
           >
-            <span className={`relative block h-16 ${collapsed ? "lg:h-9 lg:w-9 w-44" : "w-44"}`}>
+            <span className={`relative block h-12 ${collapsed ? "lg:h-9 lg:w-9 w-[105px]" : "w-[105px]"}`}>
               <img
                 src="/mjg-logos/mjg_black_white.png"
                 alt="MJG"
@@ -111,7 +111,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
                 className="hidden h-full w-full object-contain object-left dark:block"
               />
             </span>
-            <span className={`mt-1 font-serif text-sm font-semibold italic leading-none text-foreground ${collapsed ? "lg:hidden" : ""}`}>
+            <span className={`mt-1 font-serif text-[0.65rem] font-semibold italic leading-none text-foreground ${collapsed ? "lg:hidden" : ""}`}>
               Michael <span className="text-[#c9aa70]">J.</span> Gauthier
             </span>
           </Link>
@@ -222,9 +222,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
         </DashboardActionTokenProvider>
       </div>
 
-      {(profile.role === ROLES.SUPER_ADMIN || profile.role === ROLES.ADMIN) && (
-        <MobileBottomNav role={profile.role} />
-      )}
+      <MobileBottomNav entries={visibleEntries} />
     </div>
     </DmUnreadProvider>
   );
