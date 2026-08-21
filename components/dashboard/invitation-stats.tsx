@@ -33,7 +33,10 @@ export function InvitationStats({
 }) {
   const [open, setOpen] = useState<StatusKey | null>(null);
   const active = CARDS.find((c) => c.key === open) ?? null;
-  const rows = open ? invitations.filter((i) => i.status === open) : [];
+  // Pending excludes expired (matches the count) — an expired, never-sent invite isn't pending.
+  const rows = open
+    ? invitations.filter((i) => i.status === open && (open !== "pending" || !i.expires_at || new Date(i.expires_at) >= new Date()))
+    : [];
   const dateCol = open === "accepted" ? "Accepted" : open === "sent" ? "Sent" : "Created";
   const dateVal = (i: DashboardInvitation) => (open === "accepted" ? i.accepted_at : open === "sent" ? i.sent_at ?? i.created_at : i.created_at);
 

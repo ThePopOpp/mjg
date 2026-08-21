@@ -8,6 +8,7 @@ import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants"
  *  send), and accepted (joined). */
 export async function getInvitationCounts(): Promise<{ sent: number; pending: number; accepted: number; total: number }> {
   const supabase = createSupabaseAdminClient();
+  const nowIso = new Date().toISOString();
   // Exact server-side counts (head:true fetches no rows) so this stays cheap at scale.
   const countFor = async (status?: string) => {
     let q = supabase.from("user_invitations").select("*", { count: "exact", head: true });
@@ -15,7 +16,14 @@ export async function getInvitationCounts(): Promise<{ sent: number; pending: nu
     const { count } = await q;
     return count ?? 0;
   };
-  const [total, sent, pending, accepted] = await Promise.all([countFor(), countFor("sent"), countFor("pending"), countFor("accepted")]);
+  // "Pending" = queued and still actionable — an expired, never-sent invite isn't pending.
+  const pendingPromise = supabase
+    .from("user_invitations")
+    .select("*", { count: "exact", head: true })
+    .eq("invite_status", "pending")
+    .or(`expires_at.is.null,expires_at.gte.${nowIso}`)
+    .then(({ count }) => count ?? 0);
+  const [total, sent, pending, accepted] = await Promise.all([countFor(), countFor("sent"), pendingPromise, countFor("accepted")]);
   return { sent, pending, accepted, total };
 }
 
