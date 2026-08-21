@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
 import { getCheckInSubmissionStats, listCheckInSubmissions } from "@/lib/check-in/submissions";
 import { getInvitationCounts } from "@/lib/user-management/repository";
+import { getSectionSeen } from "@/lib/dashboard/section-seen";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
 import { getDmStats } from "@/lib/direct-messages/data";
@@ -50,6 +51,12 @@ export default async function DashboardPage() {
   ];
   // check_in_submissions has no PostgREST relationship to participants to embed, so resolve
   // each check-in's wave from the participants we already loaded, keyed by participant_id.
+  // Per-section "new since last seen" — badge is gold normally, red when the count grew.
+  const sectionSeen = profile ? await getSectionSeen(profile.id) : {};
+  const recentNew = checkInStats.count > (sectionSeen.recent_check_ins ?? 0);
+  const waveNew = data.participants.length > (sectionSeen.wave_summary ?? 0);
+  const pipelineNew = checkInStats.count > (sectionSeen.pipeline ?? 0);
+
   const waveByParticipant = new Map<string, string | null>(data.participants.map((p: any) => [p.id, p.wave ?? p.source ?? null]));
   const waveRows = ["wave_0", "wave_1", "wave_2", "wave_3"].map((wave) => ({
     wave,
@@ -117,6 +124,8 @@ export default async function DashboardPage() {
         <CollapsibleSection
           title="Recent Check-Ins"
           count={checkInStats.count}
+          sectionKey="recent_check_ins"
+          isNew={recentNew}
           right={<Link href="/dashboard/check-in-results" className="shrink-0 text-sm font-medium text-primary hover:underline">View all →</Link>}
         >
           <Table>
@@ -146,7 +155,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
-        <CollapsibleSection title="Wave summary" count={data.participants.length}>
+        <CollapsibleSection title="Wave summary" count={data.participants.length} sectionKey="wave_summary" isNew={waveNew}>
           <Table>
             <TableHeader>
               <TableRow>
@@ -171,7 +180,7 @@ export default async function DashboardPage() {
           </Table>
         </CollapsibleSection>
 
-        <CollapsibleSection title="Pipeline status" count={checkInStats.count}>
+        <CollapsibleSection title="Pipeline status" count={checkInStats.count} sectionKey="pipeline" isNew={pipelineNew}>
           <div className="space-y-3 px-5 pb-5">
             {[
               ["Check-In completed", checkInStats.count],
