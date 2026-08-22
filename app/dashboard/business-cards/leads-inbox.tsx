@@ -112,7 +112,7 @@ export function LeadsInbox({ isAdmin, scope, actionToken, onChanged }: { isAdmin
           <p className="mt-1 max-w-xs text-xs text-muted-foreground">When someone taps “Send me your info” on a published card, their details land here.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-border">
+        <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/30 text-left text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">

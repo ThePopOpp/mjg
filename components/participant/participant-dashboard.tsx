@@ -54,7 +54,7 @@ export async function ParticipantDashboard({ profile }: { profile: DashboardProf
           </Button>
         </div>
         {checkIns.length ? (
-          <div className="overflow-hidden rounded-xl border">
+          <div className="overflow-x-auto rounded-xl border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/40 text-left">
@@ -87,7 +87,7 @@ export async function ParticipantDashboard({ profile }: { profile: DashboardProf
       <div className="space-y-4 border-t pt-6">
         <h2 className="text-lg font-semibold tracking-tight">Your Surveys &amp; Forms</h2>
         {submissions.length ? (
-          <div className="overflow-hidden rounded-xl border">
+          <div className="overflow-x-auto rounded-xl border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/40 text-left">

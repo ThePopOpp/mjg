@@ -153,7 +153,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
-        <CollapsibleSection title="Wave summary" count={data.participants.length} sectionKey="wave_summary" isNew={waveNew} detailHref="/dashboard/participants" detailLabel="View participants">
+        <CollapsibleSection className="min-w-0" title="Wave summary" count={data.participants.length} sectionKey="wave_summary" isNew={waveNew} detailHref="/dashboard/participants" detailLabel="View participants">
           <Table>
             <TableHeader>
               <TableRow>
@@ -178,7 +178,7 @@ export default async function DashboardPage() {
           </Table>
         </CollapsibleSection>
 
-        <CollapsibleSection title="Pipeline status" count={checkInStats.count} sectionKey="pipeline" isNew={pipelineNew} detailHref="/dashboard/reports" detailLabel="View reports">
+        <CollapsibleSection className="min-w-0" title="Pipeline status" count={checkInStats.count} sectionKey="pipeline" isNew={pipelineNew} detailHref="/dashboard/reports" detailLabel="View reports">
           <div className="space-y-3 px-5 pb-5">
             {[
               ["Check-In completed", checkInStats.count],

@@ -139,7 +139,7 @@ export function CardBuilder({
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-x-auto overflow-y-hidden">
         {/* Left rail */}
         <div className="w-[150px] shrink-0 overflow-y-auto border-r border-border bg-card/40 py-2">
           {PANELS.map(({ key, label, icon: Icon, soon }) => (

@@ -23,6 +23,7 @@ export function CollapsibleSection({
   detailHref,
   detailLabel = "View full details",
   defaultOpen = true,
+  className,
   children,
 }: {
   title: string;
@@ -32,6 +33,7 @@ export function CollapsibleSection({
   detailHref?: string;
   detailLabel?: string;
   defaultOpen?: boolean;
+  className?: string;
   children: React.ReactNode;
 }) {
   const actionToken = useDashboardActionToken();
@@ -52,7 +54,7 @@ export function CollapsibleSection({
   );
 
   return (
-    <Card className="overflow-hidden">
+    <Card className={cn("overflow-hidden", className)}>
       <Accordion type="single" collapsible defaultValue={defaultOpen ? "section" : undefined}>
         <AccordionItem value="section" className="border-b-0">
           <div className="flex items-center gap-2 pr-4">
