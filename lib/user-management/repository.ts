@@ -4,36 +4,60 @@ import { ROLES, type AppRole, isAppRole } from "@/lib/rbac/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants";
 
-/** Invitation counts for the dashboard: sent (awaiting acceptance), pending (queued to
- *  send), and accepted (joined). */
-export async function getInvitationCounts(): Promise<{ sent: number; pending: number; accepted: number; total: number }> {
-  const supabase = createSupabaseAdminClient();
-  const nowIso = new Date().toISOString();
-  const base = () => supabase.from("user_invitations").select("*", { count: "exact", head: true });
-  const [total, sent, pending, accepted] = await Promise.all([
-    base().then(({ count }) => count ?? 0),
-    // Sent = every invite that was emailed (accepted ones were sent too).
-    base().in("invite_status", ["sent", "accepted"]).then(({ count }) => count ?? 0),
-    // Pending = awaiting acceptance: sent (or queued) but not yet accepted, and not expired.
-    base().in("invite_status", ["pending", "sent"]).or(`expires_at.is.null,expires_at.gte.${nowIso}`).then(({ count }) => count ?? 0),
-    base().eq("invite_status", "accepted").then(({ count }) => count ?? 0),
+/** Emails that have "engaged": an active platform account OR a completed Created-for-More
+ *  Check-In. For challenge cohorts, completing the Check-In is the act of accepting/starting,
+ *  so these emails count as Accepted (not Pending) in the dashboard funnel. */
+async function getEngagedEmails(supabase: ReturnType<typeof createSupabaseAdminClient>): Promise<Set<string>> {
+  const [profiles, checkIns] = await Promise.all([
+    supabase.from("profiles").select("email").eq("status", "active"),
+    supabase.from("check_in_submissions").select("email"),
   ]);
-  return { sent, pending, accepted, total };
+  const set = new Set<string>();
+  for (const r of (profiles.data ?? []) as any[]) if (r.email) set.add(String(r.email).toLowerCase());
+  for (const r of (checkIns.data ?? []) as any[]) if (r.email) set.add(String(r.email).toLowerCase());
+  return set;
 }
 
-/** Recent invitations for the dashboard stat modals (email, role, status, timestamps). */
+/** Invitation funnel for the dashboard. Sent = emailed; Accepted = joined the platform OR
+ *  completed the Check-In; Pending = emailed/queued, not expired, and not yet engaged. */
+export async function getInvitationCounts(): Promise<{ sent: number; pending: number; accepted: number; total: number }> {
+  const supabase = createSupabaseAdminClient();
+  const now = Date.now();
+  const [{ data }, engaged] = await Promise.all([
+    supabase.from("user_invitations").select("email,invite_status,expires_at").limit(1000),
+    getEngagedEmails(supabase),
+  ]);
+  const rows = (data ?? []) as any[];
+  const isEngaged = (e: any) => Boolean(e) && engaged.has(String(e).toLowerCase());
+  const notExpired = (r: any) => !r.expires_at || new Date(r.expires_at).getTime() >= now;
+  let sent = 0, pending = 0, accepted = 0;
+  for (const r of rows) {
+    const acc = r.invite_status === "accepted" || isEngaged(r.email);
+    if (r.invite_status === "sent" || r.invite_status === "accepted") sent++;
+    if (acc) accepted++;
+    else if ((r.invite_status === "pending" || r.invite_status === "sent") && notExpired(r)) pending++;
+  }
+  return { sent, pending, accepted, total: rows.length };
+}
+
+/** Recent invitations for the dashboard stat modals. `engaged` marks people who've joined the
+ *  platform or completed the Check-In — used to move them out of Pending and into Accepted. */
 export async function getRecentInvitations(limit = 200) {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
-    .from("user_invitations")
-    .select("id,email,phone,role,invite_status,created_at,sent_at,accepted_at,expires_at,metadata")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  const [{ data }, engaged] = await Promise.all([
+    supabase
+      .from("user_invitations")
+      .select("id,email,phone,role,invite_status,created_at,sent_at,accepted_at,expires_at,metadata")
+      .order("created_at", { ascending: false })
+      .limit(limit),
+    getEngagedEmails(supabase),
+  ]);
   return (data ?? []).map((r: any) => ({
     id: r.id as string,
     email: (r.email ?? r.phone ?? "—") as string,
     role: r.role as string,
     status: r.invite_status as string,
+    engaged: Boolean(r.email) && engaged.has(String(r.email).toLowerCase()),
     created_at: r.created_at as string,
     sent_at: r.sent_at as string | null,
     accepted_at: r.accepted_at as string | null,

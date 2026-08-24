@@ -139,6 +139,7 @@ export default async function UserManagementPage() {
                   <TableHead>Phone</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Check-in</TableHead>
                   <TableHead>Participant</TableHead>
                   <TableHead>Last login</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -155,8 +156,9 @@ export default async function UserManagementPage() {
                       <TableCell>{pt.phone ?? "-"}</TableCell>
                       <TableCell>{account ? roleLabel(account.role) : ROLE_LABELS[ROLES.PARTICIPANT]}</TableCell>
                       <TableCell>
-                        {account ? <StatusBadge status={account.status} /> : <StatusBadge status={pt.check_in_status ?? "no account"} />}
+                        {account ? <StatusBadge status={account.status} /> : <StatusBadge status="no account" />}
                       </TableCell>
+                      <TableCell><StatusBadge status={pt.check_in_status ?? "not_started"} /></TableCell>
                       <TableCell>{prettify(pt.participant_type)}</TableCell>
                       <TableCell>{account?.last_login_at ? new Date(account.last_login_at).toLocaleDateString() : "-"}</TableCell>
                       <TableCell className="text-right">
@@ -167,7 +169,7 @@ export default async function UserManagementPage() {
                     </TableRow>
                   );
                 })}
-                {!data.participants.length ? <TableRow><TableCell colSpan={8}>No participants yet.</TableCell></TableRow> : null}
+                {!data.participants.length ? <TableRow><TableCell colSpan={9}>No participants yet.</TableCell></TableRow> : null}
               </TableBody>
             </Table>
           </div>

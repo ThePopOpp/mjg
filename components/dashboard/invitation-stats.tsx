@@ -14,7 +14,7 @@ type StatusKey = "sent" | "pending" | "accepted";
 const CARDS: { key: StatusKey; label: string; detail: string; icon: LucideIcon }[] = [
   { key: "sent", label: "Sent", detail: "Total invites emailed", icon: Send },
   { key: "pending", label: "Pending", detail: "Awaiting acceptance", icon: Clock },
-  { key: "accepted", label: "Accepted", detail: "Joined the platform", icon: UserCheck },
+  { key: "accepted", label: "Accepted", detail: "Joined or completed Check-In", icon: UserCheck },
 ];
 
 function roleLabel(role: string) {
@@ -34,15 +34,16 @@ export function InvitationStats({
   const [open, setOpen] = useState<StatusKey | null>(null);
   const active = CARDS.find((c) => c.key === open) ?? null;
   const notExpired = (i: DashboardInvitation) => !i.expires_at || new Date(i.expires_at) >= new Date();
-  // Sent = everything emailed (sent + accepted); Pending = awaiting acceptance (sent/queued, not
-  // expired, not yet accepted); Accepted = accepted.
+  // Sent = everything emailed (sent + accepted). Accepted = invitation accepted OR the person
+  // engaged (joined the platform / completed the Check-In). Pending = emailed/queued, not
+  // expired, and NOT engaged — so people drop out of Pending once they accept the challenge.
   const rows = !open
     ? []
     : open === "sent"
       ? invitations.filter((i) => i.status === "sent" || i.status === "accepted")
       : open === "pending"
-        ? invitations.filter((i) => (i.status === "pending" || i.status === "sent") && notExpired(i))
-        : invitations.filter((i) => i.status === "accepted");
+        ? invitations.filter((i) => (i.status === "pending" || i.status === "sent") && notExpired(i) && !i.engaged)
+        : invitations.filter((i) => i.status === "accepted" || i.engaged);
   const dateCol = open === "accepted" ? "Accepted" : "Sent";
   const dateVal = (i: DashboardInvitation) => (open === "accepted" ? i.accepted_at : i.sent_at ?? i.created_at);
 

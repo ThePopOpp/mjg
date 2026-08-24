@@ -9,6 +9,7 @@ import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
 import { getExperienceById, getFacilitators } from "@/lib/experiences/repository";
 import { getExperienceBacklog } from "@/lib/experiences/add-attendee";
+import { getCheckInSubmissionsForEmails } from "@/lib/check-in/submissions";
 import { ExperienceActions } from "@/components/experiences/experience-actions";
 import { ExperienceSchedule } from "@/components/experiences/experience-schedule";
 import { AddAttendeeButton } from "@/components/experiences/add-attendee-button";
@@ -46,6 +47,24 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
 
   // Attendee lookup for the schedule table.
   const attendeeById = new Map<string, any>(attendees.map((a: any) => [a.id, a]));
+
+  // Per-attendee challenge status: Completed once they submit the Created-for-More Check-In,
+  // Emailed once at least one step has gone out to them, otherwise Pending.
+  const attendeeEmails = attendees.map((a: any) => a.email).filter(Boolean) as string[];
+  const checkIns = attendeeEmails.length ? await getCheckInSubmissionsForEmails(attendeeEmails) : [];
+  const completedEmails = new Set(checkIns.map((c: any) => String(c.email ?? "").toLowerCase()));
+  const emailedAttendeeIds = new Set(sendEvents.filter((e: any) => e.status === "sent").map((e: any) => e.attendee_id));
+  const challengeStatus = (a: any): "Completed" | "Emailed" | "Pending" =>
+    a.email && completedEmails.has(String(a.email).toLowerCase())
+      ? "Completed"
+      : emailedAttendeeIds.has(a.id)
+        ? "Emailed"
+        : "Pending";
+  const CHALLENGE_TONE: Record<string, string> = {
+    Completed: "bg-primary text-primary-foreground",
+    Emailed: "bg-secondary text-secondary-foreground",
+    Pending: "bg-muted text-muted-foreground",
+  };
 
   return (
     <div className="space-y-6">
@@ -90,18 +109,25 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Challenge</TableHead>
                 <TableHead>Opted out</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {attendees.map((a: any) => (
-                <TableRow key={a.id}>
-                  <TableCell className="font-medium">{a.name || "-"}</TableCell>
-                  <TableCell>{a.email}</TableCell>
-                  <TableCell>{a.opted_out ? "Yes" : "No"}</TableCell>
-                </TableRow>
-              ))}
-              {!attendees.length ? <TableRow><TableCell colSpan={3}>No attendees.</TableCell></TableRow> : null}
+              {attendees.map((a: any) => {
+                const cs = challengeStatus(a);
+                return (
+                  <TableRow key={a.id}>
+                    <TableCell className="font-medium">{a.name || "-"}</TableCell>
+                    <TableCell>{a.email}</TableCell>
+                    <TableCell>
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${CHALLENGE_TONE[cs]}`}>{cs}</span>
+                    </TableCell>
+                    <TableCell>{a.opted_out ? "Yes" : "No"}</TableCell>
+                  </TableRow>
+                );
+              })}
+              {!attendees.length ? <TableRow><TableCell colSpan={4}>No attendees.</TableCell></TableRow> : null}
             </TableBody>
           </Table>
         </CardContent>

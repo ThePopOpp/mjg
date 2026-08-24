@@ -66,6 +66,17 @@ export async function POST(request: Request) {
     });
     if (error) throw error;
 
+    // Completing the Check-In is the participant's first challenge action — mark it on their
+    // record so User Management / Participants / the dashboard reflect "completed", not
+    // "not_started". Best-effort: the submission is already saved.
+    if (participantId) {
+      await supabase
+        .from("participants")
+        .update({ check_in_status: "completed" })
+        .eq("id", participantId)
+        .then(({ error: e }) => { if (e) console.error("[created-for-more] participant status update failed", e.message); });
+    }
+
     // Emails are non-fatal: the submission is already saved, so a mail failure must not
     // turn into "something went wrong" for the visitor. We report emailed:false instead.
     let emailed = false;
