@@ -49,6 +49,22 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     durationLabel: null,
   },
   {
+    slug: "homework",
+    order: 0.5,
+    badge: "Homework",
+    title: "Your First Assignment",
+    subtitle: "Do the pre-work before Week 1 begins.",
+    description:
+      "Before the first session, watch this short homework video and take the Created for More Check-In. It sets up everything Week 1 builds on.",
+    youtubeId: null,
+    driveId: "1dlwMGJ2ZTIThMv04GZstd5wD-G9MrIMB",
+    embedDirect: true,
+    videoUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/homework.svg",
+    thumbnailDark: "/6-week-challenge/thumbnails/homework.svg",
+    durationLabel: null,
+  },
+  {
     slug: "week-1",
     order: 1,
     badge: "Week 1",
@@ -73,8 +89,11 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     description:
       "A blueprint shows where the walls go, but not why the house is being built. Week 2 gets clear on what your life is rooted in and built toward.",
     youtubeId: null,
+    driveId: "1h8VIR-xPMke-NQrC1rey9ExxVci__r-B",
+    embedDirect: true,
     videoUrl: null,
-    thumbnailUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/week2.svg",
+    thumbnailDark: "/6-week-challenge/thumbnails/week2.svg",
     durationLabel: null,
   },
   {
@@ -87,7 +106,8 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
       "The four visible pillars carry the weight of everyday life. Week 3 assesses each honestly and chooses the one focus pillar for the next 90 days.",
     youtubeId: null,
     videoUrl: null,
-    thumbnailUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/week3.svg",
+    thumbnailDark: "/6-week-challenge/thumbnails/week3.svg",
     durationLabel: null,
   },
   {
@@ -100,7 +120,8 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
       "A guardrail is a decision made before the moment of pressure — not after regret. Week 4 builds one boundary specific enough to actually keep.",
     youtubeId: null,
     videoUrl: null,
-    thumbnailUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/week4.svg",
+    thumbnailDark: "/6-week-challenge/thumbnails/week4.svg",
     durationLabel: null,
   },
   {
@@ -113,7 +134,8 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
       "Change is sustained by rhythm, not intensity. Week 5 focuses on keystone habits and the energy needed to steward what matters without running empty.",
     youtubeId: null,
     videoUrl: null,
-    thumbnailUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/week5.svg",
+    thumbnailDark: "/6-week-challenge/thumbnails/week5.svg",
     durationLabel: null,
   },
   {
@@ -126,7 +148,8 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
       "Week 6 brings the whole structure together into one Personal Blueprint, retakes the Created for More Check-In, and names the next 30-day commitment.",
     youtubeId: null,
     videoUrl: null,
-    thumbnailUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/week6.svg",
+    thumbnailDark: "/6-week-challenge/thumbnails/week6.svg",
     durationLabel: null,
   },
   {
@@ -139,7 +162,8 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
       "A closing word after Week 6: how to keep the Blueprint from sitting in a drawer, protect your 30-day commitment, and multiply what you built.",
     youtubeId: null,
     videoUrl: null,
-    thumbnailUrl: null,
+    thumbnailUrl: "/6-week-challenge/thumbnails/whats-next.svg",
+    thumbnailDark: "/6-week-challenge/thumbnails/whats-next.svg",
     durationLabel: null,
   },
 ];
