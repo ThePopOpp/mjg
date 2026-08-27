@@ -85,7 +85,8 @@ export function MediaStudioDashboard({
 
   function switchMediaType(tab: AssetType) {
     setActive(tab);
-    setSubTab("studio");
+    // Video opens on Files first (the video library); other types open on Studio.
+    setSubTab(tab === "video" ? "files" : "studio");
   }
 
   function handleEditAudio(asset: any) {
@@ -127,7 +128,7 @@ export function MediaStudioDashboard({
 
       {/* Studio / Files sub-tabs */}
       <div className="flex w-fit items-center gap-1 rounded-lg border bg-muted p-1">
-        {(["studio", "files"] as SubTab[]).map((s) => (
+        {((active === "video" ? ["files", "studio"] : ["studio", "files"]) as SubTab[]).map((s) => (
           <button
             key={s}
             type="button"
