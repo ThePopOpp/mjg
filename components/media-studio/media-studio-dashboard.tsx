@@ -16,6 +16,7 @@ import { useDashboardActionToken } from "@/components/layout/dashboard-action-to
 import { SendToClaudeButton } from "@/components/dev-requests/send-to-claude-button";
 import { AskStewardButton } from "@/components/ai-agent/ask-steward-button";
 import { ListenOrderPanel } from "@/components/media-studio/listen-order-panel";
+import { ChallengeVideoLibrary } from "@/components/media-studio/challenge-video-library";
 import { cn } from "@/lib/utils";
 
 type AssetType = "audio" | "video" | "photo" | "document";
@@ -172,6 +173,7 @@ export function MediaStudioDashboard({
       )}
 
       {/* Files content */}
+      {subTab === "files" && active === "video" && <ChallengeVideoLibrary />}
       {subTab === "files" && (
         <MediaLibrary
           active={active}
