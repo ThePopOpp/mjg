@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PilotShell } from "@/components/pilot/pilot-shell";
-import { CHALLENGE_VIDEOS_BY_ORDER } from "@/lib/six-week-challenge/videos";
+import { listChallengeVideos } from "@/lib/six-week-challenge/repository";
 
 export const metadata: Metadata = {
   title: "The Life You're Building — 6-Week Challenge",
@@ -30,7 +30,10 @@ function CTA({ href, children }: { href: string; children: React.ReactNode }) {
   );
 }
 
-export default function SixWeekChallengeHubPage() {
+export const dynamic = "force-dynamic";
+
+export default async function SixWeekChallengeHubPage() {
+  const challengeVideos = await listChallengeVideos();
   return (
     <PilotShell
       eyebrow="The Life You're Building"
@@ -62,7 +65,7 @@ export default function SixWeekChallengeHubPage() {
           watch it together), then come ready to be honest.
         </p>
         <ul className="mt-4 grid gap-1.5">
-          {CHALLENGE_VIDEOS_BY_ORDER.map((v) => (
+          {challengeVideos.map((v) => (
             <li key={v.slug}>
               <Link href={`/6-week-challenge/videos/${v.slug}`} className="text-foreground underline-offset-2 hover:text-primary hover:underline">
                 {v.badge} &mdash; {v.title}

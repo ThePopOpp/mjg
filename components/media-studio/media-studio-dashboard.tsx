@@ -17,6 +17,8 @@ import { SendToClaudeButton } from "@/components/dev-requests/send-to-claude-but
 import { AskStewardButton } from "@/components/ai-agent/ask-steward-button";
 import { ListenOrderPanel } from "@/components/media-studio/listen-order-panel";
 import { ChallengeVideoLibrary } from "@/components/media-studio/challenge-video-library";
+import { ChallengeVideoStudio } from "@/components/media-studio/challenge-video-studio";
+import type { AdminChallengeVideo } from "@/lib/six-week-challenge/repository";
 import { cn } from "@/lib/utils";
 
 type AssetType = "audio" | "video" | "photo" | "document";
@@ -65,11 +67,13 @@ export function MediaStudioDashboard({
   assets,
   superAdmins = [],
   isSuperAdmin = false,
+  challengeVideos = [],
 }: {
   actionToken: string;
   assets: any[];
   superAdmins?: ShareableAdmin[];
   isSuperAdmin?: boolean;
+  challengeVideos?: AdminChallengeVideo[];
 }) {
   const dashboardActionToken = useDashboardActionToken();
   const effectiveActionToken = actionToken || dashboardActionToken;
@@ -80,6 +84,7 @@ export function MediaStudioDashboard({
   const editSeq = useRef(0);
   const [audioEditTrigger, setAudioEditTrigger] = useState<{ asset: any; seq: number } | null>(null);
   const [documentEditTrigger, setDocumentEditTrigger] = useState<{ asset: any; seq: number } | null>(null);
+  const [videos, setVideos] = useState<AdminChallengeVideo[]>(challengeVideos);
 
   const visibleAssets = useMemo(() => assets.filter((a) => a.asset_type === active), [active, assets]);
 
@@ -169,12 +174,15 @@ export function MediaStudioDashboard({
           isSuperAdmin={isSuperAdmin}
         />
       )}
-      {subTab === "studio" && (active === "video" || active === "photo") && (
-        <VideoPhotoStudio active={active} actionToken={effectiveActionToken} />
+      {subTab === "studio" && active === "video" && (
+        <ChallengeVideoStudio videos={videos} onChange={setVideos} actionToken={effectiveActionToken} />
+      )}
+      {subTab === "studio" && active === "photo" && (
+        <VideoPhotoStudio active="photo" actionToken={effectiveActionToken} />
       )}
 
       {/* Files content */}
-      {subTab === "files" && active === "video" && <ChallengeVideoLibrary />}
+      {subTab === "files" && active === "video" && <ChallengeVideoLibrary videos={videos} />}
       {subTab === "files" && (
         <MediaLibrary
           active={active}

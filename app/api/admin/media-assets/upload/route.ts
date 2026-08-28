@@ -4,7 +4,7 @@ import { requireContentManager } from "@/lib/user-management/auth";
 
 const BUCKET = "media-assets";
 const AUDIO_TYPES = new Set(["audio/webm", "audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/mp4"]);
-const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"]);
 const VIDEO_TYPES = new Set(["video/mp4", "video/webm", "video/quicktime", "video/x-msvideo"]);
 // Documents (Resources tab) intentionally accept a broad range — PDFs, images,
 // office docs, text — so the team can drop any reference material. The bucket

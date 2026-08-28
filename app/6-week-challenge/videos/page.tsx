@@ -3,14 +3,17 @@ import Link from "next/link";
 import { PlayCircle } from "lucide-react";
 import { PilotShell } from "@/components/pilot/pilot-shell";
 import { ChallengeVideoPoster } from "@/components/six-week-challenge/video-player";
-import { CHALLENGE_VIDEOS_BY_ORDER } from "@/lib/six-week-challenge/videos";
+import { listChallengeVideos } from "@/lib/six-week-challenge/repository";
 
 export const metadata: Metadata = {
   title: "Video Library — The 6-Week Challenge",
   description: "Every teaching video for The Life You're Building 6-Week Challenge, in order.",
 };
 
-export default function ChallengeVideoLibraryPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ChallengeVideoLibraryPage() {
+  const videos = await listChallengeVideos();
   return (
     <PilotShell
       heroVariant="centered"
@@ -20,7 +23,7 @@ export default function ChallengeVideoLibraryPage() {
       cta={{ href: "/6-week-challenge", label: "Back to the challenge" }}
     >
       <div className="grid gap-4 sm:grid-cols-2">
-        {CHALLENGE_VIDEOS_BY_ORDER.map((v) => (
+        {videos.map((v) => (
           <Link
             key={v.slug}
             href={`/6-week-challenge/videos/${v.slug}`}

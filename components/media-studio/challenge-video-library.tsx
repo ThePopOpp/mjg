@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ChallengeVideoPlayer } from "@/components/six-week-challenge/video-player";
-import { CHALLENGE_VIDEOS_BY_ORDER, type ChallengeVideo } from "@/lib/six-week-challenge/videos";
+import type { ChallengeVideo } from "@/lib/six-week-challenge/videos";
 import { cn } from "@/lib/utils";
 
 type View = "cards" | "list" | "table" | "calendar";
@@ -31,10 +31,9 @@ const VIEWS: { key: View; label: string; icon: typeof LayoutGrid }[] = [
   { key: "calendar", label: "Calendar", icon: CalendarDays },
 ];
 
-export function ChallengeVideoLibrary() {
+export function ChallengeVideoLibrary({ videos }: { videos: ChallengeVideo[] }) {
   const [view, setView] = useState<View>("cards");
   const [active, setActive] = useState<ChallengeVideo | null>(null);
-  const videos = CHALLENGE_VIDEOS_BY_ORDER;
 
   return (
     <>

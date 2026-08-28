@@ -6,15 +6,17 @@ import { MEDIA_STUDIO_HELP, MEDIA_STUDIO_HELP_INTRO, MEDIA_STUDIO_HELP_TITLE } f
 import { createAdminActionToken } from "@/lib/auth/action-token";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getMediaStudioData, getShareableSuperAdmins } from "@/lib/content/media";
+import { listChallengeVideosAdmin } from "@/lib/six-week-challenge/repository";
 import { ROLES } from "@/lib/rbac/roles";
 
 export const dynamic = "force-dynamic";
 
 export default async function MediaStudioPage() {
-  const [data, profile, superAdmins] = await Promise.all([
+  const [data, profile, superAdmins, challengeVideos] = await Promise.all([
     getMediaStudioData(),
     getCurrentProfile(),
     getShareableSuperAdmins(),
+    listChallengeVideosAdmin(),
   ]);
   const isSuperAdmin = profile?.role === ROLES.SUPER_ADMIN;
   const shareableAdmins = superAdmins.filter((a) => a.id !== profile?.id);
@@ -31,6 +33,7 @@ export default async function MediaStudioPage() {
         assets={data.assets as any[]}
         superAdmins={shareableAdmins}
         isSuperAdmin={isSuperAdmin}
+        challengeVideos={challengeVideos}
       />
       {data.error ? (
         <Card>

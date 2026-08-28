@@ -4,27 +4,26 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PilotShell } from "@/components/pilot/pilot-shell";
 import { ChallengeVideoPlayer } from "@/components/six-week-challenge/video-player";
-import { CHALLENGE_VIDEOS_BY_ORDER, getChallengeVideo } from "@/lib/six-week-challenge/videos";
+import { listChallengeVideos, getChallengeVideoBySlug } from "@/lib/six-week-challenge/repository";
 
-export function generateStaticParams() {
-  return CHALLENGE_VIDEOS_BY_ORDER.map((v) => ({ slug: v.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const v = getChallengeVideo(slug);
+  const v = await getChallengeVideoBySlug(slug);
   if (!v) return { title: "Video — The 6-Week Challenge" };
   return { title: `${v.badge}: ${v.title} — The 6-Week Challenge`, description: v.subtitle };
 }
 
 export default async function ChallengeVideoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const video = getChallengeVideo(slug);
+  const video = await getChallengeVideoBySlug(slug);
   if (!video) notFound();
 
-  const idx = CHALLENGE_VIDEOS_BY_ORDER.findIndex((v) => v.slug === slug);
-  const prev = idx > 0 ? CHALLENGE_VIDEOS_BY_ORDER[idx - 1] : null;
-  const next = idx < CHALLENGE_VIDEOS_BY_ORDER.length - 1 ? CHALLENGE_VIDEOS_BY_ORDER[idx + 1] : null;
+  const all = await listChallengeVideos();
+  const idx = all.findIndex((v) => v.slug === slug);
+  const prev = idx > 0 ? all[idx - 1] : null;
+  const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
   return (
     <PilotShell
