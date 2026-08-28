@@ -717,6 +717,9 @@ a   { color: inherit; text-decoration: none; }
   .about-photo-frame { aspect-ratio: 4/3; border-radius: 16px; }
   .about-hero-copy { padding-bottom: 0; }
   .about-hero { padding: 48px 0 44px; }
+  /* Equal-width, stacked hero buttons on mobile. */
+  .about-hero-btns { flex-direction: column; align-items: stretch; }
+  .about-hero-btns .btn { width: 100%; box-sizing: border-box; justify-content: center; text-align: center; }
 }
 </style>
 
