@@ -106,6 +106,8 @@ export function renderNavStyles() {
     .nav-links.open { display: flex; }
     @media (max-width: 768px) {
       .mobile-menu-toggle { display: inline-flex; }
+      /* Hide the "Michael J. Gauthier" wordmark on phones — keep just the logo mark. */
+      .nav-logo-text { display: none; }
       .nav-links {
         position: absolute; top: 60px; left: 0; right: 0;
         flex-direction: column; gap: 1rem; padding: 1.25rem 1.5rem 1.75rem;
@@ -431,7 +433,16 @@ function transformStaticHtml(html: string) {
       .replace(new RegExp(`href='${escapeRegExp(fileName)}'`, "g"), `href='${absolute}'`);
   }
 
-  return injectViewport(injectLegalFooterColumn(injectPwa(injectFaviconLinks(output))));
+  return injectMobileNavStyle(injectViewport(injectLegalFooterColumn(injectPwa(injectFaviconLinks(output)))));
+}
+
+// The exported main/*.html pages carry their own nav CSS; on phones the "Michael J. Gauthier"
+// wordmark wraps to two lines and looks broken. Hide it below 768px (keep the logo mark).
+function injectMobileNavStyle(html: string) {
+  const style = `<style>@media (max-width:768px){.nav-logo-text{display:none !important;}}</style>\n`;
+  if (/<\/head>/i.test(html)) return html.replace(/<\/head>/i, `  ${style}</head>`);
+  if (/<head[^>]*>/i.test(html)) return html.replace(/(<head[^>]*>)/i, `$1\n  ${style}`);
+  return `${style}${html}`;
 }
 
 // Several exported main/*.html pages (about-us, created-for-more, post, resources) are Bricks
