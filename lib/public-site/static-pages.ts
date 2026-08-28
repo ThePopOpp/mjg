@@ -137,7 +137,7 @@ export function renderSiteHeader(siteUrl: string) {
         <li><a href="${siteUrl}/">Home</a></li>
         <li><a href="${siteUrl}/about">About</a></li>
         <li><a href="${siteUrl}/mission">Mission</a></li>
-        <li><a href="${siteUrl}/listen">Listen</a></li>
+        <li><a href="${siteUrl}/6-week-challenge/videos">Videos</a></li>
         <li><a href="${siteUrl}/resources">Resources</a></li>
         <li><a href="${siteUrl}/contact">Contact</a></li>
         <li><a href="${siteUrl}/#join" class="nav-cta">Join the Journey</a></li>
@@ -410,7 +410,19 @@ function transformStaticHtml(html: string) {
       /var FLUENT_CRM_URL = 'https:\/\/michaeljgauthier\.com\/\?fluentcrm=1&route=contact&hash=[^']+';/g,
       "var FLUENT_CRM_URL = '/api/public/join-journey';",
     )
-    .replace("const POST_PAGE = 'post.html';", "const POST_PAGE = '/post';");
+    .replace("const POST_PAGE = 'post.html';", "const POST_PAGE = '/post';")
+    // Nav: replace the "Listen" item (an audio-modal button, or a /listen link) with a
+    // "Videos" link to the challenge video library, and drop its now-dead click handler so
+    // the page's inline script doesn't throw on a missing element.
+    .replace(
+      /<li>\s*<button id="listen-(?:btn|nav)"[^>]*>\s*Listen\s*<\/button>\s*<\/li>/gi,
+      `<li><a href="${siteUrl}/6-week-challenge/videos" class="nav-link-plain">Videos</a></li>`,
+    )
+    .replace(
+      /<li>\s*<a href="[^"]*\/listen"[^>]*>\s*Listen\s*<\/a>\s*<\/li>/gi,
+      `<li><a href="${siteUrl}/6-week-challenge/videos">Videos</a></li>`,
+    )
+    .replace(/document\.getElementById\(['"]listen-(?:btn|nav)['"]\)\s*\.addEventListener\([^;]*\);/g, "");
 
   for (const [fileName, route] of Object.entries(STATIC_ROUTES)) {
     const absolute = `${siteUrl}${route === "/" ? "/" : route}`;
@@ -419,7 +431,19 @@ function transformStaticHtml(html: string) {
       .replace(new RegExp(`href='${escapeRegExp(fileName)}'`, "g"), `href='${absolute}'`);
   }
 
-  return injectLegalFooterColumn(injectPwa(injectFaviconLinks(output)));
+  return injectViewport(injectLegalFooterColumn(injectPwa(injectFaviconLinks(output))));
+}
+
+// Several exported main/*.html pages (about-us, created-for-more, post, resources) are Bricks
+// code-block fragments with no <head> and no viewport meta — so phones render them at desktop
+// width and shrink everything. Inject the viewport meta when it's missing (browsers hoist a
+// leading <meta> into <head>).
+function injectViewport(html: string) {
+  if (/<meta[^>]+name=["']viewport["']/i.test(html)) return html;
+  const tag = `<meta name="viewport" content="width=device-width, initial-scale=1" />\n`;
+  if (/<\/head>/i.test(html)) return html.replace(/<\/head>/i, `  ${tag}</head>`);
+  if (/<head[^>]*>/i.test(html)) return html.replace(/(<head[^>]*>)/i, `$1\n  ${tag}`);
+  return `${tag}${html}`;
 }
 
 // The static pages in main/*.html carry their own hardcoded <footer>, separate from

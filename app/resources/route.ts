@@ -35,7 +35,27 @@ function renderArchive(posts: any[], audioAssets: any[], siteUrl: string) {
     .eyebrow { color:var(--gold); font-weight:800; letter-spacing:.16em; text-transform:uppercase; font-size:13px; }
     h1 { font-family:var(--font-display); font-size:clamp(48px, 9vw, 90px); line-height:.95; margin:18px 0; }
     .hero p { color:var(--muted); font-size:20px; max-width:700px; margin:0 auto; line-height:1.7; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:22px; padding:28px 0 90px; }
+    /* Two columns of post cards + a sticky quick-access sidebar. */
+    .layout { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:32px; align-items:start; padding:28px 0 90px; }
+    .cards { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-content:start; }
+    .sidebar { position:sticky; top:96px; }
+    .quick { border:1px solid var(--line); background:var(--card); border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.04); }
+    .quick-head { font-family:var(--font-display); font-size:22px; line-height:1.1; padding:20px 20px 4px; }
+    .quick-sub { color:var(--muted); font-size:13px; padding:0 20px 14px; }
+    .qitem { display:flex; align-items:center; gap:14px; padding:14px 20px; border-top:1px solid var(--line); text-decoration:none; color:inherit; transition:background .15s ease; }
+    .qitem:hover { background:rgba(201,170,112,.09); }
+    .qicon { width:40px; height:40px; flex:0 0 auto; border-radius:11px; display:grid; place-items:center; background:rgba(201,170,112,.13); color:var(--gold); }
+    .qicon svg { width:20px; height:20px; }
+    .qtext { display:flex; flex-direction:column; gap:1px; min-width:0; }
+    .qtext strong { font-weight:700; font-size:15px; letter-spacing:-.01em; }
+    .qtext small { color:var(--muted); font-size:12.5px; line-height:1.35; }
+    .qarrow { margin-left:auto; color:var(--muted); flex:0 0 auto; transition:transform .15s ease, color .15s ease; }
+    .qitem:hover .qarrow { color:var(--gold); transform:translateX(2px); }
+    .qitem-feature { background:linear-gradient(180deg, rgba(201,170,112,.14), rgba(201,170,112,.05)); border-top:0; }
+    .qitem-feature .qicon { background:var(--gold); color:#0d0d0c; }
+    .quick-foot { padding:14px 20px 18px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+    @media (max-width:980px) { .layout { grid-template-columns:1fr; gap:24px; } .sidebar { position:static; } }
+    @media (max-width:560px) { .cards { grid-template-columns:1fr; } }
     article { border:1px solid var(--line); background:var(--card); border-radius:8px; overflow:hidden; height:100%; }
     article img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
     /* Whole post card is a link. */
@@ -70,10 +90,13 @@ function renderArchive(posts: any[], audioAssets: any[], siteUrl: string) {
       <h1>The Stewardship Blueprint</h1>
       <p>Reflections, resources, and practical next steps for living with intention across faith, family, fitness, finances, and meaningful experiences.</p>
     </section>
-    <section class="grid">
-      ${audioAssets.map((asset) => renderAudioCard(asset)).join("")}
-      ${posts.map((post) => renderPostCard(post, siteUrl)).join("")}
-    </section>
+    <div class="layout">
+      <div class="cards">
+        ${audioAssets.map((asset) => renderAudioCard(asset)).join("")}
+        ${posts.map((post) => renderPostCard(post, siteUrl)).join("")}
+      </div>
+      <aside class="sidebar">${renderQuickAccess(siteUrl)}</aside>
+    </div>
   </main>
   ${renderAudioModal()}
   ${renderSiteFooter(siteUrl)}
@@ -115,6 +138,42 @@ function renderPostCard(post: any, siteUrl: string) {
       <span class="read">Read post -></span>
     </div>
   </article></a>`;
+}
+
+// Sticky quick-access menu — the fastest paths off the Resources page.
+function renderQuickAccess(siteUrl: string) {
+  const ICONS: Record<string, string> = {
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    play: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5 16 12l-6 3.5z" fill="currentColor" stroke="none"/>',
+    clipboard: '<rect x="8" y="3" width="8" height="4" rx="1"/><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="m9 14 2 2 4-4"/>',
+    message: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+    phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.94.36 1.86.7 2.73a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.35-1.35a2 2 0 0 1 2.11-.45c.87.34 1.79.57 2.73.7A2 2 0 0 1 22 16.92z"/>',
+  };
+  const arrow = '<svg class="qarrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+  const svg = (name: string) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+
+  const items: { href: string; icon: string; title: string; sub: string; feature?: boolean }[] = [
+    { href: `${siteUrl}/6-week-challenge`, icon: "target", title: "The 6-Week Challenge", sub: "The Life You're Building — join or start a group.", feature: true },
+    { href: `${siteUrl}/6-week-challenge/videos`, icon: "play", title: "Video Library", sub: "Every teaching video, in order." },
+    { href: `${siteUrl}/created-for-more-check-in`, icon: "clipboard", title: "Created for More Check-In", sub: "A short stewardship self-assessment." },
+    { href: `${siteUrl}/surveys/general`, icon: "message", title: "Take the Survey", sub: "Tell us where you are on the journey." },
+    { href: `${siteUrl}/book`, icon: "calendar", title: "Book a Session", sub: "Sit down with Michael one-on-one." },
+    { href: `${siteUrl}/#join`, icon: "mail", title: "Join the Journey", sub: "Get new resources in your inbox." },
+    { href: `${siteUrl}/contact`, icon: "phone", title: "Contact Us", sub: "Questions? Reach the team." },
+  ];
+
+  return `<div class="quick">
+    <div class="quick-head">Quick Access</div>
+    <div class="quick-sub">Jump straight to the next step.</div>
+    ${items.map((it) => `<a class="qitem${it.feature ? " qitem-feature" : ""}" href="${it.href}">
+      <span class="qicon">${svg(it.icon)}</span>
+      <span class="qtext"><strong>${escapeHtml(it.title)}</strong><small>${escapeHtml(it.sub)}</small></span>
+      ${arrow}
+    </a>`).join("")}
+    <div class="quick-foot">New resources are added regularly — check back often.</div>
+  </div>`;
 }
 
 function renderAudioModal() {
