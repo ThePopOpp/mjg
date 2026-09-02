@@ -21,6 +21,7 @@ export type ChallengeVideoInput = {
   thumbnailUrl?: string | null;
   thumbnailDark?: string | null;
   durationLabel?: string | null;
+  availability?: string | null;
   status?: string;
 };
 
@@ -42,6 +43,7 @@ function rowToVideo(r: any): AdminChallengeVideo {
     thumbnailUrl: r.thumbnail_url ?? null,
     thumbnailDark: r.thumbnail_dark ?? null,
     durationLabel: r.duration_label ?? null,
+    availability: r.availability ?? null,
     status: r.status ?? "published",
   };
 }
@@ -65,6 +67,7 @@ function inputToRow(input: ChallengeVideoInput): Record<string, unknown> {
   set("thumbnail_url", input.thumbnailUrl);
   set("thumbnail_dark", input.thumbnailDark);
   set("duration_label", input.durationLabel);
+  set("availability", input.availability);
   set("status", input.status);
   return row;
 }

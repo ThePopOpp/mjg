@@ -22,12 +22,13 @@ type FormState = {
   videoLink: string;
   embedDirect: boolean;
   thumbnailUrl: string;
+  availability: string;
   status: string;
 };
 
 const EMPTY: FormState = {
   slug: "", order: 0, badge: "", title: "", subtitle: "", description: "",
-  videoLink: "", embedDirect: true, thumbnailUrl: "", status: "published",
+  videoLink: "", embedDirect: true, thumbnailUrl: "", availability: "coming_soon", status: "published",
 };
 
 const hasVideo = (v: AdminChallengeVideo) => Boolean(v.youtubeId || v.driveId || v.videoUrl);
@@ -91,6 +92,7 @@ export function ChallengeVideoStudio({
       videoLink: videoLinkOf(v),
       embedDirect: v.embedDirect ?? true,
       thumbnailUrl: v.thumbnailUrl ?? "",
+      availability: v.availability ?? (hasVideo(v) ? "available" : "coming_soon"),
       status: v.status ?? "published",
     });
   }
@@ -140,6 +142,7 @@ export function ChallengeVideoStudio({
         embedDirect: form.embedDirect,
         thumbnailUrl: form.thumbnailUrl || null,
         thumbnailDark: form.thumbnailUrl || null,
+        availability: form.availability,
         status: form.status,
       };
       const res = await fetch(
@@ -303,6 +306,14 @@ export function ChallengeVideoStudio({
                 <input type="checkbox" checked={form.embedDirect} onChange={(e) => setForm({ ...form, embedDirect: e.target.checked })} className="h-4 w-4 rounded border-border" />
                 Play on one click (embed the host player directly)
               </label>
+
+              <Field label="Availability chip" hint="Shown on the card — flip to Available as each video goes live.">
+                <select value={form.availability} onChange={(e) => setForm({ ...form, availability: e.target.value })} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                  <option value="available">Available</option>
+                  <option value="coming_soon">Coming Soon</option>
+                  <option value="none">No chip</option>
+                </select>
+              </Field>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <Field label="Slug" hint="URL id; auto from title if blank">

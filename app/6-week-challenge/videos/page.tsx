@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PlayCircle } from "lucide-react";
 import { PilotShell } from "@/components/pilot/pilot-shell";
 import { ChallengeVideoPoster } from "@/components/six-week-challenge/video-player";
+import { AvailabilityChip } from "@/components/six-week-challenge/availability-chip";
 import { listChallengeVideos } from "@/lib/six-week-challenge/repository";
 
 export const metadata: Metadata = {
@@ -50,6 +51,7 @@ export default async function ChallengeVideoLibraryPage() {
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">{v.badge}{v.durationLabel ? ` · ${v.durationLabel}` : ""}</p>
               <h3 className="mt-1 font-serif text-lg font-semibold text-foreground group-hover:text-primary">{v.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{v.subtitle}</p>
+              <div className="mt-3 flex justify-end"><AvailabilityChip video={v} /></div>
             </div>
           </Link>
         ))}

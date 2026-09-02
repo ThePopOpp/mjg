@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ChallengeVideoPlayer } from "@/components/six-week-challenge/video-player";
+import { AvailabilityChip } from "@/components/six-week-challenge/availability-chip";
 import type { ChallengeVideo } from "@/lib/six-week-challenge/videos";
 import { cn } from "@/lib/utils";
 
@@ -128,16 +129,15 @@ function CardsView({ videos }: { videos: ChallengeVideo[] }) {
         <div key={v.slug} className="flex min-w-0 flex-col gap-2 rounded-xl border border-border bg-card p-2">
           {/* embedDirect disabled so the grid shows branded posters and only loads a player on click */}
           <ChallengeVideoPlayer {...v} embedDirect={false} title={v.title} badge={v.badge} />
-          <div className="flex items-start justify-between gap-2 px-1">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">{v.badge}</p>
-              <p className="truncate font-semibold">{v.title}</p>
-              <p className="line-clamp-2 text-xs text-muted-foreground">{v.subtitle}</p>
-            </div>
-            <StatusPill v={v} />
+          <div className="px-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">{v.badge}</p>
+            <p className="truncate font-semibold">{v.title}</p>
+            <p className="line-clamp-2 text-xs text-muted-foreground">{v.subtitle}</p>
           </div>
-          <div className="flex items-center justify-between px-1 pb-1">
+          {/* Bottom-right of the card body: the Available / Coming Soon chip */}
+          <div className="flex items-center justify-between gap-2 px-1 pb-1">
             <PageLink v={v} />
+            <AvailabilityChip video={v} />
           </div>
         </div>
       ))}

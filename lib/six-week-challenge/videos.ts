@@ -27,6 +27,9 @@ export type ChallengeVideo = {
   thumbnailUrl: string | null; // custom poster image (used in light mode) if no poster text
   thumbnailDark?: string | null; // optional dark-mode poster image
   durationLabel: string | null; // e.g. "11 min"
+  // Availability chip shown on the card body: 'available' | 'coming_soon' | 'none'. When unset,
+  // it's derived — Available if a video source exists, otherwise Coming Soon.
+  availability?: string | null;
 };
 
 export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
