@@ -30,6 +30,7 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
   const [open, setOpen] = useState(false);
 
   const [typeId, setTypeId] = useState(types[0]?.id ?? "");
+  const [name, setName] = useState("");
   const [attendees, setAttendees] = useState<Member[]>([{ name: "", email: "" }]);
   const [frequency, setFrequency] = useState<"weekly" | "biweekly">("weekly");
   const [startDate, setStartDate] = useState(todayISO());
@@ -50,6 +51,7 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
 
   function reset() {
     setTypeId(types[0]?.id ?? "");
+    setName("");
     setAttendees([{ name: "", email: "" }]);
     setFrequency("weekly");
     setStartDate(todayISO());
@@ -77,6 +79,7 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
         body: JSON.stringify({
           actionToken,
           experienceTypeId: typeId,
+          name: name.trim() || undefined,
           attendees,
           frequency,
           startDate,
@@ -144,6 +147,12 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
                   <SelectTrigger><SelectValue placeholder="Select a challenge" /></SelectTrigger>
                   <SelectContent>{types.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
                 </Select>
+              </div>
+
+              {/* Group name */}
+              <div className="space-y-1.5">
+                <Label>Group name <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                <Input placeholder="e.g. Core 5 Group" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
 
               {/* Recipients */}
