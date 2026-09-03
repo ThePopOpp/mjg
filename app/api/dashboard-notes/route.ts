@@ -9,8 +9,15 @@ import {
 function errStatus(m: string) { return /authentication/i.test(m) ? 401 : /permission|required|super/i.test(m) ? 403 : 500; }
 const appUrl = () => (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "");
 
-async function notifyRecipients(note: DashboardNote, authorName: string) {
-  if (!note.recipient_emails.length) return;
+// Owner always gets an email on every edit request (frontend or dashboard), on top of any
+// recipients the author picked. Overridable via env; defaults to the site owner's inbox.
+const ALWAYS_NOTIFY = (process.env.EDIT_REQUEST_NOTIFY_EMAIL || "jwaters@qallus.co").trim().toLowerCase();
+
+async function notifyRecipients(note: DashboardNote, authorName: string, authorEmail = "") {
+  const recipients = new Set((note.recipient_emails ?? []).map((e) => e.toLowerCase()));
+  // Don't self-notify if the owner is the one who filed the request.
+  if (ALWAYS_NOTIFY && ALWAYS_NOTIFY !== authorEmail.toLowerCase()) recipients.add(ALWAYS_NOTIFY);
+  if (!recipients.size) return;
   const link = `${appUrl()}${note.route || "/dashboard"}`;
   const html = `
     <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1a1a1a">
@@ -20,7 +27,7 @@ async function notifyRecipients(note: DashboardNote, authorName: string) {
       ${note.route ? `<p><a href="${link}" style="display:inline-block;background:#111111;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:700">Open the page</a></p>` : ""}
     </div>`;
   await Promise.allSettled(
-    note.recipient_emails.map((to) => sendSmtpEmail({ to, subject: `Dashboard edit request: ${note.page_title || note.route || "review"}`, html })),
+    [...recipients].map((to) => sendSmtpEmail({ to, subject: `Edit request: ${note.page_title || note.route || "review"}`, html })),
   );
 }
 function escapeHtml(s: string) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -56,7 +63,7 @@ export async function POST(request: Request) {
           recipientEmails: Array.isArray(p.recipientEmails) ? p.recipientEmails : [], screenshotUrl: p.screenshotUrl ?? null,
           actorUserId: actor.id, actorEmail: me, actorName: name,
         });
-        notifyRecipients(note, name).catch(() => {});
+        notifyRecipients(note, name, me).catch(() => {});
         return NextResponse.json({ note });
       }
       case "update_status":
