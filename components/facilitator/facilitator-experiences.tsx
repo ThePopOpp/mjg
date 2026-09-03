@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { EmailCalendar } from "@/components/experiences/experiences-list";
 import { TeamResultsTabs } from "@/components/facilitator/team-results-tabs";
 import { StartChallengeLauncher } from "@/components/facilitator/start-challenge-modal";
+import { LaunchStepsModal } from "@/components/experiences/launch-steps-modal";
 import { cn } from "@/lib/utils";
 import { FREQUENCY_LABELS, type EmailEvent } from "@/lib/experiences/types";
 import type { FacilitatorExperience } from "@/lib/facilitator/experiences";
@@ -44,7 +45,10 @@ function LaunchChallengeBanner({ teamMembers }: { teamMembers: { name: string; e
           <p className="text-sm font-semibold">Launch the 6-Week Challenge for your group</p>
           <p className="text-sm text-muted-foreground">Add participants, choose weekly or bi-weekly, invite them, and start the series.</p>
         </div>
-        <StartChallengeLauncher teamMembers={teamMembers} />
+        <div className="flex items-center gap-2">
+          <LaunchStepsModal />
+          <StartChallengeLauncher teamMembers={teamMembers} />
+        </div>
       </div>
     </div>
   );
