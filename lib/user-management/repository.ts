@@ -409,7 +409,7 @@ export async function acceptUserInvitation(input: {
       const { data: tpl } = await supabase
         .from("email_templates")
         .select("id")
-        .eq("slug", "6wc-participant-00-challenge-accepted")
+        .eq("slug", "6wc-00-challenge-accepted")
         .maybeSingle();
       if (tpl?.id) {
         await sendTemplateEmail({
