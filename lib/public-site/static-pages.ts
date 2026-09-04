@@ -95,6 +95,27 @@ export function renderNavStyles() {
       font-weight: 500; font-size: 0.875rem; text-decoration: none; transition: opacity 0.2s;
     }
     .nav-cta:hover { opacity: 0.9; }
+    /* Account dropdown — keeps Sign in / Register in the bar without widening it. */
+    .nav-account { position: relative; }
+    .nav-account-btn {
+      display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;
+      background: none; border: none; padding: 0; font-family: var(--font-body);
+      font-size: 0.875rem; color: var(--nav-text); transition: opacity 0.2s;
+    }
+    .nav-account-btn:hover { opacity: 0.7; }
+    .nav-caret { transition: transform 0.2s; }
+    .nav-account-btn[aria-expanded="true"] .nav-caret { transform: rotate(180deg); }
+    .nav-account-menu {
+      display: none; position: absolute; top: calc(100% + 0.7rem); right: 0; min-width: 170px;
+      background: var(--nav-bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.4rem; box-shadow: 0 12px 30px rgba(0,0,0,0.12); z-index: 110;
+    }
+    .nav-account-menu.open { display: block; }
+    .nav-account-menu a {
+      display: block; padding: 0.6rem 0.75rem; border-radius: 6px;
+      font-size: 0.875rem; color: var(--nav-text); text-decoration: none; transition: background 0.15s;
+    }
+    .nav-account-menu a:hover { background: var(--ctrl-bg); opacity: 1; }
     .theme-toggle, .mobile-menu-toggle {
       display: inline-flex; align-items: center; justify-content: center;
       width: 42px; height: 42px; border-radius: 14px; padding: 0; cursor: pointer;
@@ -117,11 +138,21 @@ export function renderNavStyles() {
       .nav-links a, .nav-cta { width: 100%; box-sizing: border-box; }
       .nav-cta { text-align: center; }
       .theme-toggle { width: 100%; border-radius: 8px; height: 44px; }
+      /* In the stacked mobile menu the dropdown becomes an inline group — no overlay,
+         no caret toggle needed. */
+      .nav-account-btn { display: none; }
+      .nav-account-menu {
+        display: block; position: static; min-width: 0; padding: 0;
+        border: none; box-shadow: none; background: none;
+      }
+      .nav-account-menu a { padding: 0; }
     }`;
 }
 
 /** Nav HTML — the <nav> element with logo, links, and controls */
 export function renderSiteHeader(siteUrl: string) {
+  // Sign in / Register live on THIS app, not the marketing site.
+  const app = appUrl();
   return `<nav>
     <div class="nav-inner">
       <a href="${siteUrl}/" class="nav-logo">
@@ -142,6 +173,16 @@ export function renderSiteHeader(siteUrl: string) {
         <li><a href="${siteUrl}/6-week-challenge/videos">Videos</a></li>
         <li><a href="${siteUrl}/resources">Resources</a></li>
         <li><a href="${siteUrl}/contact">Contact</a></li>
+        <li class="nav-account">
+          <button id="account-toggle" class="nav-account-btn" type="button" aria-haspopup="true" aria-expanded="false">
+            Account
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="nav-account-menu" id="account-menu">
+            <a href="${app}/login">Sign in</a>
+            <a href="${app}/register">Register</a>
+          </div>
+        </li>
         <li><a href="${siteUrl}/#join" class="nav-cta">Join the Journey</a></li>
         <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode">
           <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
@@ -266,8 +307,9 @@ export function renderSiteFooter(siteUrl: string) {
         <div>
           <h4>Account</h4>
           <ul>
-            <li><a href="${app}/login">Login</a></li>
-            <li><a href="${siteUrl}/#join">Register</a></li>
+            <li><a href="${app}/login">Sign in</a></li>
+            <li><a href="${app}/register">Register</a></li>
+            <li><a href="${siteUrl}/#join">Join the Journey</a></li>
             <li><a href="tel:+14804667070">Call Us</a></li>
             <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
           </ul>
@@ -308,7 +350,8 @@ export function renderNavScript() {
   return `<script>(function(){
     var logo=document.getElementById('nav-logo'),ti=document.getElementById('theme-icon'),
         tt=document.getElementById('theme-toggle'),mt=document.getElementById('mobile-menu-toggle'),
-        nl=document.getElementById('nav-links');
+        nl=document.getElementById('nav-links'),
+        at=document.getElementById('account-toggle'),am=document.getElementById('account-menu');
     var SUN='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
     var MOON='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
     var HAM='<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
@@ -321,10 +364,20 @@ export function renderNavScript() {
     }
     function openMenu(){nl&&nl.classList.add('open');mt&&(mt.querySelector('svg').innerHTML=X);}
     function closeMenu(){nl&&nl.classList.remove('open');mt&&(mt.querySelector('svg').innerHTML=HAM);}
+    function closeAccount(){am&&am.classList.remove('open');at&&at.setAttribute('aria-expanded','false');}
+    function toggleAccount(){
+      if(!am||!at)return;
+      var isOpen=am.classList.toggle('open');
+      at.setAttribute('aria-expanded',isOpen?'true':'false');
+    }
     tt&&tt.addEventListener('click',function(){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');});
     mt&&mt.addEventListener('click',function(){nl&&nl.classList.contains('open')?closeMenu():openMenu();});
-    document.addEventListener('click',function(e){if(nl&&nl.classList.contains('open')&&!e.target.closest('nav'))closeMenu();});
-    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu();});
+    at&&at.addEventListener('click',function(e){e.stopPropagation();toggleAccount();});
+    document.addEventListener('click',function(e){
+      if(!e.target.closest('.nav-account'))closeAccount();
+      if(nl&&nl.classList.contains('open')&&!e.target.closest('nav'))closeMenu();
+    });
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeMenu();closeAccount();}});
     applyTheme(document.documentElement.dataset.theme||'light');
   })();</script>`;
 }

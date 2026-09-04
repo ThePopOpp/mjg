@@ -19,6 +19,8 @@ export async function POST(request: Request) {
       sendInvitations: body.sendInvitations !== false,
       invitationSendAt: typeof body.invitationSendAt === "string" ? body.invitationSendAt : null,
       startChallenge: body.startChallenge !== false,
+      joinAsFacilitator: body.joinAsFacilitator !== false,
+      facilitatorEmailTrack: body.facilitatorEmailTrack === "participant" ? "participant" : "leader",
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {

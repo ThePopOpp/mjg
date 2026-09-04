@@ -7,6 +7,7 @@ import { getTeamResults, getFacilitatorTeam } from "@/lib/facilitator/team";
 import { getFacilitatorExperiences } from "@/lib/facilitator/experiences";
 import { getFacilitatorAllowedTypeIds } from "@/lib/facilitator/access";
 import { getExperienceTypes } from "@/lib/experiences/repository";
+import { CHALLENGE_TYPE_SLUG, LEADER_TYPE_SLUG } from "@/lib/experiences/facilitator-join";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +26,14 @@ export default async function MyExperiencesPage() {
   const teamMembers = team.participants
     .filter((p) => p.email)
     .map((p) => ({ name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), email: String(p.email) }));
-  // Super Admins control which challenges a facilitator can start/see.
+  // Super Admins control which challenges a facilitator can start/see. The stored slug is
+  // "six-week-challenge-biweekly" — matching the bare "six-week-challenge" found nothing, so
+  // the launcher was permanently hidden.
   const allowed = new Set(allowedTypeIds);
-  const sixWcTypeId = types.find((t) => t.slug === "six-week-challenge")?.id ?? null;
+  const sixWcTypeId =
+    types.find((t) => t.slug === CHALLENGE_TYPE_SLUG)?.id ??
+    types.find((t) => t.slug.startsWith("six-week-challenge") && t.slug !== LEADER_TYPE_SLUG)?.id ??
+    null;
   const canStartChallenge = Boolean(sixWcTypeId && allowed.has(sixWcTypeId));
   const allowedTypes = types.filter((t) => allowed.has(t.id));
 
@@ -41,6 +47,7 @@ export default async function MyExperiencesPage() {
         results={results}
         teamMembers={teamMembers}
         canStartChallenge={canStartChallenge}
+        meName={[profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.email}
       />
     </div>
   );

@@ -25,6 +25,9 @@ export async function POST(request: Request) {
       sendInvitations: body.sendInvitations !== false,
       invitationSendAt: typeof body.invitationSendAt === "string" ? body.invitationSendAt : null,
       startChallenge: body.startChallenge !== false,
+      // Admins are NOT assumed to be the facilitator — this is an explicit opt-in.
+      joinAsFacilitator: body.joinAsFacilitator === true,
+      facilitatorEmailTrack: body.facilitatorEmailTrack === "participant" ? "participant" : "leader",
       visibility:
         body.visibility && typeof body.visibility === "object"
           ? { mode: body.visibility.mode === "all" ? "all" : body.visibility.mode === "select" ? "select" : "none", facilitatorIds: Array.isArray(body.visibility.facilitatorIds) ? body.visibility.facilitatorIds : [] }

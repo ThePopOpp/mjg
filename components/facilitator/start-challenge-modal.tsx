@@ -7,6 +7,7 @@ import { useDashboardActionToken } from "@/components/layout/dashboard-action-to
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FacilitatorJoinToggle, type FacilitatorEmailTrack } from "@/components/experiences/facilitator-join-toggle";
 import { Switch } from "@/components/ui/switch";
 import { DatePicker } from "@/components/ui/date-picker";
 import { TimePicker } from "@/components/ui/time-picker";
@@ -21,7 +22,7 @@ function todayISO() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] }) {
+export function StartChallengeLauncher({ teamMembers, meName }: { teamMembers: Member[]; meName?: string | null }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
   const [open, setOpen] = useState(false);
@@ -39,6 +40,10 @@ export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] 
   const [inviteDate, setInviteDate] = useState(todayISO());
   const [inviteTime, setInviteTime] = useState("09:00");
   const [startChallenge, setStartChallenge] = useState(true);
+  // A facilitator launching for their own group is almost always in it, so this starts ON —
+  // shown as a confirmation to verify rather than an opt-in they might miss.
+  const [joinAsFacilitator, setJoinAsFacilitator] = useState(true);
+  const [emailTrack, setEmailTrack] = useState<FacilitatorEmailTrack>("leader");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<{ invited: number; attendees: number; started: boolean; failedInvites: { email: string; reason: string }[] } | null>(null);
@@ -68,7 +73,7 @@ export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] 
       const res = await fetch("/api/facilitator/experiences/start-challenge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ actionToken, attendees, frequency, startDate, startTime, sendInvitations, invitationSendAt, startChallenge }),
+        body: JSON.stringify({ actionToken, attendees, frequency, startDate, startTime, sendInvitations, invitationSendAt, startChallenge, joinAsFacilitator, facilitatorEmailTrack: emailTrack }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
@@ -118,6 +123,16 @@ export function StartChallengeLauncher({ teamMembers }: { teamMembers: Member[] 
             </div>
           ) : (
             <div className="space-y-5">
+              {/* Are you the facilitator? — directly above the roster so joining is explicit. */}
+              <FacilitatorJoinToggle
+                variant="facilitator"
+                joining={joinAsFacilitator}
+                onJoiningChange={setJoinAsFacilitator}
+                track={emailTrack}
+                onTrackChange={setEmailTrack}
+                actorName={meName}
+              />
+
               {/* Participants */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /> Participants</Label>

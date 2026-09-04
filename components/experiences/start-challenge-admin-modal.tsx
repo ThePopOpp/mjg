@@ -12,6 +12,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { FacilitatorJoinToggle, type FacilitatorEmailTrack } from "@/components/experiences/facilitator-join-toggle";
 import { cn } from "@/lib/utils";
 
 type Member = { name: string; email: string };
@@ -43,6 +44,9 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
   const [startChallenge, setStartChallenge] = useState(true);
   const [visibility, setVisibility] = useState<VisibilityMode>("all");
   const [visibleFacilitators, setVisibleFacilitators] = useState<string[]>([]);
+  // An admin isn't assumed to be the group's facilitator — explicit opt-in.
+  const [joinAsFacilitator, setJoinAsFacilitator] = useState(false);
+  const [emailTrack, setEmailTrack] = useState<FacilitatorEmailTrack>("leader");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<{ invited: number; attendees: number; started: boolean; visibility: number; failedInvites: { email: string; reason: string }[] } | null>(null);
@@ -85,6 +89,8 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
           startDate,
           startTime,
           facilitatorId: ownerId || null,
+          joinAsFacilitator,
+          facilitatorEmailTrack: emailTrack,
           sendInvitations,
           invitationSendAt,
           startChallenge,
@@ -154,6 +160,16 @@ export function StartChallengeAdminLauncher({ types, facilitators }: { types: Op
                 <Label>Group name <span className="font-normal text-muted-foreground">(optional)</span></Label>
                 <Input placeholder="e.g. Core 5 Group" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
+
+              {/* Are you the facilitator? — sits directly above the roster so it's clear
+                  whether the launcher is themselves in the challenge. */}
+              <FacilitatorJoinToggle
+                variant="admin"
+                joining={joinAsFacilitator}
+                onJoiningChange={setJoinAsFacilitator}
+                track={emailTrack}
+                onTrackChange={setEmailTrack}
+              />
 
               {/* Recipients */}
               <div className="space-y-2">

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Rocket, Sparkles, CalendarClock, Tag, Users, Gauge, Send, ClipboardList,
-  ChevronLeft, ChevronRight, Check, type LucideIcon,
+  ChevronLeft, ChevronRight, Check, Mail, UserCheck, type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -15,7 +15,9 @@ const STEPS: Step[] = [
   { icon: Sparkles, title: "Open the launcher", body: "On the Experiences page, click Start New Challenge. A short form opens — you fill it top to bottom." },
   { icon: CalendarClock, title: "Pick the challenge", body: "Choose “6 Week Challenge – Bi-Weekly.” It carries the full, ready-to-send email sequence." },
   { icon: Tag, title: "Name the group", body: "Give it a clear name like “Core 5 Group” so it’s easy to find later.", tip: "Optional, but recommended for multiple groups." },
-  { icon: Users, title: "Add the men joining", body: "Type each person’s name and email, and add a row for everyone in the group — participants or facilitators." },
+  { icon: UserCheck, title: "Say whether you’re the facilitator", body: "Right above the recipient list there’s a toggle: are you the facilitator of this group? Turn it on and you’re added to the challenge yourself — you don’t need to type your own email into the list below.", tip: "Leading the group yourself? Leave it on. Setting it up for someone else? Turn it off." },
+  { icon: Mail, title: "Pick your email track", body: "If you’re joining, choose which emails you get: the Leader track (5 coaching emails built for running the group) or the Participant track (the same emails your men receive).", tip: "Most group leaders want the Leader track." },
+  { icon: Users, title: "Add the men joining", body: "Type each person’s name and email, and add a row for everyone in the group. You don’t need to add yourself — the facilitator toggle above already did." },
   { icon: Gauge, title: "Choose the pace", body: "Weekly sends one module per week — the standard schedule. Bi-Weekly spaces the modules every two weeks.", tip: "Weekly matches the standard 6-week plan." },
   { icon: CalendarClock, title: "Set the start date & time", body: "Pick the Week 1 date and time (Arizona). Everything anchors to this — the week-before Welcome and the 48-hour reminder go out before it automatically.", tip: "You don’t set the reminder dates yourself — they’re calculated for you." },
   { icon: Send, title: "Send the invitations", body: "Keep invitations on so each person gets an invite to join. Send now, or schedule them for a specific date and time." },

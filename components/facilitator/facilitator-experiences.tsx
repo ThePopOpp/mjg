@@ -37,7 +37,7 @@ function freqLabel(f: string) {
 
 // The outlined "Launch the 6-Week Challenge" CTA — shown on both the Experiences and
 // New Experiences tabs so a facilitator can start without switching tabs.
-function LaunchChallengeBanner({ teamMembers }: { teamMembers: { name: string; email: string }[] }) {
+function LaunchChallengeBanner({ teamMembers, meName }: { teamMembers: { name: string; email: string }[]; meName?: string | null }) {
   return (
     <div className="rounded-xl border border-primary/30 bg-primary/[0.03] p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -47,7 +47,7 @@ function LaunchChallengeBanner({ teamMembers }: { teamMembers: { name: string; e
         </div>
         <div className="flex items-center gap-2">
           <LaunchStepsModal />
-          <StartChallengeLauncher teamMembers={teamMembers} />
+          <StartChallengeLauncher teamMembers={teamMembers} meName={meName} />
         </div>
       </div>
     </div>
@@ -61,6 +61,7 @@ export function FacilitatorExperiences({
   results,
   teamMembers,
   canStartChallenge,
+  meName,
 }: {
   experiences: FacilitatorExperience[];
   emailEvents: EmailEvent[];
@@ -68,6 +69,7 @@ export function FacilitatorExperiences({
   results: { checkIns: any[]; surveys: any[]; submissions: any[] };
   teamMembers: { name: string; email: string }[];
   canStartChallenge: boolean;
+  meName?: string | null;
 }) {
   const [active, setActive] = useState<FacilitatorExperience | null>(null);
 
@@ -81,11 +83,11 @@ export function FacilitatorExperiences({
         </TabsList>
 
         <TabsContent value="experiences" className="mt-4 space-y-6">
-          {canStartChallenge ? <LaunchChallengeBanner teamMembers={teamMembers} /> : null}
+          {canStartChallenge ? <LaunchChallengeBanner teamMembers={teamMembers} meName={meName} /> : null}
           <ExperienceViews experiences={experiences} emailEvents={emailEvents} onOpen={setActive} />
         </TabsContent>
         <TabsContent value="new" className="mt-4 space-y-6">
-          {canStartChallenge ? <LaunchChallengeBanner teamMembers={teamMembers} /> : null}
+          {canStartChallenge ? <LaunchChallengeBanner teamMembers={teamMembers} meName={meName} /> : null}
           {types.length ? (
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Other experiences</p>
