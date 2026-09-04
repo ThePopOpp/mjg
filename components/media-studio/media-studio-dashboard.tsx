@@ -2,9 +2,10 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Copy, Download, FileAudio, FileText, ImageIcon, LayoutGrid, LayoutList, LinkIcon, Mic,
+  BookOpen, Copy, Download, FileAudio, FileText, ImageIcon, LayoutGrid, LayoutList, LinkIcon, Mic,
   Pause, Pencil, Play, RotateCcw, Save, Square, Table, Upload, Video, X,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,19 +19,25 @@ import { AskStewardButton } from "@/components/ai-agent/ask-steward-button";
 import { ListenOrderPanel } from "@/components/media-studio/listen-order-panel";
 import { ChallengeVideoLibrary } from "@/components/media-studio/challenge-video-library";
 import { ChallengeVideoStudio } from "@/components/media-studio/challenge-video-studio";
+import { BookStudio } from "@/components/media-studio/book-studio";
 import type { AdminChallengeVideo } from "@/lib/six-week-challenge/repository";
+import type { Book, BookableAsset } from "@/lib/books/repository";
 import { cn } from "@/lib/utils";
 
 type AssetType = "audio" | "video" | "photo" | "document";
+// "books" is not a media_assets asset_type — it's its own surface (the 3D book builder), so it
+// sits alongside the asset types in the tab row but skips the Studio/Files sub-tabs entirely.
+type MainTab = AssetType | "books";
 type ViewMode = "card" | "list" | "table";
 type SubTab = "studio" | "files";
 type UploadedFile = { url: string; bucket: string; path: string; mimeType: string; fileSize: number };
 
-const mediaTypes: { value: AssetType; label: string; icon: React.ElementType }[] = [
+const mediaTypes: { value: MainTab; label: string; icon: LucideIcon }[] = [
   { value: "audio", label: "Audio", icon: Mic },
   { value: "video", label: "Video", icon: Video },
   { value: "photo", label: "Photos", icon: ImageIcon },
   { value: "document", label: "Resources", icon: FileText },
+  { value: "books", label: "Books", icon: BookOpen },
 ];
 
 const resourceTypes = [
@@ -40,12 +47,20 @@ const resourceTypes = [
   { value: "other", label: "Other" },
 ];
 
-function typeLabelFor(active: AssetType) {
-  return active === "audio" ? "Audio" : active === "video" ? "Video" : active === "photo" ? "Photo" : "Resource";
+function typeLabelFor(active: MainTab) {
+  return active === "audio" ? "Audio"
+    : active === "video" ? "Video"
+    : active === "photo" ? "Photo"
+    : active === "books" ? "Book"
+    : "Resource";
 }
 
-function typeIconFor(active: AssetType) {
-  return active === "audio" ? Mic : active === "video" ? Video : active === "document" ? FileText : ImageIcon;
+function typeIconFor(active: MainTab) {
+  return active === "audio" ? Mic
+    : active === "video" ? Video
+    : active === "document" ? FileText
+    : active === "books" ? BookOpen
+    : ImageIcon;
 }
 
 const displayTargets = [
@@ -68,16 +83,20 @@ export function MediaStudioDashboard({
   superAdmins = [],
   isSuperAdmin = false,
   challengeVideos = [],
+  books = [],
+  bookableAssets = [],
 }: {
   actionToken: string;
   assets: any[];
   superAdmins?: ShareableAdmin[];
   isSuperAdmin?: boolean;
   challengeVideos?: AdminChallengeVideo[];
+  books?: Book[];
+  bookableAssets?: BookableAsset[];
 }) {
   const dashboardActionToken = useDashboardActionToken();
   const effectiveActionToken = actionToken || dashboardActionToken;
-  const [active, setActive] = useState<AssetType>("audio");
+  const [active, setActive] = useState<MainTab>("audio");
   const [subTab, setSubTab] = useState<SubTab>("studio");
   const [viewMode, setViewMode] = useState<ViewMode>("card");
   const [playerAsset, setPlayerAsset] = useState<any | null>(null);
@@ -88,7 +107,7 @@ export function MediaStudioDashboard({
 
   const visibleAssets = useMemo(() => assets.filter((a) => a.asset_type === active), [active, assets]);
 
-  function switchMediaType(tab: AssetType) {
+  function switchMediaType(tab: MainTab) {
     setActive(tab);
     // Video opens on Files first (the video library); other types open on Studio.
     setSubTab(tab === "video" ? "files" : "studio");
@@ -131,8 +150,8 @@ export function MediaStudioDashboard({
         })}
       </div>
 
-      {/* Studio / Files sub-tabs */}
-      <div className="flex w-fit items-center gap-1 rounded-lg border bg-muted p-1">
+      {/* Studio / Files sub-tabs — Books has a single surface, so it skips them. */}
+      <div className={cn("flex w-fit items-center gap-1 rounded-lg border bg-muted p-1", active === "books" && "hidden")}>
         {((active === "video" ? ["files", "studio"] : ["studio", "files"]) as SubTab[]).map((s) => (
           <button
             key={s}
@@ -154,6 +173,11 @@ export function MediaStudioDashboard({
           </button>
         ))}
       </div>
+
+      {/* Books — 3D page-turning book builder (its own surface, no Studio/Files split) */}
+      {active === "books" && (
+        <BookStudio books={books} assets={bookableAssets} actionToken={effectiveActionToken} />
+      )}
 
       {/* Studio content */}
       {subTab === "studio" && active === "audio" && (
@@ -183,7 +207,7 @@ export function MediaStudioDashboard({
 
       {/* Files content */}
       {subTab === "files" && active === "video" && <ChallengeVideoLibrary videos={videos} />}
-      {subTab === "files" && (
+      {subTab === "files" && active !== "books" && (
         <MediaLibrary
           active={active}
           assets={visibleAssets}

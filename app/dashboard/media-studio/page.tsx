@@ -7,16 +7,21 @@ import { createAdminActionToken } from "@/lib/auth/action-token";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { getMediaStudioData, getShareableSuperAdmins } from "@/lib/content/media";
 import { listChallengeVideosAdmin } from "@/lib/six-week-challenge/repository";
+import { listBookableAssets, listBooks } from "@/lib/books/repository";
 import { ROLES } from "@/lib/rbac/roles";
 
 export const dynamic = "force-dynamic";
 
 export default async function MediaStudioPage() {
-  const [data, profile, superAdmins, challengeVideos] = await Promise.all([
+  const [data, profile, superAdmins, challengeVideos, books, bookableAssets] = await Promise.all([
     getMediaStudioData(),
     getCurrentProfile(),
     getShareableSuperAdmins(),
     listChallengeVideosAdmin(),
+    // The books table may not be migrated yet on a given environment — don't take the whole
+    // Media Studio down with it.
+    listBooks().catch(() => []),
+    listBookableAssets().catch(() => []),
   ]);
   const isSuperAdmin = profile?.role === ROLES.SUPER_ADMIN;
   const shareableAdmins = superAdmins.filter((a) => a.id !== profile?.id);
@@ -34,6 +39,8 @@ export default async function MediaStudioPage() {
         superAdmins={shareableAdmins}
         isSuperAdmin={isSuperAdmin}
         challengeVideos={challengeVideos}
+        books={books}
+        bookableAssets={bookableAssets}
       />
       {data.error ? (
         <Card>
