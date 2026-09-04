@@ -446,9 +446,94 @@ export function renderGeneratedPage(input: { title: string; eyebrow: string; bod
   );
 }
 
+/**
+ * The Account dropdown for the STATIC marketing pages in main/*.html.
+ *
+ * Those pages ship their own hardcoded nav and never call renderSiteHeader(), so the dropdown
+ * added there does not reach them — it has to be injected here instead. Self-contained styles
+ * and script so it can't collide with each page's own nav CSS or theme/menu handlers.
+ */
+function accountNavMarkup(app: string) {
+  return `<li class="nav-account">
+          <button class="nav-account-btn" type="button" aria-haspopup="true" aria-expanded="false">Account<svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="nav-account-menu"><a href="${app}/login">Sign in</a><a href="${app}/register">Register</a></div>
+        </li>
+        `;
+}
+
+const ACCOUNT_NAV_STYLES = `<style id="mjg-account-nav">
+  .nav-account { position: relative; }
+  .nav-account-btn { display: inline-flex; align-items: center; gap: .3rem; cursor: pointer; background: none; border: none; padding: 0; font-family: var(--font-body, inherit); font-size: .875rem; color: var(--nav-text, #111110); transition: color .2s; }
+  .nav-account-btn:hover { color: var(--text, #111110); }
+  .nav-caret { transition: transform .2s; }
+  .nav-account-btn[aria-expanded="true"] .nav-caret { transform: rotate(180deg); }
+  .nav-account-menu { display: none; position: absolute; top: calc(100% + .7rem); right: 0; min-width: 170px; background: var(--nav-background, #fff); border: 1px solid var(--border, #e8e6e0); border-radius: 10px; padding: .4rem; box-shadow: 0 12px 30px rgba(0,0,0,.12); z-index: 200; }
+  .nav-account-menu.open { display: block; }
+  .nav-account-menu a { display: block; padding: .6rem .75rem; border-radius: 6px; font-size: .875rem; color: var(--nav-text, #111110); text-decoration: none; white-space: nowrap; }
+  .nav-account-menu a:hover { background: var(--surface-alt, rgba(0,0,0,.05)); }
+  @media (max-width: 768px) {
+    .nav-account-btn { display: none; }
+    .nav-account-menu { display: block; position: static; min-width: 0; padding: 0; border: none; box-shadow: none; background: none; }
+    .nav-account-menu a { padding: 0; }
+  }
+</style>`;
+
+const ACCOUNT_NAV_SCRIPT = `<script>(function(){
+  var btn=document.querySelector('.nav-account-btn'),menu=document.querySelector('.nav-account-menu');
+  if(!btn||!menu)return;
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var open=menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded',open?'true':'false');
+  });
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.nav-account')){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}
+  });
+})();</script>`;
+
+function injectAccountNav(html: string, app: string) {
+  if (html.includes("nav-account")) return html; // already present
+
+  const withItem = html.replace(
+    /(<ul class="nav-links" id="nav-links">)([\s\S]*?)(<\/ul>)/,
+    (match, open: string, body: string, close: string) => {
+      const item = accountNavMarkup(app);
+      // Sit just before the "Join the Journey" CTA when there is one, so Account stays with
+      // the text links rather than after the button; otherwise append to the end of the list.
+      const ctaIndex = body.search(/<li>\s*<a [^>]*class="btn btn-dark"/);
+      return ctaIndex >= 0
+        ? open + body.slice(0, ctaIndex) + item + body.slice(ctaIndex) + close
+        : open + body + item + close;
+    },
+  );
+  if (withItem === html) return html; // no nav list on this page
+
+  // Several of the main/*.html sources are partial documents with no </head> or </body> at
+  // all (about-us, resources, post), so anchored injection silently does nothing there.
+  // Fall back to appending — browsers accept <style>/<script> anywhere in the document.
+  const withStyles = withItem.includes("</head>")
+    ? withItem.replace("</head>", `${ACCOUNT_NAV_STYLES}\n</head>`)
+    : `${ACCOUNT_NAV_STYLES}\n${withItem}`;
+
+  return withStyles.includes("</body>")
+    ? withStyles.replace("</body>", `${ACCOUNT_NAV_SCRIPT}\n</body>`)
+    : `${withStyles}\n${ACCOUNT_NAV_SCRIPT}`;
+}
+
 function transformStaticHtml(html: string) {
   const siteUrl = publicSiteUrl();
+  const app = appUrl();
   let output = html
+    // The source HTML points footer "Register" at the newsletter anchor (#join). Registration
+    // is a real page now, so retarget it BEFORE the generic host rewrite below turns the URL
+    // into ${siteUrl}/#join and makes it unmatchable.
+    .replace(
+      /<a href="https:\/\/my\.michaeljgauthier\.com\/#join">Register<\/a>/g,
+      `<a href="${app}/register">Register</a>`,
+    )
     .replaceAll("https://blueprint.michaeljgauthier.com", siteUrl)
     // The main/*.html sources hardcode ~72 my.michaeljgauthier.com nav/footer/CTA
     // links. Rewrite them to the configured site domain so the marketing pages
@@ -456,7 +541,8 @@ function transformStaticHtml(html: string) {
     // on the my. → apex redirect. URL host only, so mailto:/@ addresses are safe.
     .replaceAll("https://my.michaeljgauthier.com", siteUrl)
     .replace(/https:\/\/michaeljgauthier\.com\/login\/?/g, `${siteUrl}/login`)
-    .replace(/https:\/\/michaeljgauthier\.com\/register\/?/g, `${siteUrl}/#join`)
+    // Was pointed at the /#join newsletter anchor back when there was no registration page.
+    .replace(/https:\/\/michaeljgauthier\.com\/register\/?/g, `${app}/register`)
     .replace(
       /const FLUENT_CRM_ENDPOINT = 'https:\/\/michaeljgauthier\.com\/\?fluentcrm=1&route=contact&hash=[^']+';/g,
       "const FLUENT_CRM_ENDPOINT = '/api/public/join-journey';",
@@ -486,7 +572,10 @@ function transformStaticHtml(html: string) {
       .replace(new RegExp(`href='${escapeRegExp(fileName)}'`, "g"), `href='${absolute}'`);
   }
 
-  return injectMobileNavStyle(injectViewport(injectLegalFooterColumn(injectPwa(injectFaviconLinks(output)))));
+  return injectAccountNav(
+    injectMobileNavStyle(injectViewport(injectLegalFooterColumn(injectPwa(injectFaviconLinks(output))))),
+    app,
+  );
 }
 
 // The exported main/*.html pages carry their own nav CSS; on phones the "Michael J. Gauthier"
