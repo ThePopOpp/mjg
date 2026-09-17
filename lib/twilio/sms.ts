@@ -39,7 +39,10 @@ export async function sendSms({ to, body, conversationId, sentByProfileId }: Sen
 
   if (conversationId) {
     const supabase = createSupabaseAdminClient();
-    await supabase.from("sms_messages").insert({
+    // Never swallow this. Twilio has already sent the message at this point, so a failed
+    // insert means the thread silently loses a message that really went out — which is
+    // exactly what happened when "accepted" wasn't an allowed status value.
+    const { error: insertError } = await supabase.from("sms_messages").insert({
       conversation_id: conversationId,
       direction: "outbound",
       body,
@@ -48,6 +51,10 @@ export async function sendSms({ to, body, conversationId, sentByProfileId }: Sen
       sent_by: sentByProfileId ?? null,
       sent_at: new Date().toISOString(),
     });
+    if (insertError) {
+      console.error("[sms] message sent but NOT recorded", message.sid, message.status, insertError.message);
+      throw new Error(`Message sent (${message.sid}) but could not be saved: ${insertError.message}`);
+    }
     await supabase
       .from("sms_conversations")
       .update({
