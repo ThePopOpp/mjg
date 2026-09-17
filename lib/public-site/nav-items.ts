@@ -23,9 +23,12 @@ export function publicNavItems(siteUrl: string, appUrl: string): NavItem[] {
       // Resources stays a real link to its own page AND carries a dropdown.
       label: "Resources",
       href: `${siteUrl}/resources`,
+      // Order is deliberate (Book Waitlist, Check-In, Videos) and drives both the desktop
+      // dropdown and the flattened mobile rows.
       children: [
-        { label: "Videos", href: `${siteUrl}/6-week-challenge/videos` },
         { label: "Book Waitlist", href: `${appUrl}/book-waitlist` },
+        { label: "Check-In", href: `${appUrl}/created-for-more-check-in` },
+        { label: "Videos", href: `${siteUrl}/6-week-challenge/videos` },
       ],
     },
     { label: "Contact", href: `${siteUrl}/contact` },

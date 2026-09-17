@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PilotShell } from "@/components/pilot/pilot-shell";
+import { SiteShell, SiteHero, SITE_CONTENT_BOX } from "@/components/public-site/site-shell";
 import { CreatedForMoreAssessment } from "@/components/check-in/created-for-more-assessment";
 import { getCurrentProfile } from "@/lib/auth/server";
 
@@ -19,12 +19,13 @@ export default async function CreatedForMoreCheckInPage({ searchParams }: { sear
   const profile = await getCurrentProfile();
   const dashboardHref = redirectTo ?? (profile ? "/dashboard" : null);
   return (
-    <PilotShell
-      heroVariant="centered"
-      eyebrow="A Stewardship Blueprint Assessment"
-      title="Created for More Check-In"
-      description="A 15-minute check-in on the life you're actually building."
-    >
+    <SiteShell>
+      <SiteHero
+        eyebrow="A Stewardship Blueprint Assessment"
+        title="Created for More Check-In"
+        description="A 15-minute check-in on the life you're actually building."
+      />
+      <div className={`${SITE_CONTENT_BOX} pb-14`}>
       {/* Intro copy — full width to match the form fields below */}
       <div className="mb-12 space-y-4 text-[15px] leading-7 text-muted-foreground">
         <p>You were created for more than simply getting through the week, meeting expectations, and checking off the next task. But even when we know what matters most, it is remarkably easy for life to drift.</p>
@@ -40,6 +41,7 @@ export default async function CreatedForMoreCheckInPage({ searchParams }: { sear
       </div>
 
       <CreatedForMoreAssessment redirectTo={redirectTo} dashboardHref={dashboardHref} />
-    </PilotShell>
+      </div>
+    </SiteShell>
   );
 }
