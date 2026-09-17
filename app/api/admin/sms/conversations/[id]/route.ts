@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireParticipantManager } from "@/lib/user-management/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { buildConversationContact, smsDirectoryByPhone } from "@/lib/sms/contacts";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -36,7 +37,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       .update({ unread_count: 0, updated_at: new Date().toISOString() })
       .eq("id", id);
 
-    return NextResponse.json({ conversation, messages: messages ?? [] });
+    const directory = await smsDirectoryByPhone();
+    const contact = buildConversationContact(conversation.contact_number, conversation.contact_name, directory);
+
+    return NextResponse.json({ conversation: { ...conversation, contact }, messages: messages ?? [] });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch conversation.";
     const status = message.includes("required") || message.includes("permission") ? 403 : 500;

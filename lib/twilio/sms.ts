@@ -1,6 +1,7 @@
 import { getTwilioClient, TWILIO_MESSAGING_SERVICE_SID, TWILIO_PHONE_NUMBER } from "@/lib/twilio/client";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { renderSmsTemplate, extractSmsFields } from "@/lib/sms/templates";
+import { phoneKey, resolveSmsContact, toE164 } from "@/lib/sms/contacts";
 
 export interface SendSmsOptions {
   to: string;
@@ -60,58 +61,43 @@ export async function sendSms({ to, body, conversationId, sentByProfileId }: Sen
   return { sid: message.sid, status: message.status };
 }
 
+/**
+ * Find the thread for a number, or start one.
+ *
+ * Matching is on the last ten digits rather than the literal string: Twilio delivers E.164
+ * ("+14803527598") while a hand-typed send may be "4803527598", and keying on the raw text
+ * split the same person into separate threads. New rows always store E.164.
+ */
 export async function getOrCreateConversation(contactNumber: string, contactName?: string | null) {
   const supabase = createSupabaseAdminClient();
+  const e164 = toE164(contactNumber) || contactNumber;
+  const key = phoneKey(contactNumber);
 
-  const { data: existing } = await supabase
+  const { data: candidates } = await supabase
     .from("sms_conversations")
-    .select("id")
+    .select("id, contact_number")
     .eq("twilio_number", TWILIO_PHONE_NUMBER)
-    .eq("contact_number", contactNumber)
-    .maybeSingle();
+    .order("created_at", { ascending: true });
 
+  const existing = (candidates ?? []).find((c) => phoneKey(c.contact_number) === key);
   if (existing) return existing.id as string;
 
-  const participant = await lookupParticipantByPhone(contactNumber);
-  const profile = participant ? null : await lookupProfileByPhone(contactNumber);
+  const contact = await resolveSmsContact(e164);
 
   const { data: created, error } = await supabase
     .from("sms_conversations")
     .insert({
       twilio_number: TWILIO_PHONE_NUMBER,
-      contact_number: contactNumber,
-      contact_name: contactName ?? participant?.full_name ?? profile?.full_name ?? null,
-      participant_id: participant?.id ?? null,
-      profile_id: profile?.id ?? null,
+      contact_number: e164,
+      contact_name: contactName ?? contact?.name ?? null,
+      participant_id: contact?.kind === "participant" ? contact.id : null,
+      profile_id: contact?.kind === "profile" ? contact.id : null,
     })
     .select("id")
     .single();
 
   if (error) throw new Error(`Failed to create conversation: ${error.message}`);
   return created.id as string;
-}
-
-async function lookupParticipantByPhone(phone: string) {
-  const supabase = createSupabaseAdminClient();
-  const normalized = phone.replace(/\D/g, "");
-  const { data } = await supabase
-    .from("participants")
-    .select("id, first_name, last_name")
-    .or(`phone.eq.${phone},phone.eq.+${normalized}`)
-    .maybeSingle();
-  if (!data) return null;
-  return { id: data.id, full_name: `${data.first_name} ${data.last_name}`.trim() };
-}
-
-async function lookupProfileByPhone(phone: string) {
-  const supabase = createSupabaseAdminClient();
-  const normalized = phone.replace(/\D/g, "");
-  const { data } = await supabase
-    .from("profiles")
-    .select("id, full_name")
-    .or(`phone.eq.${phone},phone.eq.+${normalized}`)
-    .maybeSingle();
-  return data ?? null;
 }
 
 export function buildMergeData(recipient: Record<string, unknown>): Record<string, string> {

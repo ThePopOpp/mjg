@@ -6,12 +6,28 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Send, Search } from "lucide-react";
+import { Send, Search, ChevronDown, Mail, User as UserIcon } from "lucide-react";
+import { UserAvatar } from "@/components/ui/user-avatar";
+import { SmsContactEmailDialog } from "@/components/sms/sms-contact-email-dialog";
+
+/** Resolved from profiles/participants/contacts by phone — see lib/sms/contacts.ts. */
+export interface ResolvedContact {
+  name: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  avatarUrl: string | null;
+  phone: string;
+  phoneDisplay: string;
+  kind: "profile" | "participant" | "contact" | null;
+  id: string | null;
+}
 
 interface Conversation {
   id: string;
   contact_number: string;
   contact_name: string | null;
+  contact?: ResolvedContact | null;
   last_message_at: string | null;
   last_message_preview: string | null;
   unread_count: number;
@@ -41,6 +57,8 @@ export function SmsInbox() {
   const [sending, setSending] = useState(false);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -105,9 +123,7 @@ export function SmsInbox() {
   }
 
   function getContactName(conv: Conversation) {
-    return conv.contact_name ?? conv.participants
-      ? `${conv.participants?.first_name ?? ""} ${conv.participants?.last_name ?? ""}`.trim()
-      : conv.profiles?.full_name ?? conv.contact_number;
+    return conv.contact?.name || conv.contact_name || conv.contact?.phoneDisplay || conv.contact_number;
   }
 
   function formatTime(iso: string | null) {
@@ -147,16 +163,28 @@ export function SmsInbox() {
                   activeConvId === conv.id ? "bg-accent" : ""
                 }`}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium truncate">{getContactName(conv)}</span>
-                  <div className="flex items-center gap-1 shrink-0">
-                    {conv.unread_count > 0 && (
-                      <Badge className="h-5 px-1.5 text-xs">{conv.unread_count}</Badge>
-                    )}
-                    <span className="text-xs text-muted-foreground">{formatTime(conv.last_message_at)}</span>
+                <div className="flex items-start gap-3">
+                  <UserAvatar
+                    firstName={conv.contact?.firstName}
+                    lastName={conv.contact?.lastName}
+                    email={conv.contact?.email}
+                    avatarUrl={conv.contact?.avatarUrl}
+                    className="h-9 w-9 shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-medium">{getContactName(conv)}</span>
+                      <div className="flex shrink-0 items-center gap-1">
+                        {conv.unread_count > 0 && <Badge className="h-5 px-1.5 text-xs">{conv.unread_count}</Badge>}
+                        <span className="text-xs text-muted-foreground">{formatTime(conv.last_message_at)}</span>
+                      </div>
+                    </div>
+                    {conv.contact?.name ? (
+                      <p className="text-xs text-muted-foreground">{conv.contact.phoneDisplay}</p>
+                    ) : null}
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">{conv.last_message_preview ?? conv.contact?.phoneDisplay ?? conv.contact_number}</p>
                   </div>
                 </div>
-                <p className="mt-0.5 text-xs text-muted-foreground truncate">{conv.last_message_preview ?? conv.contact_number}</p>
               </button>
             ))
           )}
@@ -171,11 +199,56 @@ export function SmsInbox() {
           </div>
         ) : (
           <>
-            <div className="p-4 border-b flex items-center gap-3">
-              <div>
-                <p className="font-medium text-sm">{activeConv ? getContactName(activeConv) : ""}</p>
-                <p className="text-xs text-muted-foreground">{activeConv?.contact_number}</p>
+            <div className="border-b">
+              <div className="flex items-center gap-3 p-4">
+                <UserAvatar
+                  firstName={activeConv?.contact?.firstName}
+                  lastName={activeConv?.contact?.lastName}
+                  email={activeConv?.contact?.email}
+                  avatarUrl={activeConv?.contact?.avatarUrl}
+                  className="h-10 w-10 shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{activeConv ? getContactName(activeConv) : ""}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {activeConv?.contact?.phoneDisplay ?? activeConv?.contact_number}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-expanded={contactOpen}
+                  aria-label={contactOpen ? "Hide contact details" : "Show contact details"}
+                  onClick={() => setContactOpen((v) => !v)}
+                >
+                  <ChevronDown className={`h-4 w-4 transition-transform ${contactOpen ? "rotate-180" : ""}`} />
+                </Button>
               </div>
+
+              {contactOpen ? (
+                <div className="space-y-2 border-t bg-muted/30 px-4 py-3 text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <UserIcon className="h-3.5 w-3.5 shrink-0" />
+                    <span>
+                      {activeConv?.contact?.name ?? "Not in your contacts"}
+                      {activeConv?.contact?.kind ? (
+                        <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[11px] capitalize">{activeConv.contact.kind}</span>
+                      ) : null}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="flex items-center gap-2 text-muted-foreground">
+                      <Mail className="h-3.5 w-3.5 shrink-0" />
+                      {activeConv?.contact?.email ?? "No email on file"}
+                    </span>
+                    {activeConv?.contact?.email ? (
+                      <Button size="sm" variant="outline" onClick={() => setEmailOpen(true)}>
+                        <Mail className="mr-1.5 h-3.5 w-3.5" /> Email
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -226,6 +299,12 @@ export function SmsInbox() {
           </>
         )}
       </div>
+
+      <SmsContactEmailDialog
+        open={emailOpen}
+        onOpenChange={setEmailOpen}
+        contact={activeConv?.contact ?? null}
+      />
     </div>
   );
 }

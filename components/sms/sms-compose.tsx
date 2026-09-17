@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Upload, Plus, Send } from "lucide-react";
 import { smsSegmentCount } from "@/lib/sms/templates";
+import { SmsRecipientPicker } from "@/components/sms/sms-recipient-picker";
 
 interface SmsTemplate { id: string; name: string; body: string; }
 interface Participant { id: string; first_name: string; last_name: string; phone: string | null; sms_opt_in: boolean; }
@@ -134,11 +135,9 @@ export function SmsCompose({ templates, participants }: SmsComposeProps) {
             <Card>
               <CardHeader><CardTitle>Recipient</CardTitle></CardHeader>
               <CardContent>
-                <Input
-                  placeholder="+1 (555) 000-0000"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                />
+                {/* Searchable directory (profiles, participants, contacts) with a
+                    type-any-number fallback. */}
+                <SmsRecipientPicker value={to} onChange={setTo} />
               </CardContent>
             </Card>
           ) : (
