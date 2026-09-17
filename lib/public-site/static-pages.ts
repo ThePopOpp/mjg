@@ -117,6 +117,13 @@ export function renderNavStyles() {
     }
     .nav-dropdown:last-of-type .nav-dropdown-menu { left: auto; right: 0; }
     .nav-dropdown-menu.open { display: block; }
+    /* Invisible bridge across the gap between the trigger and the panel, so moving the
+       pointer down to the menu doesn't drop the hover. */
+    .nav-dropdown-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -0.75rem; height: 0.75rem; }
+    /* Open on hover for pointer devices; the click handler stays for touch and keyboard. */
+    @media (hover: hover) and (min-width: 769px) {
+      .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+    }
     .nav-dropdown-menu a {
       display: block; padding: 0.6rem 0.75rem; border-radius: 6px; white-space: nowrap;
       font-size: 0.875rem; color: var(--nav-text); text-decoration: none; transition: background 0.15s;
@@ -124,11 +131,6 @@ export function renderNavStyles() {
     .nav-dropdown-menu a:hover { background: var(--ctrl-bg); opacity: 1; }
     /* Mobile-only rows (flattened Resources children, Join the Journey, Sign in/Register). */
     .nav-mobile-only { display: none; }
-    .mjg-nav-cta {
-      display: block; text-align: center; padding: 0.85rem 1.25rem; border-radius: 8px;
-      background: var(--btn-bg); color: var(--btn-text) !important;
-      font-weight: 700; font-size: 1rem; text-decoration: none;
-    }
     .mjg-nav-auth-btn {
       display: block; text-align: center; padding: 0.8rem 1rem; border-radius: 8px;
       border: 1px solid var(--ctrl-border); color: var(--nav-text) !important;
@@ -182,7 +184,6 @@ export function renderNavStyles() {
       .nav-mobile-auth {
         display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.9rem;
       }
-      .mjg-nav-cta { margin-top: 1.1rem; }
       .nav-toggle-item { margin-top: 0.9rem; }
       .theme-toggle { width: 100%; border-radius: 8px; height: 46px; }
     }
@@ -230,7 +231,7 @@ export function renderNavListItems(siteUrl: string, themeToggleHtml?: string) {
   const account = items.find((i) => i.label === ACCOUNT_LABEL);
   const mobileExtras = `
         ${(resources?.children ?? []).map((c) => `<li class="nav-mobile-only nav-mobile-child"><a href="${c.href}">${c.label}</a></li>`).join("\n        ")}
-        <li class="nav-mobile-only nav-mobile-join"><a href="${joinJourneyHref(siteUrl)}" class="mjg-nav-cta">Join the Journey</a></li>
+        <li class="nav-mobile-only nav-mobile-join"><a href="${joinJourneyHref(siteUrl)}">Join the Journey</a></li>
         <li class="nav-mobile-only nav-mobile-auth">
           ${(account?.children ?? []).map((c) => `<a href="${c.href}" class="mjg-nav-auth-btn">${c.label}</a>`).join("\n          ")}
         </li>`;
@@ -588,17 +589,19 @@ const STATIC_NAV_STYLES = `<style id="mjg-frontend-nav">
   }
   .nav-dropdown:last-of-type .nav-dropdown-menu { left: auto; right: 0; }
   .nav-dropdown-menu.open { display: block; }
+  /* Invisible bridge across the gap between the trigger and the panel, so moving the pointer
+     down to the menu doesn't drop the hover. */
+  .nav-dropdown-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -0.75rem; height: 0.75rem; }
+  /* Open on hover for pointer devices; the click handler stays for touch and keyboard. */
+  @media (hover: hover) and (min-width: 769px) {
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+  }
   .nav-dropdown-menu a {
     display: block; padding: 0.6rem 0.75rem; border-radius: 6px; white-space: nowrap;
     font-size: 0.875rem; color: var(--nav-text, #111110); text-decoration: none;
   }
   .nav-dropdown-menu a:hover { background: var(--surface-alt, rgba(0,0,0,.05)); opacity: 1; }
   .nav-mobile-only { display: none; }
-  .mjg-nav-cta {
-    display: block; text-align: center; padding: 0.85rem 1.25rem; border-radius: 8px;
-    background: var(--btn-bg, #111110); color: var(--btn-text, #fff) !important;
-    font-weight: 700; font-size: 1rem; text-decoration: none;
-  }
   .mjg-nav-auth-btn {
     display: block; text-align: center; padding: 0.8rem 1rem; border-radius: 8px;
     border: 1px solid var(--border, #e8e6e0); color: var(--nav-text, #111110) !important;
@@ -637,7 +640,6 @@ const STATIC_NAV_STYLES = `<style id="mjg-frontend-nav">
     .nav-links.open .nav-mobile-auth {
       display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.9rem;
     }
-    .nav-links.open .mjg-nav-cta { margin-top: 1.1rem; }
     .nav-links.open .nav-toggle-item { margin-top: 0.9rem; }
     .nav-links.open .theme-toggle, .nav-links.open .nav-theme-toggle {
       width: 100%; border-radius: 8px; height: 46px;

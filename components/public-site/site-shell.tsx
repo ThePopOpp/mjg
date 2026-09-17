@@ -52,3 +52,61 @@ export function SiteShell({
 
 /** The page-content box that lines up with the nav bar. */
 export const SITE_CONTENT_BOX = "mx-auto w-full max-w-[1160px] px-8";
+
+/**
+ * The standard frontend hero: eyebrow chip, serif headline with the last word in gold,
+ * supporting copy, and an optional CTA. Mirrors the shape PilotShell's hero had so pages can
+ * move onto the frontend chrome without rewriting their headers.
+ */
+export function SiteHero({
+  eyebrow,
+  title,
+  description,
+  cta,
+  align = "center",
+  children,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  cta?: { href: string; label: string };
+  align?: "center" | "left";
+  children?: React.ReactNode;
+}) {
+  const words = title.trim().split(" ");
+  const lead = words.slice(0, -1).join(" ");
+  const last = words[words.length - 1];
+  const centered = align === "center";
+
+  return (
+    <section className={`${SITE_CONTENT_BOX} py-12 md:py-16`}>
+      <div className={centered ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
+        {eyebrow ? (
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#b88a4a]/40 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#b88a4a]">
+            <span aria-hidden>✦</span> {eyebrow}
+          </span>
+        ) : null}
+        <h1 className="mt-6 font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+          {lead ? `${lead} ` : ""}
+          <em className="not-italic text-[#b88a4a]">{last}</em>
+        </h1>
+        {description ? (
+          <p className={`mt-5 text-lg leading-8 text-muted-foreground ${centered ? "mx-auto max-w-2xl" : "max-w-2xl"}`}>
+            {description}
+          </p>
+        ) : null}
+        {cta ? (
+          <div className={`mt-8 ${centered ? "flex justify-center" : ""}`}>
+            <Link
+              href={cta.href}
+              className="inline-flex h-12 items-center rounded-md bg-primary px-6 text-base font-semibold text-primary-foreground no-underline transition-opacity hover:opacity-90"
+            >
+              {cta.label}
+            </Link>
+          </div>
+        ) : null}
+      </div>
+      {children}
+    </section>
+  );
+}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PlayCircle } from "lucide-react";
-import { PilotShell } from "@/components/pilot/pilot-shell";
+import { SiteShell, SiteHero } from "@/components/public-site/site-shell";
 import { ChallengeVideoPoster } from "@/components/six-week-challenge/video-player";
 import { AvailabilityChip } from "@/components/six-week-challenge/availability-chip";
 import { listChallengeVideos } from "@/lib/six-week-challenge/repository";
@@ -16,14 +16,14 @@ export const dynamic = "force-dynamic";
 export default async function ChallengeVideoLibraryPage() {
   const videos = await listChallengeVideos();
   return (
-    <PilotShell
-      heroVariant="centered"
-      eyebrow="The Life You're Building"
-      title="The Video Library"
-      description="Every teaching video for the 6-Week Challenge, in order — from the invitation through the closing word. Watch each week's video before your session."
-      cta={{ href: "/6-week-challenge", label: "Back to the challenge" }}
-    >
-      <div className="grid gap-4 sm:grid-cols-2">
+    <SiteShell>
+      <SiteHero
+        eyebrow="The Life You're Building"
+        title="The Video Library"
+        description="Every teaching video for the 6-Week Challenge, in order — from the invitation through the closing word. Watch each week's video before your session."
+        cta={{ href: "/6-week-challenge", label: "Back to the challenge" }}
+      />
+      <div className="mx-auto w-full max-w-[1160px] px-8 pb-14 grid gap-4 sm:grid-cols-2">
         {videos.map((v) => (
           <Link
             key={v.slug}
@@ -56,6 +56,6 @@ export default async function ChallengeVideoLibraryPage() {
           </Link>
         ))}
       </div>
-    </PilotShell>
+    </SiteShell>
   );
 }

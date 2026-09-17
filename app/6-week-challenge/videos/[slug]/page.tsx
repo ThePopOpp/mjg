@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { PilotShell } from "@/components/pilot/pilot-shell";
+import { SiteShell, SiteHero } from "@/components/public-site/site-shell";
 import { ChallengeVideoPlayer } from "@/components/six-week-challenge/video-player";
 import { listChallengeVideos, getChallengeVideoBySlug } from "@/lib/six-week-challenge/repository";
 
@@ -26,14 +26,14 @@ export default async function ChallengeVideoPage({ params }: { params: Promise<{
   const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
   return (
-    <PilotShell
-      heroVariant="centered"
-      eyebrow={`The 6-Week Challenge · ${video.badge}`}
-      title={video.title}
-      description={video.subtitle}
-      cta={{ href: "/6-week-challenge/videos", label: "All videos" }}
-    >
-      <div className="mx-auto max-w-3xl">
+    <SiteShell>
+      <SiteHero
+        eyebrow={`The 6-Week Challenge · ${video.badge}`}
+        title={video.title}
+        description={video.subtitle}
+        cta={{ href: "/6-week-challenge/videos", label: "All videos" }}
+      />
+      <div className="mx-auto w-full max-w-3xl px-8 pb-14">
         {/* Branded player — YouTube-hosted but never looks like YouTube (facade + privacy embed). */}
         <ChallengeVideoPlayer
           youtubeId={video.youtubeId}
@@ -63,6 +63,6 @@ export default async function ChallengeVideoPage({ params }: { params: Promise<{
           ) : <span />}
         </div>
       </div>
-    </PilotShell>
+    </SiteShell>
   );
 }

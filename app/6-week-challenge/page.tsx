@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PilotShell } from "@/components/pilot/pilot-shell";
+import { SiteShell, SiteHero, SITE_CONTENT_BOX } from "@/components/public-site/site-shell";
 import { listChallengeVideos } from "@/lib/six-week-challenge/repository";
 
 export const metadata: Metadata = {
@@ -35,12 +35,15 @@ export const dynamic = "force-dynamic";
 export default async function SixWeekChallengeHubPage() {
   const challengeVideos = await listChallengeVideos();
   return (
-    <PilotShell
-      eyebrow="The Life You're Building"
-      title="The 6-Week Challenge"
-      description="An honest six-week journey for men who are willing to slow down, look at the life they are actually building, and begin stewarding it with more purpose. Everything you need is right here."
-      cta={{ href: "/created-for-more-check-in", label: "Start your Check-In" }}
-    >
+    <SiteShell>
+      <SiteHero
+        align="left"
+        eyebrow="The Life You're Building"
+        title="The 6-Week Challenge"
+        description="An honest six-week journey for men who are willing to slow down, look at the life they are actually building, and begin stewarding it with more purpose. Everything you need is right here."
+        cta={{ href: "/created-for-more-check-in", label: "Start your Check-In" }}
+      />
+      <div className={`${SITE_CONTENT_BOX} pb-14`}>
       <Section id="dates" eyebrow="Start Here" title="Protect the six weeks">
         <p>
           The challenge is six weekly sessions. The men who get the most out of it do one simple thing first: they put
@@ -108,6 +111,7 @@ export default async function SixWeekChallengeHubPage() {
           it comes straight to us.
         </p>
       </Section>
-    </PilotShell>
+      </div>
+    </SiteShell>
   );
 }

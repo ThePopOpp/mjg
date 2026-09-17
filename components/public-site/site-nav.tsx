@@ -73,7 +73,12 @@ export function SiteNav({ siteUrl }: { siteUrl: string }) {
         {/* Desktop links */}
         <ul className="hidden items-center gap-7 md:flex">
           {items.map((item) => (
-            <li key={item.label} className="relative flex items-center gap-0.5">
+            <li
+              key={item.label}
+              className="relative flex items-center gap-0.5"
+              onMouseEnter={item.children ? () => setOpenDropdown(item.label) : undefined}
+              onMouseLeave={item.children ? () => setOpenDropdown((cur) => (cur === item.label ? null : cur)) : undefined}
+            >
               <NavLabel item={item} />
               {item.children ? (
                 <>
@@ -91,10 +96,12 @@ export function SiteNav({ siteUrl }: { siteUrl: string }) {
                     <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", openDropdown === item.label && "rotate-180")} />
                   </button>
                   {openDropdown === item.label ? (
-                    <div className="absolute right-0 top-[calc(100%+0.7rem)] min-w-[180px] rounded-[10px] border bg-background p-1.5 shadow-lg">
-                      {item.children.map((c) => (
-                        <NavChildLink key={c.label} href={c.href} label={c.label} onNavigate={() => setOpenDropdown(null)} />
-                      ))}
+                    <div className="absolute right-0 top-full pt-[0.7rem]">
+                      <div className="min-w-[180px] rounded-[10px] border bg-background p-1.5 shadow-lg">
+                        {item.children.map((c) => (
+                          <NavChildLink key={c.label} href={c.href} label={c.label} onNavigate={() => setOpenDropdown(null)} />
+                        ))}
+                      </div>
                     </div>
                   ) : null}
                 </>
@@ -132,15 +139,8 @@ export function SiteNav({ siteUrl }: { siteUrl: string }) {
             {(resources?.children ?? []).map((c) => (
               <MobileRow key={c.label} href={c.href} label={c.label} onNavigate={() => setMenuOpen(false)} />
             ))}
-            <li className="mt-4">
-              <a
-                href={joinJourneyHref(siteUrl)}
-                className="block rounded-lg bg-primary px-5 py-3.5 text-center text-base font-bold text-primary-foreground no-underline"
-              >
-                Join the Journey
-              </a>
-            </li>
-            <MobileRow href={items.find((i) => i.label === "Contact")!.href!} label="Contact" onNavigate={() => setMenuOpen(false)} className="mt-4" />
+            <MobileRow href={joinJourneyHref(siteUrl)} label="Join the Journey" onNavigate={() => setMenuOpen(false)} />
+            <MobileRow href={items.find((i) => i.label === "Contact")!.href!} label="Contact" onNavigate={() => setMenuOpen(false)} />
             <li className="mt-4 grid grid-cols-2 gap-2.5">
               {(account?.children ?? []).map((c) => (
                 <Link
