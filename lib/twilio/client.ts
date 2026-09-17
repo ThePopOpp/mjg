@@ -18,6 +18,16 @@ export const TWILIO_API_KEY = process.env.TWILIO_API_KEY ?? "";
 export const TWILIO_API_SECRET = process.env.TWILIO_API_SECRET ?? "";
 export const TWILIO_TWIML_APP_SID = process.env.TWILIO_TWIML_APP_SID ?? "";
 
+/**
+ * Messaging Service that carries the approved A2P 10DLC campaign.
+ *
+ * Sending with `messagingServiceSid` instead of a bare `from` number is what routes traffic
+ * through the registered campaign. Sending from the raw number only works when that number is
+ * attached to the campaign's service — otherwise US carriers reject every message with
+ * error 30034 ("message from an unregistered number") and it silently never arrives.
+ */
+export const TWILIO_MESSAGING_SERVICE_SID = process.env.TWILIO_MESSAGING_SERVICE_SID ?? "";
+
 export function validateTwilioRequest(url: string, params: Record<string, string>, signature: string) {
   const { validateRequest } = twilio;
   return validateRequest(TWILIO_AUTH_TOKEN, signature, url, params);

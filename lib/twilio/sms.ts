@@ -1,4 +1,4 @@
-import { getTwilioClient, TWILIO_PHONE_NUMBER } from "@/lib/twilio/client";
+import { getTwilioClient, TWILIO_MESSAGING_SERVICE_SID, TWILIO_PHONE_NUMBER } from "@/lib/twilio/client";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { renderSmsTemplate, extractSmsFields } from "@/lib/sms/templates";
 
@@ -16,10 +16,24 @@ export interface SendSmsResult {
 
 export async function sendSms({ to, body, conversationId, sentByProfileId }: SendSmsOptions): Promise<SendSmsResult> {
   const client = getTwilioClient();
+
+  // Prefer the Messaging Service that carries the approved A2P 10DLC campaign; fall back to
+  // the bare number only when no service is configured. See TWILIO_MESSAGING_SERVICE_SID.
+  const sender = TWILIO_MESSAGING_SERVICE_SID
+    ? { messagingServiceSid: TWILIO_MESSAGING_SERVICE_SID }
+    : { from: TWILIO_PHONE_NUMBER };
+
+  // Ask Twilio to report delivery outcomes back to us. Without this the status webhook never
+  // fires, so a carrier rejection (30034, opt-out, unreachable) leaves the message sitting at
+  // "queued" in the dashboard and looks like it was sent.
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "");
+  const statusCallback = appUrl ? `${appUrl}/api/webhooks/twilio/sms-status` : undefined;
+
   const message = await client.messages.create({
-    from: TWILIO_PHONE_NUMBER,
+    ...sender,
     to,
     body,
+    ...(statusCallback ? { statusCallback } : {}),
   });
 
   if (conversationId) {
