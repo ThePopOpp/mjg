@@ -1,61 +1,16 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendSmtpEmail } from "@/lib/email/smtp";
-import { findOrCreateConversation } from "@/lib/direct-messages/data";
 import { createDashboardNotification } from "@/lib/notifications/notify";
+import { dmBadge, getNotifierId } from "@/lib/notifications/system-dm";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
 import { MAX_SCORE, type CheckInScore } from "@/lib/check-in/created-for-more";
 
 // Always alert these two, even if their role wouldn't otherwise receive it.
 const ALWAYS_EMAIL = ["mike@strategicincomegroup.com", "jwaters@qallus.co"];
-const NOTIFIER_EMAIL = "system-notifications@michaeljgauthier.com";
 
 function esc(v: string) {
   return v.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 }
-
-/** A hidden "MJG Notifications" profile used only as the sender of system DM alerts, so the
- *  DM bell badges cleanly (no cross-user confusion). profiles.id is FK'd to auth.users, so it
- *  needs a real (non-login) auth user. Created once, then reused. */
-async function getNotifierId(supabase: ReturnType<typeof createSupabaseAdminClient>): Promise<string | null> {
-  const { data: existing } = await supabase.from("profiles").select("id").eq("email", NOTIFIER_EMAIL).maybeSingle();
-  if (existing?.id) return existing.id;
-
-  // Create (or find) the backing auth user — email confirmed but no password, so it can't log in.
-  let authId: string | null = null;
-  const { data: created, error: authErr } = await supabase.auth.admin.createUser({ email: NOTIFIER_EMAIL, email_confirm: true, user_metadata: { system_notifier: true } });
-  if (created?.user) authId = created.user.id;
-  else {
-    const { data: list } = await supabase.auth.admin.listUsers();
-    authId = list?.users?.find((u: any) => (u.email ?? "").toLowerCase() === NOTIFIER_EMAIL)?.id ?? null;
-    if (!authId) { console.error("[check-in-alert] notifier auth user failed", authErr?.message); return null; }
-  }
-
-  const { error } = await supabase
-    .from("profiles")
-    .upsert({ id: authId, auth_user_id: authId, email: NOTIFIER_EMAIL, first_name: "MJG", last_name: "Notifications", full_name: "MJG Notifications", role: "participant", status: "inactive" }, { onConflict: "id" });
-  if (error) { console.error("[check-in-alert] notifier profile create failed", error.message); return null; }
-  return authId;
-}
-
-/** Badge a recipient's DM bell with a system alert — inserts the message directly (no DM
- *  email of its own, since we send our own styled email). */
-async function dmBadge(supabase: ReturnType<typeof createSupabaseAdminClient>, notifierId: string, recipientId: string, body: string) {
-  if (notifierId === recipientId) return;
-  const convId = await findOrCreateConversation(notifierId, recipientId);
-  const { data: msg } = await supabase
-    .from("dm_messages")
-    .insert({ conversation_id: convId, sender_id: notifierId, body, importance: "important", attachments: [] })
-    .select("id, created_at")
-    .single();
-  if (!msg) return;
-  await supabase
-    .from("dm_conversations")
-    .update({ last_message_at: msg.created_at, last_message_preview: body.slice(0, 140), last_sender_id: notifierId, updated_at: msg.created_at })
-    .eq("id", convId);
-  // Mark the notifier (sender) read; leave the recipient unread so their bell badges.
-  await supabase.from("dm_participants").update({ last_read_at: msg.created_at }).eq("conversation_id", convId).eq("user_id", notifierId);
-}
-
 /**
  * Alert the team when someone completes the Created for More Check-In: a styled email to Mike
  * and Jeremy (+ any super admins), a DM bell notification to both, and a dashboard

@@ -6,6 +6,8 @@ import { getCurrentProfile } from "@/lib/auth/server";
 import { ROLES } from "@/lib/rbac/roles";
 import { getFacilitatorTeam } from "@/lib/facilitator/team";
 import { getParticipantTeam } from "@/lib/participant/team";
+import { getEnergyAuditsForEmails } from "@/lib/energy-audit/submissions";
+import { TeamEnergyAudits } from "@/components/energy-audit/team-energy-audits";
 
 export const dynamic = "force-dynamic";
 
@@ -30,10 +32,15 @@ export default async function TeamPage() {
 
   const { participants, touchpoints, stats } = await getFacilitatorTeam(profile.id);
 
+  // Energy Audits completed by anyone on this facilitator's team, matched by email.
+  const teamEmails = participants.map((p: any) => p.email).filter(Boolean) as string[];
+  const audits = await getEnergyAuditsForEmails(teamEmails);
+
   return (
     <div className="space-y-6">
       <SectionHeader title="My Team" description="The participants you lead. Add people, notify them, and track their journey." />
       <MyTeam participants={participants} touchpoints={touchpoints} stats={stats} />
+      <TeamEnergyAudits audits={audits} teamSize={participants.length} />
     </div>
   );
 }

@@ -3,15 +3,20 @@ import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Activity, CheckCircle2, CircleUserRound, MailCheck, MessageSquareText, TrendingUp, UsersRound } from "lucide-react";
+import { Activity, BatteryCharging, BookMarked, CheckCircle2, CircleUserRound, MailCheck, MessageSquareText, TrendingUp, UsersRound } from "lucide-react";
 import { getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
 import { listCheckInSubmissions, getCheckInSubmissionStats } from "@/lib/check-in/submissions";
+import { getEnergyAuditStats } from "@/lib/energy-audit/submissions";
+import { getBookWaitlistStats } from "@/lib/book-waitlist/repository";
+import { SECTION_MAX, TOTAL_MAX } from "@/lib/energy-audit/energy-audit";
 
 export default async function ReportsPage() {
-  const [data, submissions, checkInStats] = await Promise.all([
+  const [data, submissions, checkInStats, energyStats, waitlistStats] = await Promise.all([
     getPilotDashboardData(),
     listCheckInSubmissions(),
     getCheckInSubmissionStats(),
+    getEnergyAuditStats(),
+    getBookWaitlistStats(),
   ]);
   const metrics = getPilotMetrics(data);
   const funnel = [
@@ -45,6 +50,8 @@ export default async function ReportsPage() {
         <MetricCard label="Survey completed" value={String(metrics.surveyCompleted)} detail="General and Pastor/Elder" icon={MessageSquareText} />
         <MetricCard label="Inner Circle accepted" value={String(metrics.innerCircle)} detail="Accepted invitation" icon={CircleUserRound} />
         <MetricCard label="Follow-up permission" value={String(metrics.followUpPermission)} detail="Ready for personal follow-up" icon={Activity} />
+        <MetricCard label="Energy Audit completed" value={String(energyStats.count)} detail={`Average score ${energyStats.averageScore ?? "-"} / ${TOTAL_MAX}`} icon={BatteryCharging} />
+        <MetricCard label="Book waitlist" value={String(waitlistStats.total)} detail={`${waitlistStats.registered} with an account`} icon={BookMarked} />
       </StatCardRow>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
@@ -133,6 +140,100 @@ export default async function ReportsPage() {
               <BarRow key={row.label} label={row.label} value={row.count} max={lowestAreaRows[0]?.count ?? 0} />
             ))}
             {!lowestAreaRows.length ? <p className="text-sm text-muted-foreground">No Check-In data yet.</p> : null}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Energy Audit — completion, score spread, and where people are most depleted */}
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Energy Audit results</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-2xl font-semibold tabular-nums">{energyStats.count}</p>
+                <p className="text-xs text-muted-foreground">Completed</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold tabular-nums">{energyStats.averageScore ?? "—"}</p>
+                <p className="text-xs text-muted-foreground">Avg / {TOTAL_MAX}</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold tabular-nums">{energyStats.last7}</p>
+                <p className="text-xs text-muted-foreground">Last 7 days</p>
+              </div>
+            </div>
+            <div className="space-y-3 border-t pt-4">
+              {energyStats.byInterpretation.map((b) => (
+                <BarRow key={b.label} label={b.label} value={b.count} max={Math.max(1, ...energyStats.byInterpretation.map((x) => x.count))} />
+              ))}
+            </div>
+            <div className="grid grid-cols-4 gap-2 border-t pt-4">
+              {energyStats.averageBySource.map((s) => (
+                <div key={s.key} className="text-center">
+                  <p className="text-sm font-semibold tabular-nums">{s.average}</p>
+                  <p className="text-[11px] text-muted-foreground">{s.label.replace(" Energy", "")}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">Average per energy, out of {SECTION_MAX}.</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Most depleted energy</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {energyStats.byLowest.map((l) => (
+              <BarRow key={l.key} label={l.label} value={l.count} max={Math.max(1, ...energyStats.byLowest.map((x) => x.count))} />
+            ))}
+            {!energyStats.count ? <p className="text-sm text-muted-foreground">No Energy Audit data yet.</p> : null}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Book waitlist — demand for The Life You're Building */}
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Book waitlist</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-2xl font-semibold tabular-nums">{waitlistStats.total}</p>
+                <p className="text-xs text-muted-foreground">On the list</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold tabular-nums">{waitlistStats.registered}</p>
+                <p className="text-xs text-muted-foreground">With an account</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold tabular-nums">{waitlistStats.last7}</p>
+                <p className="text-xs text-muted-foreground">Last 7 days</p>
+              </div>
+            </div>
+            <div className="space-y-3 border-t pt-4">
+              {waitlistStats.byFormat.map((f) => (
+                <BarRow key={f.label} label={f.label} value={f.count} max={Math.max(1, ...waitlistStats.byFormat.map((x) => x.count))} />
+              ))}
+              {!waitlistStats.total ? <p className="text-sm text-muted-foreground">No waitlist requests yet.</p> : null}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Waitlist by role</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {waitlistStats.byRole.map((r) => (
+              <BarRow key={r.label} label={r.label} value={r.count} max={Math.max(1, ...waitlistStats.byRole.map((x) => x.count))} />
+            ))}
+            {!waitlistStats.total ? <p className="text-sm text-muted-foreground">No waitlist requests yet.</p> : null}
           </CardContent>
         </Card>
       </div>

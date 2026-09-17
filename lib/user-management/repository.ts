@@ -10,7 +10,9 @@ import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants"
 async function getEngagedEmails(supabase: ReturnType<typeof createSupabaseAdminClient>): Promise<Set<string>> {
   const [profiles, checkIns] = await Promise.all([
     supabase.from("profiles").select("email").eq("status", "active"),
-    supabase.from("check_in_submissions").select("email"),
+    // Only the Created for More Check-In counts as accepting — not other assessments (e.g.
+    // the Energy Audit) that share this table.
+    supabase.from("check_in_submissions").select("email").eq("assessment", "created-for-more"),
   ]);
   const set = new Set<string>();
   for (const r of (profiles.data ?? []) as any[]) if (r.email) set.add(String(r.email).toLowerCase());

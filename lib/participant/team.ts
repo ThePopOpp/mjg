@@ -49,7 +49,7 @@ export async function getParticipantTeam(email: string | null | undefined): Prom
   const [{ data: surveyRows }, { data: checkInRows }] = await Promise.all([
     supabase.from("survey_responses").select("participant_id").in("participant_id", memberIds),
     emails.length
-      ? supabase.from("check_in_submissions").select("email").in("email", emails)
+      ? supabase.from("check_in_submissions").select("email").eq("assessment", "created-for-more").in("email", emails)
       : Promise.resolve({ data: [] as { email: string }[] }),
   ]);
   const surveyedIds = new Set((surveyRows ?? []).map((r: any) => r.participant_id).filter(Boolean));

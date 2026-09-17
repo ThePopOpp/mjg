@@ -1,5 +1,7 @@
 import {
   BarChart3,
+  BatteryCharging,
+  BookMarked,
   BookOpen,
   Bot,
   CalendarClock,
@@ -47,6 +49,8 @@ export const dashboardNav: NavEntry[] = [
       { href: "/dashboard/contacts", label: "Contacts", icon: UserCircle, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
       { href: "/dashboard/waves", label: "Waves", icon: Waves, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
       { href: "/dashboard/check-in-results", label: "Check-In Results", icon: CheckSquare, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
+      { href: "/dashboard/energy-audit", label: "Energy Audit", icon: BatteryCharging, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
+      { href: "/dashboard/book-waitlist", label: "Book Waitlist", icon: BookMarked, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
       { href: "/dashboard/surveys", label: "Surveys", icon: MessageSquareText, permission: PERMISSIONS.MANAGE_SURVEYS },
       { href: "/dashboard/pastor-elder-review", label: "Pastor/Elder Review", icon: CircleUserRound, permission: PERMISSIONS.MANAGE_SURVEYS },
       { href: "/dashboard/inner-circle", label: "Inner Circle", icon: CalendarRange, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
