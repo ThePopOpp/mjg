@@ -14,7 +14,13 @@ export async function POST(request: Request) {
       firstName: str(body.firstName, 120),
       lastName: str(body.lastName, 120),
       phone: str(body.phone, 40),
-      formatPreference: str(body.formatPreference, 40),
+      // Multi-select: an array of format values (validated in joinBookWaitlist). A single
+      // legacy `formatPreference` string is still accepted.
+      formatPreferences: Array.isArray(body.formatPreferences)
+        ? body.formatPreferences
+        : body.formatPreference
+          ? [body.formatPreference]
+          : [],
       interest: str(body.interest, 2000),
       notes: str(body.notes, 2000),
       source: str(body.source, 120),

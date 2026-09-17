@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import {
-  WAITLIST_STATUSES, formatLabel, roleLabel,
+  WAITLIST_STATUSES, formatLabels, roleLabel,
   type BookWaitlistRequest, type BookWaitlistStats, type WaitlistStatus,
 } from "@/lib/book-waitlist/repository";
 import { cn } from "@/lib/utils";
@@ -65,7 +65,7 @@ export function BookWaitlistAdmin({
     const header = ["Email", "First name", "Last name", "Phone", "Account", "Role", "Format", "Status", "Requested", "Interest"];
     const rows = filtered.map((r) => [
       r.email, r.first_name ?? "", r.last_name ?? "", r.phone ?? "",
-      r.account_type, roleLabel(r.user_role) ?? "", formatLabel(r.format_preference),
+      r.account_type, roleLabel(r.user_role) ?? "", formatLabels(r.format_preferences, r.format_preference),
       r.status, new Date(r.created_at).toISOString().slice(0, 10), (r.interest ?? "").replace(/\s+/g, " "),
     ]);
     const csv = [header, ...rows]
@@ -160,7 +160,7 @@ export function BookWaitlistAdmin({
                         <Badge variant="outline" className="text-muted-foreground">Guest</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{formatLabel(r.format_preference)}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{formatLabels(r.format_preferences, r.format_preference)}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{fmtDate(r.created_at)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

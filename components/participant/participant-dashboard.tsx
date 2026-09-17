@@ -12,7 +12,7 @@ import { MAX_SCORE } from "@/lib/check-in/created-for-more";
 import { getEnergyAuditsByEmail } from "@/lib/energy-audit/submissions";
 import { EnergyAuditDetail } from "@/components/energy-audit/energy-audit-detail";
 import { TOTAL_MAX } from "@/lib/energy-audit/energy-audit";
-import { getBookWaitlistForEmail, formatLabel } from "@/lib/book-waitlist/repository";
+import { getBookWaitlistForEmail, formatLabels } from "@/lib/book-waitlist/repository";
 import type { DashboardProfile } from "@/lib/auth/server";
 
 function fmtDate(iso: string) {
@@ -151,7 +151,7 @@ export async function ParticipantDashboard({ profile }: { profile: DashboardProf
             <div>
               <p className="font-medium">You&rsquo;re on the book waitlist</p>
               <p className="text-muted-foreground">
-                Requested {fmtDate(waitlist.created_at)} · Preferred format: {formatLabel(waitlist.format_preference)}
+                Requested {fmtDate(waitlist.created_at)} · Preferred format: {formatLabels(waitlist.format_preferences, waitlist.format_preference)}
               </p>
             </div>
             <span className="rounded-full bg-[#b88a4a]/15 px-2.5 py-1 text-xs font-medium capitalize text-[#8a6d33] dark:text-[#e2ca9a]">

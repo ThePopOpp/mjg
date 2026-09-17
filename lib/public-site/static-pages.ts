@@ -2,13 +2,17 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { INSTALL_GUIDES, SHARE_ICON_SVG } from "@/lib/pwa/install-guide";
+import { ACCOUNT_LABEL, RESOURCES_LABEL, joinJourneyHref, publicNavItems } from "@/lib/public-site/nav-items";
 
-const DEFAULT_SITE_URL = "https://my.michaeljgauthier.com";
+// The primary domain is the apex michaeljgauthier.com. The my.* sub-domain still resolves but
+// is no longer the canonical host, so it must not be the fallback. Override per environment
+// with NEXT_PUBLIC_SITE_URL / NEXT_PUBLIC_APP_URL.
+const DEFAULT_SITE_URL = "https://michaeljgauthier.com";
 // Where THIS app is served — login, the legal pages, and the SMS/email consent
 // pages all live here. It's separate from publicSiteUrl() because the marketing
 // site and the app are different hosts today. Set NEXT_PUBLIC_APP_URL to move it
 // (e.g. when the primary domain changes) rather than editing links one by one.
-const DEFAULT_APP_URL = "https://my.michaeljgauthier.com";
+const DEFAULT_APP_URL = "https://michaeljgauthier.com";
 
 const STATIC_ROUTES: Record<string, string> = {
   "index.html": "/",
@@ -95,27 +99,41 @@ export function renderNavStyles() {
       font-weight: 500; font-size: 0.875rem; text-decoration: none; transition: opacity 0.2s;
     }
     .nav-cta:hover { opacity: 0.9; }
-    /* Account dropdown — keeps Sign in / Register in the bar without widening it. */
-    .nav-account { position: relative; }
-    .nav-account-btn {
+    /* Dropdowns (Resources, Account). A parent with a link keeps the label clickable and
+       puts the caret in its own button; a parent without one is a single button. */
+    .nav-dropdown { position: relative; display: flex; align-items: center; gap: 0.15rem; }
+    .nav-parent-btn, .nav-caret-btn {
       display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;
       background: none; border: none; padding: 0; font-family: var(--font-body);
       font-size: 0.875rem; color: var(--nav-text); transition: opacity 0.2s;
     }
-    .nav-account-btn:hover { opacity: 0.7; }
+    .nav-parent-btn:hover, .nav-caret-btn:hover { opacity: 0.7; }
     .nav-caret { transition: transform 0.2s; }
-    .nav-account-btn[aria-expanded="true"] .nav-caret { transform: rotate(180deg); }
-    .nav-account-menu {
-      display: none; position: absolute; top: calc(100% + 0.7rem); right: 0; min-width: 170px;
+    [aria-expanded="true"] .nav-caret { transform: rotate(180deg); }
+    .nav-dropdown-menu {
+      display: none; position: absolute; top: calc(100% + 0.7rem); left: 0; min-width: 180px;
       background: var(--nav-bg); border: 1px solid var(--border); border-radius: 10px;
       padding: 0.4rem; box-shadow: 0 12px 30px rgba(0,0,0,0.12); z-index: 110;
     }
-    .nav-account-menu.open { display: block; }
-    .nav-account-menu a {
-      display: block; padding: 0.6rem 0.75rem; border-radius: 6px;
+    .nav-dropdown:last-of-type .nav-dropdown-menu { left: auto; right: 0; }
+    .nav-dropdown-menu.open { display: block; }
+    .nav-dropdown-menu a {
+      display: block; padding: 0.6rem 0.75rem; border-radius: 6px; white-space: nowrap;
       font-size: 0.875rem; color: var(--nav-text); text-decoration: none; transition: background 0.15s;
     }
-    .nav-account-menu a:hover { background: var(--ctrl-bg); opacity: 1; }
+    .nav-dropdown-menu a:hover { background: var(--ctrl-bg); opacity: 1; }
+    /* Mobile-only rows (flattened Resources children, Join the Journey, Sign in/Register). */
+    .nav-mobile-only { display: none; }
+    .mjg-nav-cta {
+      display: block; text-align: center; padding: 0.85rem 1.25rem; border-radius: 8px;
+      background: var(--btn-bg); color: var(--btn-text) !important;
+      font-weight: 700; font-size: 1rem; text-decoration: none;
+    }
+    .mjg-nav-auth-btn {
+      display: block; text-align: center; padding: 0.8rem 1rem; border-radius: 8px;
+      border: 1px solid var(--ctrl-border); color: var(--nav-text) !important;
+      font-weight: 600; font-size: 0.95rem; text-decoration: none;
+    }
     .theme-toggle, .mobile-menu-toggle {
       display: inline-flex; align-items: center; justify-content: center;
       width: 42px; height: 42px; border-radius: 14px; padding: 0; cursor: pointer;
@@ -124,35 +142,111 @@ export function renderNavStyles() {
     }
     .theme-toggle:hover, .mobile-menu-toggle:hover { background: var(--ctrl-hover); transform: translateY(-1px); }
     .mobile-menu-toggle { display: none; }
-    .nav-links.open { display: flex; }
     @media (max-width: 768px) {
       .mobile-menu-toggle { display: inline-flex; }
       /* Hide the "Michael J. Gauthier" wordmark on phones — keep just the logo mark. */
       .nav-logo-text { display: none; }
+      /* Full-page mobile menu: fixed, full viewport, its own scroll. */
       .nav-links {
-        position: absolute; top: 60px; left: 0; right: 0;
-        flex-direction: column; gap: 1rem; padding: 1.25rem 1.5rem 1.75rem;
-        background: var(--nav-bg); border-bottom: 1px solid var(--border); display: none;
+        display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+        flex-direction: column; align-items: stretch; gap: 0.35rem;
+        padding: 1.25rem 1.5rem 2.5rem; overflow-y: auto;
+        background: var(--nav-bg); z-index: 105;
       }
+      .nav-links.open { display: flex; }
       .nav-links li { width: 100%; }
-      .nav-links a, .nav-cta { width: 100%; box-sizing: border-box; }
-      .nav-cta { text-align: center; }
-      .theme-toggle { width: 100%; border-radius: 8px; height: 44px; }
-      /* In the stacked mobile menu the dropdown becomes an inline group — no overlay,
-         no caret toggle needed. */
-      .nav-account-btn { display: none; }
-      .nav-account-menu {
-        display: block; position: static; min-width: 0; padding: 0;
-        border: none; box-shadow: none; background: none;
+      .nav-links > li > a, .nav-parent-link {
+        display: block; width: 100%; box-sizing: border-box;
+        padding: 0.85rem 0; font-size: 1.05rem; border-bottom: 1px solid var(--border);
       }
-      .nav-account-menu a { padding: 0; }
-    }`;
+      .nav-mobile-only { display: block; }
+      /* The desktop dropdowns collapse: the parent stays a plain row, the caret and the
+         floating menu disappear, and the children show as their own mobile rows. */
+      .nav-dropdown { display: block; }
+      .nav-caret-btn, .nav-parent-btn { display: none; }
+      .nav-dropdown-menu { display: none !important; }
+      /* Mobile order per spec: Home, About, Mission, Resources, Videos, Book Waitlist,
+         Join the Journey, Contact, Sign in/Register, theme toggle. DOM order stays
+         desktop-correct; only the flex order changes. */
+      .nav-item-home { order: 1; }
+      .nav-item-about { order: 2; }
+      .nav-item-mission { order: 3; }
+      .nav-item-resources { order: 4; }
+      .nav-mobile-child { order: 5; }
+      .nav-mobile-join { order: 7; }
+      .nav-item-contact { order: 8; }
+      .nav-mobile-auth { order: 9; }
+      .nav-toggle-item { order: 10; }
+      /* Account collapses on mobile — Sign in / Register are their own buttons below. */
+      .nav-item-account { display: none; }
+      .nav-mobile-auth {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.9rem;
+      }
+      .mjg-nav-cta { margin-top: 1.1rem; }
+      .nav-toggle-item { margin-top: 0.9rem; }
+      .theme-toggle { width: 100%; border-radius: 8px; height: 46px; }
+    }
+    /* Lock the page behind the open mobile menu. */
+    body.mjg-nav-open { overflow: hidden; }`;
+}
+
+/**
+ * The nav list items, shared by renderSiteHeader() and the main/*.html injection.
+ *
+ * Desktop shows: Home · About · Mission · Resources▾ · Contact · Account▾ · theme toggle.
+ * "Join the Journey" is mobile-only (it was removed from the desktop bar), and the mobile
+ * menu adds the Resources children as flat rows plus a Sign in / Register button pair.
+ *
+ * `themeToggleHtml` lets the static pages keep their OWN toggle button markup — they use two
+ * different element ids (theme-toggle / nav-theme-toggle) wired to their own inline scripts,
+ * so re-emitting a single id would break the toggle on half of them.
+ */
+export function renderNavListItems(siteUrl: string, themeToggleHtml?: string) {
+  const app = appUrl();
+  const items = publicNavItems(siteUrl, app);
+  const caret = `<svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+  const desktop = items
+    .map((item, index) => {
+      const slug = item.label.toLowerCase().replace(/[^a-z]+/g, "-");
+      if (!item.children) return `<li class="nav-item-plain nav-item-${slug}"><a href="${item.href}">${item.label}</a></li>`;
+      const menuId = `nav-menu-${index}`;
+      // A parent with both a link and a dropdown: the label navigates, the caret opens.
+      const trigger = item.href
+        ? `<a href="${item.href}" class="nav-parent-link">${item.label}</a>
+            <button class="nav-caret-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="${menuId}" aria-label="Open ${item.label} menu">${caret}</button>`
+        : `<button class="nav-parent-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="${menuId}">${item.label}${caret}</button>`;
+      return `<li class="nav-dropdown nav-item-${slug}">
+          ${trigger}
+          <div class="nav-dropdown-menu" id="${menuId}">
+            ${item.children.map((c) => `<a href="${c.href}">${c.label}</a>`).join("\n            ")}
+          </div>
+        </li>`;
+    })
+    .join("\n        ");
+
+  // Mobile-only rows: the Resources children flattened, then the CTA and account buttons.
+  const resources = items.find((i) => i.label === RESOURCES_LABEL);
+  const account = items.find((i) => i.label === ACCOUNT_LABEL);
+  const mobileExtras = `
+        ${(resources?.children ?? []).map((c) => `<li class="nav-mobile-only nav-mobile-child"><a href="${c.href}">${c.label}</a></li>`).join("\n        ")}
+        <li class="nav-mobile-only nav-mobile-join"><a href="${joinJourneyHref(siteUrl)}" class="mjg-nav-cta">Join the Journey</a></li>
+        <li class="nav-mobile-only nav-mobile-auth">
+          ${(account?.children ?? []).map((c) => `<a href="${c.href}" class="mjg-nav-auth-btn">${c.label}</a>`).join("\n          ")}
+        </li>`;
+
+  const toggle =
+    themeToggleHtml ??
+    `<li class="nav-toggle-item"><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode">
+          <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        </button></li>`;
+
+  return `${desktop}${mobileExtras}
+        ${toggle}`;
 }
 
 /** Nav HTML — the <nav> element with logo, links, and controls */
 export function renderSiteHeader(siteUrl: string) {
-  // Sign in / Register live on THIS app, not the marketing site.
-  const app = appUrl();
   return `<nav>
     <div class="nav-inner">
       <a href="${siteUrl}/" class="nav-logo">
@@ -163,30 +257,11 @@ export function renderSiteHeader(siteUrl: string) {
           data-logo-dark="/mjg-logos/mjg_white.png" />
         <span class="nav-logo-text">Michael <span class="gold">J.</span> Gauthier</span>
       </a>
-      <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="Open menu">
+      <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <ul class="nav-links" id="nav-links">
-        <li><a href="${siteUrl}/">Home</a></li>
-        <li><a href="${siteUrl}/about">About</a></li>
-        <li><a href="${siteUrl}/mission">Mission</a></li>
-        <li><a href="${siteUrl}/6-week-challenge/videos">Videos</a></li>
-        <li><a href="${siteUrl}/resources">Resources</a></li>
-        <li><a href="${siteUrl}/contact">Contact</a></li>
-        <li class="nav-account">
-          <button id="account-toggle" class="nav-account-btn" type="button" aria-haspopup="true" aria-expanded="false">
-            Account
-            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="nav-account-menu" id="account-menu">
-            <a href="${app}/login">Sign in</a>
-            <a href="${app}/register">Register</a>
-          </div>
-        </li>
-        <li><a href="${siteUrl}/#join" class="nav-cta">Join the Journey</a></li>
-        <li><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode">
-          <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-        </button></li>
+        ${renderNavListItems(siteUrl)}
       </ul>
     </div>
   </nav>`;
@@ -347,40 +422,79 @@ export function renderSiteFooter(siteUrl: string) {
 
 /** Nav JS — place just before </body> */
 export function renderNavScript() {
-  return `<script>(function(){
-    var logo=document.getElementById('nav-logo'),ti=document.getElementById('theme-icon'),
-        tt=document.getElementById('theme-toggle'),mt=document.getElementById('mobile-menu-toggle'),
-        nl=document.getElementById('nav-links'),
-        at=document.getElementById('account-toggle'),am=document.getElementById('account-menu');
-    var SUN='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-    var MOON='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-    var HAM='<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
-    var X='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
-    function applyTheme(t){
-      document.documentElement.dataset.theme=t;
-      localStorage.setItem('theme',t);
-      if(logo)logo.src=t==='dark'?logo.dataset.logoDark:logo.dataset.logoLight;
-      if(ti)ti.innerHTML=t==='dark'?MOON:SUN;
-    }
-    function openMenu(){nl&&nl.classList.add('open');mt&&(mt.querySelector('svg').innerHTML=X);}
-    function closeMenu(){nl&&nl.classList.remove('open');mt&&(mt.querySelector('svg').innerHTML=HAM);}
-    function closeAccount(){am&&am.classList.remove('open');at&&at.setAttribute('aria-expanded','false');}
-    function toggleAccount(){
-      if(!am||!at)return;
-      var isOpen=am.classList.toggle('open');
-      at.setAttribute('aria-expanded',isOpen?'true':'false');
-    }
-    tt&&tt.addEventListener('click',function(){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');});
-    mt&&mt.addEventListener('click',function(){nl&&nl.classList.contains('open')?closeMenu():openMenu();});
-    at&&at.addEventListener('click',function(e){e.stopPropagation();toggleAccount();});
-    document.addEventListener('click',function(e){
-      if(!e.target.closest('.nav-account'))closeAccount();
-      if(nl&&nl.classList.contains('open')&&!e.target.closest('nav'))closeMenu();
-    });
-    document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeMenu();closeAccount();}});
-    applyTheme(document.documentElement.dataset.theme||'light');
-  })();</script>`;
+  return `<script>${NAV_BEHAVIOUR_JS}</script>`;
 }
+
+/**
+ * Nav behaviour, shared by the server-rendered pages and the main/*.html injection: theme
+ * toggle, the full-page mobile menu (with a scroll lock on <body>), and the dropdowns.
+ *
+ * Written defensively — the static pages carry their own inline nav scripts with differing
+ * element ids, so every lookup is optional and the mobile/dropdown wiring works even when
+ * this is the only script on the page.
+ */
+export const NAV_BEHAVIOUR_JS = `(function(){
+  var logo=document.getElementById('nav-logo'),ti=document.getElementById('theme-icon'),
+      tt=document.getElementById('theme-toggle'),mt=document.getElementById('mobile-menu-toggle'),
+      nl=document.getElementById('nav-links');
+  var SUN='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  var MOON='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  var HAM='<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>';
+  var X='<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+
+  function applyTheme(t){
+    document.documentElement.dataset.theme=t;
+    try{localStorage.setItem('theme',t);}catch(e){}
+    if(logo&&logo.dataset)logo.src=t==='dark'?logo.dataset.logoDark:logo.dataset.logoLight;
+    if(ti)ti.innerHTML=t==='dark'?MOON:SUN;
+  }
+  function closeDropdowns(){
+    var open=document.querySelectorAll('.nav-dropdown-menu.open');
+    for(var i=0;i<open.length;i++)open[i].classList.remove('open');
+    var exp=document.querySelectorAll('.nav-dropdown [aria-expanded="true"]');
+    for(var j=0;j<exp.length;j++)exp[j].setAttribute('aria-expanded','false');
+  }
+  function openMenu(){
+    if(nl)nl.classList.add('open');
+    document.body.classList.add('mjg-nav-open');
+    if(mt){mt.setAttribute('aria-expanded','true');var s=mt.querySelector('svg');if(s)s.innerHTML=X;}
+  }
+  function closeMenu(){
+    if(nl)nl.classList.remove('open');
+    document.body.classList.remove('mjg-nav-open');
+    if(mt){mt.setAttribute('aria-expanded','false');var s=mt.querySelector('svg');if(s)s.innerHTML=HAM;}
+  }
+
+  if(tt)tt.addEventListener('click',function(){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');});
+  if(mt)mt.addEventListener('click',function(){
+    if(nl&&nl.classList.contains('open'))closeMenu();else openMenu();
+  });
+
+  // Dropdown triggers: the caret button next to a parent link, or a parent that is itself a button.
+  var triggers=document.querySelectorAll('.nav-caret-btn, .nav-parent-btn');
+  for(var t2=0;t2<triggers.length;t2++){
+    triggers[t2].addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      var parent=this.closest('.nav-dropdown');
+      var menu=parent&&parent.querySelector('.nav-dropdown-menu');
+      if(!menu)return;
+      var isOpen=menu.classList.contains('open');
+      closeDropdowns();
+      if(!isOpen){menu.classList.add('open');this.setAttribute('aria-expanded','true');}
+    });
+  }
+
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.nav-dropdown'))closeDropdowns();
+    // Tapping outside the bar closes the mobile menu, but taps inside it must not.
+    if(nl&&nl.classList.contains('open')&&!e.target.closest('nav'))closeMenu();
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeDropdowns();closeMenu();}});
+  // Leaving the mobile breakpoint should never strand the menu open.
+  window.addEventListener('resize',function(){if(window.innerWidth>768)closeMenu();});
+
+  applyTheme(document.documentElement.dataset.theme||'light');
+})();`;
 
 export function publicSiteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, "");
@@ -447,80 +561,158 @@ export function renderGeneratedPage(input: { title: string; eyebrow: string; bod
 }
 
 /**
- * The Account dropdown for the STATIC marketing pages in main/*.html.
+ * Frontend nav for the STATIC marketing pages in main/*.html.
  *
- * Those pages ship their own hardcoded nav and never call renderSiteHeader(), so the dropdown
- * added there does not reach them — it has to be injected here instead. Self-contained styles
- * and script so it can't collide with each page's own nav CSS or theme/menu handlers.
+ * Those pages ship their own hardcoded nav and never call renderSiteHeader(), so the shared
+ * nav has to be injected. The whole <ul> body is rebuilt from renderNavListItems() — patching
+ * item by item across five files with differing markup was the fragile way to do this.
+ *
+ * Their own theme-toggle <li> is preserved verbatim: the files use two different ids
+ * (theme-toggle / nav-theme-toggle) wired to their own inline scripts, so re-emitting a single
+ * id would break the toggle on half the pages.
  */
-function accountNavMarkup(app: string) {
-  return `<li class="nav-account">
-          <button class="nav-account-btn" type="button" aria-haspopup="true" aria-expanded="false">Account<svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
-          <div class="nav-account-menu"><a href="${app}/login">Sign in</a><a href="${app}/register">Register</a></div>
-        </li>
-        `;
-}
-
-const ACCOUNT_NAV_STYLES = `<style id="mjg-account-nav">
-  .nav-account { position: relative; }
-  .nav-account-btn { display: inline-flex; align-items: center; gap: .3rem; cursor: pointer; background: none; border: none; padding: 0; font-family: var(--font-body, inherit); font-size: .875rem; color: var(--nav-text, #111110); transition: color .2s; }
-  .nav-account-btn:hover { color: var(--text, #111110); }
-  .nav-caret { transition: transform .2s; }
-  .nav-account-btn[aria-expanded="true"] .nav-caret { transform: rotate(180deg); }
-  .nav-account-menu { display: none; position: absolute; top: calc(100% + .7rem); right: 0; min-width: 170px; background: var(--nav-background, #fff); border: 1px solid var(--border, #e8e6e0); border-radius: 10px; padding: .4rem; box-shadow: 0 12px 30px rgba(0,0,0,.12); z-index: 200; }
-  .nav-account-menu.open { display: block; }
-  .nav-account-menu a { display: block; padding: .6rem .75rem; border-radius: 6px; font-size: .875rem; color: var(--nav-text, #111110); text-decoration: none; white-space: nowrap; }
-  .nav-account-menu a:hover { background: var(--surface-alt, rgba(0,0,0,.05)); }
-  @media (max-width: 768px) {
-    .nav-account-btn { display: none; }
-    .nav-account-menu { display: block; position: static; min-width: 0; padding: 0; border: none; box-shadow: none; background: none; }
-    .nav-account-menu a { padding: 0; }
+const STATIC_NAV_STYLES = `<style id="mjg-frontend-nav">
+  .nav-dropdown { position: relative; display: flex; align-items: center; gap: 0.15rem; }
+  .nav-parent-btn, .nav-caret-btn {
+    display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;
+    background: none; border: none; padding: 0; font-family: var(--font-body, inherit);
+    font-size: 0.875rem; color: var(--nav-text, #111110); transition: opacity 0.2s;
   }
+  .nav-parent-btn:hover, .nav-caret-btn:hover { opacity: 0.7; }
+  .nav-caret { transition: transform 0.2s; }
+  [aria-expanded="true"] .nav-caret { transform: rotate(180deg); }
+  .nav-dropdown-menu {
+    display: none; position: absolute; top: calc(100% + 0.7rem); left: 0; min-width: 180px;
+    background: var(--nav-background, var(--nav-bg, #fff)); border: 1px solid var(--border, #e8e6e0);
+    border-radius: 10px; padding: 0.4rem; box-shadow: 0 12px 30px rgba(0,0,0,0.12); z-index: 200;
+  }
+  .nav-dropdown:last-of-type .nav-dropdown-menu { left: auto; right: 0; }
+  .nav-dropdown-menu.open { display: block; }
+  .nav-dropdown-menu a {
+    display: block; padding: 0.6rem 0.75rem; border-radius: 6px; white-space: nowrap;
+    font-size: 0.875rem; color: var(--nav-text, #111110); text-decoration: none;
+  }
+  .nav-dropdown-menu a:hover { background: var(--surface-alt, rgba(0,0,0,.05)); opacity: 1; }
+  .nav-mobile-only { display: none; }
+  .mjg-nav-cta {
+    display: block; text-align: center; padding: 0.85rem 1.25rem; border-radius: 8px;
+    background: var(--btn-bg, #111110); color: var(--btn-text, #fff) !important;
+    font-weight: 700; font-size: 1rem; text-decoration: none;
+  }
+  .mjg-nav-auth-btn {
+    display: block; text-align: center; padding: 0.8rem 1rem; border-radius: 8px;
+    border: 1px solid var(--border, #e8e6e0); color: var(--nav-text, #111110) !important;
+    font-weight: 600; font-size: 0.95rem; text-decoration: none;
+  }
+  @media (max-width: 768px) {
+    /* Full-page mobile menu. The page's own script toggles .open; this only restyles it. */
+    .nav-links.open {
+      display: flex !important; position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+      flex-direction: column; align-items: stretch; gap: 0.35rem;
+      padding: 1.25rem 1.5rem 2.5rem; overflow-y: auto; z-index: 150;
+      background: var(--nav-background, var(--nav-bg, #fff));
+    }
+    .nav-links.open > li { width: 100%; }
+    .nav-links.open > li > a, .nav-links.open .nav-parent-link {
+      display: block; width: 100%; box-sizing: border-box;
+      padding: 0.85rem 0; font-size: 1.05rem; border-bottom: 1px solid var(--border, #e8e6e0);
+    }
+    .nav-links.open .nav-mobile-only { display: block; }
+    .nav-links.open .nav-dropdown { display: block; }
+    .nav-links.open .nav-caret-btn, .nav-links.open .nav-parent-btn { display: none; }
+    .nav-links.open .nav-dropdown-menu { display: none !important; }
+    /* Mobile order per spec: Home, About, Mission, Resources, Videos, Book Waitlist,
+       Join the Journey, Contact, Sign in/Register, theme toggle. */
+    .nav-links.open .nav-item-home { order: 1; }
+    .nav-links.open .nav-item-about { order: 2; }
+    .nav-links.open .nav-item-mission { order: 3; }
+    .nav-links.open .nav-item-resources { order: 4; }
+    .nav-links.open .nav-mobile-child { order: 5; }
+    .nav-links.open .nav-mobile-join { order: 7; }
+    .nav-links.open .nav-item-contact { order: 8; }
+    .nav-links.open .nav-mobile-auth { order: 9; }
+    .nav-links.open .nav-toggle-item { order: 10; }
+    /* Account collapses on mobile — Sign in / Register are their own buttons below. */
+    .nav-links.open .nav-item-account { display: none; }
+    .nav-links.open .nav-mobile-auth {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.9rem;
+    }
+    .nav-links.open .mjg-nav-cta { margin-top: 1.1rem; }
+    .nav-links.open .nav-toggle-item { margin-top: 0.9rem; }
+    .nav-links.open .theme-toggle, .nav-links.open .nav-theme-toggle {
+      width: 100%; border-radius: 8px; height: 46px;
+    }
+    /* Hero CTAs stack to equal width on phones instead of hugging their label. */
+    .hero-ctas { flex-direction: column; align-items: stretch; }
+    .hero-ctas .btn { width: 100%; min-width: 0; }
+  }
+  body.mjg-nav-open { overflow: hidden; }
 </style>`;
 
-const ACCOUNT_NAV_SCRIPT = `<script>(function(){
-  var btn=document.querySelector('.nav-account-btn'),menu=document.querySelector('.nav-account-menu');
-  if(!btn||!menu)return;
-  btn.addEventListener('click',function(e){
-    e.stopPropagation();
-    var open=menu.classList.toggle('open');
-    btn.setAttribute('aria-expanded',open?'true':'false');
-  });
+/**
+ * Dropdown + scroll-lock behaviour for the static pages ONLY.
+ *
+ * Deliberately does NOT wire the hamburger or the theme toggle: each page already has its own
+ * handlers for those. A second hamburger handler would toggle .open twice per click and the
+ * menu would open and immediately close — so the scroll lock watches the class instead.
+ */
+const STATIC_NAV_SCRIPT = `<script>(function(){
+  function closeDropdowns(){
+    var open=document.querySelectorAll('.nav-dropdown-menu.open');
+    for(var i=0;i<open.length;i++)open[i].classList.remove('open');
+    var exp=document.querySelectorAll('.nav-dropdown [aria-expanded="true"]');
+    for(var j=0;j<exp.length;j++)exp[j].setAttribute('aria-expanded','false');
+  }
+  var triggers=document.querySelectorAll('.nav-caret-btn, .nav-parent-btn');
+  for(var t=0;t<triggers.length;t++){
+    triggers[t].addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      var parent=this.closest('.nav-dropdown');
+      var menu=parent&&parent.querySelector('.nav-dropdown-menu');
+      if(!menu)return;
+      var isOpen=menu.classList.contains('open');
+      closeDropdowns();
+      if(!isOpen){menu.classList.add('open');this.setAttribute('aria-expanded','true');}
+    });
+  }
   document.addEventListener('click',function(e){
-    if(!e.target.closest('.nav-account')){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}
+    if(!e.target.closest('.nav-dropdown'))closeDropdowns();
   });
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}
-  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDropdowns();});
+
+  // Mirror the page's own .open toggle onto <body> so the page behind can't scroll.
+  var nl=document.getElementById('nav-links');
+  if(nl&&window.MutationObserver){
+    new MutationObserver(function(){
+      document.body.classList.toggle('mjg-nav-open', nl.classList.contains('open'));
+    }).observe(nl,{attributes:true,attributeFilter:['class']});
+  }
 })();</script>`;
 
-function injectAccountNav(html: string, app: string) {
-  if (html.includes("nav-account")) return html; // already present
+function injectFrontendNav(html: string, siteUrl: string) {
+  if (html.includes("mjg-frontend-nav")) return html; // already injected
 
-  const withItem = html.replace(
+  const withNav = html.replace(
     /(<ul class="nav-links" id="nav-links">)([\s\S]*?)(<\/ul>)/,
-    (match, open: string, body: string, close: string) => {
-      const item = accountNavMarkup(app);
-      // Sit just before the "Join the Journey" CTA when there is one, so Account stays with
-      // the text links rather than after the button; otherwise append to the end of the list.
-      const ctaIndex = body.search(/<li>\s*<a [^>]*class="btn btn-dark"/);
-      return ctaIndex >= 0
-        ? open + body.slice(0, ctaIndex) + item + body.slice(ctaIndex) + close
-        : open + body + item + close;
+    (_match, open: string, body: string, close: string) => {
+      // Keep this page's own theme-toggle button exactly as it is.
+      const toggle = body.match(/<li>\s*<button id="(?:nav-)?theme-toggle"[\s\S]*?<\/li>/);
+      const toggleHtml = toggle ? `<li class="nav-toggle-item">${toggle[0].replace(/^<li>/, "").replace(/<\/li>$/, "")}</li>` : undefined;
+      return `${open}\n        ${renderNavListItems(siteUrl, toggleHtml)}\n      ${close}`;
     },
   );
-  if (withItem === html) return html; // no nav list on this page
+  if (withNav === html) return html; // no nav list on this page
 
   // Several of the main/*.html sources are partial documents with no </head> or </body> at
   // all (about-us, resources, post), so anchored injection silently does nothing there.
   // Fall back to appending — browsers accept <style>/<script> anywhere in the document.
-  const withStyles = withItem.includes("</head>")
-    ? withItem.replace("</head>", `${ACCOUNT_NAV_STYLES}\n</head>`)
-    : `${ACCOUNT_NAV_STYLES}\n${withItem}`;
+  const withStyles = withNav.includes("</head>")
+    ? withNav.replace("</head>", `${STATIC_NAV_STYLES}\n</head>`)
+    : `${STATIC_NAV_STYLES}\n${withNav}`;
 
   return withStyles.includes("</body>")
-    ? withStyles.replace("</body>", `${ACCOUNT_NAV_SCRIPT}\n</body>`)
-    : `${withStyles}\n${ACCOUNT_NAV_SCRIPT}`;
+    ? withStyles.replace("</body>", `${STATIC_NAV_SCRIPT}\n</body>`)
+    : `${withStyles}\n${STATIC_NAV_SCRIPT}`;
 }
 
 function transformStaticHtml(html: string) {
@@ -563,7 +755,13 @@ function transformStaticHtml(html: string) {
       /<li>\s*<a href="[^"]*\/listen"[^>]*>\s*Listen\s*<\/a>\s*<\/li>/gi,
       `<li><a href="${siteUrl}/6-week-challenge/videos">Videos</a></li>`,
     )
-    .replace(/document\.getElementById\(['"]listen-(?:btn|nav)['"]\)\s*\.addEventListener\([^;]*\);/g, "");
+    .replace(/document\.getElementById\(['"]listen-(?:btn|nav)['"]\)\s*\.addEventListener\([^;]*\);/g, "")
+    // The nav is rebuilt below (injectFrontendNav), which removes elements these pages' own
+    // inline scripts still reach for — about-us.html, for one, does
+    // getElementById('join-btn').addEventListener(...), and that TypeError would kill the rest
+    // of its script, taking the theme toggle and hamburger with it. Make every such lookup
+    // null-safe rather than trying to delete multi-line handler bodies with a regex.
+    .replace(/(document\.getElementById\((['"])[^'"]+\2\))\s*\.addEventListener\(/g, "$1?.addEventListener(");
 
   for (const [fileName, route] of Object.entries(STATIC_ROUTES)) {
     const absolute = `${siteUrl}${route === "/" ? "/" : route}`;
@@ -572,9 +770,9 @@ function transformStaticHtml(html: string) {
       .replace(new RegExp(`href='${escapeRegExp(fileName)}'`, "g"), `href='${absolute}'`);
   }
 
-  return injectAccountNav(
+  return injectFrontendNav(
     injectMobileNavStyle(injectViewport(injectLegalFooterColumn(injectPwa(injectFaviconLinks(output))))),
-    app,
+    siteUrl,
   );
 }
 

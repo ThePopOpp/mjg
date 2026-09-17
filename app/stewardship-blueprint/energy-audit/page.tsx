@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PilotShell } from "@/components/pilot/pilot-shell";
+import { SiteShell, SITE_CONTENT_BOX } from "@/components/public-site/site-shell";
 import { EnergyAuditFlow } from "@/components/energy-audit/energy-audit-flow";
 import { getCurrentProfile } from "@/lib/auth/server";
 
@@ -18,17 +18,28 @@ export default async function EnergyAuditPage() {
   const signedIn = Boolean(profile && profile.id !== "local-preview" && profile.email);
 
   return (
-    <PilotShell
-      heroVariant="centered"
-      eyebrow="A Stewardship Blueprint Assessment"
-      title="The Energy Audit Check-In"
-      description="See where your tank is full, where it's leaking, and what renewal you need next."
-    >
-      <EnergyAuditFlow
-        signedIn={signedIn}
-        firstName={signedIn ? profile!.firstName : null}
-        dashboardHref={signedIn ? "/dashboard" : null}
-      />
-    </PilotShell>
+    <SiteShell>
+      <section className={`${SITE_CONTENT_BOX} py-12 md:py-16`}>
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#b88a4a]/40 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#b88a4a]">
+            <span aria-hidden>✦</span> A Stewardship Blueprint Assessment
+          </span>
+          <h1 className="mt-6 font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+            The Energy Audit <em className="not-italic text-[#b88a4a]">Check-In</em>
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
+            See where your tank is full, where it&rsquo;s leaking, and what renewal you need next.
+          </p>
+        </div>
+
+        <div className="mt-12">
+          <EnergyAuditFlow
+            signedIn={signedIn}
+            firstName={signedIn ? profile!.firstName : null}
+            dashboardHref={signedIn ? "/dashboard" : null}
+          />
+        </div>
+      </section>
+    </SiteShell>
   );
 }

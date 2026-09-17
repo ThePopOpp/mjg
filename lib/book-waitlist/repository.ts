@@ -3,10 +3,18 @@ import { ROLE_LABELS, normalizeAppRole } from "@/lib/rbac/roles";
 
 export const FORMAT_OPTIONS = [
   { value: "print", label: "Print" },
-  { value: "ebook", label: "E-book" },
+  { value: "ebook", label: "E-Book" },
   { value: "audiobook", label: "Audiobook" },
   { value: "any", label: "Whichever comes first" },
 ] as const;
+
+export type FormatValue = (typeof FORMAT_OPTIONS)[number]["value"];
+/** "Whichever comes first" is mutually exclusive with picking specific editions. */
+export const FORMAT_ANY: FormatValue = "any";
+
+export function isFormatValue(value: unknown): value is FormatValue {
+  return typeof value === "string" && FORMAT_OPTIONS.some((f) => f.value === value);
+}
 
 export const WAITLIST_STATUSES = ["requested", "notified", "fulfilled", "archived"] as const;
 export type WaitlistStatus = (typeof WAITLIST_STATUSES)[number];
@@ -21,7 +29,9 @@ export type BookWaitlistRequest = {
   participant_id: string | null;
   account_type: "registered" | "guest";
   user_role: string | null;
+  /** Legacy single value, kept in sync with the first entry of format_preferences. */
   format_preference: string | null;
+  format_preferences: string[] | null;
   interest: string | null;
   notes: string | null;
   source: string;
@@ -31,10 +41,17 @@ export type BookWaitlistRequest = {
 };
 
 const SELECT =
-  "id,email,first_name,last_name,phone,profile_id,participant_id,account_type,user_role,format_preference,interest,notes,source,status,notified_at,created_at";
+  "id,email,first_name,last_name,phone,profile_id,participant_id,account_type,user_role,format_preference,format_preferences,interest,notes,source,status,notified_at,created_at";
 
 export function formatLabel(value: string | null | undefined) {
   return FORMAT_OPTIONS.find((f) => f.value === value)?.label ?? "—";
+}
+
+/** Human-readable list of every format someone selected, in the option order. */
+export function formatLabels(values: string[] | null | undefined, fallback?: string | null): string {
+  const list = (values ?? []).filter(isFormatValue);
+  if (!list.length) return fallback ? formatLabel(fallback) : "—";
+  return FORMAT_OPTIONS.filter((f) => list.includes(f.value)).map((f) => f.label).join(", ");
 }
 
 export function roleLabel(value: string | null | undefined) {
@@ -47,7 +64,7 @@ export type JoinWaitlistInput = {
   firstName?: string;
   lastName?: string;
   phone?: string;
-  formatPreference?: string;
+  formatPreferences?: unknown;
   interest?: string;
   notes?: string;
   source?: string;
@@ -78,7 +95,12 @@ export async function joinBookWaitlist(input: JoinWaitlistInput): Promise<JoinWa
     supabase.from("book_waitlist_requests").select("id,status").ilike("email", email).maybeSingle(),
   ]);
 
-  const format = FORMAT_OPTIONS.some((f) => f.value === input.formatPreference) ? input.formatPreference! : "any";
+  // Multi-select, de-duped and kept in option order. "Whichever comes first" wins outright.
+  const requested = Array.isArray(input.formatPreferences) ? input.formatPreferences.filter(isFormatValue) : [];
+  const unique = Array.from(new Set(requested));
+  const formats: FormatValue[] = unique.includes(FORMAT_ANY) || !unique.length
+    ? [FORMAT_ANY]
+    : FORMAT_OPTIONS.map((f) => f.value).filter((v) => unique.includes(v));
   const row = {
     email,
     first_name: (input.firstName ?? "").trim() || profile?.first_name || null,
@@ -88,7 +110,9 @@ export async function joinBookWaitlist(input: JoinWaitlistInput): Promise<JoinWa
     participant_id: participant?.id ?? null,
     account_type: profile ? ("registered" as const) : ("guest" as const),
     user_role: profile?.role ?? null,
-    format_preference: format,
+    format_preferences: formats,
+    // Legacy single column — first selection, so older reads still resolve to something real.
+    format_preference: formats[0],
     interest: (input.interest ?? "").trim().slice(0, 2000) || null,
     notes: (input.notes ?? "").trim().slice(0, 2000) || null,
     source: (input.source ?? "").trim().slice(0, 120) || "book_waitlist_page",
@@ -140,7 +164,7 @@ export async function getBookWaitlistStats(): Promise<BookWaitlistStats> {
   const supabase = createSupabaseAdminClient();
   const { data } = await supabase
     .from("book_waitlist_requests")
-    .select("account_type,user_role,format_preference,status,created_at")
+    .select("account_type,user_role,format_preference,format_preferences,status,created_at")
     .limit(5000);
   const rows = data ?? [];
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -150,6 +174,15 @@ export async function getBookWaitlistStats(): Promise<BookWaitlistStats> {
     const s = r.status as WaitlistStatus;
     if (s in byStatus) byStatus[s] += 1;
   }
+
+  // A multi-select counts once per chosen format, so these sum to more than `total`.
+  const tallyFormats = (selections: string[][]) => {
+    const counts = new Map<string, number>();
+    for (const sel of selections) {
+      for (const v of new Set(sel.filter(isFormatValue))) counts.set(v, (counts.get(v) ?? 0) + 1);
+    }
+    return FORMAT_OPTIONS.filter((f) => counts.has(f.value)).map((f) => ({ label: f.label, count: counts.get(f.value)! }));
+  };
 
   const tally = (values: (string | null)[]) => {
     const map = new Map<string, number>();
@@ -163,7 +196,7 @@ export async function getBookWaitlistStats(): Promise<BookWaitlistStats> {
     guests: rows.filter((r) => r.account_type !== "registered").length,
     last7: rows.filter((r) => new Date(r.created_at as string).getTime() >= weekAgo).length,
     byStatus,
-    byFormat: tally(rows.map((r) => formatLabel(r.format_preference as string))),
+    byFormat: tallyFormats(rows.map((r) => (r.format_preferences as string[]) ?? [])),
     byRole: tally(rows.map((r) => roleLabel(r.user_role as string) ?? "No account")),
   };
 }
