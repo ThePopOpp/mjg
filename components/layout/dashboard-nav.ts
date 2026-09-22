@@ -71,7 +71,12 @@ export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/plans", label: "Plans", icon: ClipboardList },
   { kind: "item", href: "/dashboard/workspace", label: "Workspace", icon: NotebookPen, permission: PERMISSIONS.MANAGE_WORKSPACE },
   { kind: "item", href: "/dashboard/bookings", label: "Bookings & Events", icon: CalendarClock },
-  { kind: "item", href: "/dashboard/experiences", label: "Experiences", icon: Sparkles, permission: PERMISSIONS.MANAGE_EXPERIENCES },
+  {
+    kind: "group", label: "Experiences", icon: Sparkles, items: [
+      { href: "/dashboard/experiences", label: "All Experiences", icon: Sparkles, permission: PERMISSIONS.MANAGE_EXPERIENCES },
+      { href: "/dashboard/experiences/automation", label: "Email Automation", icon: MailCheck, permission: PERMISSIONS.MANAGE_EXPERIENCES },
+    ],
+  },
   { kind: "item", href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
