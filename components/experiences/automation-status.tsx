@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  AlertTriangle, CalendarClock, CalendarDays, CheckCircle2, Clock,
-  Columns3, History, LayoutGrid, Mail, Table as TableIcon, Users,
-} from "lucide-react";
+import { AlertTriangle, CalendarDays, Columns3, LayoutGrid, Table as TableIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -100,42 +97,42 @@ export function AutomationStatusView({
             items={[
               {
                 key: "progress",
-                icon: CheckCircle2,
+                icon: "check",
                 label: "Progress",
                 value: `${status.totals.sentSteps} of ${status.totals.steps}`,
                 detail: "Emails sent",
               },
               {
                 key: "recipients",
-                icon: Users,
+                icon: "users",
                 label: "Recipients",
                 value: String(status.totals.recipients),
                 detail: "On every email",
               },
               {
                 key: "last-relative",
-                icon: Mail,
+                icon: "mail",
                 label: "Last sent",
                 value: status.lastSentAt ? relative(status.lastSentAt) : "—",
                 detail: status.lastSentAt ? "Most recent email" : "Nothing sent yet",
               },
               {
                 key: "next-relative",
-                icon: Clock,
+                icon: "clock",
                 label: "Next email",
                 value: status.nextSendAt ? relative(status.nextSendAt) : "All sent",
                 detail: status.nextStep?.templateName ?? "Sequence complete",
               },
               {
                 key: "next-datetime",
-                icon: CalendarClock,
+                icon: "calendar",
                 label: "Next email date & time",
                 value: status.nextSendAt ? fmt(status.nextSendAt) : "—",
                 detail: status.nextSendAt ? "Arizona time" : "Nothing scheduled",
               },
               {
                 key: "last-datetime",
-                icon: History,
+                icon: "history",
                 label: "Last email date & time",
                 value: status.lastSentAt ? fmt(status.lastSentAt) : "—",
                 detail: status.lastSentAt ? "Arizona time" : "Nothing sent yet",

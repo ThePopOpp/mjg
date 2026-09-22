@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import {
-  Activity, AlertTriangle, ArrowLeft, CalendarClock, CheckCircle2, Clock, History, Mail,
-  SkipForward, UserCheck, Users,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatCarousel } from "@/components/experiences/stat-carousel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -107,16 +104,16 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
       {/* One sliding row rather than two static grids — auto-advances, pauses on hover. */}
       <StatCarousel
         items={[
-          { key: "status", icon: Activity, label: "Status", value: experience.status, detail: "Experience state" },
-          { key: "facilitator", icon: UserCheck, label: "Facilitator", value: facilitatorName, detail: "Group leader" },
-          { key: "attendees", icon: Users, label: "Attendees", value: String(attendees.length), detail: "People in this group" },
-          { key: "scheduled-sends", icon: Mail, label: "Scheduled sends", value: String(sendEvents.length), detail: "Emails × recipients" },
-          { key: "next", icon: CalendarClock, label: "Next email date & time", value: nextSendLabel, detail: nextSendDetail },
-          { key: "last", icon: History, label: "Last email date & time", value: lastSentLabel, detail: lastSentDetail },
-          { key: "sent", icon: CheckCircle2, label: "Sent", value: String(counts.sent ?? 0), detail: "Individual sends" },
-          { key: "scheduled", icon: Clock, label: "Scheduled", value: String(counts.scheduled ?? 0), detail: "Still to go out" },
-          { key: "skipped", icon: SkipForward, label: "Skipped", value: String(counts.skipped ?? 0), detail: "Suppressed sends" },
-          { key: "failed", icon: AlertTriangle, label: "Failed", value: String(counts.failed ?? 0), detail: "Needs attention" },
+          { key: "status", icon: "activity", label: "Status", value: experience.status, detail: "Experience state" },
+          { key: "facilitator", icon: "user-check", label: "Facilitator", value: facilitatorName, detail: "Group leader" },
+          { key: "attendees", icon: "users", label: "Attendees", value: String(attendees.length), detail: "People in this group" },
+          { key: "scheduled-sends", icon: "mail", label: "Scheduled sends", value: String(sendEvents.length), detail: "Emails × recipients" },
+          { key: "next", icon: "calendar", label: "Next email date & time", value: nextSendLabel, detail: nextSendDetail },
+          { key: "last", icon: "history", label: "Last email date & time", value: lastSentLabel, detail: lastSentDetail },
+          { key: "sent", icon: "check", label: "Sent", value: String(counts.sent ?? 0), detail: "Individual sends" },
+          { key: "scheduled", icon: "clock", label: "Scheduled", value: String(counts.scheduled ?? 0), detail: "Still to go out" },
+          { key: "skipped", icon: "skip", label: "Skipped", value: String(counts.skipped ?? 0), detail: "Suppressed sends" },
+          { key: "failed", icon: "alert", label: "Failed", value: String(counts.failed ?? 0), detail: "Needs attention" },
         ]}
       />
 

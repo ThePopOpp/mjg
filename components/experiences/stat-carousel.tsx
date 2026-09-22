@@ -1,13 +1,39 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
+import {
+  Activity, AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, ChevronRight, Clock,
+  History, Mail, SkipForward, UserCheck, Users, type LucideIcon,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+/**
+ * Icons are named rather than passed as components.
+ *
+ * This is a client component, and a Server Component caller cannot hand a React component
+ * across the boundary — functions are not serializable, and doing so throws a server-side
+ * exception at render. A string key is serializable, so both server and client pages can use
+ * this the same way.
+ */
+const ICONS = {
+  activity: Activity,
+  alert: AlertTriangle,
+  calendar: CalendarClock,
+  check: CheckCircle2,
+  clock: Clock,
+  history: History,
+  mail: Mail,
+  skip: SkipForward,
+  "user-check": UserCheck,
+  users: Users,
+} satisfies Record<string, LucideIcon>;
+
+export type StatIconName = keyof typeof ICONS;
+
 export type StatItem = {
   key: string;
-  icon: LucideIcon;
+  icon: StatIconName;
   label: string;
   value: string;
   detail: string;
@@ -97,10 +123,7 @@ export function StatCarousel({ items }: { items: StatItem[] }) {
             className="w-[240px] shrink-0 snap-start sm:w-[260px]"
           >
             <CardContent className="p-4">
-              <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                <item.icon className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{item.label}</span>
-              </p>
+              <StatLabel icon={item.icon} label={item.label} />
               <p className="mt-1 truncate text-lg font-semibold" title={item.value}>{item.value}</p>
               <p className="truncate text-xs text-muted-foreground" title={item.detail}>{item.detail}</p>
             </CardContent>
@@ -112,6 +135,16 @@ export function StatCarousel({ items }: { items: StatItem[] }) {
       <NudgeButton side="left" disabled={atStart} onClick={() => step(-1)} />
       <NudgeButton side="right" disabled={atEnd && items.length < 2} onClick={() => step(1)} />
     </div>
+  );
+}
+
+function StatLabel({ icon, label }: { icon: StatIconName; label: string }) {
+  const Icon = ICONS[icon] ?? Activity;
+  return (
+    <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      <Icon className="h-3.5 w-3.5 shrink-0" />
+      <span className="truncate">{label}</span>
+    </p>
   );
 }
 
