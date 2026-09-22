@@ -25,6 +25,13 @@ export type AutomationStep = {
   /** Rolled up from the per-recipient events. */
   status: "sent" | "scheduled" | "failed" | "partial" | "none";
   date: string | null;
+  /**
+   * When a step went out in more than one batch. Recipients added after launch are caught up
+   * separately, so "the date this email went out" can be two or more different times — and
+   * showing only the latest misrepresents when the group actually received it.
+   */
+  firstSentAt: string | null;
+  waves: number;
   total: number;
   sent: number;
   failed: number;
@@ -131,7 +138,15 @@ export async function getAutomationStatus(experienceId: string): Promise<Automat
       : "scheduled";
 
     const sentAt = latest(group.map((e) => e.sent_at));
+    const firstSentAt = earliest(group.map((e) => e.sent_at));
     const schedAt = earliest(group.map((e) => e.scheduled_at));
+    // Count distinct send minutes: a single automated run stamps them together.
+    const waves = new Set(
+      group
+        .map((e) => e.sent_at)
+        .filter(Boolean)
+        .map((v: any) => Math.floor(new Date(v).getTime() / 60_000)),
+    ).size;
 
     return {
       stepNumber: s.step_number,
@@ -140,6 +155,8 @@ export async function getAutomationStatus(experienceId: string): Promise<Automat
       subject: s.email_templates?.subject ?? null,
       status,
       date: sentAt ?? schedAt,
+      firstSentAt,
+      waves,
       total: group.length,
       sent,
       failed,

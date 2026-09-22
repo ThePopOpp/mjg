@@ -46,6 +46,25 @@ export function azDayKey(iso: string) {
   }).format(new Date(iso));
 }
 
+/**
+ * What to show as "the date" for a step.
+ *
+ * A step sent in more than one batch (late-added recipients get caught up separately) has no
+ * single date — lead with the first send and say how many batches, rather than silently
+ * showing the last one as if everyone received it then.
+ */
+export function SendDate({ step }: { step: AutomationStep }) {
+  const primary = step.waves > 1 ? step.firstSentAt : step.date;
+  return (
+    <>
+      <span className="whitespace-nowrap">{fmt(primary)}</span>
+      <span className="block text-xs text-muted-foreground">
+        {step.waves > 1 ? `+${step.waves - 1} later batch${step.waves > 2 ? "es" : ""} · last ${fmt(step.date)}` : relative(step.date)}
+      </span>
+    </>
+  );
+}
+
 export function StatusBadge({ step }: { step: AutomationStep }) {
   if (step.status === "sent") return <Badge className="bg-[#b88a4a] text-white hover:bg-[#b88a4a]">Sent</Badge>;
   if (step.status === "partial") {
@@ -81,10 +100,7 @@ export function ScheduleTable({ steps }: { steps: AutomationStep[] }) {
                 {s.errors.length ? <p className="mt-1 text-xs text-destructive">{s.errors.join(" · ")}</p> : null}
               </TableCell>
               <TableCell><StatusBadge step={s} /></TableCell>
-              <TableCell className="whitespace-nowrap text-sm">
-                {fmt(s.date)}
-                <span className="block text-xs text-muted-foreground">{relative(s.date)}</span>
-              </TableCell>
+              <TableCell className="text-sm"><SendDate step={s} /></TableCell>
               <TableCell className="text-right text-sm tabular-nums">
                 {s.status === "sent" || s.status === "partial" ? `${s.sent}/${s.total}` : s.total}
               </TableCell>
@@ -117,9 +133,10 @@ export function CardsView({ steps }: { steps: AutomationStep[] }) {
           <p className="font-medium leading-snug">{s.templateName ?? "(no template)"}</p>
           {s.subject ? <p className="line-clamp-2 text-xs text-muted-foreground">{s.subject}</p> : null}
           <div className="mt-auto space-y-0.5 border-t pt-2 text-xs">
-            <p className="font-medium">{fmt(s.date)}</p>
+            <p className="font-medium">{fmt(s.waves > 1 ? s.firstSentAt : s.date)}</p>
             <p className="text-muted-foreground">
-              {relative(s.date)} · {s.status === "sent" || s.status === "partial" ? `${s.sent}/${s.total}` : s.total}{" "}
+              {s.waves > 1 ? `sent in ${s.waves} batches` : relative(s.date)} ·{" "}
+              {s.status === "sent" || s.status === "partial" ? `${s.sent}/${s.total}` : s.total}{" "}
               recipient{s.total === 1 ? "" : "s"}
             </p>
             {s.errors.length ? <p className="text-destructive">{s.errors.join(" · ")}</p> : null}
@@ -162,7 +179,10 @@ export function KanbanView({ steps }: { steps: AutomationStep[] }) {
                   <span className="text-xs text-muted-foreground">{relative(s.date)}</span>
                 </div>
                 <p className="mt-1 text-sm font-medium leading-snug">{s.templateName ?? "(no template)"}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{fmt(s.date)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{fmt(s.waves > 1 ? s.firstSentAt : s.date)}</p>
+                {s.waves > 1 ? (
+                  <p className="text-xs text-muted-foreground">sent in {s.waves} batches</p>
+                ) : null}
                 {s.status === "partial" ? (
                   <p className="mt-1 text-xs text-destructive">Only {s.sent} of {s.total} recipients</p>
                 ) : null}
