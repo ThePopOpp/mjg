@@ -1,42 +1,30 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, Clock, Mail, Users } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import {
+  AlertTriangle, CalendarClock, CalendarDays, CheckCircle2, Clock,
+  Columns3, History, LayoutGrid, Mail, Table as TableIcon, Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { AutomationStatus, AutomationStep, GroupOption } from "@/lib/experiences/automation";
+import { StatCarousel } from "@/components/experiences/stat-carousel";
+import {
+  CalendarView, CardsView, KanbanView, ScheduleTable, fmt, relative,
+} from "@/components/experiences/automation-views";
+import type { AutomationStatus, GroupOption } from "@/lib/experiences/automation";
 import { cn } from "@/lib/utils";
 
-// Experiences are anchored to Arizona time (the 6-Week Challenge copy says so), and Arizona
-// has no DST — so render every date in that zone and label it, rather than in the viewer's
-// local time where "8:00 AM" could mean something else.
-const TZ = "America/Phoenix";
+type View = "table" | "cards" | "kanban" | "calendar";
 
-function fmt(iso: string | null) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleString("en-US", {
-    timeZone: TZ,
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function relative(iso: string | null) {
-  if (!iso) return "";
-  const diff = new Date(iso).getTime() - Date.now();
-  const days = Math.round(Math.abs(diff) / 86_400_000);
-  const hours = Math.round(Math.abs(diff) / 3_600_000);
-  const amount = days >= 1 ? `${days} day${days === 1 ? "" : "s"}` : `${hours} hour${hours === 1 ? "" : "s"}`;
-  return diff >= 0 ? `in ${amount}` : `${amount} ago`;
-}
+const VIEWS: { key: View; label: string; icon: typeof TableIcon }[] = [
+  { key: "table", label: "Table", icon: TableIcon },
+  { key: "cards", label: "Cards", icon: LayoutGrid },
+  { key: "kanban", label: "Kanban", icon: Columns3 },
+  { key: "calendar", label: "Calendar", icon: CalendarDays },
+];
 
 export function AutomationStatusView({
   groups,
@@ -46,6 +34,7 @@ export function AutomationStatusView({
   status: AutomationStatus | null;
 }) {
   const router = useRouter();
+  const [view, setView] = useState<View>("table");
 
   return (
     <div className="space-y-6">
@@ -107,27 +96,52 @@ export function AutomationStatusView({
             </Card>
           ) : null}
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <Stat
-              icon={CheckCircle2}
-              label="Progress"
-              value={`${status.totals.sentSteps} of ${status.totals.steps}`}
-              detail="Emails sent"
-            />
-            <Stat icon={Users} label="Recipients" value={String(status.totals.recipients)} detail="On every email" />
-            <Stat
-              icon={Mail}
-              label="Last sent"
-              value={status.lastSentAt ? relative(status.lastSentAt) : "—"}
-              detail={fmt(status.lastSentAt)}
-            />
-            <Stat
-              icon={Clock}
-              label="Next email"
-              value={status.nextSendAt ? relative(status.nextSendAt) : "All sent"}
-              detail={status.nextStep?.templateName ?? fmt(status.nextSendAt)}
-            />
-          </div>
+          <StatCarousel
+            items={[
+              {
+                key: "progress",
+                icon: CheckCircle2,
+                label: "Progress",
+                value: `${status.totals.sentSteps} of ${status.totals.steps}`,
+                detail: "Emails sent",
+              },
+              {
+                key: "recipients",
+                icon: Users,
+                label: "Recipients",
+                value: String(status.totals.recipients),
+                detail: "On every email",
+              },
+              {
+                key: "last-relative",
+                icon: Mail,
+                label: "Last sent",
+                value: status.lastSentAt ? relative(status.lastSentAt) : "—",
+                detail: status.lastSentAt ? "Most recent email" : "Nothing sent yet",
+              },
+              {
+                key: "next-relative",
+                icon: Clock,
+                label: "Next email",
+                value: status.nextSendAt ? relative(status.nextSendAt) : "All sent",
+                detail: status.nextStep?.templateName ?? "Sequence complete",
+              },
+              {
+                key: "next-datetime",
+                icon: CalendarClock,
+                label: "Next email date & time",
+                value: status.nextSendAt ? fmt(status.nextSendAt) : "—",
+                detail: status.nextSendAt ? "Arizona time" : "Nothing scheduled",
+              },
+              {
+                key: "last-datetime",
+                icon: History,
+                label: "Last email date & time",
+                value: status.lastSentAt ? fmt(status.lastSentAt) : "—",
+                detail: status.lastSentAt ? "Arizona time" : "Nothing sent yet",
+              },
+            ]}
+          />
 
           {/* Progress bar across the sequence */}
           <Card>
@@ -157,89 +171,47 @@ export function AutomationStatusView({
           </Card>
 
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Email schedule</CardTitle>
-              <p className="text-sm text-muted-foreground">All times Arizona ({TZ.split("/")[1].replace("_", " ")}).</p>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">#</TableHead>
-                      <TableHead>Email template</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead className="text-right">Recipients</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {status.steps.map((s) => (
-                      <TableRow key={s.stepNumber} className={s.status === "failed" ? "bg-destructive/5" : undefined}>
-                        <TableCell className="text-muted-foreground">{s.stepNumber}</TableCell>
-                        <TableCell>
-                          <p className="font-medium">{s.templateName ?? "(no template)"}</p>
-                          {s.subject ? <p className="max-w-md truncate text-xs text-muted-foreground">{s.subject}</p> : null}
-                          {s.errors.length ? (
-                            <p className="mt-1 text-xs text-destructive">{s.errors.join(" · ")}</p>
-                          ) : null}
-                        </TableCell>
-                        <TableCell><StatusBadge step={s} /></TableCell>
-                        <TableCell className="whitespace-nowrap text-sm">
-                          {fmt(s.date)}
-                          <span className="block text-xs text-muted-foreground">{relative(s.date)}</span>
-                        </TableCell>
-                        <TableCell className="text-right text-sm tabular-nums">
-                          {s.status === "sent" || s.status === "partial" ? `${s.sent}/${s.total}` : s.total}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {!status.steps.length ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="py-10 text-center text-sm text-muted-foreground">
-                          This group has no email sequence configured.
-                        </TableCell>
-                      </TableRow>
-                    ) : null}
-                  </TableBody>
-                </Table>
+            <CardHeader className="flex-col items-stretch gap-3 space-y-0 pb-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle className="text-base">Email schedule</CardTitle>
+                <p className="text-sm text-muted-foreground">All times Arizona (Phoenix).</p>
               </div>
+              <div className="inline-flex shrink-0 rounded-md border bg-card p-0.5">
+                {VIEWS.map((v) => (
+                  <button
+                    key={v.key}
+                    type="button"
+                    onClick={() => setView(v.key)}
+                    aria-pressed={view === v.key}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium transition-colors",
+                      view === v.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <v.icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{v.label}</span>
+                  </button>
+                ))}
+              </div>
+            </CardHeader>
+            <CardContent className={view === "table" ? "p-0" : "pt-0"}>
+              {!status.steps.length ? (
+                <p className="py-10 text-center text-sm text-muted-foreground">
+                  This group has no email sequence configured.
+                </p>
+              ) : view === "table" ? (
+                <ScheduleTable steps={status.steps} />
+              ) : view === "cards" ? (
+                <CardsView steps={status.steps} />
+              ) : view === "kanban" ? (
+                <KanbanView steps={status.steps} />
+              ) : (
+                <CalendarView steps={status.steps} nextSendAt={status.nextSendAt} />
+              )}
             </CardContent>
           </Card>
         </>
       )}
     </div>
-  );
-}
-
-function StatusBadge({ step }: { step: AutomationStep }) {
-  if (step.status === "sent") return <Badge className="bg-[#b88a4a] text-white hover:bg-[#b88a4a]">Sent</Badge>;
-  if (step.status === "partial") return <Badge variant="outline" className="border-[#b88a4a]">Partial {step.sent}/{step.total}</Badge>;
-  if (step.status === "failed") return <Badge variant="destructive">Failed</Badge>;
-  if (step.status === "none") return <Badge variant="outline" className="text-muted-foreground">Not queued</Badge>;
-  return <Badge variant="secondary">Scheduled</Badge>;
-}
-
-function Stat({
-  icon: Icon,
-  label,
-  value,
-  detail,
-}: {
-  icon: typeof Mail;
-  label: string;
-  value: string;
-  detail: string;
-}) {
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          <Icon className="h-3.5 w-3.5" /> {label}
-        </p>
-        <p className="mt-1 text-xl font-semibold">{value}</p>
-        <p className="truncate text-xs text-muted-foreground">{detail}</p>
-      </CardContent>
-    </Card>
   );
 }
