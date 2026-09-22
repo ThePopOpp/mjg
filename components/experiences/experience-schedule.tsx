@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarClock, Send, Save } from "lucide-react";
+import {
+  CalendarClock, CalendarDays, Columns3, LayoutGrid, Send, Save, Table as TableIcon,
+} from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { CalendarView, CardsView, KanbanView } from "@/components/experiences/automation-views";
+import type { AutomationStep } from "@/lib/experiences/automation";
+import { cn } from "@/lib/utils";
 
 export type ScheduleRow = {
   id: string;
@@ -33,6 +38,62 @@ function splitLocal(iso: string | null): { date: string; time: string } {
   return { date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:${pad(d.getMinutes())}` };
 }
 
+type View = "table" | "cards" | "kanban" | "calendar";
+
+const VIEWS: { key: View; label: string; icon: typeof TableIcon }[] = [
+  { key: "table", label: "Table", icon: TableIcon },
+  { key: "cards", label: "Cards", icon: LayoutGrid },
+  { key: "kanban", label: "Kanban", icon: Columns3 },
+  { key: "calendar", label: "Calendar", icon: CalendarDays },
+];
+
+const timeOf = (v: string | null) => (v ? new Date(v).getTime() : NaN);
+function pickTime(values: (string | null)[], choose: (a: number, b: number) => number) {
+  const times = values.map(timeOf).filter((n) => Number.isFinite(n));
+  if (!times.length) return null;
+  return new Date(times.reduce((a, b) => choose(a, b))).toISOString();
+}
+
+/**
+ * Roll the per-recipient rows up to one entry per email.
+ *
+ * The table stays per-recipient because that is the level the Reschedule / Send-now actions
+ * work at. Cards, Kanban and Calendar would be unreadable at 120 entries, so they summarise
+ * by step and carry the recipient counts instead.
+ */
+function rollUpToSteps(rows: ScheduleRow[]): AutomationStep[] {
+  const byStep = new Map<number, ScheduleRow[]>();
+  for (const r of rows) byStep.set(r.step_number, [...(byStep.get(r.step_number) ?? []), r]);
+
+  return [...byStep.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([stepNumber, group]) => {
+      const sent = group.filter((r) => r.status === "sent").length;
+      const failed = group.filter((r) => r.status !== "sent" && r.status !== "scheduled").length;
+      const sentAt = pickTime(group.map((r) => r.sent_at), Math.max);
+      const firstSentAt = pickTime(group.map((r) => r.sent_at), Math.min);
+      const schedAt = pickTime(group.map((r) => r.scheduled_at), Math.min);
+      const waves = new Set(
+        group.map((r) => r.sent_at).filter(Boolean).map((v) => Math.floor(new Date(v as string).getTime() / 60_000)),
+      ).size;
+
+      return {
+        stepNumber,
+        templateName: group[0]?.label ?? `Step ${stepNumber}`,
+        templateSlug: null,
+        subject: null,
+        status: !group.length ? "none" : failed && !sent ? "failed" : sent && sent < group.length ? "partial" : sent === group.length ? "sent" : "scheduled",
+        date: sentAt ?? schedAt,
+        firstSentAt,
+        waves,
+        total: group.length,
+        sent,
+        failed,
+        errors: Array.from(new Set(group.map((r) => r.error_message).filter(Boolean))).slice(0, 3) as string[],
+      } satisfies AutomationStep;
+    });
+}
+
 export function ExperienceSchedule({ experienceId, rows }: { experienceId: string; rows: ScheduleRow[] }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
@@ -42,6 +103,13 @@ export function ExperienceSchedule({ experienceId, rows }: { experienceId: strin
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmSend, setConfirmSend] = useState<ScheduleRow | null>(null);
+  const [view, setView] = useState<View>("table");
+
+  const steps = useMemo(() => rollUpToSteps(rows), [rows]);
+  const nextSendAt = useMemo(
+    () => pickTime(rows.filter((r) => r.status === "scheduled").map((r) => r.scheduled_at), Math.min),
+    [rows],
+  );
 
   function openEdit(row: ScheduleRow) {
     const { date: d, time: t } = splitLocal(row.scheduled_at);
@@ -94,6 +162,36 @@ export function ExperienceSchedule({ experienceId, rows }: { experienceId: strin
 
   return (
     <>
+      <div className="flex justify-end px-4 pb-3">
+        <div className="inline-flex rounded-md border bg-card p-0.5">
+          {VIEWS.map((v) => (
+            <button
+              key={v.key}
+              type="button"
+              onClick={() => setView(v.key)}
+              aria-pressed={view === v.key}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium transition-colors",
+                view === v.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <v.icon className="h-4 w-4" />
+              <span className="hidden sm:inline">{v.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {view !== "table" ? (
+        <div className="px-4 pb-4">
+          {view === "cards" ? <CardsView steps={steps} /> : null}
+          {view === "kanban" ? <KanbanView steps={steps} /> : null}
+          {view === "calendar" ? <CalendarView steps={steps} nextSendAt={nextSendAt} /> : null}
+          <p className="mt-3 text-xs text-muted-foreground">
+            Summarised by email. Switch to Table to reschedule or send an individual message.
+          </p>
+        </div>
+      ) : (
       <Table>
         <TableHeader>
           <TableRow>
@@ -137,6 +235,7 @@ export function ExperienceSchedule({ experienceId, rows }: { experienceId: strin
           {!rows.length ? <TableRow><TableCell colSpan={7}>Nothing scheduled yet.</TableCell></TableRow> : null}
         </TableBody>
       </Table>
+      )}
       {error ? <p className="px-4 py-2 text-sm text-destructive">{error}</p> : null}
 
       {/* Reschedule dialog */}

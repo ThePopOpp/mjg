@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import {
+  Activity, AlertTriangle, ArrowLeft, CalendarClock, CheckCircle2, Clock, History, Mail,
+  SkipForward, UserCheck, Users,
+} from "lucide-react";
 import { SectionHeader } from "@/components/dashboard/section-header";
-import { StatCardRow } from "@/components/dashboard/stat-card-row";
+import { StatCarousel } from "@/components/experiences/stat-carousel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getCurrentProfile } from "@/lib/auth/server";
@@ -45,6 +48,23 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
     {} as Record<string, number>,
   );
 
+  // Next / last send for the stat row. Compared by time value, never lexicographically —
+  // these arrive as ISO strings but sorting them as text is a trap worth avoiding outright.
+  const pickTime = (values: (string | null)[], choose: (a: number, b: number) => number) => {
+    const times = values.map((v) => (v ? new Date(v).getTime() : NaN)).filter((n) => Number.isFinite(n));
+    return times.length ? new Date(times.reduce((a, b) => choose(a, b))) : null;
+  };
+  // Experiences are anchored to Arizona time, which has no DST.
+  const azTime = (d: Date | null) =>
+    d ? d.toLocaleString("en-US", { timeZone: "America/Phoenix", weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "—";
+
+  const nextSend = pickTime(sendEvents.filter((e: any) => e.status === "scheduled").map((e: any) => e.scheduled_at), Math.min);
+  const lastSent = pickTime(sendEvents.map((e: any) => e.sent_at), Math.max);
+  const nextSendLabel = azTime(nextSend);
+  const nextSendDetail = nextSend ? "Arizona time" : "Nothing scheduled";
+  const lastSentLabel = azTime(lastSent);
+  const lastSentDetail = lastSent ? "Arizona time" : "Nothing sent yet";
+
   // Attendee lookup for the schedule table.
   const attendeeById = new Map<string, any>(attendees.map((a: any) => [a.id, a]));
 
@@ -84,19 +104,21 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
         description={`${cadenceLabel(experience)} · ${experience.duration_weeks} steps · starts ${new Date(`${experience.start_date}T00:00:00Z`).toLocaleDateString([], { timeZone: "UTC", dateStyle: "medium" })} ${(experience.start_time ?? "").slice(0, 5)}`}
       />
 
-      <StatCardRow className="grid gap-4 md:grid-cols-4">
-        <Stat label="Status" value={experience.status} />
-        <Stat label="Facilitator" value={facilitatorName} />
-        <Stat label="Attendees" value={String(attendees.length)} />
-        <Stat label="Scheduled sends" value={String(sendEvents.length)} />
-      </StatCardRow>
-
-      <StatCardRow className="grid gap-4 md:grid-cols-4">
-        <Stat label="Sent" value={String(counts.sent ?? 0)} />
-        <Stat label="Scheduled" value={String(counts.scheduled ?? 0)} />
-        <Stat label="Skipped" value={String(counts.skipped ?? 0)} />
-        <Stat label="Failed" value={String(counts.failed ?? 0)} />
-      </StatCardRow>
+      {/* One sliding row rather than two static grids — auto-advances, pauses on hover. */}
+      <StatCarousel
+        items={[
+          { key: "status", icon: Activity, label: "Status", value: experience.status, detail: "Experience state" },
+          { key: "facilitator", icon: UserCheck, label: "Facilitator", value: facilitatorName, detail: "Group leader" },
+          { key: "attendees", icon: Users, label: "Attendees", value: String(attendees.length), detail: "People in this group" },
+          { key: "scheduled-sends", icon: Mail, label: "Scheduled sends", value: String(sendEvents.length), detail: "Emails × recipients" },
+          { key: "next", icon: CalendarClock, label: "Next email date & time", value: nextSendLabel, detail: nextSendDetail },
+          { key: "last", icon: History, label: "Last email date & time", value: lastSentLabel, detail: lastSentDetail },
+          { key: "sent", icon: CheckCircle2, label: "Sent", value: String(counts.sent ?? 0), detail: "Individual sends" },
+          { key: "scheduled", icon: Clock, label: "Scheduled", value: String(counts.scheduled ?? 0), detail: "Still to go out" },
+          { key: "skipped", icon: SkipForward, label: "Skipped", value: String(counts.skipped ?? 0), detail: "Suppressed sends" },
+          { key: "failed", icon: AlertTriangle, label: "Failed", value: String(counts.failed ?? 0), detail: "Needs attention" },
+        ]}
+      />
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
@@ -158,13 +180,3 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="mt-1 text-lg font-semibold capitalize">{value}</p>
-      </CardContent>
-    </Card>
-  );
-}
