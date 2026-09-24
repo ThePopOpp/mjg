@@ -100,15 +100,21 @@ export function SiteHero({
 
   return (
     <section className={`${SITE_CONTENT_BOX} py-12 md:py-16`}>
-      <div className={centered ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
+      {/* max-w-5xl rather than 3xl: a 3xl (768px) box forced a headline such as
+          "Created for More Check-In" to wrap on desktop. The supporting copy keeps
+          its own max-w-2xl below, so reading measure is unchanged. */}
+      <div className={centered ? "mx-auto max-w-5xl text-center" : "max-w-5xl"}>
         {eyebrow ? (
           <span className="inline-flex items-center gap-2 rounded-full border border-[#b88a4a]/40 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#b88a4a]">
             <span aria-hidden>✦</span> {eyebrow}
           </span>
         ) : null}
-        <h1 className="mt-6 font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+        <h1 className="mt-6 text-balance font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
           {lead ? `${lead} ` : ""}
-          <em className="not-italic text-[#b88a4a]">{last}</em>
+          {/* whitespace-nowrap keeps a hyphenated accent word whole — without it a
+              browser happily breaks "Check-In" after the hyphen. It only ever wraps
+              a single word, so it cannot cause a long line to overflow. */}
+          <em className="whitespace-nowrap not-italic text-[#b88a4a]">{last}</em>
         </h1>
         {description ? (
           <p className={`mt-5 text-lg leading-8 text-muted-foreground ${centered ? "mx-auto max-w-2xl" : "max-w-2xl"}`}>

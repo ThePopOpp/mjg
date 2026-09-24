@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FieldSelect } from "@/components/ui/field-select";
 import { cn } from "@/lib/utils";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { useFabVisible } from "@/components/layout/fab-visibility";
 import { AgentChat } from "@/components/ai-agent/agent-chat";
 import { DmInbox } from "@/components/direct-messages/dm-inbox";
 import { useDmUnread } from "@/components/direct-messages/dm-unread";
@@ -41,6 +42,23 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
   const [agentOpen, setAgentOpen] = React.useState(false);
   const [detailId, setDetailId] = React.useState<string | null>(null);
   const { unread: dmUnread } = useDmUnread();
+
+  // Show/hide preference (Settings toggle, or the x on hover). `justHidden`
+  // drives the one-off Undo prompt so hiding it is never a one-way door.
+  const { visible, setVisible } = useFabVisible();
+  const [justHidden, setJustHidden] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!justHidden) return;
+    const timer = window.setTimeout(() => setJustHidden(false), 10000);
+    return () => window.clearTimeout(timer);
+  }, [justHidden]);
+
+  function hideFab() {
+    setOpen(false);
+    setVisible(false);
+    setJustHidden(true);
+  }
 
   function openMessages() {
     setTab("dm");
@@ -116,14 +134,43 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
   const pageName = pageTitle(pathname);
   const agentContext = `You are helping review the dashboard page at "${pathname}" ("${pageName}"). Answer with real data via your tools and only DRAFT changes — never publish or make destructive edits.`;
 
+  // Preference not read yet — render nothing rather than guess.
+  if (visible === null) return null;
+
+  // Hidden: the only thing left is a short-lived way back, so dismissing the
+  // button never strands anyone. After that, Settings is the way to restore it.
+  if (!visible) {
+    if (!justHidden) return null;
+    return (
+      <div data-fab-ignore role="status"
+        className="fixed bottom-5 right-5 z-[100] hidden items-center gap-3 rounded-full border border-border bg-card px-4 py-2 text-xs shadow-xl md:flex print:hidden">
+        <span className="text-muted-foreground">Quick actions hidden — bring it back in Settings.</span>
+        <button onClick={() => { setVisible(true); setJustHidden(false); }} className="font-semibold text-primary hover:underline">Undo</button>
+        <button onClick={() => setJustHidden(false)} aria-label="Dismiss" className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Launcher — the numeric badge reflects unread Direct Messages */}
-      <button data-fab-ignore onClick={() => setOpen((o) => !o)} aria-label="Review & messages"
-        className="fixed bottom-5 right-5 z-[100] hidden h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition hover:scale-105 md:flex print:hidden">
-        {open ? <X className="h-5 w-5" /> : <MessageSquarePlus className="h-5 w-5" />}
-        {!open && dmUnread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{dmUnread > 99 ? "99+" : dmUnread}</span>}
-      </button>
+      {/* Launcher — the numeric badge reflects unread Direct Messages. The wrapper
+          exists so the hide control can be a sibling button rather than nested
+          inside the launcher, which is invalid markup. */}
+      <div data-fab-ignore className="group fixed bottom-5 right-5 z-[100] hidden md:block print:hidden">
+        <button onClick={() => setOpen((o) => !o)} aria-label="Review & messages"
+          className="relative flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition hover:scale-105">
+          {open ? <X className="h-5 w-5" /> : <MessageSquarePlus className="h-5 w-5" />}
+          {!open && dmUnread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{dmUnread > 99 ? "99+" : dmUnread}</span>}
+        </button>
+        {/* Sits top-LEFT so it never covers the unread badge. Revealed on hover
+            and on keyboard focus, so it is reachable without a mouse. */}
+        {!open && (
+          <button onClick={hideFab} aria-label="Hide the quick actions button" title="Hide this button"
+            className="pointer-events-none absolute -left-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-card text-muted-foreground opacity-0 shadow transition hover:text-destructive focus:pointer-events-auto focus:opacity-100 focus-visible:ring-2 focus-visible:ring-ring group-hover:pointer-events-auto group-hover:opacity-100">
+            <X className="h-3 w-3" />
+          </button>
+        )}
+      </div>
 
       {open && expanded && <div data-fab-ignore className="fixed inset-0 z-[99] bg-background/70 backdrop-blur-sm print:hidden" onClick={() => setExpanded(false)} />}
 

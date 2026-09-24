@@ -7,7 +7,9 @@
 
 import * as React from "react";
 import { Bot, Globe, ImageIcon, LayoutDashboard, Link2, PanelsTopLeft, Settings, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useFabVisible } from "@/components/layout/fab-visibility";
 import { AgentChat } from "@/components/ai-agent/agent-chat";
 import { GlobalsManager } from "./globals-manager";
 import { MediaManager } from "./media-manager";
@@ -43,6 +45,9 @@ export function WebsiteWorkspace({
 }) {
   const [view, setView] = React.useState<View>("overview");
   const [stewardOpen, setStewardOpen] = React.useState(false);
+  // The quick-actions FAB owns the bottom-right corner on md+ screens. Step aside
+  // when it is there, and reclaim the corner when it is hidden.
+  const { visible: fabVisible } = useFabVisible();
   const [newPageSignal, setNewPageSignal] = React.useState(0);
 
   return (
@@ -89,7 +94,11 @@ export function WebsiteWorkspace({
       {!stewardOpen ? (
         <button
           onClick={() => setStewardOpen(true)}
-          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 rounded-full bg-[#b88a4a] px-4 py-3 text-sm font-semibold text-white shadow-lg transition-opacity hover:opacity-90"
+          className={cn(
+            "fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 rounded-full bg-[#b88a4a] px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90",
+            // The FAB is a 48px circle inset 20px, and is hidden below md.
+            fabVisible && "md:right-[5.5rem]",
+          )}
         >
           <Bot className="h-4 w-4" /> Ask Steward
         </button>

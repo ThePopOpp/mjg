@@ -2,6 +2,8 @@ import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmailTestForm } from "@/components/settings/email-test-form";
 import { DmSettingsCard } from "@/components/direct-messages/dm-settings-card";
+import { FabSettingsCard } from "@/components/settings/fab-settings-card";
+import { ROLES } from "@/lib/rbac/roles";
 import { getCurrentProfile } from "@/lib/auth/server";
 
 export default async function SettingsPage() {
@@ -12,6 +14,10 @@ export default async function SettingsPage() {
       <SectionHeader title="Settings" description="Manage dashboard preferences, Supabase-backed configuration, and admin defaults." />
 
       <DmSettingsCard />
+
+      {/* The quick-actions button only renders for Super Admins, so the toggle
+          for it only appears for them too. */}
+      {profile?.role === ROLES.SUPER_ADMIN ? <FabSettingsCard /> : null}
 
       <div className="grid gap-4 xl:grid-cols-[1fr_0.85fr]">
         <Card>
