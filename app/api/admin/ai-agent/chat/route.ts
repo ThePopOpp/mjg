@@ -3,6 +3,8 @@ import { requireAdminManager } from "@/lib/user-management/auth";
 import { runAgent, buildSystemPrompt, type ChatMessage, type AgentDecision } from "@/lib/ai-agent/agent";
 import { getAgentMemories } from "@/lib/ai-agent/memory";
 import { renderTrainingDocsForPrompt } from "@/lib/ai-agent/training-docs/data";
+import { renderWebsiteContextForPrompt } from "@/lib/website/brand";
+import { renderComponentsForPrompt, renderSiteMapForPrompt } from "@/lib/website/steward-tools";
 
 export const maxDuration = 60;
 
@@ -18,8 +20,16 @@ export async function POST(request: Request) {
     // the training-docs index), replacing any stale system message the client
     // echoed back. The index is titles/summaries only — bodies come from the
     // search_training_docs / read_training_doc tools on demand.
-    const [memories, trainingDocsIndex] = await Promise.all([getAgentMemories(), renderTrainingDocsForPrompt()]);
-    const systemContent = buildSystemPrompt(memories, trainingDocsIndex);
+    // The Frontend Editor context is retrieval, not a dump (spec §30): the rules,
+    // the brand voice, a one-line-per-page site map and the approved component
+    // schemas. Page CONTENT is only ever read through the website_* tools.
+    const [memories, trainingDocsIndex, siteMap] = await Promise.all([
+      getAgentMemories(),
+      renderTrainingDocsForPrompt(),
+      renderSiteMapForPrompt(),
+    ]);
+    const websiteContext = renderWebsiteContextForPrompt(siteMap, renderComponentsForPrompt());
+    const systemContent = buildSystemPrompt(memories, trainingDocsIndex, websiteContext);
     const conversation = incoming.filter((m) => m.role !== "system");
     const messages: ChatMessage[] = [{ role: "system", content: systemContent }, ...conversation];
 

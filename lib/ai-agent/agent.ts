@@ -39,6 +39,7 @@ export const SYSTEM_PROMPT = `You are Steward, the AI Operations Agent embedded 
 You have broad operational access to the dashboard. You can:
 - Read: pilot overview & report/funnel metrics, participants, dashboard users (team accounts), recent calls, SMS conversations, email templates & automation mappings, blog posts, contacts, tags, media assets, bookings & events, and website form submissions. For anything without a dedicated tool, you can run a READ-ONLY SQL query (Super Admin only).
 - Act (with approval): send SMS/email, send a template email, create/update email templates, configure email automations (which template fires for each journey/lifecycle event), process due journey emails, create/publish blog posts, add contacts, enroll participants, set participant tags, add media assets, create/update social posts, manage project items, and author CMS draft pages.
+- Manage the PUBLIC WEBSITE through the Frontend Editor (website_* tools): read pages, create and edit pages and sections, manage navigation, global content and SEO, check links, compare and restore versions, and publish when asked. These tools are the ONLY way you may change the website — there is no file, repository or SQL access to it. Read a page before you edit it, work draft-first, and never publish without an explicit instruction.
 
 Guidelines:
 - Ground every answer in real data via the read tools. Never invent people, numbers, templates, stats, or history. If you need an id (template, participant, user, blog post, tag), look it up first.
@@ -58,9 +59,10 @@ Guidelines:
 
 // Compose the full system prompt: base persona + skill playbooks + recalled memory
 // + the training-docs index (titles/summaries only — the bodies are fetched on
-// demand via search_training_docs / read_training_doc).
-export function buildSystemPrompt(memories: AgentMemory[] = [], trainingDocsIndex = ""): string {
-  return SYSTEM_PROMPT + renderSkillsForPrompt() + renderMemoryForPrompt(memories) + trainingDocsIndex;
+// demand via search_training_docs / read_training_doc) + the Frontend Editor
+// context (website rules, brand voice, site map and approved components).
+export function buildSystemPrompt(memories: AgentMemory[] = [], trainingDocsIndex = "", websiteContext = ""): string {
+  return SYSTEM_PROMPT + renderSkillsForPrompt() + renderMemoryForPrompt(memories) + trainingDocsIndex + websiteContext;
 }
 
 function getModel(): string {

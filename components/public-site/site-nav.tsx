@@ -16,9 +16,11 @@ const GOLD = "#b88a4a";
  * Desktop: Home · About · Mission · Resources▾ · Contact · Account▾ · theme toggle.
  * "Join the Journey" is mobile-only. Mobile is a full-page menu.
  */
-export function SiteNav({ siteUrl }: { siteUrl: string }) {
+export function SiteNav({ siteUrl, items: itemsOverride }: { siteUrl: string; items?: NavItem[] }) {
   // "" for the app origin → app pages become relative paths so Next can soft-navigate.
-  const items = publicNavItems(siteUrl, "");
+  // The Frontend Editor passes `items` so CMS-owned pages follow the navigation
+  // Mike manages in the dashboard; every other page keeps the code-owned nav.
+  const items = itemsOverride?.length ? itemsOverride : publicNavItems(siteUrl, "");
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);

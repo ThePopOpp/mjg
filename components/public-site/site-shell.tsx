@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteNav } from "@/components/public-site/site-nav";
+import type { NavItem } from "@/lib/public-site/nav-items";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
 
 /**
@@ -13,15 +14,22 @@ import { publicSiteUrl } from "@/lib/public-site/static-pages";
 export function SiteShell({
   children,
   contentClassName = "mx-auto w-full max-w-[1160px] px-8",
+  navItems,
+  footerLinks,
+  footerNote,
 }: {
   children: React.ReactNode;
   contentClassName?: string;
+  /** Frontend-Editor-managed navigation. Omit to use the code-owned nav. */
+  navItems?: NavItem[];
+  footerLinks?: { label: string; href: string }[];
+  footerNote?: string;
 }) {
   const siteUrl = publicSiteUrl();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <SiteNav siteUrl={siteUrl} />
+      <SiteNav siteUrl={siteUrl} items={navItems} />
       <main className="flex-1">{children}</main>
 
       <footer className="mt-16 border-t">
@@ -36,14 +44,26 @@ export function SiteShell({
             </span>
           </Link>
           <nav className="flex flex-wrap items-center justify-center gap-5 text-muted-foreground">
-            <a href={`${siteUrl}/about`} className="hover:text-[#b88a4a]">About</a>
-            <a href={`${siteUrl}/mission`} className="hover:text-[#b88a4a]">Mission</a>
-            <a href={`${siteUrl}/resources`} className="hover:text-[#b88a4a]">Resources</a>
-            <a href={`${siteUrl}/contact`} className="hover:text-[#b88a4a]">Contact</a>
-            <Link href="/privacy" className="hover:text-[#b88a4a]">Privacy</Link>
-            <Link href="/terms" className="hover:text-[#b88a4a]">Terms</Link>
+            {footerLinks?.length ? (
+              footerLinks.map((item) => (
+                <a key={`${item.label}-${item.href}`} href={item.href} className="hover:text-[#b88a4a]">{item.label}</a>
+              ))
+            ) : (
+              <>
+                <a href={`${siteUrl}/about`} className="hover:text-[#b88a4a]">About</a>
+                <a href={`${siteUrl}/mission`} className="hover:text-[#b88a4a]">Mission</a>
+                <a href={`${siteUrl}/resources`} className="hover:text-[#b88a4a]">Resources</a>
+                <a href={`${siteUrl}/contact`} className="hover:text-[#b88a4a]">Contact</a>
+                <Link href="/privacy" className="hover:text-[#b88a4a]">Privacy</Link>
+                <Link href="/terms" className="hover:text-[#b88a4a]">Terms</Link>
+              </>
+            )}
           </nav>
-          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Michael J. Gauthier</p>
+          {/* Kept as the original JSX children (not a template string) so pages that
+              do not pass footerNote render byte-identical markup to before. */}
+          <p className="text-xs text-muted-foreground">
+            {footerNote || <>© {new Date().getFullYear()} Michael J. Gauthier</>}
+          </p>
         </div>
       </footer>
     </div>

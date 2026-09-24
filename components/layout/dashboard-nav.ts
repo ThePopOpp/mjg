@@ -27,6 +27,7 @@ import {
   Phone,
   Settings,
   Share2,
+  SquarePen,
   Sparkles,
   Users,
   UsersRound,
@@ -80,7 +81,14 @@ export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
-  { kind: "item", href: "/dashboard/cms", label: "CMS", icon: PanelsTopLeft, permission: PERMISSIONS.MANAGE_CMS },
+  {
+    // The Frontend Editor ("Editor") nests under CMS: same Super-Admin guard
+    // (app/dashboard/cms/layout.tsx wraps everything below /dashboard/cms).
+    kind: "group", label: "CMS", icon: PanelsTopLeft, items: [
+      { href: "/dashboard/cms", label: "CMS", icon: PanelsTopLeft, permission: PERMISSIONS.MANAGE_CMS },
+      { href: "/dashboard/cms/editor", label: "Editor", icon: SquarePen, permission: PERMISSIONS.MANAGE_CMS },
+    ],
+  },
   { kind: "item", href: "/dashboard/reports", label: "Reports", icon: FileBarChart, permission: PERMISSIONS.VIEW_REPORTS },
   { kind: "item", href: "/dashboard/guide", label: "Team Guide", icon: BookOpen },
   { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },

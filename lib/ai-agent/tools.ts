@@ -27,6 +27,7 @@ import {
 import { SOCIAL_EVENT_KEYS } from "@/lib/social-media/constants";
 import { loadProjectManagerData } from "@/lib/project-manager/data";
 import { listCmsPages, createCmsDraftPage, saveCmsDraft, getCmsPage } from "@/lib/cms/data";
+import { WEBSITE_TOOLS } from "@/lib/website/steward-tools";
 import type { CmsBlock } from "@/lib/cms/types";
 
 const SOCIAL_EVENT_OPTIONS = SOCIAL_EVENT_KEYS.map((e) => e.key);
@@ -1748,6 +1749,10 @@ export const AGENT_TOOLS: AgentTool[] = [
   // Memory (internal, no confirmation)
   rememberTool,
   forgetTool,
+  // Frontend Editor — the controlled website-management tool layer. Reads
+  // auto-execute; every write lands in a draft and is confirmation-gated.
+  // See lib/website/steward-tools.ts for the safety model.
+  ...WEBSITE_TOOLS,
 ];
 
 export const TOOL_MAP: Record<string, AgentTool> = Object.fromEntries(
