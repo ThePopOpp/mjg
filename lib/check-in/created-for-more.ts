@@ -55,12 +55,12 @@ export const LAYERS: Layer[] = [
     ],
   },
   {
-    key: "habits", index: 5, title: "Keystone Habits", subtitle: "Small Rhythms That Strengthen the Structure",
+    key: "habits", index: 5, title: "Keystone Rhythms", subtitle: "Small Rhythms That Strengthen the Structure",
     coreQuestion: "Do my daily habits move me toward the life I say I want?",
     statements: [
       { text: "I have identified one or two habits that, if kept, would change everything else." },
       { text: "My mornings or evenings have a rhythm that supports who I am trying to become." },
-      { text: "When a keystone habit slips, I notice quickly and recover instead of spiraling." },
+      { text: "When a keystone rhythm slips, I notice quickly and recover instead of spiraling." },
       { text: "My habits are shaping my identity, not just filling my to-do list." },
     ],
   },

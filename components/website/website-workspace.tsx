@@ -6,11 +6,12 @@
 // Steward panel that can be opened from anywhere in the module.
 
 import * as React from "react";
-import { Bot, Globe, ImageIcon, LayoutDashboard, Link2, PanelsTopLeft, Settings, X } from "lucide-react";
+import { Bot, Globe, ImageIcon, LayoutDashboard, Link2, PanelsTopLeft, Settings, Wand2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFabVisible } from "@/components/layout/fab-visibility";
 import { AgentChat } from "@/components/ai-agent/agent-chat";
+import { EditAPage } from "./edit-a-page";
 import { GlobalsManager } from "./globals-manager";
 import { MediaManager } from "./media-manager";
 import { NavigationManager } from "./navigation-manager";
@@ -19,7 +20,7 @@ import { SettingsPanel } from "./settings-panel";
 import { WebsiteOverview } from "./overview";
 import type { WebsitePageSummary } from "@/lib/website/types";
 
-type View = "overview" | "pages" | "navigation" | "media" | "globals" | "settings";
+type View = "overview" | "edit" | "pages" | "navigation" | "media" | "globals" | "settings";
 
 const STEWARD_CONTEXT =
   "The user is in the MJG Frontend Editor (CMS → Editor), which manages the public website: pages, sections, " +
@@ -64,6 +65,7 @@ export function WebsiteWorkspace({
       <Tabs value={view} onValueChange={(v) => setView(v as View)} className="w-full">
         <TabsList>
           <TabsTrigger value="overview" className="gap-1.5"><LayoutDashboard className="h-3.5 w-3.5" /> Overview</TabsTrigger>
+          <TabsTrigger value="edit" className="gap-1.5"><Wand2 className="h-3.5 w-3.5" /> Edit a page</TabsTrigger>
           <TabsTrigger value="pages" className="gap-1.5"><PanelsTopLeft className="h-3.5 w-3.5" /> Pages</TabsTrigger>
           <TabsTrigger value="navigation" className="gap-1.5"><Link2 className="h-3.5 w-3.5" /> Navigation</TabsTrigger>
           <TabsTrigger value="media" className="gap-1.5"><ImageIcon className="h-3.5 w-3.5" /> Media</TabsTrigger>
@@ -78,10 +80,12 @@ export function WebsiteWorkspace({
               navigation: () => setView("navigation"),
               media: () => setView("media"),
               steward: () => setStewardOpen(true),
+              editPage: () => setView("edit"),
               newPage: () => { setView("pages"); setNewPageSignal((n) => n + 1); },
             }}
           />
         </TabsContent>
+        <TabsContent value="edit" className="mt-5"><EditAPage pages={initialPages} /></TabsContent>
         <TabsContent value="pages" className="mt-5">
           <PagesList key={newPageSignal} initialPages={initialPages} />
         </TabsContent>

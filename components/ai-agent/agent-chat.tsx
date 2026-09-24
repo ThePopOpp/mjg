@@ -37,6 +37,10 @@ export type AgentChatProps = {
   // Optional reference text (e.g. an uploaded JSON/CSV/document) attached to the
   // FIRST user message so the agent can build from it.
   extraContext?: string;
+  // Sent automatically once, on mount. Used where the user has already written
+  // their request elsewhere (the Frontend Editor's "Describe the edit" panel)
+  // and should not have to retype or re-send it.
+  initialMessage?: string;
 };
 
 function friendlyToolName(name: string) {
@@ -53,6 +57,7 @@ export function AgentChat({
   emptyTitle = "How can I help?",
   emptyHint = "I can read pilot data and, with your approval, send SMS and email.",
   extraContext,
+  initialMessage,
 }: AgentChatProps = {}) {
   const actionToken = useDashboardActionToken();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -123,6 +128,16 @@ export function AgentChat({
     setInput("");
     void post(next);
   }, [loading, messages, post, extraContext]);
+
+  // Fire `initialMessage` exactly once. The ref guard survives the re-render the
+  // send itself causes, and React 18's double-invoked effects in development.
+  const initialSentRef = useRef(false);
+  useEffect(() => {
+    const first = initialMessage?.trim();
+    if (!first || initialSentRef.current) return;
+    initialSentRef.current = true;
+    send(first);
+  }, [initialMessage, send]);
 
   // Read new assistant replies aloud when the speaker is on.
   useEffect(() => {

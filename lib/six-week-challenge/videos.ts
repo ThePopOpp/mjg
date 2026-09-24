@@ -132,9 +132,9 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     order: 5,
     badge: "Week 5",
     title: "Strengthen the Structure",
-    subtitle: "Choose one keystone habit and one renewal rhythm.",
+    subtitle: "Choose one keystone rhythm and one renewal rhythm.",
     description:
-      "Change is sustained by rhythm, not intensity. Week 5 focuses on keystone habits and the energy needed to steward what matters without running empty.",
+      "Change is sustained by rhythm, not intensity. Week 5 focuses on keystone rhythms and the energy needed to steward what matters without running empty.",
     youtubeId: null,
     videoUrl: null,
     thumbnailUrl: "/6-week-challenge/thumbnails/week5.svg",
