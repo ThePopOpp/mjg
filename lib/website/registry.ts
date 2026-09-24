@@ -404,6 +404,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     stewardEditable: true,
     ownerEditable: true,
     fields: [
+      eyebrow,
       heading(false),
       body("Intro copy"),
       {

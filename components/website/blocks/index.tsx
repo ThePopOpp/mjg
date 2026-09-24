@@ -236,7 +236,7 @@ export function TimelineBlock({ props }: P) {
   const centered = centeredOf(props);
   return (
     <Section block={props as SectionProps}>
-      <SectionHeader title={text(props.title)} description={text(props.description)} centered={centered} />
+      <SectionHeader eyebrow={text(props.eyebrow)} title={text(props.title)} description={text(props.description)} centered={centered} />
       <ol className="mt-10 space-y-8 border-l border-[#b88a4a]/40 pl-6 text-left">
         {items.map((item, i) => (
           <li key={i} className="relative">
