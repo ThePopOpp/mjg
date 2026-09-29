@@ -12,6 +12,9 @@ import { TimePicker } from "@/components/ui/time-picker";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { CalendarView, CardsView, KanbanView } from "@/components/experiences/automation-views";
+import {
+  ScheduleActionBar, SelectAllCheckbox, useScheduleSelection,
+} from "@/components/experiences/schedule-selection";
 import type { AutomationStep } from "@/lib/experiences/automation";
 import { cn } from "@/lib/utils";
 
@@ -97,6 +100,8 @@ function rollUpToSteps(rows: ScheduleRow[]): AutomationStep[] {
 export function ExperienceSchedule({ experienceId, rows }: { experienceId: string; rows: ScheduleRow[] }) {
   const router = useRouter();
   const actionToken = useDashboardActionToken();
+  // Shared with the summary views below so bulk actions work from this page too.
+  const selection = useScheduleSelection();
   const [editing, setEditing] = useState<ScheduleRow | null>(null);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("09:00");
@@ -162,7 +167,13 @@ export function ExperienceSchedule({ experienceId, rows }: { experienceId: strin
 
   return (
     <>
-      <div className="flex justify-end px-4 pb-3">
+      <div className="flex items-center justify-end gap-3 px-4 pb-3">
+        {steps.length ? (
+          <label className="mr-auto flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+            <SelectAllCheckbox steps={steps} selection={selection} />
+            <span>Select all emails</span>
+          </label>
+        ) : null}
         <div className="inline-flex rounded-md border bg-card p-0.5">
           {VIEWS.map((v) => (
             <button
@@ -184,11 +195,12 @@ export function ExperienceSchedule({ experienceId, rows }: { experienceId: strin
 
       {view !== "table" ? (
         <div className="px-4 pb-4">
-          {view === "cards" ? <CardsView steps={steps} /> : null}
-          {view === "kanban" ? <KanbanView steps={steps} /> : null}
-          {view === "calendar" ? <CalendarView steps={steps} nextSendAt={nextSendAt} /> : null}
+          {view === "cards" ? <CardsView steps={steps} selection={selection} /> : null}
+          {view === "kanban" ? <KanbanView steps={steps} selection={selection} /> : null}
+          {view === "calendar" ? <CalendarView steps={steps} selection={selection} nextSendAt={nextSendAt} /> : null}
           <p className="mt-3 text-xs text-muted-foreground">
-            Summarised by email. Switch to Table to reschedule or send an individual message.
+            Summarised by email. Tick emails to pause, resend or move them together; switch to Table to reschedule or send
+            to one person.
           </p>
         </div>
       ) : (
@@ -271,6 +283,13 @@ export function ExperienceSchedule({ experienceId, rows }: { experienceId: strin
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ScheduleActionBar
+        experienceId={experienceId}
+        steps={steps}
+        selection={selection}
+        onDone={() => { selection.clear(); router.refresh(); }}
+      />
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LayoutList, Table as TableIcon, Columns3, CalendarDays, Sparkles, ClipboardList } from "lucide-react";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
@@ -13,6 +13,8 @@ import { EmailCalendar } from "@/components/experiences/experiences-list";
 import { TeamResultsTabs } from "@/components/facilitator/team-results-tabs";
 import { StartChallengeLauncher } from "@/components/facilitator/start-challenge-modal";
 import { LaunchStepsModal } from "@/components/experiences/launch-steps-modal";
+import { GroupScheduleCard } from "@/components/experiences/group-schedule-card";
+import type { AutomationStep } from "@/lib/experiences/automation";
 import { cn } from "@/lib/utils";
 import { FREQUENCY_LABELS, type EmailEvent } from "@/lib/experiences/types";
 import type { FacilitatorExperience } from "@/lib/facilitator/experiences";
@@ -247,11 +249,55 @@ function NewExperiencesGrid({ types }: { types: TypeOption[] }) {
   );
 }
 
+/**
+ * The email sequence for one of the facilitator's own groups, with the same bulk
+ * selection and quick actions admins get. Loaded on demand — the list view does
+ * not need every group's schedule up front.
+ */
+function GroupSchedule({ experienceId }: { experienceId: string }) {
+  const [steps, setSteps] = useState<AutomationStep[]>([]);
+  const [nextSendAt, setNextSendAt] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/facilitator/experiences/${experienceId}/schedule`);
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error || "Could not load the schedule.");
+      setSteps(body.steps ?? []);
+      setNextSendAt(body.nextSendAt ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load the schedule.");
+    } finally {
+      setLoading(false);
+    }
+  }, [experienceId]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  if (error) return <p className="py-6 text-center text-sm text-destructive">{error}</p>;
+  return (
+    <GroupScheduleCard
+      experienceId={experienceId}
+      steps={steps}
+      nextSendAt={nextSendAt}
+      loading={loading}
+      onChanged={load}
+    />
+  );
+}
+
 function OverviewModal({ experience, onClose }: { experience: FacilitatorExperience | null; onClose: () => void }) {
   const p = experience?.preview ?? null;
+  const [tab, setTab] = useState<"overview" | "schedule">("overview");
+  useEffect(() => { setTab("overview"); }, [experience?.id]);
+
   return (
     <Dialog open={experience !== null} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>{p?.title || experience?.name}</DialogTitle>
           <DialogDescription>
@@ -259,6 +305,27 @@ function OverviewModal({ experience, onClose }: { experience: FacilitatorExperie
           </DialogDescription>
         </DialogHeader>
         {experience && (
+          <div className="mb-3 inline-flex rounded-md border bg-card p-0.5">
+            {([["overview", "Overview"], ["schedule", "Email schedule"]] as const).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setTab(key)}
+                aria-pressed={tab === key}
+                className={cn(
+                  "rounded px-3 py-1.5 text-sm font-medium transition-colors",
+                  tab === key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {experience && tab === "schedule" ? <GroupSchedule experienceId={experience.id} /> : null}
+
+        {experience && tab === "overview" && (
           <div className="space-y-4">
             {p?.image_url ? (
               // eslint-disable-next-line @next/next/no-img-element

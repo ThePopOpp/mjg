@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AlertTriangle, CalendarDays, Columns3, LayoutGrid, Table as TableIcon } from "lucide-react";
@@ -11,6 +11,9 @@ import { StatCarousel } from "@/components/experiences/stat-carousel";
 import {
   CalendarView, CardsView, KanbanView, ScheduleTable, fmt, relative,
 } from "@/components/experiences/automation-views";
+import {
+  ScheduleActionBar, SelectAllCheckbox, useScheduleSelection,
+} from "@/components/experiences/schedule-selection";
 import type { AutomationStatus, GroupOption } from "@/lib/experiences/automation";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +35,12 @@ export function AutomationStatusView({
 }) {
   const router = useRouter();
   const [view, setView] = useState<View>("table");
+  // One selection shared by all four views, so a tick survives switching view.
+  const selection = useScheduleSelection();
+
+  // Changing group must not carry a stale selection onto a different sequence.
+  const groupId = status?.group.id ?? null;
+  useEffect(() => { selection.clear(); }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-6">
@@ -171,9 +180,18 @@ export function AutomationStatusView({
             <CardHeader className="flex-col items-stretch gap-3 space-y-0 pb-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <CardTitle className="text-base">Email schedule</CardTitle>
-                <p className="text-sm text-muted-foreground">All times Arizona (Phoenix).</p>
+                <p className="text-sm text-muted-foreground">
+                  All times Arizona (Phoenix). Tick emails to pause, resend or move them.
+                </p>
               </div>
-              <div className="inline-flex shrink-0 rounded-md border bg-card p-0.5">
+              <div className="flex shrink-0 items-center gap-3">
+                {status.steps.length ? (
+                  <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                    <SelectAllCheckbox steps={status.steps} selection={selection} />
+                    <span className="hidden sm:inline">Select all</span>
+                  </label>
+                ) : null}
+              <div className="inline-flex rounded-md border bg-card p-0.5">
                 {VIEWS.map((v) => (
                   <button
                     key={v.key}
@@ -190,6 +208,7 @@ export function AutomationStatusView({
                   </button>
                 ))}
               </div>
+              </div>
             </CardHeader>
             <CardContent className={view === "table" ? "p-0" : "pt-0"}>
               {!status.steps.length ? (
@@ -197,16 +216,23 @@ export function AutomationStatusView({
                   This group has no email sequence configured.
                 </p>
               ) : view === "table" ? (
-                <ScheduleTable steps={status.steps} />
+                <ScheduleTable steps={status.steps} selection={selection} />
               ) : view === "cards" ? (
-                <CardsView steps={status.steps} />
+                <CardsView steps={status.steps} selection={selection} />
               ) : view === "kanban" ? (
-                <KanbanView steps={status.steps} />
+                <KanbanView steps={status.steps} selection={selection} />
               ) : (
-                <CalendarView steps={status.steps} nextSendAt={status.nextSendAt} />
+                <CalendarView steps={status.steps} selection={selection} nextSendAt={status.nextSendAt} />
               )}
             </CardContent>
           </Card>
+
+          <ScheduleActionBar
+            experienceId={status.group.id}
+            steps={status.steps}
+            selection={selection}
+            onDone={() => { selection.clear(); router.refresh(); }}
+          />
         </>
       )}
     </div>

@@ -5,7 +5,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { AutomationStep } from "@/lib/experiences/automation";
+import { SelectAllCheckbox, StepCheckbox, type Selection } from "@/components/experiences/schedule-selection";
 import { cn } from "@/lib/utils";
+
+/**
+ * Every view takes the SAME selection object, so a tick made in the calendar is
+ * still there after switching to the table. Selection is keyed by step number.
+ */
+type WithSelection = { steps: AutomationStep[]; selection: Selection };
 
 // Experiences are anchored to Arizona time and Arizona has no DST, so every date renders in
 // that zone rather than the viewer's local time.
@@ -77,12 +84,13 @@ export function StatusBadge({ step }: { step: AutomationStep }) {
 
 /* ─────────────────────────────── Table ─────────────────────────────── */
 
-export function ScheduleTable({ steps }: { steps: AutomationStep[] }) {
+export function ScheduleTable({ steps, selection }: WithSelection) {
   return (
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-10"><SelectAllCheckbox steps={steps} selection={selection} /></TableHead>
             <TableHead className="w-12">#</TableHead>
             <TableHead>Email template</TableHead>
             <TableHead>Status</TableHead>
@@ -92,7 +100,11 @@ export function ScheduleTable({ steps }: { steps: AutomationStep[] }) {
         </TableHeader>
         <TableBody>
           {steps.map((s) => (
-            <TableRow key={s.stepNumber} className={s.status === "failed" ? "bg-destructive/5" : undefined}>
+            <TableRow
+              key={s.stepNumber}
+              className={cn(s.status === "failed" && "bg-destructive/5", selection.isSelected(s.stepNumber) && "bg-[#b88a4a]/[0.07]")}
+            >
+              <TableCell><StepCheckbox step={s} selection={selection} /></TableCell>
               <TableCell className="text-muted-foreground">{s.stepNumber}</TableCell>
               <TableCell>
                 <p className="font-medium">{s.templateName ?? "(no template)"}</p>
@@ -114,7 +126,7 @@ export function ScheduleTable({ steps }: { steps: AutomationStep[] }) {
 
 /* ─────────────────────────────── Cards ─────────────────────────────── */
 
-export function CardsView({ steps }: { steps: AutomationStep[] }) {
+export function CardsView({ steps, selection }: WithSelection) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {steps.map((s) => (
@@ -124,10 +136,13 @@ export function CardsView({ steps }: { steps: AutomationStep[] }) {
             "flex flex-col gap-2 rounded-lg border p-4",
             s.status === "sent" && "border-[#b88a4a]/40 bg-[#b88a4a]/[0.04]",
             (s.status === "failed" || s.status === "partial") && "border-destructive/50 bg-destructive/5",
+            selection.isSelected(s.stepNumber) && "ring-2 ring-[#b88a4a]",
           )}
         >
           <div className="flex items-start justify-between gap-2">
-            <span className="text-xs font-semibold text-muted-foreground">Email {s.stepNumber}</span>
+            <span className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+              <StepCheckbox step={s} selection={selection} /> Email {s.stepNumber}
+            </span>
             <StatusBadge step={s} />
           </div>
           <p className="font-medium leading-snug">{s.templateName ?? "(no template)"}</p>
@@ -149,7 +164,7 @@ export function CardsView({ steps }: { steps: AutomationStep[] }) {
 
 /* ─────────────────────────────── Kanban ────────────────────────────── */
 
-export function KanbanView({ steps }: { steps: AutomationStep[] }) {
+export function KanbanView({ steps, selection }: WithSelection) {
   // Grouped by what you would act on rather than by raw status: what is done, what is
   // coming, and what needs a human (failed outright, or only some recipients received it).
   const columns = [
@@ -172,10 +187,16 @@ export function KanbanView({ steps }: { steps: AutomationStep[] }) {
             {col.items.map((s) => (
               <div
                 key={s.stepNumber}
-                className={cn("rounded-md border bg-background p-3", col.key === "attention" && "border-destructive/50")}
+                className={cn(
+                  "rounded-md border bg-background p-3",
+                  col.key === "attention" && "border-destructive/50",
+                  selection.isSelected(s.stepNumber) && "ring-2 ring-[#b88a4a]",
+                )}
               >
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-xs font-semibold text-muted-foreground">#{s.stepNumber}</span>
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                    <StepCheckbox step={s} selection={selection} /> #{s.stepNumber}
+                  </span>
                   <span className="text-xs text-muted-foreground">{relative(s.date)}</span>
                 </div>
                 <p className="mt-1 text-sm font-medium leading-snug">{s.templateName ?? "(no template)"}</p>
@@ -201,7 +222,7 @@ export function KanbanView({ steps }: { steps: AutomationStep[] }) {
 
 /* ────────────────────────────── Calendar ───────────────────────────── */
 
-export function CalendarView({ steps, nextSendAt }: { steps: AutomationStep[]; nextSendAt: string | null }) {
+export function CalendarView({ steps, selection, nextSendAt }: WithSelection & { nextSendAt: string | null }) {
   // Open on the month of the next send — the month someone actually wants to look at.
   const [cursor, setCursor] = useState(() => {
     const anchor = nextSendAt ?? new Date().toISOString();
@@ -272,20 +293,26 @@ export function CalendarView({ steps, nextSendAt }: { steps: AutomationStep[]; n
               <div className="text-xs">{d.getUTCDate()}</div>
               <div className="mt-0.5 space-y-0.5">
                 {items.map((s) => (
-                  <div
+                  <button
+                    type="button"
                     key={s.stepNumber}
+                    onClick={() => selection.toggle(s.stepNumber)}
                     title={`${s.templateName ?? ""} — ${s.status} — ${fmt(s.date)}`}
+                    aria-pressed={selection.isSelected(s.stepNumber)}
                     className={cn(
-                      "truncate rounded px-1 py-0.5 text-[11px]",
+                      "flex w-full items-center gap-1 truncate rounded px-1 py-0.5 text-left text-[11px]",
                       s.status === "sent"
                         ? "bg-[#b88a4a]/20 text-[#8a6d33] dark:text-[#e2ca9a]"
                         : s.status === "failed" || s.status === "partial"
                           ? "bg-destructive/15 text-destructive"
                           : "bg-muted text-muted-foreground",
+                      selection.isSelected(s.stepNumber) && "ring-2 ring-[#b88a4a]",
                     )}
                   >
-                    #{s.stepNumber} {shortName(s.templateName)}
-                  </div>
+                    {/* The whole chip toggles, so the box is presentational here. */}
+                    <StepCheckbox step={s} selection={selection} className="h-3 w-3 pointer-events-none" />
+                    <span className="truncate">#{s.stepNumber} {shortName(s.templateName)}</span>
+                  </button>
                 ))}
               </div>
             </div>
