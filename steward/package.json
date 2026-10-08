@@ -1,0 +1,16 @@
+{
+  "name": "mjg-steward-agent",
+  "private": true,
+  "type": "module",
+  "description": "Steward — the member-facing agent. Its own eve project root so the agent definition, build output and dependencies stay separate from the Next.js app.",
+  "scripts": {
+    "build": "eve build",
+    "start": "eve start",
+    "test:auth": "node tests/supabase-principal.test.mjs",
+    "check": "eve info"
+  },
+  "dependencies": {
+    "eve": "^0.74.0",
+    "jose": "^5.10.0"
+  }
+}

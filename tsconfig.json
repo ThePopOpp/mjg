@@ -23,5 +23,11 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "_archive", "docs"]
+  // `steward` is excluded because it is a separate project, not part of this
+  // Next.js app: it has its own package.json, its own build (`eve build`) and
+  // its own type check, which `eve info` reports as Diagnostics. It also uses
+  // eve's authoring conventions — notably explicit `.ts` import specifiers —
+  // which this config rejects (TS5097). Type errors there are caught by
+  // `npm --prefix steward run check`, not by this tsconfig.
+  "exclude": ["node_modules", "_archive", "docs", "steward"]
 }

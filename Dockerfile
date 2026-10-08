@@ -4,8 +4,11 @@
 # (No `# syntax=` directive on purpose — we use no BuildKit-frontend features,
 #  so we skip pulling docker/dockerfile:1.)
 
+# Node 24 is a hard floor: the eve agent runtime declares `engines.node >= 24`.
+# Bumping this is what lets steward/ build and run in the image at all.
+
 # ── Build stage ────────────────────────────────────────────────────────────────
-FROM node:22-bookworm-slim AS builder
+FROM node:24-bookworm-slim AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -29,7 +32,7 @@ COPY . .
 RUN npm run build
 
 # ── Runtime stage ──────────────────────────────────────────────────────────────
-FROM node:22-bookworm-slim AS runner
+FROM node:24-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000
 

@@ -47,6 +47,14 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|favicon.svg|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // `.well-known/workflow` is excluded deliberately, not for performance. The
+    // eve/Workflow worker delivers orchestration and step invocations to
+    // /.well-known/workflow/v1/flow over loopback, and @workflow/world-postgres
+    // is explicit: "Do not gate these paths in framework middleware... a handler
+    // that consumes the internal request body breaks execution." Running this
+    // middleware over them would do exactly that. That route is protected at the
+    // ingress instead, where blocking external traffic costs nothing because
+    // loopback delivery never traverses it.
+    "/((?!_next/static|_next/image|favicon.ico|favicon.svg|\\.well-known/workflow|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
