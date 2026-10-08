@@ -1,6 +1,6 @@
 // Frontend Editor — approved page templates (spec §25).
 //
-// A template is just a starting block list plus sensible page defaults. Steward
+// A template is just a starting block list plus sensible page defaults. Shepherd
 // picks the closest one when creating a page; Mike picks from the New Page
 // dialog. Every block a template emits goes through createBlock(), so templates
 // can never seed a page with unregistered components.
@@ -13,7 +13,7 @@ export type PageTemplate = {
   label: string;
   description: string;
   pageType: WebsitePageType;
-  /** Steward should reach for this when the request matches these words. */
+  /** Shepherd should reach for this when the request matches these words. */
   hints: string[];
   build: (title: string) => WebsiteBlock[];
 };
@@ -193,7 +193,7 @@ export function templateContent(key: string, title: string): WebsiteContent {
   return { version: 1, blocks: template.build(title) };
 }
 
-/** Steward's template menu, rendered into its tool description. */
+/** Shepherd's template menu, rendered into its tool description. */
 export function templateSummary(): { key: string; label: string; description: string; bestFor: string }[] {
   return TEMPLATES.map((t) => ({
     key: t.key,

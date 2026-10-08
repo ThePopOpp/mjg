@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { SendToClaudeButton } from "@/components/dev-requests/send-to-claude-button";
-import { AskStewardButton } from "@/components/ai-agent/ask-steward-button";
+import { AskShepherdButton } from "@/components/ai-agent/ask-shepherd-button";
 import { ListenOrderPanel } from "@/components/media-studio/listen-order-panel";
 import { ChallengeVideoLibrary } from "@/components/media-studio/challenge-video-library";
 import { ChallengeVideoStudio } from "@/components/media-studio/challenge-video-studio";
@@ -1413,7 +1413,7 @@ function ResourceCard({ asset, onEdit, isSuperAdmin = false }: { asset: any; onE
   const targets = Array.isArray(asset.metadata?.display_targets) ? asset.metadata.display_targets : [];
   const sharedCount = Array.isArray(asset.metadata?.shared_with) ? asset.metadata.shared_with.length : 0;
   const fileLabel = asset.metadata?.original_filename || asset.file_url;
-  const stewardContext = [
+  const shepherdContext = [
     `A team member submitted this resource in Media Studio for review.`,
     `Title: ${asset.title}`,
     `Type: ${resourceTypeLabel}`,
@@ -1489,9 +1489,9 @@ function ResourceCard({ asset, onEdit, isSuperAdmin = false }: { asset: any; onE
               requestKind: asset.metadata?.resource_type || "resource",
             }}
           />
-          <AskStewardButton
+          <AskShepherdButton
             subtitle="Media Studio resource"
-            extraContext={stewardContext}
+            extraContext={shepherdContext}
             suggestions={[
               "Summarize this resource and what it's asking for.",
               "If this is a feature request, outline how you'd implement it.",

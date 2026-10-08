@@ -3,7 +3,7 @@
 // The website has two kinds of page and the difference decides what can happen
 // when he describes an edit:
 //
-//   "managed"    — a website_pages row. Steward reads it, proposes a change set,
+//   "managed"    — a website_pages row. Shepherd reads it, proposes a change set,
 //                  the change lands in a draft, he previews it and publishes.
 //
 //   "code"       — a page built in the repository (a static file under main/, or

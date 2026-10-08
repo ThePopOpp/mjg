@@ -12,14 +12,14 @@ const PM_SUGGESTIONS = [
   "Connect the CMS task so it waits on the CMS and Experience project.",
 ];
 
-// "Ask Steward" — opens the AI agent in a modal, scoped/branded for the Project
+// "Ask Shepherd" — opens the AI agent in a modal, scoped/branded for the Project
 // Manager and with PM tools available. Text or voice (mic + read-aloud).
-export function AskSteward() {
+export function AskShepherd() {
   const [open, setOpen] = useState(false);
   return (
     <>
       <Button onClick={() => setOpen(true)} variant="outline" className="shrink-0 gap-1.5">
-        <Bot className="h-4 w-4" /> Ask Steward
+        <Bot className="h-4 w-4" /> Ask Shepherd
       </Button>
 
       {open && (
@@ -34,10 +34,10 @@ export function AskSteward() {
               <X className="h-4 w-4" />
             </button>
             <AgentChat
-              title="Steward"
+              title="Shepherd"
               subtitle="Project Manager assistant"
               suggestions={PM_SUGGESTIONS}
-              placeholder="Ask Steward about your projects… (Enter to send, mic to speak)"
+              placeholder="Ask Shepherd about your projects… (Enter to send, mic to speak)"
               audio
               heightClassName="h-[72vh] min-h-[440px]"
               emptyTitle="How can I help with your projects?"

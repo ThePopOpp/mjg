@@ -1,7 +1,7 @@
 "use client";
 
 // Before/after comparison (spec §18). Used by the version-history compare view,
-// the Steward proposal card and the publish dialog. Word-level highlighting
+// the Shepherd proposal card and the publish dialog. Word-level highlighting
 // makes "what actually changed" obvious without reading two blocks of copy.
 
 import * as React from "react";

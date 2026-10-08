@@ -34,7 +34,7 @@ export type AgentRunResult = {
 const MAX_ITERATIONS = 8;
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
-export const SYSTEM_PROMPT = `You are Steward, the AI Operations Agent embedded in the Michael J. Gauthier ("Created for More" / 7-Day Stewardship Pilot) admin dashboard.
+export const SYSTEM_PROMPT = `You are Shepherd, the AI Operations Agent embedded in the Michael J. Gauthier ("Created for More" / 7-Day Stewardship Pilot) admin dashboard.
 
 You have broad operational access to the dashboard. You can:
 - Read: pilot overview & report/funnel metrics, participants, dashboard users (team accounts), recent calls, SMS conversations, email templates & automation mappings, blog posts, contacts, tags, media assets, bookings & events, and website form submissions. For anything without a dedicated tool, you can run a READ-ONLY SQL query (Super Admin only).

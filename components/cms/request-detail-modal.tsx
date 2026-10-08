@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { FieldSelect } from "@/components/ui/field-select";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { SendToClaudeButton } from "@/components/dev-requests/send-to-claude-button";
-import { AskStewardButton } from "@/components/ai-agent/ask-steward-button";
+import { AskShepherdButton } from "@/components/ai-agent/ask-shepherd-button";
 import { PRIORITY_COLOR, STATUSES, type Person, type Req } from "@/components/cms/request-shared";
 import type { DashboardNoteComment } from "@/lib/dashboard-notes/data";
 
@@ -162,7 +162,7 @@ export function RequestDetailModal({
               priority: (["low", "medium", "high", "urgent"].includes(req.priority) ? req.priority : "medium") as "low" | "medium" | "high" | "urgent",
             }}
           />
-          <AskStewardButton
+          <AskShepherdButton
             subtitle={`${req.kind} edit request`}
             extraContext={[
               `A ${req.kind} edit request from the CMS.`,

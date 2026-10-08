@@ -229,10 +229,10 @@ export default function TeamGuidePage() {
             ]} />
           </Card>
 
-          <Card icon={Bot} title="Ask Steward">
+          <Card icon={Bot} title="Ask Shepherd">
             <div className="mb-3">
               <span className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-[13px] font-semibold text-primary">
-                <Bot className="h-3.5 w-3.5" /> Ask Steward
+                <Bot className="h-3.5 w-3.5" /> Ask Shepherd
               </span>
             </div>
             <Bullets items={[
@@ -248,7 +248,7 @@ export default function TeamGuidePage() {
           </span>
           <div>
             <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">Dev Queue · CMS Overview</div>
-            <p className="mt-0.5 text-sm">A tile on the CMS Overview shows how many items are waiting to be built. Click it to open Steward and triage the queue.</p>
+            <p className="mt-0.5 text-sm">A tile on the CMS Overview shows how many items are waiting to be built. Click it to open Shepherd and triage the queue.</p>
           </div>
         </div>
       </section>

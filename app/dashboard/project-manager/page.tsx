@@ -2,7 +2,7 @@ import { SectionHeader } from "@/components/dashboard/section-header";
 import { loadProjectManagerData, loadProjectLinkOptions } from "@/lib/project-manager/data";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
-import { AskSteward } from "@/components/ai-agent/ask-steward";
+import { AskShepherd } from "@/components/ai-agent/ask-shepherd";
 import { ProjectManagerClient } from "./project-manager-client";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +26,7 @@ export default async function ProjectManagerPage() {
   );
   const currentUserName = profile ? `${profile.firstName} ${profile.lastName}`.trim() : "";
   const currentUserEmail = profile?.email ?? "";
-  const canAskSteward = profile ? can(profile.role, PERMISSIONS.MANAGE_SETTINGS) : false;
+  const canAskShepherd = profile ? can(profile.role, PERMISSIONS.MANAGE_SETTINGS) : false;
 
   return (
     <div className="space-y-6">
@@ -36,7 +36,7 @@ export default async function ProjectManagerPage() {
           title="Project Manager"
           description="Plan stewardship and operations work across projects, phases, tasks, and milestones — with templates, dependencies, and multiple views."
         />
-        {canAskSteward && <AskSteward />}
+        {canAskShepherd && <AskShepherd />}
       </div>
       <ProjectManagerClient
         initialData={data}

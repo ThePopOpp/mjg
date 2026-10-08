@@ -4,7 +4,7 @@
 // CONNECTS to it rather than creating a second one, so an image uploaded in
 // Media Studio is immediately pickable here and usage stays in one place.
 //
-// Steward may search and attach existing media and edit alt text. It may not
+// Shepherd may search and attach existing media and edit alt text. It may not
 // invent assets — every attach goes through an id that must already exist.
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -72,7 +72,7 @@ export async function getMediaItem(id: string): Promise<MediaItem | null> {
 export async function updateMediaAltText(
   id: string,
   altText: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward" } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {},
 ): Promise<MediaItem> {
   const sb = createSupabaseAdminClient();
   const existing = await getMediaItem(id);

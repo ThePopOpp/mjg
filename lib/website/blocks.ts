@@ -2,7 +2,7 @@
 //
 // The content model is a flat, ordered list (spec §9). Every helper returns a new
 // content document, so the same functions back the manual editor's optimistic UI,
-// the server-side API and Steward's tools — one implementation, one behaviour.
+// the server-side API and Shepherd's tools — one implementation, one behaviour.
 
 import { createBlock, getDefinition, newBlockId } from "./registry";
 import { validateProps } from "./schema";
@@ -22,7 +22,7 @@ export function blockIndex(content: WebsiteContent, blockId: string): number {
 
 /**
  * Insert a new block. `position` is an index; omit it to append. `afterBlockId`
- * is the friendlier form Steward uses ("put it below the hero").
+ * is the friendlier form Shepherd uses ("put it below the hero").
  */
 export function addBlock(
   content: WebsiteContent,

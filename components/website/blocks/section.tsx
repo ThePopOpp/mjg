@@ -6,7 +6,7 @@ import { mdToHtml } from "@/lib/cms/md";
  * Shared chrome for every registered block (spec §26 — approved settings only,
  * never author-supplied class names). The five shared props from the registry
  * map onto design-system presets here and nowhere else, so the whole site stays
- * consistent no matter what Mike or Steward assemble.
+ * consistent no matter what Mike or Shepherd assemble.
  */
 
 export type SectionProps = {

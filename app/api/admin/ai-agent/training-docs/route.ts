@@ -7,7 +7,7 @@ import {
 } from "@/lib/ai-agent/training-docs/data";
 import { logUserActivity } from "@/lib/user-management/repository";
 
-// Training Docs — upload reference material for Steward. Files are converted to
+// Training Docs — upload reference material for Shepherd. Files are converted to
 // markdown on ingest (see lib/ai-agent/training-docs/convert.ts) and the original
 // is kept in storage so it stays downloadable.
 // Super-admin only, matching the AI Agent surface.
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const mime = file.type || "application/octet-stream";
     const conversion = await convertToMarkdown(buffer, file.name, mime);
 
-    // Keep the original regardless of conversion outcome: a doc Steward can't read
+    // Keep the original regardless of conversion outcome: a doc Shepherd can't read
     // is still a doc the team may want to download. A storage failure isn't fatal —
     // the markdown is what the agent actually needs.
     let fileUrl: string | null = null;

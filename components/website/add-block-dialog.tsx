@@ -82,7 +82,7 @@ export function AddBlockDialog({
           ))}
           {!matches.length ? (
             <p className="col-span-full py-6 text-center text-sm text-muted-foreground">
-              No section matches that. If you need something that is not here, ask Steward — it will write a developer
+              No section matches that. If you need something that is not here, ask Shepherd — it will write a developer
               specification for a new component rather than improvising.
             </p>
           ) : null}

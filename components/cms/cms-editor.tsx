@@ -156,7 +156,7 @@ export function CmsEditor({ page, initialBlocks }: {
   const [device, setDevice] = React.useState("desktop");
   const [panelW, setPanelW] = React.useState(232);
   const [templates, setTemplates] = React.useState<{ id: string; name: string; content: CmsBlock[] }[]>([]);
-  const [stewardOpen, setStewardOpen] = React.useState(false);
+  const [shepherdOpen, setShepherdOpen] = React.useState(false);
   const dragId = React.useRef<string | null>(null);
   const [dropHint, setDropHint] = React.useState<DropTarget | null>(null);
   const canvasRef = React.useRef<HTMLDivElement>(null);
@@ -352,7 +352,7 @@ export function CmsEditor({ page, initialBlocks }: {
           <div className="text-[11px] text-muted-foreground">/p/{page.slug}</div>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setStewardOpen(true)}><Bot className="h-3.5 w-3.5" /> Steward AI</Button>
+          <Button variant="outline" size="sm" onClick={() => setShepherdOpen(true)}><Bot className="h-3.5 w-3.5" /> Shepherd AI</Button>
           <Button variant="outline" size="sm" onClick={openPreview} disabled={busy}><ExternalLink className="h-3.5 w-3.5" /> Open preview</Button>
           <Button size="sm" onClick={save} disabled={busy || !dirty}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />} {saved ? "Saved" : "Save draft"}</Button>
         </div>
@@ -479,13 +479,13 @@ export function CmsEditor({ page, initialBlocks }: {
         </div>
       </div>
 
-      {stewardOpen && <StewardEditorModal page={page} blocks={blocks} onClose={() => setStewardOpen(false)} />}
+      {shepherdOpen && <ShepherdEditorModal page={page} blocks={blocks} onClose={() => setShepherdOpen(false)} />}
     </div>
   );
 }
 
-// ── Steward AI, scoped to THIS page ───────────────────────────────────────────
-function StewardEditorModal({ page, blocks, onClose }: { page: { id: string; title: string }; blocks: CmsBlock[]; onClose: () => void }) {
+// ── Shepherd AI, scoped to THIS page ───────────────────────────────────────────
+function ShepherdEditorModal({ page, blocks, onClose }: { page: { id: string; title: string }; blocks: CmsBlock[]; onClose: () => void }) {
   const stripped = blocks.map((b) => { const c = { ...b }; delete (c as { id?: string }).id; return c; });
   const context = `You are editing the EXISTING CMS page titled "${page.title}" with pageId "${page.id}". To change it, call update_cms_draft_page with pageId "${page.id}" and the FULL new block array. Current blocks (JSON):\n${JSON.stringify(stripped)}`;
   return (
@@ -493,10 +493,10 @@ function StewardEditorModal({ page, blocks, onClose }: { page: { id: string; tit
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => { onClose(); window.location.reload(); }} aria-hidden="true" />
       <div className="relative z-10 w-full max-w-2xl">
         <button onClick={() => { onClose(); window.location.reload(); }} aria-label="Close" className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"><X className="h-4 w-4" /></button>
-        <AgentChat title="Steward AI" subtitle={`Editing “${page.title}”`} audio extraContext={context}
+        <AgentChat title="Shepherd AI" subtitle={`Editing “${page.title}”`} audio extraContext={context}
           suggestions={["Add a hero section to the top of this page.", "Add a 3-column card grid explaining the benefits.", "Rewrite the copy to be warmer and more concise.", "Add an FAQ accordion and a closing call-to-action."]}
-          placeholder="Tell Steward how to change this page…" heightClassName="h-[68vh] min-h-[420px]"
-          emptyTitle="Edit this page with Steward" emptyHint="I can add, rewrite, and restructure this page's blocks. Changes save as a draft — reopen after I finish to see them. Close this window to refresh the editor." />
+          placeholder="Tell Shepherd how to change this page…" heightClassName="h-[68vh] min-h-[420px]"
+          emptyTitle="Edit this page with Shepherd" emptyHint="I can add, rewrite, and restructure this page's blocks. Changes save as a draft — reopen after I finish to see them. Close this window to refresh the editor." />
       </div>
     </div>
   );

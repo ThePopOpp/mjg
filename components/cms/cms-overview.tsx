@@ -17,7 +17,7 @@ import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type { CmsPage } from "@/lib/cms/types";
 
-export type CmsNav = { pages: () => void; editor: () => void; requests: () => void; steward: () => void };
+export type CmsNav = { pages: () => void; editor: () => void; requests: () => void; shepherd: () => void };
 type UReq = { kind: "frontend" | "dashboard"; note: string; page: string; status: string; priority: string; type: string; authorEmail: string; authorName: string; createdAt: string; updatedAt: string };
 
 const PRIORITY_COLOR: Record<string, string> = { low: "text-muted-foreground", medium: "text-foreground", high: "text-amber-600 dark:text-amber-400", urgent: "text-destructive" };
@@ -92,12 +92,12 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
     { label: "Frontend Editor", desc: "Review & annotate public pages", icon: MousePointerClick, onClick: nav.editor, primary: true },
     { label: "Edit Requests", desc: "Triage frontend & dashboard requests", icon: ClipboardList, onClick: nav.requests },
     { label: "Pages & Block Builder", desc: "Create & edit CMS pages", icon: PanelsTopLeft, onClick: nav.pages },
-    { label: "Steward AI", desc: "Draft pages & changes with AI", icon: Bot, onClick: nav.steward },
+    { label: "Shepherd AI", desc: "Draft pages & changes with AI", icon: Bot, onClick: nav.shepherd },
   ];
   const stats = [
     { label: "Pages", value: s.pagesTotal, sub: `${s.pagesDraft} draft · ${s.pagesPublished} published`, icon: FileText, onClick: nav.pages },
     { label: "Open requests", value: s.open, sub: "awaiting action", icon: CircleDot, tone: "amber", onClick: nav.requests },
-    { label: "Dev Queue", value: devQueue, sub: "flagged for Claude", icon: SendHorizonal, tone: devQueue ? "blue" : undefined, onClick: nav.steward },
+    { label: "Dev Queue", value: devQueue, sub: "flagged for Claude", icon: SendHorizonal, tone: devQueue ? "blue" : undefined, onClick: nav.shepherd },
     { label: "In progress", value: s.inProgress, sub: "being worked", icon: Clock, tone: "blue", onClick: nav.requests },
     { label: "Completed", value: s.done, sub: "all time", icon: CheckCircle2, tone: "emerald", onClick: nav.requests },
     { label: "Submitted (7d)", value: s.submittedWeek, sub: "last 7 days", icon: CalendarDays, onClick: nav.requests },

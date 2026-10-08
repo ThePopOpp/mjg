@@ -6,7 +6,7 @@ import * as React from "react";
  * Whether the floating quick-actions button (the Review FAB in the bottom-right
  * corner) is shown. Three places read it: the FAB itself, the Settings toggle,
  * and anything that has to keep clear of the FAB's corner — currently the
- * Website Editor's "Ask Steward" pill.
+ * Website Editor's "Ask Shepherd" pill.
  *
  * Stored in localStorage rather than the database on purpose: it is chrome for
  * one person on one screen, it has to apply on the very first paint with no

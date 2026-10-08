@@ -30,7 +30,7 @@ export const BLOCK_PRESETS: { name: string; description: string; blocks: CmsPres
       { type: "cardgrid", columns: 3, padTop: 8, padBottom: 48, items: [
         { title: "Assess", body: "Start with a clear picture of where you are today." },
         { title: "Plan", body: "Build a simple, faithful plan you can actually follow." },
-        { title: "Steward", body: "Take next steps with guidance and accountability." },
+        { title: "Shepherd", body: "Take next steps with guidance and accountability." },
       ] },
     ],
   },

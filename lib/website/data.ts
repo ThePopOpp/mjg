@@ -81,7 +81,7 @@ function revalidateWebsitePage(slug: string): void {
 
 export async function logWebsiteAudit(input: {
   actorId?: string | null;
-  actorType?: "user" | "steward";
+  actorType?: "user" | "shepherd";
   action: string;
   resourceType?: string;
   resourceId?: string | null;
@@ -216,7 +216,7 @@ export type CreatePageInput = {
   navigation_label?: string | null;
   content?: unknown;
   actorId?: string | null;
-  actorType?: "user" | "steward";
+  actorType?: "user" | "shepherd";
 };
 
 /** Always lands as a DRAFT (spec §15: no production write before a valid draft). */
@@ -247,7 +247,7 @@ export async function createPage(input: CreatePageInput): Promise<WebsitePage> {
       navigation_label: input.navigation_label ?? null,
       is_legal: pageType === "legal",
       has_unpublished_changes: true,
-      last_edited_source: input.actorType === "steward" ? "steward" : "manual",
+      last_edited_source: input.actorType === "shepherd" ? "shepherd" : "manual",
       created_by: input.actorId ?? null,
       updated_by: input.actorId ?? null,
     })
@@ -289,7 +289,7 @@ export type UpdatePageMetaInput = {
   scheduled_at?: string | null;
   unpublish_at?: string | null;
   actorId?: string | null;
-  actorType?: "user" | "steward";
+  actorType?: "user" | "shepherd";
   /** Create a 301 from the old address when the slug changes (spec §24). */
   createRedirect?: boolean;
 };
@@ -322,7 +322,7 @@ export async function updatePageMeta(id: string, patch: UpdatePageMetaInput): Pr
   if (patch.scheduled_at !== undefined) row.scheduled_at = patch.scheduled_at || null;
   if (patch.unpublish_at !== undefined) row.unpublish_at = patch.unpublish_at || null;
   if (patch.actorId) row.updated_by = patch.actorId;
-  if (patch.actorType) row.last_edited_source = patch.actorType === "steward" ? "steward" : "manual";
+  if (patch.actorType) row.last_edited_source = patch.actorType === "shepherd" ? "shepherd" : "manual";
 
   let oldSlug: string | null = null;
   if (patch.slug !== undefined && slugify(patch.slug) !== current.slug) {
@@ -403,7 +403,7 @@ export async function saveDraft(
   if (!opts.silent) {
     await logWebsiteAudit({
       actorId: opts.actorId,
-      actorType: opts.source === "steward" ? "steward" : "user",
+      actorType: opts.source === "shepherd" ? "shepherd" : "user",
       action: "page.draft_saved",
       resourceId: id,
       summary: `Saved the draft of "${page.title}" (${clean.blocks.length} sections).`,
@@ -500,7 +500,7 @@ export async function getVersion(versionId: string): Promise<WebsitePageVersion 
  */
 export async function restoreVersion(
   versionId: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward" } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {},
 ): Promise<WebsitePage> {
   const version = await getVersion(versionId);
   if (!version) throw new Error("That version no longer exists.");
@@ -534,7 +534,7 @@ export async function restoreVersion(
 
 export async function publishPage(
   id: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward"; summary?: string } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd"; summary?: string } = {},
 ): Promise<{ page: WebsitePage; version: WebsitePageVersion; issues: { path: string; message: string }[] }> {
   const sb = createSupabaseAdminClient();
   const page = await getPageOrThrow(id);
@@ -547,7 +547,7 @@ export async function publishPage(
 
   // 2. Version record (before the swap, so the previous live content is kept).
   const version = await createVersion(page, content, {
-    source: opts.actorType === "steward" ? "steward" : "manual",
+    source: opts.actorType === "shepherd" ? "shepherd" : "manual",
     summary: opts.summary ?? "Published.",
     actorId: opts.actorId,
   });
@@ -589,7 +589,7 @@ export async function publishPage(
 
 export async function unpublishPage(
   id: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward" } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {},
 ): Promise<WebsitePage> {
   const sb = createSupabaseAdminClient();
   const page = await getPageOrThrow(id);
@@ -623,7 +623,7 @@ export async function unpublishPage(
 
 export async function archivePage(
   id: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward" } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {},
 ): Promise<WebsitePage> {
   const sb = createSupabaseAdminClient();
   const page = await getPageOrThrow(id);
@@ -652,7 +652,7 @@ export async function archivePage(
 
 export async function restorePage(
   id: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward" } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {},
 ): Promise<WebsitePage> {
   const sb = createSupabaseAdminClient();
   const page = await getPageOrThrow(id);
@@ -739,7 +739,7 @@ export async function pageDependencies(id: string): Promise<PageDependencies> {
  */
 export async function deletePage(
   id: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward"; hard?: boolean; confirmTitle?: string } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd"; hard?: boolean; confirmTitle?: string } = {},
 ): Promise<{ ok: true }> {
   const sb = createSupabaseAdminClient();
   const page = await getPageOrThrow(id);
@@ -775,7 +775,7 @@ export async function deletePage(
 
 export async function duplicatePage(
   id: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward"; title?: string } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd"; title?: string } = {},
 ): Promise<WebsitePage> {
   const source = await getPageOrThrow(id);
   const title = String(opts.title || `${source.title} (copy)`).trim();

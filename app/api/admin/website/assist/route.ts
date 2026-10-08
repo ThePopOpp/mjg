@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     if (!source.trim()) throw new Error("There is no text to work with yet.");
 
     const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) throw new Error("Steward is not configured on this environment (OPENAI_API_KEY is missing).");
+    if (!apiKey) throw new Error("Shepherd is not configured on this environment (OPENAI_API_KEY is missing).");
 
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -56,15 +56,15 @@ export async function POST(request: NextRequest) {
         ],
       }),
     });
-    if (!res.ok) throw new Error(`Steward could not complete that rewrite (${res.status}).`);
+    if (!res.ok) throw new Error(`Shepherd could not complete that rewrite (${res.status}).`);
 
     const data = await res.json();
     const result = String(data?.choices?.[0]?.message?.content ?? "").trim();
-    if (!result) throw new Error("Steward returned nothing for that rewrite.");
+    if (!result) throw new Error("Shepherd returned nothing for that rewrite.");
 
     await logWebsiteAudit({
       actorId: actor.id,
-      actorType: "steward",
+      actorType: "shepherd",
       action: "assist.inline_rewrite",
       resourceType: "page",
       resourceId: body.pageId ?? null,

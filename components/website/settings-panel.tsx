@@ -28,7 +28,7 @@ export function SettingsPanel() {
     setBusy(true);
     setError("");
     try {
-      const { settings: next } = await websiteApi.updateSettings(token, { allowStewardDirectPublish: value });
+      const { settings: next } = await websiteApi.updateSettings(token, { allowShepherdDirectPublish: value });
       setSettings(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save that setting.");
@@ -40,34 +40,34 @@ export function SettingsPanel() {
   return (
     <div className="space-y-6">
       <section className="rounded-lg border border-border p-4">
-        <h2 className="font-semibold">Steward</h2>
+        <h2 className="font-semibold">Shepherd</h2>
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
 
         <label className="mt-3 flex cursor-pointer items-start gap-3">
           <input
             type="checkbox"
             disabled={busy || !settings}
-            checked={settings?.allowStewardDirectPublish ?? false}
+            checked={settings?.allowShepherdDirectPublish ?? false}
             onChange={(e) => toggleDirectPublish(e.target.checked)}
             className="mt-1 h-4 w-4 accent-[#b88a4a]"
           />
           <span>
             <span className="block text-sm font-medium">
-              Let Steward publish low-risk changes without asking
+              Let Shepherd publish low-risk changes without asking
               {busy ? <Loader2 className="ml-2 inline h-3 w-3 animate-spin" /> : null}
             </span>
             <span className="mt-1 block text-sm text-muted-foreground">
-              Off by default. With this on, Steward can still only publish a change it has already validated, it still
+              Off by default. With this on, Shepherd can still only publish a change it has already validated, it still
               records a version and an audit entry, and it still cannot publish a protected page, a legal page or
               anything classed as high risk — those always come back to you.
             </span>
           </span>
         </label>
 
-        {settings?.allowStewardDirectPublish ? (
+        {settings?.allowShepherdDirectPublish ? (
           <p className="mt-3 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-            Direct publishing is on. Steward&rsquo;s low-risk edits will go live as soon as it makes them.
+            Direct publishing is on. Shepherd&rsquo;s low-risk edits will go live as soon as it makes them.
           </p>
         ) : null}
       </section>
@@ -75,7 +75,7 @@ export function SettingsPanel() {
       <section className="rounded-lg border border-border p-4">
         <h2 className="flex items-center gap-1.5 font-semibold"><ShieldCheck className="h-4 w-4" /> Protected addresses</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          These belong to the application itself. No page created here — by you or by Steward — can take one of these
+          These belong to the application itself. No page created here — by you or by Shepherd — can take one of these
           addresses, and nothing here can edit or delete them.
         </p>
         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -93,7 +93,7 @@ export function SettingsPanel() {
 function AuditLog() {
   const token = useDashboardActionToken();
   const [logs, setLogs] = React.useState<WebsiteAuditLog[]>([]);
-  const [filter, setFilter] = React.useState<"all" | "user" | "steward">("all");
+  const [filter, setFilter] = React.useState<"all" | "user" | "shepherd">("all");
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -106,9 +106,9 @@ function AuditLog() {
     <section className="rounded-lg border border-border">
       <div className="flex flex-wrap items-center gap-2 border-b border-border p-4">
         <h2 className="font-semibold">History</h2>
-        <p className="text-sm text-muted-foreground">Every change to the website, by you or by Steward.</p>
+        <p className="text-sm text-muted-foreground">Every change to the website, by you or by Shepherd.</p>
         <div className="ml-auto flex gap-1">
-          {(["all", "user", "steward"] as const).map((f) => (
+          {(["all", "user", "shepherd"] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -117,7 +117,7 @@ function AuditLog() {
                 filter === f ? "bg-[#b88a4a] text-white" : "bg-muted text-muted-foreground hover:text-foreground",
               )}
             >
-              {f === "user" ? "By people" : f === "steward" ? "By Steward" : "All"}
+              {f === "user" ? "By people" : f === "shepherd" ? "By Shepherd" : "All"}
             </button>
           ))}
         </div>
@@ -126,7 +126,7 @@ function AuditLog() {
       <ul className="divide-y divide-border">
         {visible.map((log) => (
           <li key={log.id} className="flex gap-3 px-4 py-3">
-            {log.actor_type === "steward" ? (
+            {log.actor_type === "shepherd" ? (
               <Bot className="mt-0.5 h-4 w-4 shrink-0 text-[#b88a4a]" />
             ) : (
               <User className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />

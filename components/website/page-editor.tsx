@@ -4,7 +4,7 @@
 //
 //   left   — page structure: add, reorder, duplicate, hide, remove
 //   centre — live preview in a real iframe at desktop / tablet / phone widths
-//   right  — Content · Design · SEO · History · Steward
+//   right  — Content · Design · SEO · History · Shepherd
 //
 // Editing is local-first with a 1.5s debounced autosave to the DRAFT. The
 // published page is never touched by autosave; publishing is always a deliberate
@@ -29,11 +29,11 @@ import { BlockSettings } from "./block-settings";
 import { BlockTree } from "./block-tree";
 import { ChangeReview } from "./change-review";
 import { PageSettings } from "./page-settings";
-import { StewardPanel } from "./steward-panel";
+import { ShepherdPanel } from "./shepherd-panel";
 import { VersionHistory } from "./version-history";
 import { STATUS_PILL, relativeTime } from "./constants";
 
-type RightTab = "block" | "page" | "history" | "steward";
+type RightTab = "block" | "page" | "history" | "shepherd";
 type Device = "desktop" | "tablet" | "mobile";
 
 const DEVICE_WIDTH: Record<Device, string> = { desktop: "100%", tablet: "834px", mobile: "390px" };
@@ -344,10 +344,10 @@ export function PageEditor({ initial }: { initial: PageContext }) {
             <TabButton active={tab === "block"} onClick={() => setTab("block")} icon={Settings2}>Section</TabButton>
             <TabButton active={tab === "page"} onClick={() => setTab("page")} icon={Search}>Page &amp; SEO</TabButton>
             <TabButton active={tab === "history"} onClick={() => setTab("history")} icon={History}>History</TabButton>
-            <TabButton active={tab === "steward"} onClick={() => setTab("steward")} icon={Bot}>
-              Steward
+            <TabButton active={tab === "shepherd"} onClick={() => setTab("shepherd")} icon={Bot}>
+              Shepherd
               {changeSets.some((c) => c.status === "proposed" || c.status === "draft_applied") ? (
-                <span className="ml-1 h-1.5 w-1.5 rounded-full bg-[#b88a4a]" aria-label="Steward has proposals waiting" />
+                <span className="ml-1 h-1.5 w-1.5 rounded-full bg-[#b88a4a]" aria-label="Shepherd has proposals waiting" />
               ) : null}
             </TabButton>
           </div>
@@ -374,7 +374,7 @@ export function PageEditor({ initial }: { initial: PageContext }) {
                 onRestore={async (versionId) => { await runAction({ action: "restoreVersion", versionId }); }}
               />
             ) : null}
-            {tab === "steward" ? <StewardPanel page={page} changeSets={changeSets} onChanged={reload} /> : null}
+            {tab === "shepherd" ? <ShepherdPanel page={page} changeSets={changeSets} onChanged={reload} /> : null}
           </div>
         </aside>
       </div>

@@ -16,12 +16,12 @@ import type { CmsPage } from "@/lib/cms/types";
 
 type View = "overview" | "pages" | "editor" | "requests" | "completed";
 
-const STEWARD_CONTEXT =
-  "You are Steward helping with the MJG CMS. You can list, create, and update CMS DRAFT pages and answer questions about pages and edit requests. Everything you author is a draft for a Super Admin to review — never publish or edit the live site.";
+const SHEPHERD_CONTEXT =
+  "You are Shepherd helping with the MJG CMS. You can list, create, and update CMS DRAFT pages and answer questions about pages and edit requests. Everything you author is a draft for a Super Admin to review — never publish or edit the live site.";
 
 export function CmsWorkspace({ initialPages, frontendPages, displayName }: { initialPages: CmsPage[]; frontendPages: FrontendPage[]; displayName?: string }) {
   const [view, setView] = React.useState<View>("overview");
-  const [stewardOpen, setStewardOpen] = React.useState(false);
+  const [shepherdOpen, setShepherdOpen] = React.useState(false);
   const token = useDashboardActionToken();
 
   // Count of edits completed since this user last opened the Completed Edits tab.
@@ -39,7 +39,7 @@ export function CmsWorkspace({ initialPages, frontendPages, displayName }: { ini
 
   const nav: CmsNav = {
     pages: () => setView("pages"), editor: () => setView("editor"),
-    requests: () => setView("requests"), steward: () => setStewardOpen(true),
+    requests: () => setView("requests"), shepherd: () => setShepherdOpen(true),
   };
 
   // The Frontend Editor is a focused, full-width view: the CMS tabs + page header
@@ -86,15 +86,15 @@ export function CmsWorkspace({ initialPages, frontendPages, displayName }: { ini
         </TabsContent>
       </Tabs>
 
-      {stewardOpen && (
+      {shepherdOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setStewardOpen(false)} />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShepherdOpen(false)} />
           <div className="relative z-10 w-full max-w-2xl">
-            <button onClick={() => setStewardOpen(false)} className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"><X className="h-4 w-4" /></button>
-            <AgentChat title="Steward AI" subtitle="CMS assistant" audio extraContext={STEWARD_CONTEXT}
+            <button onClick={() => setShepherdOpen(false)} className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"><X className="h-4 w-4" /></button>
+            <AgentChat title="Shepherd AI" subtitle="CMS assistant" audio extraContext={SHEPHERD_CONTEXT}
               suggestions={["What edit requests are still open?", "Create a draft landing page for the Stewardship Blueprint.", "Summarize the requests for the Home page.", "List my CMS pages and their status."]}
-              placeholder="Ask Steward about pages or requests…" heightClassName="h-[68vh] min-h-[420px]"
-              emptyTitle="Steward — CMS assistant" emptyHint="I can draft & edit CMS pages and answer questions about pages and edit requests. Drafts only — I won't publish or touch the live site." />
+              placeholder="Ask Shepherd about pages or requests…" heightClassName="h-[68vh] min-h-[420px]"
+              emptyTitle="Shepherd — CMS assistant" emptyHint="I can draft & edit CMS pages and answer questions about pages and edit requests. Drafts only — I won't publish or touch the live site." />
           </div>
         </div>
       )}

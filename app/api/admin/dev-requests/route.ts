@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const action = body.action ?? "upsert";
 
     if (action === "update_status") {
-      const updated = await updateDevRequestStatus({ id: body.id, status: body.status, stewardBrief: body.stewardBrief });
+      const updated = await updateDevRequestStatus({ id: body.id, status: body.status, shepherdBrief: body.shepherdBrief });
       return NextResponse.json({ ok: true, request: updated });
     }
 

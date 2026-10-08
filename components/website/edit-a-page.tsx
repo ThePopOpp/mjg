@@ -6,7 +6,7 @@
 // Where it goes depends on what kind of page it is, and the panel says so BEFORE
 // you start writing rather than after you press send:
 //
-//   Editor-managed page → Steward reads the page, proposes a change set, and
+//   Editor-managed page → Shepherd reads the page, proposes a change set, and
 //                         applies it to the draft for preview and publishing.
 //   Code-owned page     → the description is queued as a developer request.
 //                         Nothing can rewrite a hand-built page from here, and
@@ -42,7 +42,7 @@ export function EditAPage({ pages }: { pages: WebsitePageSummary[] }) {
 
   const [selectedId, setSelectedId] = React.useState("");
   const [description, setDescription] = React.useState("");
-  const [stewardPrompt, setStewardPrompt] = React.useState<string | null>(null);
+  const [shepherdPrompt, setShepherdPrompt] = React.useState<string | null>(null);
   const [queueing, setQueueing] = React.useState(false);
   const [queued, setQueued] = React.useState<string | null>(null);
   const [error, setError] = React.useState("");
@@ -109,9 +109,9 @@ export function EditAPage({ pages }: { pages: WebsitePageSummary[] }) {
     }
   }
 
-  function sendToSteward() {
+  function sendToShepherd() {
     if (!selected || selected.kind !== "managed") return;
-    setStewardPrompt(
+    setShepherdPrompt(
       `Please edit the website page "${selected.label}" (${selected.path}).\n\n` +
         `Read it first with website_get_page, then propose the change below into the draft so I can preview it.\n\n` +
         `What I want changed:\n${description.trim()}`,
@@ -190,7 +190,7 @@ export function EditAPage({ pages }: { pages: WebsitePageSummary[] }) {
 
               {selected.kind === "managed" ? (
                 <p className="mt-1.5 text-sm text-muted-foreground">
-                  Steward will read this page, propose your change, and apply it to the draft. You preview it and decide
+                  Shepherd will read this page, propose your change, and apply it to the draft. You preview it and decide
                   whether to publish — nothing reaches the live site on its own.
                 </p>
               ) : (
@@ -275,8 +275,8 @@ export function EditAPage({ pages }: { pages: WebsitePageSummary[] }) {
 
           <div className="flex flex-wrap items-center gap-2">
             {selected.kind === "managed" ? (
-              <Button onClick={sendToSteward} disabled={!canSend} className="gap-1.5">
-                <Bot className="h-4 w-4" /> Send to Steward
+              <Button onClick={sendToShepherd} disabled={!canSend} className="gap-1.5">
+                <Bot className="h-4 w-4" /> Send to Shepherd
               </Button>
             ) : (
               <Button onClick={queueForDeveloper} disabled={!canSend || queueing} className="gap-1.5">
@@ -296,29 +296,29 @@ export function EditAPage({ pages }: { pages: WebsitePageSummary[] }) {
         </div>
       ) : null}
 
-      {/* Steward, pre-loaded with the page and the instruction */}
-      {stewardPrompt && selected ? (
+      {/* Shepherd, pre-loaded with the page and the instruction */}
+      {shepherdPrompt && selected ? (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setStewardPrompt(null)} aria-hidden />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShepherdPrompt(null)} aria-hidden />
           <div className="relative z-10 w-full max-w-2xl">
             <button
-              onClick={() => setStewardPrompt(null)}
+              onClick={() => setShepherdPrompt(null)}
               aria-label="Close"
               className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"
             >
               <X className="h-4 w-4" />
             </button>
             <AgentChat
-              title="Steward"
+              title="Shepherd"
               subtitle={selected.label}
               audio
-              initialMessage={stewardPrompt}
+              initialMessage={shepherdPrompt}
               extraContext={
                 `The user is editing the website page "${selected.label}" (id: ${selected.id}, address: ${selected.path}). ` +
                 "Read it with website_get_page before proposing anything, then use website_propose_change or " +
                 "website_edit_section so the change lands in the draft for review. Do not publish unless asked."
               }
-              placeholder="Add more detail or answer Steward…"
+              placeholder="Add more detail or answer Shepherd…"
               heightClassName="h-[70vh] min-h-[440px]"
               emptyTitle="Working on it"
               emptyHint="Reading the page…"

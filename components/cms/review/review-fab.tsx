@@ -187,7 +187,7 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
             <button onClick={openMessages} className={cn("flex-1 rounded-lg px-3 py-1.5 text-xs font-medium", tab === "dm" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted")}>
               <span className="inline-flex items-center gap-1"><MessageSquareText className="h-3.5 w-3.5" /> Messages{dmUnread > 0 && <span className="rounded-full bg-destructive px-1.5 text-[9px] font-bold text-destructive-foreground">{dmUnread}</span>}</span>
             </button>
-            <Button size="sm" variant="outline" className="h-7 px-2" onClick={() => setAgentOpen(true)} title="Ask Steward"><Bot className="h-3.5 w-3.5" /></Button>
+            <Button size="sm" variant="outline" className="h-7 px-2" onClick={() => setAgentOpen(true)} title="Ask Shepherd"><Bot className="h-3.5 w-3.5" /></Button>
             <Button size="sm" variant="outline" className="h-7 px-2" onClick={toggleExpanded} title={expanded ? "Collapse" : "Expand to full page"}>{expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}</Button>
           </div>
 
@@ -260,8 +260,8 @@ export function ReviewFab({ me }: { me: { email: string; name: string } }) {
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setAgentOpen(false)} />
           <div className="relative z-10 w-full max-w-2xl">
             <button onClick={() => setAgentOpen(false)} className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"><X className="h-4 w-4" /></button>
-            <AgentChat title="Steward AI" subtitle={`Reviewing ${pageName}`} audio extraContext={agentContext}
-              placeholder="Ask Steward about this page…" heightClassName="h-[68vh] min-h-[420px]"
+            <AgentChat title="Shepherd AI" subtitle={`Reviewing ${pageName}`} audio extraContext={agentContext}
+              placeholder="Ask Shepherd about this page…" heightClassName="h-[68vh] min-h-[420px]"
               emptyTitle="Ask about this page" emptyHint="I can look things up and draft changes for review — I won't publish or delete anything." />
           </div>
         </div>

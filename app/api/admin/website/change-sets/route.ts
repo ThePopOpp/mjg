@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * Approve / apply / reject (spec §14). "apply" is the default landing point for
- * a Steward proposal: it writes the DRAFT and leaves publishing to the owner.
+ * a Shepherd proposal: it writes the DRAFT and leaves publishing to the owner.
  */
 export async function POST(request: NextRequest) {
   try {

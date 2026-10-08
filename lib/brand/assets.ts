@@ -1,6 +1,6 @@
 // MJG Brand Kit / Design System — the single source of truth for logos, colors,
 // fonts, voice, and reusable on-brand snippets. Consumed by the dashboard Assets
-// page and by the AI agent (Steward) so generated content stays on-brand.
+// page and by the AI agent (Shepherd) so generated content stays on-brand.
 
 // Logos are self-hosted at /mjg-logos (public/), NOT WordPress. These URLs are
 // ABSOLUTE because they render in email, where relative paths don't resolve — and

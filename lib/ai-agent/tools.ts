@@ -27,7 +27,7 @@ import {
 import { SOCIAL_EVENT_KEYS } from "@/lib/social-media/constants";
 import { loadProjectManagerData } from "@/lib/project-manager/data";
 import { listCmsPages, createCmsDraftPage, saveCmsDraft, getCmsPage } from "@/lib/cms/data";
-import { WEBSITE_TOOLS } from "@/lib/website/steward-tools";
+import { WEBSITE_TOOLS } from "@/lib/website/shepherd-tools";
 import type { CmsBlock } from "@/lib/cms/types";
 
 const SOCIAL_EVENT_OPTIONS = SOCIAL_EVENT_KEYS.map((e) => e.key);
@@ -375,7 +375,7 @@ const runSqlQuery: AgentTool = {
     }
     if (/;/.test(query.replace(/;+\s*$/, ""))) throw new Error("Only a single statement is allowed.");
     const supabase = createSupabaseAdminClient();
-    const { data, error } = await supabase.rpc("steward_readonly_query", { query_text: query });
+    const { data, error } = await supabase.rpc("shepherd_readonly_query", { query_text: query });
     if (error) throw new Error(error.message);
     const rows = Array.isArray(data) ? data : data == null ? [] : [data];
     await logUserActivity({ userId: ctx.actorId, action: "ai_agent_sql_query", entityType: "database", metadata: { query: query.slice(0, 500), rows: rows.length } }).catch(() => {});
@@ -1441,7 +1441,7 @@ const updateProjectItem: AgentTool = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
-// CMS authoring (Super-Admin only; Steward can only ever produce DRAFTS)
+// CMS authoring (Super-Admin only; Shepherd can only ever produce DRAFTS)
 // ──────────────────────────────────────────────────────────────────────────────
 
 // CMS is Super-Admin-only at every layer. The chat route admits any admin+, so
@@ -1614,7 +1614,7 @@ const updateDevRequestStatusTool: AgentTool = {
     const updated = await updateDevRequestStatus({
       id: String(args.id),
       status: args.status as never,
-      stewardBrief: typeof args.brief === "string" ? args.brief : undefined,
+      shepherdBrief: typeof args.brief === "string" ? args.brief : undefined,
     });
     await logUserActivity({
       userId: ctx.actorId,
@@ -1751,7 +1751,7 @@ export const AGENT_TOOLS: AgentTool[] = [
   forgetTool,
   // Frontend Editor — the controlled website-management tool layer. Reads
   // auto-execute; every write lands in a draft and is confirmation-gated.
-  // See lib/website/steward-tools.ts for the safety model.
+  // See lib/website/shepherd-tools.ts for the safety model.
   ...WEBSITE_TOOLS,
 ];
 

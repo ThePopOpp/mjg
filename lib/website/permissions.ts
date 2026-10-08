@@ -19,7 +19,7 @@ export const WEBSITE_CAPABILITIES = [
   "manageGlobals",
   "manageSeo",
   "manageSettings",
-  "useSteward",
+  "useShepherd",
   "viewAuditLog",
 ] as const;
 
@@ -34,7 +34,7 @@ const ALL = [...WEBSITE_CAPABILITIES];
  */
 const CAPABILITIES: Record<string, WebsiteCapability[]> = {
   [ROLES.SUPER_ADMIN]: ALL,
-  [ROLES.ADMIN]: ["view", "editDraft", "createPage", "manageSeo", "useSteward"],
+  [ROLES.ADMIN]: ["view", "editDraft", "createPage", "manageSeo", "useShepherd"],
 };
 
 export function websiteCapabilities(role: string | null | undefined): WebsiteCapability[] {
@@ -47,7 +47,7 @@ export function canWebsite(role: string | null | undefined, capability: WebsiteC
   return websiteCapabilities(role).includes(capability);
 }
 
-/** Throwing form for server actions and Steward tools. */
+/** Throwing form for server actions and Shepherd tools. */
 export function assertWebsiteCapability(role: string | null | undefined, capability: WebsiteCapability): void {
   if (!canWebsite(role, capability)) {
     throw new Error(`Your role cannot ${CAPABILITY_VERBS[capability]} website content.`);
@@ -66,6 +66,6 @@ const CAPABILITY_VERBS: Record<WebsiteCapability, string> = {
   manageGlobals: "change global content on",
   manageSeo: "change SEO for",
   manageSettings: "change settings for",
-  useSteward: "use Steward on",
+  useShepherd: "use Shepherd on",
   viewAuditLog: "review the history of",
 };

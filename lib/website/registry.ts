@@ -1,6 +1,6 @@
 // Frontend Editor — the approved component registry (spec §10).
 //
-// This file is the allow-list. Mike and Steward can only place block types that
+// This file is the allow-list. Mike and Shepherd can only place block types that
 // appear here, and only set props that appear in a block's field list; anything
 // else is dropped by validateProps() before it ever reaches storage or the
 // renderer. Adding a new approved component later means adding one entry here
@@ -19,10 +19,10 @@ export type ComponentDefinition = {
   label: string;
   description: string;
   category: BlockCategory;
-  /** Field list — validation, Steward's schema, and the property panel. */
+  /** Field list — validation, Shepherd's schema, and the property panel. */
   fields: FieldDef[];
-  /** Steward may create/modify this block type. */
-  stewardEditable: boolean;
+  /** Shepherd may create/modify this block type. */
+  shepherdEditable: boolean;
   /** The owner-facing editor exposes this block type. */
   ownerEditable: boolean;
   /** Block pulls live site data (blog posts, events) rather than authored props. */
@@ -123,7 +123,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Hero",
     description: "Full-width opening section: eyebrow, headline, supporting copy and up to two buttons.",
     category: "Layout",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       eyebrow,
@@ -149,7 +149,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Rich text",
     description: "A block of formatted copy. Supports **bold**, *italic*, [links](/page) and - bullet lists.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       { key: "title", label: "Heading (optional)", kind: "text", maxLength: 200, group: "content" },
@@ -162,7 +162,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Two column content",
     description: "Two side-by-side columns of copy, each with its own optional heading.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       { key: "title", label: "Section heading", kind: "text", maxLength: 200, group: "content" },
@@ -178,7 +178,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Image + content",
     description: "An image beside a block of copy with an optional button.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       eyebrow,
@@ -199,7 +199,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Video",
     description: "An embedded YouTube or Vimeo video with an optional caption.",
     category: "Media",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -217,7 +217,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Feature grid",
     description: "A grid of short feature points, each with a heading and a line of copy.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       eyebrow,
@@ -242,7 +242,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Card grid",
     description: "A grid of linked cards, each with an optional image.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -270,7 +270,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Call to action",
     description: "A standout band with a headline, short copy and up to two buttons.",
     category: "Conversion",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       eyebrow,
@@ -286,7 +286,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Button group",
     description: "A row of buttons on their own.",
     category: "Conversion",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       {
@@ -309,7 +309,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Testimonial",
     description: "One or more quotes with an attributed name and role.",
     category: "Proof",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -330,7 +330,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Pull quote",
     description: "A single large quote used to break up a page.",
     category: "Proof",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       { key: "quote", label: "Quote", kind: "textarea", required: true, maxLength: 800, group: "content" },
@@ -343,7 +343,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "FAQ / Accordion",
     description: "Expandable question-and-answer rows.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -363,7 +363,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Tabs",
     description: "Tabbed panels of copy.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -382,7 +382,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Stats",
     description: "A row of headline numbers with labels.",
     category: "Proof",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -401,7 +401,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Timeline",
     description: "An ordered sequence of steps or milestones.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       eyebrow,
@@ -423,7 +423,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Team members",
     description: "Profile cards with a photo, name, role and short bio.",
     category: "Proof",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -445,7 +445,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Resource / download",
     description: "Downloadable resources with a title, description and file link.",
     category: "Content",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -467,7 +467,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Stewardship Blueprint section",
     description: "The branded Stewardship Blueprint explainer with its own call to action.",
     category: "Conversion",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       { key: "eyebrow", label: "Eyebrow", kind: "text", maxLength: 80, group: "content", default: "The Stewardship Blueprint" },
@@ -489,7 +489,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Pricing",
     description: "Pricing or membership tiers with features and a button each.",
     category: "Conversion",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -515,7 +515,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Subscription CTA",
     description: "A membership or subscription invitation band.",
     category: "Conversion",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       eyebrow,
@@ -534,7 +534,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Contact form",
     description: "The site contact form. Fields and destination are fixed by the application.",
     category: "Conversion",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -549,7 +549,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Booking CTA",
     description: "An invitation to book, pointing at the application booking flow.",
     category: "Conversion",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       eyebrow,
@@ -564,7 +564,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Newsletter signup",
     description: "Email capture that posts to the application's signup endpoint.",
     category: "Conversion",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -579,7 +579,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Image gallery",
     description: "A grid of images with alt text and optional captions.",
     category: "Media",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -603,7 +603,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Logo grid",
     description: "A row of partner or publication logos.",
     category: "Proof",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       heading(false),
@@ -623,7 +623,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Blog feed",
     description: "The most recent published blog posts. Content comes from Blog Posts, not from this block.",
     category: "Data",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     dynamic: true,
     fields: [
@@ -638,7 +638,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Event feed",
     description: "Upcoming public events. Content comes from Bookings & Events, not from this block.",
     category: "Data",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     dynamic: true,
     fields: [
@@ -653,7 +653,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Divider",
     description: "A horizontal rule between sections.",
     category: "Layout",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       {
@@ -668,7 +668,7 @@ const DEFINITIONS: ComponentDefinition[] = [
     label: "Spacer",
     description: "Empty vertical space.",
     category: "Layout",
-    stewardEditable: true,
+    shepherdEditable: true,
     ownerEditable: true,
     fields: [
       {
@@ -759,7 +759,7 @@ export type ContentValidation = { content: WebsiteContent; issues: ValidationIss
 
 /**
  * Validate a whole content document. Invalid blocks are dropped (with an issue
- * recorded) rather than failing the entire save, so one bad block from Steward
+ * recorded) rather than failing the entire save, so one bad block from Shepherd
  * can never wipe a page. Duplicate ids are re-issued.
  */
 export function validateContent(raw: unknown): ContentValidation {
@@ -779,11 +779,11 @@ export function validateContent(raw: unknown): ContentValidation {
 }
 
 /**
- * The registry rendered for Steward's system context (spec §30) — every block
+ * The registry rendered for Shepherd's system context (spec §30) — every block
  * type it may use, with the exact prop names and shapes.
  */
 export function renderRegistryForPrompt(): string {
-  const lines = DEFINITIONS.filter((d) => d.stewardEditable).map((d) => {
+  const lines = DEFINITIONS.filter((d) => d.shepherdEditable).map((d) => {
     const contentFields = d.fields.filter((f) => (f.group ?? "content") === "content" || f.group === "media");
     return `### ${d.type} — ${d.label}\n${d.description}\nProps:\n${describeFields(contentFields, "  ")}`;
   });

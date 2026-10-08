@@ -1,11 +1,11 @@
 // Frontend Editor — shared types (docs/frontend-editor/frontend-editor.md).
 //
 // Client-safe: no node/server imports, so the dashboard editor, the public
-// renderer and the Steward tool layer can all share one vocabulary.
+// renderer and the Shepherd tool layer can all share one vocabulary.
 
 export type WebsitePageStatus = "draft" | "published" | "scheduled" | "archived";
 export type WebsitePageType = "page" | "landing" | "resource" | "marketing" | "legal" | "system";
-export type EditSource = "manual" | "steward" | "restore";
+export type EditSource = "manual" | "shepherd" | "restore";
 
 /** One validated block instance on a page. `props` is always registry-shaped. */
 export type WebsiteBlock = {
@@ -95,7 +95,7 @@ export type WebsiteChangeSet = {
   id: string;
   page_id: string | null;
   requested_by: string | null;
-  source: "steward" | "manual";
+  source: "shepherd" | "manual";
   risk: ChangeRisk;
   prompt: string | null;
   summary: string;
@@ -148,7 +148,7 @@ export type WebsiteRedirect = {
 export type WebsiteAuditLog = {
   id: string;
   actor_id: string | null;
-  actor_type: "user" | "steward";
+  actor_type: "user" | "shepherd";
   action: string;
   resource_type: string;
   resource_id: string | null;
@@ -160,11 +160,11 @@ export type WebsiteAuditLog = {
 /** Editor behaviour stored in website_globals under `editor.settings`. */
 export type EditorSettings = {
   /** Spec §16 — OFF by default. Even when ON, protected/legal pages ignore it. */
-  allowStewardDirectPublish: boolean;
+  allowShepherdDirectPublish: boolean;
 };
 
 export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
-  allowStewardDirectPublish: false,
+  allowShepherdDirectPublish: false,
 };
 
 export const PAGE_TYPE_LABELS: Record<WebsitePageType, string> = {

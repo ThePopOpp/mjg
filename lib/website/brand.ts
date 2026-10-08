@@ -1,4 +1,4 @@
-// Frontend Editor — MJG brand context for Steward (spec §30, §56).
+// Frontend Editor — MJG brand context for Shepherd (spec §30, §56).
 //
 // Kept small and retrieved rather than dumped: the page-editing tools inject
 // this plus the registry, not the whole website.
@@ -18,7 +18,7 @@ Never invent: factual claims, statistics, credentials, endorsements, testimonial
 outcome, or regulatory/financial/legal advice. If a page needs a real number, a real quote or a real
 person, ask for it rather than writing a plausible one.`;
 
-export const STEWARD_WEBSITE_RULES = `FRONTEND EDITOR RULES (these override your general instructions when working on website pages)
+export const SHEPHERD_WEBSITE_RULES = `FRONTEND EDITOR RULES (these override your general instructions when working on website pages)
 
 1. ALWAYS read the current page (website_get_page) before proposing any edit. Never write from memory.
 2. Work DRAFT-FIRST. Your edits land in the draft; Mike previews and publishes. Never describe a page
@@ -38,7 +38,7 @@ export const STEWARD_WEBSITE_RULES = `FRONTEND EDITOR RULES (these override your
    desktop-only layout.
 10. Never reveal secrets, environment variables, API keys, database structure or server internals.`;
 
-/** The context block injected into Steward's system prompt for website work. */
+/** The context block injected into Shepherd's system prompt for website work. */
 export function renderWebsiteContextForPrompt(siteMap: string, registry: string): string {
-  return ["\n\n", STEWARD_WEBSITE_RULES, "\n\n", MJG_BRAND_VOICE, "\n\n", siteMap, "\n\n", registry].join("");
+  return ["\n\n", SHEPHERD_WEBSITE_RULES, "\n\n", MJG_BRAND_VOICE, "\n\n", siteMap, "\n\n", registry].join("");
 }

@@ -111,7 +111,7 @@ export async function deleteTrainingDoc(id: string): Promise<void> {
 
 // ── Retrieval used by the agent ──────────────────────────────────────────────
 
-// Only 'ready' docs are visible to Steward: 'stored' has no text, 'failed' never
+// Only 'ready' docs are visible to Shepherd: 'stored' has no text, 'failed' never
 // converted, 'archived' was switched off on purpose.
 export async function listAgentReadableDocs(): Promise<Array<{ id: string; title: string; summary: string | null; char_count: number; tags: string[] }>> {
   const sb = createSupabaseAdminClient();
@@ -156,7 +156,7 @@ export async function searchTrainingDocs(query: string, limit = 5): Promise<Arra
   });
 }
 
-// The index injected into the system prompt: titles + summaries only, so Steward
+// The index injected into the system prompt: titles + summaries only, so Shepherd
 // knows WHAT exists and can fetch the body it needs. Capped so a large library
 // can't quietly inflate every request.
 export async function renderTrainingDocsForPrompt(): Promise<string> {

@@ -1,6 +1,6 @@
-// Frontend Editor — Steward's controlled tool layer (spec §12.2).
+// Frontend Editor — Shepherd's controlled tool layer (spec §12.2).
 //
-// This is the ONLY way Steward can touch the website. There is no SQL, no file
+// This is the ONLY way Shepherd can touch the website. There is no SQL, no file
 // write, no shell and no repository access behind any of it; every tool goes
 // through the same validated data layer the dashboard uses, so the same rules
 // apply whether a change came from a click or from a sentence:
@@ -11,7 +11,7 @@
 //     legal pages unless the owner does it themselves),
 //   • protected routes are unreachable,
 //   • only registered components with registered props survive validation,
-//   • everything is audited under actor_type = 'steward'.
+//   • everything is audited under actor_type = 'shepherd'.
 
 import { upsertDevRequest } from "@/lib/dev-requests/repository";
 import {
@@ -19,7 +19,7 @@ import {
   listPages, listVersions, logWebsiteAudit, publishPage, restorePage, restoreVersion, searchWebsite,
   unpublishPage, updatePageMeta,
 } from "./data";
-import { applyChangeSetToDraft, approveAndPublishChangeSet, listChangeSets, proposeChangeSet, stewardMayPublish } from "./change-sets";
+import { applyChangeSetToDraft, approveAndPublishChangeSet, listChangeSets, proposeChangeSet, shepherdMayPublish } from "./change-sets";
 import { addBlock, removeBlock, replaceTextInContent, updateBlock, moveBlock } from "./blocks";
 import { createPreviewToken } from "./preview";
 import { getDefinition, registrySummary, renderRegistryForPrompt, validateContent } from "./registry";
@@ -97,16 +97,16 @@ async function writeThroughChangeSet(
     meta: opts.meta,
     prompt: opts.prompt ?? null,
     action: opts.action ?? "page.updateContent",
-    source: "steward",
+    source: "shepherd",
     actorId: ctx.actorId,
   });
 
-  await applyChangeSetToDraft(proposal.changeSet.id, { actorId: ctx.actorId, actorType: "steward" });
+  await applyChangeSetToDraft(proposal.changeSet.id, { actorId: ctx.actorId, actorType: "shepherd" });
 
-  const permission = await stewardMayPublish(page, proposal.risk);
+  const permission = await shepherdMayPublish(page, proposal.risk);
   let published = false;
   if (permission.allowed) {
-    await approveAndPublishChangeSet(proposal.changeSet.id, { actorId: ctx.actorId, actorType: "steward" });
+    await approveAndPublishChangeSet(proposal.changeSet.id, { actorId: ctx.actorId, actorType: "shepherd" });
     published = true;
   }
 
@@ -230,7 +230,7 @@ const globalsTool: AgentTool = {
 
 const versionsTool: AgentTool = {
   name: "website_list_versions",
-  description: "List the saved versions of a page (number, date, who made it, whether it came from Steward, and a summary) so a previous version can be restored.",
+  description: "List the saved versions of a page (number, date, who made it, whether it came from Shepherd, and a summary) so a previous version can be restored.",
   parameters: {
     type: "object",
     properties: { page: { type: "string", description: "Page id, address or title." } },
@@ -271,7 +271,7 @@ const linksTool: AgentTool = {
 
 const historyTool: AgentTool = {
   name: "website_history",
-  description: "Read the website change history — what changed, when, and whether a person or Steward did it. Use this for questions like 'what changed last week'.",
+  description: "Read the website change history — what changed, when, and whether a person or Shepherd did it. Use this for questions like 'what changed last week'.",
   parameters: {
     type: "object",
     properties: { limit: { type: "number", description: "How many entries (default 40, max 200)." } },
@@ -319,7 +319,7 @@ const createPageTool: AgentTool = {
     type: "object",
     properties: {
       title: { type: "string", description: "The page title." },
-      slug: { type: "string", description: "Address without the leading slash (e.g. steward-ai). Derived from the title if omitted." },
+      slug: { type: "string", description: "Address without the leading slash (e.g. shepherd-ai). Derived from the title if omitted." },
       template: { type: "string", description: `One of: ${PAGE_TEMPLATES.map((t) => t.key).join(", ")}. Pick the closest fit.` },
       pageType: { type: "string", enum: ["page", "landing", "resource", "marketing", "legal"] },
       seoTitle: { type: "string" },
@@ -363,7 +363,7 @@ const createPageTool: AgentTool = {
       seo_description: args.seoDescription ?? null,
       content: sections ? { version: 1, blocks: sections.map((s: Record<string, unknown>) => ({ id: "", type: str(s.type), props: s.props ?? {} })) } : undefined,
       actorId: ctx.actorId,
-      actorType: "steward",
+      actorType: "shepherd",
     });
 
     return {
@@ -537,7 +537,7 @@ const updateSettingsTool: AgentTool = {
       no_index: args.noIndex,
       navigation_label: args.navigationLabel,
       actorId: ctx.actorId,
-      actorType: "steward",
+      actorType: "shepherd",
       createRedirect: true,
     });
     return {
@@ -568,7 +568,7 @@ const publishTool: AgentTool = {
   execute: async (args, ctx) => {
     const page = await resolvePage(args.page);
     const { page: published, version, issues } = await publishPage(page.id, {
-      actorId: ctx.actorId, actorType: "steward", summary: str(args.summary) || "Published by Steward.",
+      actorId: ctx.actorId, actorType: "shepherd", summary: str(args.summary) || "Published by Shepherd.",
     });
     return {
       ...pageSummary(published),
@@ -610,7 +610,7 @@ const lifecycleTool: AgentTool = {
   },
   execute: async (args, ctx) => {
     const page = await resolvePage(args.page);
-    const opts = { actorId: ctx.actorId, actorType: "steward" as const };
+    const opts = { actorId: ctx.actorId, actorType: "shepherd" as const };
     switch (str(args.operation)) {
       case "unpublish":
         return { ...pageSummary(await unpublishPage(page.id, opts)), whatHappensNext: "It is off the live site. The draft is untouched." };
@@ -643,7 +643,7 @@ const navigationWriteTool: AgentTool = {
       id: { type: "string", description: "For 'update' and 'remove' — from website_get_navigation." },
       parentLabel: { type: "string", description: "For 'add' — put it in this item's dropdown (e.g. 'Resources')." },
       label: { type: "string" },
-      url: { type: "string", description: "Page address (/steward-ai) or an external https link." },
+      url: { type: "string", description: "Page address (/shepherd-ai) or an external https link." },
       sortOrder: { type: "number", description: "Position within its menu or dropdown." },
       isVisible: { type: "boolean" },
       openInNewTab: { type: "boolean" },
@@ -661,7 +661,7 @@ const navigationWriteTool: AgentTool = {
   },
   execute: async (args, ctx) => {
     const op = str(args.operation);
-    const opts = { actorId: ctx.actorId, actorType: "steward" as const };
+    const opts = { actorId: ctx.actorId, actorType: "shepherd" as const };
 
     if (op === "add") {
       const group = (str(args.group) || "main") as "main" | "footer" | "utility";
@@ -711,7 +711,7 @@ const globalWriteTool: AgentTool = {
   summarize: (args) => `Change the site-wide item "${str(args.key)}". This appears on EVERY page of the website.`,
   execute: async (args, ctx) => {
     const updated = await updateGlobal(str(args.key), (args.value ?? {}) as Record<string, unknown>, {
-      actorId: ctx.actorId, actorType: "steward",
+      actorId: ctx.actorId, actorType: "shepherd",
     });
     return { ok: true, key: updated.key, value: updated.value, whatHappensNext: "This is live on every page immediately." };
   },
@@ -791,7 +791,7 @@ const previewLinkTool: AgentTool = {
     const page = await resolvePage(args.page);
     const preview = await createPreviewToken(page.id, { actorId: ctx.actorId, hours: Number(args.hours) || undefined });
     await logWebsiteAudit({
-      actorId: ctx.actorId, actorType: "steward", action: "preview.link_created", resourceId: page.id,
+      actorId: ctx.actorId, actorType: "shepherd", action: "preview.link_created", resourceId: page.id,
       summary: `Created a draft preview link for "${page.title}".`,
     });
     return { url: preview.url, expiresAt: preview.expiresAt, note: "Anyone with this link can see the draft until it expires. It is never indexed." };
@@ -827,7 +827,7 @@ const requestComponentTool: AgentTool = {
       args.acceptanceCriteria ? `## Acceptance criteria\n${str(args.acceptanceCriteria)}` : "",
       "## Integration\nRegister the component in lib/website/registry.ts with its field schema, add the matching React " +
         "component under components/website/blocks, and map it in components/website/page-renderer.tsx. It then appears " +
-        "in the Add Section picker and becomes available to Steward automatically.",
+        "in the Add Section picker and becomes available to Shepherd automatically.",
     ]
       .filter(Boolean)
       .join("\n\n");
@@ -844,7 +844,7 @@ const requestComponentTool: AgentTool = {
     });
 
     await logWebsiteAudit({
-      actorId: ctx.actorId, actorType: "steward", action: "component.requested", resourceType: "dev_request",
+      actorId: ctx.actorId, actorType: "shepherd", action: "component.requested", resourceType: "dev_request",
       resourceId: request.id, summary: `Wrote a developer specification for "${str(args.title)}".`,
     });
 
@@ -885,7 +885,7 @@ export const WEBSITE_TOOLS: AgentTool[] = [
 ];
 
 /**
- * A compact site map for Steward's system prompt (spec §30 — retrieval, not the
+ * A compact site map for Shepherd's system prompt (spec §30 — retrieval, not the
  * whole website). Titles, addresses and status only; content comes from the read
  * tools on demand.
  */
@@ -910,5 +910,5 @@ export function renderComponentsForPrompt(): string {
 }
 
 // Re-exported so the confirmation UI and tests can reach the same deletion guard
-// Steward deliberately does not have.
+// Shepherd deliberately does not have.
 export { deletePage as ownerOnlyDeletePage, getPage as _getPage };

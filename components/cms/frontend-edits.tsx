@@ -50,7 +50,7 @@ const PRIORITY_COLOR: Record<string, string> = {
 export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: FrontendPage[]; onBack?: () => void; onOpenRequests?: () => void }) {
   const token = useDashboardActionToken();
   const [origin, setOrigin] = React.useState("");
-  const [stewardOpen, setStewardOpen] = React.useState(false);
+  const [shepherdOpen, setShepherdOpen] = React.useState(false);
   React.useEffect(() => { setOrigin(window.location.origin); }, []);
   const [page, setPage] = React.useState<FrontendPage | null>(pages[0] ?? null);
   const [customPages, setCustomPages] = React.useState<FrontendPage[]>([]);
@@ -215,7 +215,7 @@ export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: Fronte
     a.download = `edit-requests-${page.slug}.md`; a.click(); URL.revokeObjectURL(a.href);
   }
 
-  const stewardContext = page
+  const shepherdContext = page
     ? `You are reviewing the public page "${page.label}" (${fullUrl}). Its ${notes.length} saved edit request(s):\n${notes.map((n) => `- [${n.change_type}/${n.priority}/${n.status}] ${n.element_label} (${n.element_type}): ${n.note}`).join("\n") || "(none yet)"}\nHelp draft the changes as CMS drafts — never publish or edit the live site.`
     : "";
 
@@ -253,7 +253,7 @@ export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: Fronte
         <div className="ml-auto flex items-center gap-2">
           {onOpenRequests && <Button variant="outline" size="sm" onClick={onOpenRequests} title="Saved edit requests"><Bookmark className="h-4 w-4" /> Reviews</Button>}
           <Button variant="outline" size="sm" onClick={exportNotes} disabled={notes.length === 0} title="Export this page's requests as Markdown"><Download className="h-4 w-4" /> Export</Button>
-          <Button variant="outline" size="sm" onClick={() => setStewardOpen(true)} title="Ask Steward to draft the changes"><Bot className="h-4 w-4" /> Send to Steward</Button>
+          <Button variant="outline" size="sm" onClick={() => setShepherdOpen(true)} title="Ask Shepherd to draft the changes"><Bot className="h-4 w-4" /> Send to Shepherd</Button>
           <Button variant="outline" size="sm" onClick={() => { setNonce((n) => n + 1); }} title="Reload preview"><RefreshCw className="h-4 w-4" /></Button>
         </div>
       </div>
@@ -367,14 +367,14 @@ export function FrontendEdits({ pages, onBack, onOpenRequests }: { pages: Fronte
         </div>
       </div>
 
-      {stewardOpen && (
+      {shepherdOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setStewardOpen(false)} />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShepherdOpen(false)} />
           <div className="relative z-10 w-full max-w-2xl">
-            <button onClick={() => setStewardOpen(false)} className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"><X className="h-4 w-4" /></button>
-            <AgentChat title="Steward AI" subtitle={`Drafting edits for ${page.label}`} audio extraContext={stewardContext}
-              placeholder="Ask Steward to draft these edit requests…" heightClassName="h-[68vh] min-h-[420px]"
-              emptyTitle="Draft these edits with Steward" emptyHint="I can turn this page's saved edit requests into CMS draft changes for review — I won't publish or touch the live site." />
+            <button onClick={() => setShepherdOpen(false)} className="absolute -right-3 -top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow hover:bg-muted"><X className="h-4 w-4" /></button>
+            <AgentChat title="Shepherd AI" subtitle={`Drafting edits for ${page.label}`} audio extraContext={shepherdContext}
+              placeholder="Ask Shepherd to draft these edit requests…" heightClassName="h-[68vh] min-h-[420px]"
+              emptyTitle="Draft these edits with Shepherd" emptyHint="I can turn this page's saved edit requests into CMS draft changes for review — I won't publish or touch the live site." />
           </div>
         </div>
       )}

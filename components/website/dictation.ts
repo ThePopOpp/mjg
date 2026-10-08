@@ -4,7 +4,7 @@ import * as React from "react";
 
 /**
  * Browser dictation for the Frontend Editor, on top of the Web Speech API — the
- * same engine the Steward chat mic uses.
+ * same engine the Shepherd chat mic uses.
  *
  * Differences from the chat mic, because this one feeds a long description
  * rather than a one-shot message: it stays listening until it is stopped, and it

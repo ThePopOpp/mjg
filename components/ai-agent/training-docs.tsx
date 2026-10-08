@@ -1,11 +1,11 @@
 "use client";
 
-// Training Docs — upload reference material to teach Steward.
+// Training Docs — upload reference material to teach Shepherd.
 //
 // Files are converted to markdown server-side on upload (see
 // lib/ai-agent/training-docs/convert.ts); the original stays downloadable. Only
 // docs that converted to text ("Readable") reach the agent — images and formats we
-// can't parse are kept but clearly marked so nobody assumes Steward has read them.
+// can't parse are kept but clearly marked so nobody assumes Shepherd has read them.
 
 import * as React from "react";
 import {
@@ -44,10 +44,10 @@ type Doc = {
 };
 
 const STATUS_META: Record<Doc["status"], { label: string; hint: string; pill: string; icon: React.ElementType }> = {
-  ready: { label: "Readable", hint: "Converted to markdown — Steward can read this.", pill: "bg-primary/10 text-primary", icon: CircleCheck },
-  stored: { label: "Stored only", hint: "Saved and downloadable, but there's no text for Steward to read.", pill: "bg-muted text-muted-foreground", icon: ImageIcon },
+  ready: { label: "Readable", hint: "Converted to markdown — Shepherd can read this.", pill: "bg-primary/10 text-primary", icon: CircleCheck },
+  stored: { label: "Stored only", hint: "Saved and downloadable, but there's no text for Shepherd to read.", pill: "bg-muted text-muted-foreground", icon: ImageIcon },
   failed: { label: "Couldn't convert", hint: "The file was saved but conversion failed.", pill: "bg-destructive/10 text-destructive", icon: CircleAlert },
-  archived: { label: "Archived", hint: "Kept, but hidden from Steward.", pill: "bg-muted text-muted-foreground", icon: Archive },
+  archived: { label: "Archived", hint: "Kept, but hidden from Shepherd.", pill: "bg-muted text-muted-foreground", icon: Archive },
 };
 
 const FILTERS = [
@@ -130,7 +130,7 @@ export function TrainingDocs() {
   }
 
   async function remove(id: string) {
-    if (!window.confirm("Delete this training doc? Steward will stop using it.")) return;
+    if (!window.confirm("Delete this training doc? Shepherd will stop using it.")) return;
     const r = await fetch(`/api/admin/ai-agent/training-docs?id=${id}`, {
       method: "DELETE", headers: { "x-mjg-action-token": token },
     }).then((x) => x.json());
@@ -160,7 +160,7 @@ export function TrainingDocs() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <h2 className="text-base font-semibold tracking-tight">Training Docs</h2>
-          <p className="text-xs text-muted-foreground">Reference material Steward uses when answering.</p>
+          <p className="text-xs text-muted-foreground">Reference material Shepherd uses when answering.</p>
         </div>
         <PageHelp title={TRAINING_DOCS_HELP_TITLE} intro={TRAINING_DOCS_HELP_INTRO} sections={TRAINING_DOCS_HELP} />
       </div>
@@ -185,7 +185,7 @@ export function TrainingDocs() {
           </Button>
         </div>
         <p className="mx-auto mt-3 max-w-lg text-xs leading-5 text-muted-foreground">
-          Markdown, text, CSV, JSON, HTML, Word (.docx) and PDF are converted to markdown for Steward to read.
+          Markdown, text, CSV, JSON, HTML, Word (.docx) and PDF are converted to markdown for Shepherd to read.
           Images and other formats are stored for reference but can&apos;t be read. Max 25 MB per file.
         </p>
         <input
@@ -223,7 +223,7 @@ export function TrainingDocs() {
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search docs…" aria-label="Search training docs" className="h-9 pl-8 text-xs" />
         </div>
         <span className="text-xs text-muted-foreground">
-          {shown.length} doc{shown.length === 1 ? "" : "s"} · {readable} readable by Steward
+          {shown.length} doc{shown.length === 1 ? "" : "s"} · {readable} readable by Shepherd
         </span>
         <Button variant="outline" size="sm" onClick={load} aria-label="Refresh" className="ml-auto">
           <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
@@ -237,7 +237,7 @@ export function TrainingDocs() {
           <p className="text-sm font-medium">{docs.length === 0 ? "No training docs yet." : "Nothing matches."}</p>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
             {docs.length === 0
-              ? "Upload guides, playbooks or process notes and Steward will use them when answering."
+              ? "Upload guides, playbooks or process notes and Shepherd will use them when answering."
               : "Try a different filter or search."}
           </p>
         </div>
@@ -345,8 +345,8 @@ function DocDrawer({
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Summary</Label>
             <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={2} placeholder="One line describing what's in here…" />
-            {/* The summary is the only part of a doc Steward sees without opening it. */}
-            <p className="text-xs text-muted-foreground">Shown in Steward&apos;s index — this is how it decides whether to read this doc.</p>
+            {/* The summary is the only part of a doc Shepherd sees without opening it. */}
+            <p className="text-xs text-muted-foreground">Shown in Shepherd&apos;s index — this is how it decides whether to read this doc.</p>
           </div>
 
           <div className="space-y-1.5">

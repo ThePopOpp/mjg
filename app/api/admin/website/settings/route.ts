@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const actor = await requireWebsiteActor(request, actionTokenOf(body));
     const settings = await setEditorSettings(
-      { allowStewardDirectPublish: body.allowStewardDirectPublish === true },
+      { allowShepherdDirectPublish: body.allowShepherdDirectPublish === true },
       { actorId: actor.id },
     );
     return NextResponse.json({ settings });

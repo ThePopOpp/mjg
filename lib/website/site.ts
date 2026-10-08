@@ -47,7 +47,7 @@ export type NavInput = {
   is_visible?: boolean;
   open_in_new_tab?: boolean;
   actorId?: string | null;
-  actorType?: "user" | "steward";
+  actorType?: "user" | "shepherd";
 };
 
 function validateNavUrl(url: string): string {
@@ -122,7 +122,7 @@ export async function updateNavItem(id: string, input: NavInput): Promise<Websit
   return data as unknown as WebsiteNavItem;
 }
 
-export async function deleteNavItem(id: string, opts: { actorId?: string | null; actorType?: "user" | "steward" } = {}): Promise<void> {
+export async function deleteNavItem(id: string, opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {}): Promise<void> {
   const sb = createSupabaseAdminClient();
   const { data: existing } = await sb.from("website_navigation_items").select("label, navigation_group").eq("id", id).maybeSingle();
   const { error } = await sb.from("website_navigation_items").delete().eq("id", id);
@@ -186,7 +186,7 @@ export async function getGlobal(key: string): Promise<WebsiteGlobal | null> {
 export async function updateGlobal(
   key: string,
   value: Record<string, unknown>,
-  opts: { actorId?: string | null; actorType?: "user" | "steward" } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {},
 ): Promise<WebsiteGlobal> {
   const sb = createSupabaseAdminClient();
   const existing = await getGlobal(key);
@@ -249,9 +249,9 @@ export async function setEditorSettings(
     actorId: opts.actorId,
     action: "settings.updated",
     resourceType: "settings",
-    summary: next.allowStewardDirectPublish
-      ? "Turned ON direct publishing for Steward. Protected and legal pages still require your approval."
-      : "Turned OFF direct publishing for Steward. Every change now waits for your approval.",
+    summary: next.allowShepherdDirectPublish
+      ? "Turned ON direct publishing for Shepherd. Protected and legal pages still require your approval."
+      : "Turned OFF direct publishing for Shepherd. Every change now waits for your approval.",
   });
   return next;
 }
@@ -270,7 +270,7 @@ export async function createRedirect(input: {
   destination_path: string;
   status_code?: number;
   actorId?: string | null;
-  actorType?: "user" | "steward";
+  actorType?: "user" | "shepherd";
 }): Promise<WebsiteRedirect> {
   const sb = createSupabaseAdminClient();
   const source = normalizeRedirectPath(input.source_path);

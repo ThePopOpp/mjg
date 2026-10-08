@@ -94,7 +94,7 @@ export async function getCmsPageWithDraft(id: string): Promise<(CmsPage & { draf
 }
 
 // Create a new page AND seed its draft block tree in one step. Always lands as a
-// DRAFT (createCmsPage forces status:"draft") — used by Steward AI authoring.
+// DRAFT (createCmsPage forces status:"draft") — used by Shepherd AI authoring.
 export async function createCmsDraftPage(input: {
   title: string; slug?: string; page_type?: string; description?: string | null;
   blocks: CmsBlock[]; actorUserId?: string;

@@ -6,7 +6,7 @@
 // It writes the SAME Markdown subset the Editor's own rich-text block fields
 // use (**bold**, *italic*, [links](/page), - bullets), rather than HTML. That
 // keeps one content grammar across the whole module: anything Mike writes here
-// can be handed straight to Steward, or dropped into a page block, without a
+// can be handed straight to Shepherd, or dropped into a page block, without a
 // conversion step or a sanitiser to get wrong.
 
 import * as React from "react";

@@ -24,7 +24,7 @@ export type FieldInputProps = {
   field: FieldDef;
   value: unknown;
   onChange: (value: unknown) => void;
-  /** Passed down so rich-text fields can offer Steward's inline rewrites. */
+  /** Passed down so rich-text fields can offer Shepherd's inline rewrites. */
   aiContext?: { pageTitle: string; blockLabel: string };
 };
 

@@ -1,4 +1,4 @@
-// Steward skills — structured playbooks (derived from docs/agents) that tell the
+// Shepherd skills — structured playbooks (derived from docs/agents) that tell the
 // agent HOW to perform each class of task with the available tools. Injected into
 // the system prompt so behavior is consistent and correct.
 
@@ -79,7 +79,7 @@ export const AGENT_SKILLS: AgentSkill[] = [
   },
   {
     name: "CMS Page Authoring",
-    whenToUse: "Building or editing public website pages in the CMS (landing pages, stewardship pages, resource pages, informational pages) — usually triggered from the CMS 'Steward AI' button.",
+    whenToUse: "Building or editing public website pages in the CMS (landing pages, stewardship pages, resource pages, informational pages) — usually triggered from the CMS 'Shepherd AI' button.",
     playbook: [
       "CMS authoring is Super-Admin only, and everything you create is ALWAYS a DRAFT — you have NO ability to publish. A Super Admin reviews your draft in the CMS editor and publishes it. Say so: tell the user their page was saved as a draft for review.",
       "Design a page as an ORDERED array of blocks. Block types & fields: heading{text}; subheading{text}; paragraph{text}; richtext{text: markdown}; image{url,alt}; button{label,url}; cta{eyebrow,text(heading),subtext,label,url,label2,url2}; quote{text,author,role}; cardgrid{columns 2-4, items:[{title,body,imageUrl?,url?}]}; accordion{items:[{q,a}]}; video{url,aspect}; divider{}; spacer{height}; html{html}. Any block also takes align/bgColor/textColor/padTop/padBottom/marginTop/marginBottom/maxWidth.",

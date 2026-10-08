@@ -57,11 +57,11 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: "6. Review analytics & ask Steward",
+    title: "6. Review analytics & ask Shepherd",
     body: (
       <>
         <Link href="/dashboard/social-media/analytics" className="text-primary underline">Analytics</Link> shows cadence, engagement, and top
-        posts. In the <Link href="/dashboard/ai-agent" className="text-primary underline">AI Agent</Link>, ask Steward to draft posts, build
+        posts. In the <Link href="/dashboard/ai-agent" className="text-primary underline">AI Agent</Link>, ask Shepherd to draft posts, build
         templates, schedule content, summarize your reports, and analyze what&apos;s performing.
       </>
     ),
@@ -71,7 +71,7 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
 export default function SocialWizardPage() {
   return (
     <div className="space-y-6">
-      <SectionHeader eyebrow="Social Media" title="Wizard" description="A guided walkthrough of the whole social workflow — from connecting platforms to letting Steward help." />
+      <SectionHeader eyebrow="Social Media" title="Wizard" description="A guided walkthrough of the whole social workflow — from connecting platforms to letting Shepherd help." />
       <SocialTabs active="wizard" />
       <div className="space-y-2">
         {STEPS.map((s, i) => (

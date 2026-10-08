@@ -4,7 +4,7 @@ import { runAgent, buildSystemPrompt, type ChatMessage, type AgentDecision } fro
 import { getAgentMemories } from "@/lib/ai-agent/memory";
 import { renderTrainingDocsForPrompt } from "@/lib/ai-agent/training-docs/data";
 import { renderWebsiteContextForPrompt } from "@/lib/website/brand";
-import { renderComponentsForPrompt, renderSiteMapForPrompt } from "@/lib/website/steward-tools";
+import { renderComponentsForPrompt, renderSiteMapForPrompt } from "@/lib/website/shepherd-tools";
 
 export const maxDuration = 60;
 

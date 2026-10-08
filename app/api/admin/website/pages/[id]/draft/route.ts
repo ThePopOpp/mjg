@@ -27,7 +27,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 /**
  * One block operation (spec §12.2 website.blocks.*). Server-side so the same
- * rules apply whether the change came from a click or from Steward.
+ * rules apply whether the change came from a click or from Shepherd.
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

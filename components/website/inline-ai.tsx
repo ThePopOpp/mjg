@@ -73,7 +73,7 @@ export function InlineAiActions({
           onClick={() => setOpen((v) => !v)}
           className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
         >
-          <Sparkles className="h-3 w-3 text-[#b88a4a]" /> Ask Steward
+          <Sparkles className="h-3 w-3 text-[#b88a4a]" /> Ask Shepherd
         </button>
         {previous !== null ? (
           <button

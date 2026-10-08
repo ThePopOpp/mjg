@@ -1,6 +1,6 @@
-// Frontend Editor — change sets (spec §14) and the Steward apply pipeline.
+// Frontend Editor — change sets (spec §14) and the Shepherd apply pipeline.
 //
-// A change set is the unit of review. Steward never writes a page directly: it
+// A change set is the unit of review. Shepherd never writes a page directly: it
 // proposes a change set (before/after snapshot + summary + risk), the change set
 // is applied to the DRAFT, Mike previews it, and only then is it published.
 // That is what makes every AI edit explainable and reversible.
@@ -23,7 +23,7 @@ export type ProposeInput = {
   meta?: Record<string, unknown>;
   prompt?: string | null;
   action?: WebsiteAction;
-  source?: "steward" | "manual";
+  source?: "shepherd" | "manual";
   actorId?: string | null;
 };
 
@@ -37,7 +37,7 @@ export type ProposeResult = {
 
 /**
  * Record a proposal. Nothing on the page moves yet — this is the "here is what I
- * would do" step Steward shows before touching the draft.
+ * would do" step Shepherd shows before touching the draft.
  */
 export async function proposeChangeSet(input: ProposeInput): Promise<ProposeResult> {
   const sb = createSupabaseAdminClient();
@@ -54,7 +54,7 @@ export async function proposeChangeSet(input: ProposeInput): Promise<ProposeResu
     .insert({
       page_id: page.id,
       requested_by: input.actorId ?? null,
-      source: input.source ?? "steward",
+      source: input.source ?? "shepherd",
       risk,
       prompt: input.prompt ?? null,
       summary: diff.summary,
@@ -68,7 +68,7 @@ export async function proposeChangeSet(input: ProposeInput): Promise<ProposeResu
 
   await logWebsiteAudit({
     actorId: input.actorId,
-    actorType: input.source === "manual" ? "user" : "steward",
+    actorType: input.source === "manual" ? "user" : "shepherd",
     action: "changeset.proposed",
     resourceType: "change_set",
     resourceId: (data as { id: string }).id,
@@ -117,11 +117,11 @@ export async function getChangeSet(id: string): Promise<WebsiteChangeSet | null>
 
 /**
  * Apply a proposed change set to the DRAFT. This is the default landing point
- * for every Steward edit — the live page is untouched until someone publishes.
+ * for every Shepherd edit — the live page is untouched until someone publishes.
  */
 export async function applyChangeSetToDraft(
   id: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward" } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {},
 ): Promise<{ changeSet: WebsiteChangeSet; page: WebsitePage }> {
   const sb = createSupabaseAdminClient();
   const changeSet = await getChangeSet(id);
@@ -132,7 +132,7 @@ export async function applyChangeSetToDraft(
   const after = changeSet.after_state as { content?: unknown; meta?: Record<string, unknown> };
   const { page } = await saveDraft(changeSet.page_id, asContent(after.content), {
     actorId: opts.actorId,
-    source: changeSet.source === "steward" ? "steward" : "manual",
+    source: changeSet.source === "shepherd" ? "shepherd" : "manual",
     silent: true,
   });
 
@@ -192,12 +192,12 @@ export async function rejectChangeSet(
 
 /**
  * Approve AND publish. Reached only from an explicit owner action, or from
- * Steward when direct publish is switched on and the page is neither protected
+ * Shepherd when direct publish is switched on and the page is neither protected
  * nor legal (spec §16).
  */
 export async function approveAndPublishChangeSet(
   id: string,
-  opts: { actorId?: string | null; actorType?: "user" | "steward" } = {},
+  opts: { actorId?: string | null; actorType?: "user" | "shepherd" } = {},
 ): Promise<{ changeSet: WebsiteChangeSet; page: WebsitePage }> {
   const sb = createSupabaseAdminClient();
   const changeSet = await getChangeSet(id);
@@ -226,13 +226,13 @@ export async function approveAndPublishChangeSet(
 }
 
 /**
- * Whether Steward may publish this page on its own right now. Direct publish is
+ * Whether Shepherd may publish this page on its own right now. Direct publish is
  * OFF by default and NEVER applies to protected or legal pages, nor to a
  * high-risk change — those always come back to Mike (spec §16).
  */
-export async function stewardMayPublish(page: WebsitePage, risk: ChangeRisk): Promise<{ allowed: boolean; reason: string }> {
+export async function shepherdMayPublish(page: WebsitePage, risk: ChangeRisk): Promise<{ allowed: boolean; reason: string }> {
   const settings = await getEditorSettings();
-  if (!settings.allowStewardDirectPublish) {
+  if (!settings.allowShepherdDirectPublish) {
     return { allowed: false, reason: "Direct publishing is off, so this is waiting in the draft for you to review and publish." };
   }
   if (page.is_protected) {

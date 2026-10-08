@@ -14,7 +14,7 @@ export type DevRequest = {
   request_kind: string | null;
   priority: "low" | "medium" | "high" | "urgent";
   status: DevRequestStatus;
-  steward_brief: string | null;
+  shepherd_brief: string | null;
   metadata: Record<string, unknown>;
   created_by: string | null;
   created_by_email: string | null;
@@ -105,10 +105,10 @@ export async function listDevRequests(filter?: { status?: DevRequestStatus | "ac
   return (data ?? []) as DevRequest[];
 }
 
-export async function updateDevRequestStatus(input: { id: string; status: DevRequestStatus; stewardBrief?: string | null }): Promise<DevRequest> {
+export async function updateDevRequestStatus(input: { id: string; status: DevRequestStatus; shepherdBrief?: string | null }): Promise<DevRequest> {
   const supabase = createSupabaseAdminClient();
   const patch: Record<string, unknown> = { status: input.status, updated_at: new Date().toISOString() };
-  if (input.stewardBrief !== undefined) patch.steward_brief = input.stewardBrief;
+  if (input.shepherdBrief !== undefined) patch.shepherd_brief = input.shepherdBrief;
 
   const { data, error } = await supabase.from("dev_requests").update(patch).eq("id", input.id).select("*").single();
   if (error) throw error;

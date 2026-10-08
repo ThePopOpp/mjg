@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button";
 import { AgentChat } from "@/components/ai-agent/agent-chat";
 
 /**
- * Reusable "Ask Steward" launcher — a button that opens the AI agent in a modal,
+ * Reusable "Ask Shepherd" launcher — a button that opens the AI agent in a modal,
  * pre-seeded with entity context (via `extraContext`) and tap-to-run
  * `suggestions`. Use anywhere an individual item (a resource, an edit request)
- * should be triageable by Steward in-app.
+ * should be triageable by Shepherd in-app.
  */
-export function AskStewardButton({
-  label = "Ask Steward",
+export function AskShepherdButton({
+  label = "Ask Shepherd",
   size = "sm",
   variant = "outline",
   className,
-  title = "Steward",
+  title = "Shepherd",
   subtitle,
   suggestions,
   extraContext,
