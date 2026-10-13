@@ -253,13 +253,24 @@ export async function rescheduleSteps(ctx: Ctx, rawSteps: unknown, input: Resche
   }
 
   const when = absoluteAt ?? new Date(new Date(movable[0].scheduled_at as string).getTime() + deltaMs);
+  // Same warning resumeSteps gives: a move backwards can leave sends overdue,
+  // and overdue means "goes out on the next run", not "goes out on that date".
+  const nowMs = Date.now();
+  const overdueAfter = absoluteAt
+    ? (absoluteAt.getTime() < nowMs ? movable.length : 0)
+    : movable.filter((e) => new Date(e.scheduled_at as string).getTime() + deltaMs < nowMs).length;
+  const overdueNote = overdueAfter
+    ? ` ${plural(overdueAfter, "is", "are")} now past their send time and will go out on the next run.`
+    : "";
+
   const message =
-    input.mode === "absolute"
+    (input.mode === "absolute"
       ? `Moved ${plural(steps.length, "email")} to ${when.toISOString()}.`
-      : `Moved ${plural(steps.length, "email")} by ${shiftDays >= 0 ? "+" : ""}${shiftDays} day${Math.abs(shiftDays) === 1 ? "" : "s"}, keeping the spacing between them.`;
+      : `Moved ${plural(steps.length, "email")} by ${shiftDays >= 0 ? "+" : ""}${shiftDays} day${Math.abs(shiftDays) === 1 ? "" : "s"}, keeping the spacing between them.`) +
+    overdueNote;
 
   await audit(ctx, "experience_steps_rescheduled", message, {
-    steps, affected, mode: input.mode, shiftDays, at: input.at ?? null, offsetsShiftedDays,
+    steps, affected, mode: input.mode, shiftDays, at: input.at ?? null, offsetsShiftedDays, overdueAfter,
   });
   return { ok: true, affected, steps, message, offsetsShiftedDays };
 }

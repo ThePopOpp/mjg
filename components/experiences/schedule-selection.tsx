@@ -10,7 +10,7 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { CalendarClock, Loader2, Pause, Play, RotateCcw, Send, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarClock, Loader2, Pause, Play, RotateCcw, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
@@ -121,7 +121,7 @@ function azToday(): string {
 
 // ── The slide-up action bar ──────────────────────────────────────────────────
 
-type Mode = null | "reanchor" | "resend";
+type Mode = null | "reanchor" | "resend" | "move";
 
 export function ScheduleActionBar({
   experienceId,
@@ -141,6 +141,10 @@ export function ScheduleActionBar({
   const [result, setResult] = React.useState("");
   const [date, setDate] = React.useState(azToday);
   const [time, setTime] = React.useState("08:00");
+  // Move back / forward: one panel, one number, direction chosen by whichever
+  // button opened it.
+  const [moveDir, setMoveDir] = React.useState<"back" | "forward">("forward");
+  const [moveDays, setMoveDays] = React.useState("7");
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => setMounted(true), []);
@@ -150,6 +154,39 @@ export function ScheduleActionBar({
   const earliest = chosen
     .filter((s) => s.date)
     .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())[0];
+
+  // Whole days, 1-365. Rejecting 0 matters: it would report "moved" having
+  // changed nothing, and a negative typed into the field would reverse the
+  // direction the button promised.
+  const moveDaysNumber = Number(moveDays);
+  const moveDaysValid =
+    moveDays.trim() !== "" && Number.isInteger(moveDaysNumber) && moveDaysNumber >= 1 && moveDaysNumber <= 365;
+
+  // Where the first selected email would land, so the operator sees the result
+  // before committing rather than after.
+  // Moving BACK can push a queued email past "now", and the cron sends anything
+  // scheduled and overdue on its next run. That is occasionally what someone
+  // wants, so it is a warning rather than a block — but it must never be a
+  // surprise, because this button exists to be used quickly.
+  const moveWouldGoOverdue =
+    moveDir === "back" && moveDaysValid
+      ? chosen.filter(
+          (step) =>
+            step.status === "scheduled" &&
+            step.date &&
+            new Date(step.date).getTime() - moveDaysNumber * 24 * 60 * 60 * 1000 < Date.now(),
+        ).length
+      : 0;
+
+  const movePreview =
+    earliest?.date && moveDaysValid
+      ? fmt(
+          new Date(
+            new Date(earliest.date).getTime() +
+              (moveDir === "back" ? -moveDaysNumber : moveDaysNumber) * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+        )
+      : null;
 
   const sentCount = chosen.filter((s) => s.status === "sent" || s.status === "partial").length;
   const queuedCount = chosen.filter((s) => s.status === "scheduled" || s.status === "none").length;
@@ -218,6 +255,34 @@ export function ScheduleActionBar({
             </Button>
             <Button
               size="sm"
+              variant={mode === "move" && moveDir === "back" ? "default" : "outline"}
+              className="gap-1.5"
+              disabled={Boolean(busy)}
+              onClick={() => {
+                const open = mode === "move" && moveDir === "back";
+                setMode(open ? null : "move");
+                setMoveDir("back");
+                setError("");
+              }}
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Move back
+            </Button>
+            <Button
+              size="sm"
+              variant={mode === "move" && moveDir === "forward" ? "default" : "outline"}
+              className="gap-1.5"
+              disabled={Boolean(busy)}
+              onClick={() => {
+                const open = mode === "move" && moveDir === "forward";
+                setMode(open ? null : "move");
+                setMoveDir("forward");
+                setError("");
+              }}
+            >
+              <ArrowRight className="h-3.5 w-3.5" /> Move forward
+            </Button>
+            <Button
+              size="sm"
               variant={mode === "resend" ? "default" : "outline"}
               className="gap-1.5"
               disabled={Boolean(busy) || !sentCount}
@@ -272,6 +337,86 @@ export function ScheduleActionBar({
                 Move the sequence
               </Button>
             </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Anyone added to this group later will get the new dates too.
+            </p>
+          </div>
+        ) : null}
+
+        {/* Move back / forward: shift every selected email by N days, spacing kept */}
+        {mode === "move" ? (
+          <div className="border-t border-border bg-muted/40 p-3">
+            <p className="text-sm font-medium">
+              Move the selection {moveDir === "back" ? "earlier" : "later"}
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Every selected email shifts by the same number of days, so the gaps between them stay
+              exactly as they are.
+              {earliest ? (
+                <>
+                  {" "}
+                  <span className="font-medium text-foreground">
+                    {earliest.templateName ?? `Email ${earliest.stepNumber}`}
+                  </span>{" "}
+                  currently goes out {fmt(earliest.date)}
+                  {movePreview ? (
+                    <>
+                      {" "}and would move to <span className="font-medium text-foreground">{movePreview}</span>
+                    </>
+                  ) : null}
+                  .
+                </>
+              ) : null}
+            </p>
+            <div className="mt-2.5 flex flex-wrap items-end gap-2">
+              <label className="text-xs">
+                <span className="mb-1 block font-medium text-muted-foreground">Number of days</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={365}
+                  step={1}
+                  value={moveDays}
+                  onChange={(e) => setMoveDays(e.target.value)}
+                  className="h-9 w-32 rounded-md border border-input bg-background px-2 text-sm tabular-nums"
+                />
+              </label>
+              <Button
+                size="sm"
+                className="h-9 gap-1.5"
+                disabled={Boolean(busy) || !moveDaysValid}
+                title={moveDaysValid ? undefined : "Enter a whole number of days between 1 and 365"}
+                onClick={() =>
+                  run({
+                    action: "reschedule",
+                    mode: "shift",
+                    // Direction is applied here rather than asking the user for a
+                    // negative number: "Move back 7" is what they mean, and a
+                    // stray minus in the field would silently do the opposite.
+                    days: moveDir === "back" ? -Number(moveDays) : Number(moveDays),
+                    updateDefinition: true,
+                  })
+                }
+              >
+                {busy === "reschedule" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : moveDir === "back" ? (
+                  <ArrowLeft className="h-4 w-4" />
+                ) : (
+                  <ArrowRight className="h-4 w-4" />
+                )}
+                Move {moveDir} {moveDaysValid ? `${Number(moveDays)} day${Number(moveDays) === 1 ? "" : "s"}` : ""}
+              </Button>
+            </div>
+            {moveWouldGoOverdue > 0 ? (
+              <p className="mt-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-400">
+                <strong>
+                  {moveWouldGoOverdue} email{moveWouldGoOverdue === 1 ? "" : "s"} would land in the past.
+                </strong>{" "}
+                Anything scheduled and overdue goes out on the next automated run — within the hour, not on the
+                date shown. Use a smaller number if that is not what you want.
+              </p>
+            ) : null}
             <p className="mt-2 text-xs text-muted-foreground">
               Anyone added to this group later will get the new dates too.
             </p>
