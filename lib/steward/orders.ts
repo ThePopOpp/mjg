@@ -207,6 +207,21 @@ export async function activateOrder(input: {
 }): Promise<{ activationId: string; alreadyActivated: boolean }> {
   const supabase = createSupabaseAdminClient();
 
+  // OWNERSHIP IS CHECKED BEFORE ANYTHING ELSE, including the idempotency
+  // short-circuit. Checking "is it already activated?" first would answer that
+  // question for anyone holding an order id that is not theirs — it grants
+  // nothing, but it confirms the order exists and that it is activated, which
+  // is not ours to disclose.
+  const { data: order, error: orderError } = await supabase
+    .from("steward_orders")
+    .select("id, user_id, offer_key, status, paid_at")
+    .eq("id", input.orderId)
+    .maybeSingle();
+  if (orderError) throw orderError;
+  // Same message for "no such order" and "not yours", so the error cannot be
+  // used to probe which order ids exist.
+  if (!order || order.user_id !== input.userId) throw new ActivationError("Order not found.");
+
   const { data: existing } = await supabase
     .from("steward_activations")
     .select("id")
@@ -214,14 +229,6 @@ export async function activateOrder(input: {
     .maybeSingle();
   if (existing) return { activationId: existing.id as string, alreadyActivated: true };
 
-  const { data: order, error: orderError } = await supabase
-    .from("steward_orders")
-    .select("id, user_id, offer_key, status, paid_at")
-    .eq("id", input.orderId)
-    .maybeSingle();
-  if (orderError) throw orderError;
-  if (!order) throw new ActivationError("Order not found.");
-  if (order.user_id !== input.userId) throw new ActivationError("That order belongs to someone else.");
   if (order.status !== "paid" || !order.paid_at) {
     throw new ActivationError("This order is not paid. Activation requires a confirmed payment.");
   }
