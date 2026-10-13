@@ -11,13 +11,35 @@ export const metadata = {
   title: "Login | MJG Dashboard",
 };
 
-export default async function LoginPage() {
+/**
+ * Where an already-signed-in visitor is sent.
+ *
+ * LoginForm already honours ?next=, but this server-side guard used to ignore
+ * it and send everyone to /dashboard — so following a link like
+ * /login?next=/steward/pricing while signed in silently dropped the
+ * destination. Only same-origin paths are accepted: a value starting "//" or
+ * containing a backslash can address another host and would turn this into an
+ * open redirect.
+ */
+function safeNextPath(raw: string | undefined): string {
+  if (!raw) return "/dashboard";
+  if (!raw.startsWith("/")) return "/dashboard";
+  if (raw.startsWith("//") || raw.includes("\\")) return "/dashboard";
+  return raw;
+}
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ next?: string }>;
+}) {
   const profile = await getCurrentProfile();
+  const { next } = (await searchParams) ?? {};
 
   // Dashboard roles AND participants land on the dashboard (participants get a scoped,
   // sidebar dashboard — the layout + shell render their nav and ParticipantDashboard).
   if (profile?.status === "active" && (isActiveDashboardProfile(profile) || profile.role === ROLES.PARTICIPANT)) {
-    redirect("/dashboard");
+    redirect(safeNextPath(next));
   }
 
   return (

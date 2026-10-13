@@ -48,6 +48,7 @@ export type StewardOffer = {
   stripe_price_id: string | null;
   stripe_renewal_price_id: string | null;
   production_enabled: boolean;
+  is_historical_record: boolean;
   sort_order: number;
   source_ref: string | null;
 };
@@ -57,7 +58,7 @@ const COLUMNS =
   "build_days, activation_deadline_days, renewal_price_minor, renewal_interval, renewal_calendar_months, " +
   "requires_full_acquisition, requires_initial_full_not_already_acquired, requires_recurring_assent, " +
   "trial_days, eligible_roles, stripe_product_id, stripe_price_id, stripe_renewal_price_id, " +
-  "production_enabled, sort_order, source_ref";
+  "production_enabled, is_historical_record, sort_order, source_ref";
 
 /** Every offer, enabled or not. For the Agent Manager. */
 export async function listAllOffers(): Promise<StewardOffer[]> {
@@ -105,10 +106,11 @@ export function checkOfferAvailability(offer: StewardOffer, role: string | null)
       reason: `"${offer.label}" is not enabled for sale. Every offer in the accepted catalogue ships disabled; a Super Admin enables it once the Terms §8 blanks are filled in.`,
     };
   }
-  if (offer.billing === "ONE_TIME_PREPAID_NO_AUTORENEW") {
-    // Kept so legacy holders resolve correctly. The catalogue is explicit that
-    // it is reference-only and must not become a silent new recurring offer.
-    return { purchasable: false, reason: `"${offer.label}" is a legacy record and cannot be purchased.` };
+  // Prepaid and historical are both ONE_TIME_PREPAID_NO_AUTORENEW, so the flag
+  // decides, not the billing type: the $299 offer is prepaid AND sellable, while
+  // the BUILD_LIVE_299_Y1 alias exists only so prior purchases resolve.
+  if (offer.is_historical_record) {
+    return { purchasable: false, reason: `"${offer.label}" is a historical record and cannot be purchased.` };
   }
   if (offer.eligible_roles.length > 0) {
     if (role === null || !offer.eligible_roles.includes(role)) {
@@ -147,8 +149,15 @@ export function describeBilling(offer: StewardOffer): string {
     case "ONE_TIME":
       return `${price} once. This is not a subscription and does not renew.`;
 
-    case "ONE_TIME_PREPAID_NO_AUTORENEW":
-      return `${price} prepaid. Does not renew and is never converted to a subscription.`;
+    case "ONE_TIME_PREPAID_NO_AUTORENEW": {
+      const months = offer.renewal_calendar_months ?? 12;
+      // Said plainly, because "prepaid" is the whole point: nothing is kept on
+      // file, nothing renews, and there is nothing to cancel later.
+      return (
+        `${price} once, covering ${months} months. This does NOT renew — ` +
+        `no card is kept on file and you will not be charged again.`
+      );
+    }
 
     case "RECURRING": {
       const every = offer.interval === "YEAR" ? "year" : "month";

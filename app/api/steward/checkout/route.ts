@@ -54,27 +54,14 @@ export async function POST(request: Request) {
     const tax = await getTaxPolicy();
     const origin = new URL(request.url).origin;
 
-    // WHY THE BUNDLE IS NOT A SUBSCRIPTION AT CHECKOUT.
-    //
-    // build_plus_first_year is $299 today and $199/year afterwards, which looks
-    // like a two-phase subscription. It cannot be one here, for two reasons:
-    //
-    //   1. Stripe refuses a one-time price in subscription mode ("You must
-    //      provide at least one recurring price in subscription mode"), and the
-    //      $299 genuinely is one-time — it buys the build plus the first year.
-    //   2. More importantly, the renewal is anchored to ACTIVATION plus 12
-    //      calendar months, not to purchase (renewal_terms.anchor =
-    //      CONFIRMED_EXPLICIT_ACTIVATION). Activation can be up to 90 days after
-    //      payment, so a subscription created now would bill on the wrong date —
-    //      up to three months early.
-    //
-    // So the bundle is taken as a payment, with the card saved off-session, and
-    // the recurring half is created at activation with its anchor set from the
-    // activation instant. Plain RECURRING offers have no such gap and stay
-    // ordinary subscriptions.
-    const isBundle = offer.billing === "INITIAL_BUNDLE_THEN_RECURRING_ANNUAL";
+    // The $299 offer is one year PREPAID (owner, 2026-10-13), so the only
+    // subscription modes left are the genuinely recurring ones. That removes the
+    // problem the bundle used to have: a Stripe subscription created at checkout
+    // would have billed from purchase, while the docset anchors renewal to
+    // activation — which can be up to 90 days later. Nothing recurring is
+    // created here any more, so there is no anchor to reconcile.
     const mode: "payment" | "subscription" =
-      offer.billing === "ONE_TIME" || isBundle ? "payment" : "subscription";
+      offer.billing === "RECURRING" ? "subscription" : "payment";
 
     const lineItem = { price: offer.stripe_price_id as string, quantity: 1 };
 
@@ -99,12 +86,9 @@ export async function POST(request: Request) {
             },
           }
         : {}),
-      // The bundle needs the card again at activation, so keep it on file.
-      // Without this the renewal could not be set up and the member would have
-      // to re-enter a card months later to keep what they already paid for.
-      ...(isBundle
-        ? { payment_intent_data: { setup_future_usage: "off_session" as const }, customer_creation: "always" as const }
-        : {}),
+      // No setup_future_usage anywhere: one-time and prepaid purchases never
+      // charge again, so keeping a card on file would be storing a payment
+      // credential we have no use for.
 
       // Off for now by owner decision. Prices are tax-exclusive so this can be
       // switched on later without rebuilding the catalogue.

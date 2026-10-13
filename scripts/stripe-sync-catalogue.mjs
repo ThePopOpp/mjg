@@ -133,7 +133,7 @@ try {
 
   const { rows: offers } = await client.query(
     `select offer_key, product_key, label, description, price_minor, currency, billing, interval,
-            renewal_price_minor, renewal_interval, trial_days, production_enabled, stripe_product_id
+            renewal_price_minor, renewal_interval, trial_days, production_enabled, is_historical_record, stripe_product_id
        from steward_offers order by sort_order`,
   );
 
@@ -146,9 +146,10 @@ try {
       console.log(`  --  ${offer.offer_key.padEnd(28)} free — no Stripe objects needed`);
       continue;
     }
-    // Legacy prepaid is a historical record, never sold again.
-    if (offer.billing === "ONE_TIME_PREPAID_NO_AUTORENEW") {
-      console.log(`  --  ${offer.offer_key.padEnd(28)} legacy reference — not sellable, skipped`);
+    // Historical rows exist so prior purchases resolve; they are never sold
+    // and so never need a Stripe object.
+    if (offer.is_historical_record) {
+      console.log(`  --  ${offer.offer_key.padEnd(28)} historical record — skipped`);
       continue;
     }
 
