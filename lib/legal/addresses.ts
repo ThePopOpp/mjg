@@ -13,10 +13,13 @@
 //   Transactional sender ........ notifications@ ("ensure replies have a
 //                                 monitored destination")
 //
-// MAIL IS NOT ON RESEND. These mailboxes are hosted on Hostinger and are not
-// verified senders in Resend, so nothing should send *as* them through the
-// Resend path in lib/email/smtp.ts. See MAIL_SERVER below and
-// docs/legal/EMAIL_SETUP.md.
+// SENDING vs RECEIVING. The mailboxes live on Hostinger (root MX), which is what
+// makes mail *to* privacy@ arrive. Sending *as* any of these is a separate
+// question, and the answer is yes: michaeljgauthier.com is a verified domain in
+// Resend, and Resend authorises domains rather than individual addresses. The
+// limit is ours, not Resend's — sendViaResend() takes the From header only from
+// RESEND_FROM_EMAIL and SendEmailInput has no per-message `from`, so today every
+// message sends as hello@. See docs/legal/EMAIL_SETUP.md.
 
 export type LegalContact = {
   address: string;

@@ -54,11 +54,39 @@ Value: v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4qsLj041x13
 The public key belongs in DNS and in this repo — verification depends on it
 being public. The private half stays with Hostinger.
 
-**Still outstanding:** SPF and DMARC records were not supplied. DKIM alone does
-not stop another host spoofing the domain, and several large mailbox providers
-now expect a DMARC policy before they will treat bulk mail as legitimate. Worth
-confirming what Hostinger published for SPF and whether a `_dmarc` record exists
-before any of these addresses starts sending volume.
+### Live DNS, checked 2026-10-13
+
+An earlier draft of this file said SPF and DMARC were missing. That was wrong —
+both exist. Actual records:
+
+| Record | Name | Value |
+| --- | --- | --- |
+| MX | `michaeljgauthier.com` | `mx1.hostinger.com` (5), `mx2.hostinger.com` (10) |
+| SPF | `michaeljgauthier.com` | `v=spf1 include:_spf.mail.hostinger.com ~all` |
+| DMARC | `_dmarc.michaeljgauthier.com` | `v=DMARC1; p=none` |
+| DKIM | `hostingermail1._domainkey` | Hostinger mailboxes (410 chars) |
+| DKIM | `resend._domainkey` | Resend (218 chars) |
+| SPF | `send.michaeljgauthier.com` | `v=spf1 include:amazonses.com ~all` |
+| MX | `send.michaeljgauthier.com` | `feedback-smtp.us-east-1.amazonses.com` |
+
+**Resend and Hostinger do not conflict**, and the reason is worth understanding
+before anyone "tidies up" these records:
+
+- Different DKIM selectors. DNS supports any number, so `hostingermail1._domainkey`
+  and `resend._domainkey` coexist with no interaction.
+- Resend's SPF lives on the `send.` subdomain, not the root. SPF is evaluated
+  against the envelope MAIL FROM domain, so Resend passes via `send.`, Hostinger
+  passes via the root, and there is only ever one SPF record per name. **Adding
+  `include:amazonses.com` to the root SPF is not needed and risks the two-record
+  permerror that breaks SPF entirely.**
+- DMARC still passes for Resend mail because its DKIM signs with
+  `d=michaeljgauthier.com`, which aligns with a `From:` at that domain.
+
+**The one real gap: `p=none` is monitor-only.** It satisfies providers that want
+a policy present but enforces nothing, so it does not stop someone spoofing the
+domain. Tightening to `p=quarantine` is the eventual move, but only after
+confirming from DMARC reports that every legitimate sender passes — tightening
+first is how you silently start dropping your own mail.
 
 ## How sending actually resolves — read this before changing anything
 
@@ -95,7 +123,26 @@ Two things follow:
 2. **None of the six new addresses currently sends anything.** Mail goes out as
    `hello@`, and the SMTP fallback is pointed at the personal `jw@` mailbox.
 
-### To send through Hostinger instead
+### Do these addresses work with Resend? Yes.
+
+`michaeljgauthier.com` is **verified** in the Resend account (since
+2026-07-21, region us-east-1, all three DNS records verified). Resend authorises
+a **domain**, not individual addresses, so every one of the six — and any other
+address at the domain — can send through the existing configuration with no new
+setup, no per-address verification and no DNS changes.
+
+**But the app can only send as one of them.** `sendViaResend()` builds the `from`
+header solely from `RESEND_FROM_EMAIL`; `SendEmailInput` has no `from` field, so
+there is no per-message sender. Only `replyTo` can be varied per send. Sending
+billing notices as `billing@` and support replies as `support@` therefore needs a
+small change to `SendEmailInput` and `sendViaResend`, not anything in Resend.
+
+Receiving is separate and already correct: MX points at Hostinger, so mail *to*
+`privacy@` lands in the Hostinger mailbox. Resend does not receive it. Do not
+point the root MX at a sending provider — that would break every mailbox the
+legal documents tell people to write to.
+
+### To send through Hostinger instead (optional, and not recommended for bulk)
 
 In Coolify (and `.env.local` for local work):
 
@@ -124,7 +171,7 @@ sequences staying on a deliverability provider.
   personnel have no access to it. The package is explicit about this and
   `05_SIG_Separation_and_Conflict_Policy_INTERNAL.md` treats contact-channel
   segregation as a mandatory control.
-- SPF and DMARC confirmed (see above).
+- DMARC tightened past `p=none` once reports confirm every sender passes.
 - The in-app path the Privacy Policy promises for access and deletion exists, or
   the policy says "email `privacy@`" instead. The draft currently reads
   `[VERIFIED IN-APP PATH]`, which is one of the placeholders blocking publication.
