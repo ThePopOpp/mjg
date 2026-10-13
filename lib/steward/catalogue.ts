@@ -49,6 +49,10 @@ export type StewardOffer = {
   stripe_renewal_price_id: string | null;
   production_enabled: boolean;
   is_historical_record: boolean;
+  badge: string | null;
+  highlight: boolean;
+  billing_period: "any" | "monthly" | "annual";
+  layout: "card" | "row";
   sort_order: number;
   source_ref: string | null;
 };
@@ -58,7 +62,7 @@ const COLUMNS =
   "build_days, activation_deadline_days, renewal_price_minor, renewal_interval, renewal_calendar_months, " +
   "requires_full_acquisition, requires_initial_full_not_already_acquired, requires_recurring_assent, " +
   "trial_days, eligible_roles, stripe_product_id, stripe_price_id, stripe_renewal_price_id, " +
-  "production_enabled, is_historical_record, sort_order, source_ref";
+  "production_enabled, is_historical_record, badge, highlight, billing_period, layout, sort_order, source_ref";
 
 /** Every offer, enabled or not. For the Agent Manager. */
 export async function listAllOffers(): Promise<StewardOffer[]> {
@@ -182,4 +186,33 @@ export function describeBilling(offer: StewardOffer): string {
     default:
       return price;
   }
+}
+
+/**
+ * What an annual offer saves against paying monthly, or against buying its
+ * parts separately.
+ *
+ * Computed from the catalogue rather than written into the copy, so a price
+ * change cannot leave a stale "save $49" on the page. Returns null when there
+ * is nothing honest to claim.
+ */
+export function annualSaving(offer: StewardOffer, all: StewardOffer[]): { amountMinor: number; versus: string } | null {
+  // Premium annual vs twelve months of Premium monthly.
+  if (offer.offer_key === "premium_annual") {
+    const monthly = all.find((o) => o.offer_key === "premium_monthly");
+    if (!monthly) return null;
+    const diff = monthly.price_minor * 12 - offer.price_minor;
+    return diff > 0 ? { amountMinor: diff, versus: "paying monthly" } : null;
+  }
+
+  // The bundle vs buying the build and a year of Premium separately.
+  if (offer.offer_key === "build_plus_first_year") {
+    const build = all.find((o) => o.offer_key === "initial_full");
+    const annual = all.find((o) => o.offer_key === "premium_annual");
+    if (!build || !annual) return null;
+    const diff = build.price_minor + annual.price_minor - offer.price_minor;
+    return diff > 0 ? { amountMinor: diff, versus: "buying them separately" } : null;
+  }
+
+  return null;
 }
