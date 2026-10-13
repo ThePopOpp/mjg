@@ -11,7 +11,8 @@
     "db:migrate": "node scripts/apply-migrations.mjs",
     "db:migrate:status": "node scripts/apply-migrations.mjs --status",
     "db:migrate:check": "node scripts/apply-migrations.mjs --check",
-    "dev:requests": "node scripts/dev-requests.mjs"
+    "dev:requests": "node scripts/dev-requests.mjs",
+    "legal:import": "node scripts/import-legal-docs.mjs"
   },
   "dependencies": {
     "@platejs/basic-nodes": "^53.0.0",

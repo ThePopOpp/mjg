@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboard, PanelsTopLeft, MousePointerClick, ClipboardList, CheckCheck, X } from "lucide-react";
+import { LayoutDashboard, PanelsTopLeft, MousePointerClick, ClipboardList, CheckCheck, Scale, X } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { CmsPagesList } from "@/components/cms/cms-pages-list";
@@ -9,15 +9,16 @@ import { FrontendEdits, type FrontendPage } from "@/components/cms/frontend-edit
 import { EditRequests } from "@/components/cms/edit-requests";
 import { CompletedEdits } from "@/components/cms/completed-edits";
 import { CmsOverview, type CmsNav } from "@/components/cms/cms-overview";
+import { LegalManager } from "@/components/cms/legal-manager";
 import { AgentChat } from "@/components/ai-agent/agent-chat";
 import { PageHelp } from "@/components/dashboard/page-help";
 import { CMS_HELP, CMS_HELP_INTRO, CMS_HELP_TITLE } from "@/lib/content/help-text";
 import type { CmsPage } from "@/lib/cms/types";
 
-type View = "overview" | "pages" | "editor" | "requests" | "completed";
+type View = "overview" | "pages" | "editor" | "requests" | "completed" | "legal";
 
 const SHEPHERD_CONTEXT =
-  "You are Shepherd helping with the MJG CMS. You can list, create, and update CMS DRAFT pages and answer questions about pages and edit requests. Everything you author is a draft for a Super Admin to review — never publish or edit the live site.";
+  "You are Shepherd helping with the MJG CMS. You can list, create, and update CMS DRAFT pages and answer questions about pages and edit requests. Everything you author is a draft for a Super Admin to review — never publish or edit the live site. You have no access to the Legal documents and must not draft, edit, or advise on publishing them — those are attorney-review drafts and a Super Admin edits them directly.";
 
 export function CmsWorkspace({ initialPages, frontendPages, displayName }: { initialPages: CmsPage[]; frontendPages: FrontendPage[]; displayName?: string }) {
   const [view, setView] = React.useState<View>("overview");
@@ -40,6 +41,7 @@ export function CmsWorkspace({ initialPages, frontendPages, displayName }: { ini
   const nav: CmsNav = {
     pages: () => setView("pages"), editor: () => setView("editor"),
     requests: () => setView("requests"), shepherd: () => setShepherdOpen(true),
+    legal: () => setView("legal"),
   };
 
   // The Frontend Editor is a focused, full-width view: the CMS tabs + page header
@@ -76,6 +78,7 @@ export function CmsWorkspace({ initialPages, frontendPages, displayName }: { ini
               </span>
             )}
           </TabsTrigger>
+          <TabsTrigger value="legal" className="gap-1.5"><Scale className="h-3.5 w-3.5" /> Legal</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-5"><CmsOverview pages={initialPages} nav={nav} /></TabsContent>
         <TabsContent value="pages" className="mt-5"><CmsPagesList initialPages={initialPages} /></TabsContent>
@@ -83,6 +86,10 @@ export function CmsWorkspace({ initialPages, frontendPages, displayName }: { ini
         <TabsContent value="completed" className="mt-5">
           {/* Mounted only when open, so its mark-reviewed effect means "actually viewed". */}
           <CompletedEdits onReviewed={() => setCompletedUnreviewed(0)} />
+        </TabsContent>
+        <TabsContent value="legal" className="mt-5">
+          {/* Mounted only when open: it loads every document body, which is ~45KB. */}
+          {view === "legal" ? <LegalManager /> : null}
         </TabsContent>
       </Tabs>
 

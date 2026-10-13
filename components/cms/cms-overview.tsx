@@ -9,15 +9,14 @@
 import * as React from "react";
 import {
   MousePointerClick, ClipboardList, PanelsTopLeft, Bot, Plus, FileText, CheckCircle2, Clock,
-  CalendarDays, Users, Bell, HelpCircle, ArrowRight, RefreshCw, CircleDot, X, SendHorizonal,
-} from "lucide-react";
+  CalendarDays, Users, Bell, HelpCircle, ArrowRight, RefreshCw, CircleDot, X, SendHorizonal, Scale } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import type { CmsPage } from "@/lib/cms/types";
 
-export type CmsNav = { pages: () => void; editor: () => void; requests: () => void; shepherd: () => void };
+export type CmsNav = { pages: () => void; editor: () => void; requests: () => void; shepherd: () => void; legal: () => void };
 type UReq = { kind: "frontend" | "dashboard"; note: string; page: string; status: string; priority: string; type: string; authorEmail: string; authorName: string; createdAt: string; updatedAt: string };
 
 const PRIORITY_COLOR: Record<string, string> = { low: "text-muted-foreground", medium: "text-foreground", high: "text-amber-600 dark:text-amber-400", urgent: "text-destructive" };
@@ -93,6 +92,7 @@ export function CmsOverview({ pages, nav }: { pages: CmsPage[]; nav: CmsNav }) {
     { label: "Edit Requests", desc: "Triage frontend & dashboard requests", icon: ClipboardList, onClick: nav.requests },
     { label: "Pages & Block Builder", desc: "Create & edit CMS pages", icon: PanelsTopLeft, onClick: nav.pages },
     { label: "Shepherd AI", desc: "Draft pages & changes with AI", icon: Bot, onClick: nav.shepherd },
+    { label: "Legal", desc: "Privacy, Terms, SMS & AI Trust documents", icon: Scale, onClick: nav.legal },
   ];
   const stats = [
     { label: "Pages", value: s.pagesTotal, sub: `${s.pagesDraft} draft · ${s.pagesPublished} published`, icon: FileText, onClick: nav.pages },

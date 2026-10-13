@@ -395,6 +395,7 @@ export function renderSiteFooter(siteUrl: string) {
           <ul>
             <li><a href="${app}/privacy">Privacy Policy</a></li>
             <li><a href="${app}/terms">Terms of Service</a></li>
+            <li><a href="${app}/legal">Legal &amp; Trust</a></li>
             <li><a href="${app}/sms/opt-in">SMS Management</a></li>
             <li><a href="${app}/email/opt-in">Email Management</a></li>
           </ul>
@@ -814,6 +815,7 @@ function injectLegalFooterColumn(html: string) {
         <ul class="footer-links">
           <li><a href="${app}/privacy">Privacy Policy</a></li>
           <li><a href="${app}/terms">Terms of Service</a></li>
+          <li><a href="${app}/legal">Legal &amp; Trust</a></li>
           <li><a href="${app}/sms/opt-in">SMS Management</a></li>
           <li><a href="${app}/email/opt-in">Email Management</a></li>
         </ul>
