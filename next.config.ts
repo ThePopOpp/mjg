@@ -22,20 +22,28 @@ const nextConfig: NextConfig = {
  * Steward's instructions, tools and build output stay separate from the Next.js
  * app and from Shepherd.
  *
- * WHY THIS IS GATED
- * -----------------
- * In `next dev`, withEve starts the eve dev server while resolving rewrites, and
- * that server connects to its Postgres workflow store on startup. If the store
- * is unreachable it exits non-zero, and `next dev` then dies with "eve server
- * process exited before printing its server URL" — the whole app, not just
- * Steward. Mounting unconditionally would mean nobody can run the dashboard
- * locally without a workflow database, which is a bad trade while Steward has no
- * UI yet.
+ * WHY THIS IS OFF UNLESS YOU ASK FOR IT
+ * -------------------------------------
+ * withEve needs a BUILT eve service to point at. In production it asserts that
+ * steward/.output/server/index.mjs exists and throws at startup if it does not:
  *
- * So: always mounted in production builds, and opt-in locally via STEWARD_EVE=1
- * when you are actually working on Steward. A production build does not need the
- * database — only the dev server starts a live eve process.
+ *   "eve production output is missing at <root>/steward/.output/server/index.mjs.
+ *    Run eve build from <root>/steward before starting Next.js."
+ *
+ * The runtime image does not COPY steward/, so mounting it on NODE_ENV=production
+ * took the whole site down with "no available server": Next threw before it could
+ * listen and the container never came up. `next dev` fails just as hard for a
+ * different reason — it starts the eve dev server, which exits non-zero when its
+ * Postgres workflow store is unreachable and takes `next dev` down with it.
+ *
+ * Nothing calls /eve/v1/* yet, because there is no Steward agent UI. A rewrite to
+ * a service that is not running buys nothing and risks everything, so it stays
+ * off until STEWARD_EVE=1 is set deliberately.
+ *
+ * Turning it on needs all three, not just the flag: COPY steward/ into the
+ * runtime stage, run `eve build` so .output exists, and run `eve start` alongside
+ * Next so something is listening on the port the rewrite targets.
  */
-const mountEve = process.env.NODE_ENV === "production" || process.env.STEWARD_EVE === "1";
+const mountEve = process.env.STEWARD_EVE === "1";
 
 export default mountEve ? withEve(nextConfig, { eveRoot: "steward" }) : nextConfig;
