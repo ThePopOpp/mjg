@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, MessageCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   BLUEPRINT_PAGES,
   EXAMPLE_BLUEPRINT,
@@ -41,9 +44,9 @@ export default async function BlueprintPageDetail({ params }: { params: Promise<
       <header className="mt-5">
         <div className="flex flex-wrap items-center gap-3">
           <span className="font-serif text-sm text-muted-foreground tabular-nums">Page {page.number}</span>
-          <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${STATE_STYLE[state]}`}>
+          <Badge variant="outline" className={`text-[10px] ${STATE_STYLE[state]}`}>
             {state}
-          </span>
+          </Badge>
           {entry?.updated ? (
             <span className="text-[12px] text-muted-foreground">
               Updated {new Date(`${entry.updated}T00:00:00Z`).toLocaleDateString("en-US", {
@@ -65,7 +68,8 @@ export default async function BlueprintPageDetail({ params }: { params: Promise<
       {hasContent ? (
         <section className="mt-7 space-y-3">
           {entries.map((e) => (
-            <div key={e.label} className="rounded-xl border p-4">
+            <Card key={e.label}>
+              <CardContent className="p-4">
               <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{e.label}</p>
               {e.value.trim() ? (
                 <p className="mt-1.5 text-[15px] leading-relaxed">{e.value}</p>
@@ -73,40 +77,44 @@ export default async function BlueprintPageDetail({ params }: { params: Promise<
                 <p className="mt-1.5 text-[15px] italic text-muted-foreground">Nothing here yet.</p>
               )}
               {e.needsClarity ? (
-                <p className="mt-2.5 inline-flex rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-500">
+                <Badge
+                  variant="outline"
+                  className="mt-2.5 border-amber-500/40 bg-amber-500/15 text-[11px] text-amber-700 dark:text-amber-500"
+                >
                   Needs clarity
-                </p>
+                </Badge>
               ) : null}
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </section>
       ) : (
         /* The empty state. Says what the page is for and offers the only route
            in — a conversation. No blank form, because a Blueprint is not a form
            and nothing lands here without being approved first. */
-        <section className="mt-7 rounded-xl border border-dashed p-7 text-center">
+        <Card className="mt-7 border-dashed">
+          <CardContent className="p-7 text-center">
           <p className="font-serif text-lg">You haven&rsquo;t come to this one yet.</p>
           <p className="mx-auto mt-2 max-w-sm text-[14px] leading-relaxed text-muted-foreground">
             That is not a gap to fix today. When it is the right time, talk it through and nothing is written here
             until you have approved the words.
           </p>
-          <Link
-            href={`/steward/conversation?page=${page.slug}`}
-            className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#b88a4a] px-4 py-2 text-sm font-semibold text-white no-underline"
-          >
-            <MessageCircle className="h-4 w-4" /> Talk about this with Steward
-          </Link>
-        </section>
+          <Button asChild className="mt-5 gap-2 bg-[#b88a4a] text-white hover:bg-[#a67c42]">
+            <Link href={`/steward?page=${page.slug}`}>
+              <MessageCircle className="h-4 w-4" /> Talk about this with Steward
+            </Link>
+          </Button>
+          </CardContent>
+        </Card>
       )}
 
       {hasContent ? (
         <div className="mt-7 flex flex-wrap gap-2.5">
-          <Link
-            href={`/steward/conversation?page=${page.slug}`}
-            className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium no-underline hover:bg-muted"
-          >
-            <MessageCircle className="h-4 w-4" /> Work on this page
-          </Link>
+          <Button asChild variant="outline" className="gap-2">
+            <Link href={`/steward?page=${page.slug}`}>
+              <MessageCircle className="h-4 w-4" /> Work on this page
+            </Link>
+          </Button>
         </div>
       ) : null}
 

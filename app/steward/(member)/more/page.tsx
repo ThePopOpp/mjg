@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { PrototypeBanner } from "@/components/steward/prototype-banner";
 
 export const dynamic = "force-dynamic";
@@ -62,7 +64,7 @@ export default function MorePage() {
       {GROUPS.map((group) => (
         <section key={group.heading} className="mt-7">
           <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{group.heading}</h2>
-          <ul className="mt-2 divide-y rounded-xl border">
+          <Card className="mt-2 overflow-hidden"><ul className="divide-y">
             {group.items.map((item) => (
               <li key={item.label}>
                 <Link
@@ -76,15 +78,15 @@ export default function MorePage() {
                     ) : null}
                   </span>
                   {!item.ready ? (
-                    <span className="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                    <Badge variant="outline" className="shrink-0 text-[10px] text-muted-foreground">
                       Not built yet
-                    </span>
+                    </Badge>
                   ) : null}
                   <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                 </Link>
               </li>
             ))}
-          </ul>
+          </ul></Card>
         </section>
       ))}
 
