@@ -1,6 +1,5 @@
 import { BLUEPRINT_PAGES, EXAMPLE_BLUEPRINT, FREE_PAGES } from "@/lib/steward/blueprint";
 import { Conversation } from "@/components/steward/conversation";
-import { PrototypeBanner } from "@/components/steward/prototype-banner";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Steward" };
@@ -8,9 +7,9 @@ export const metadata = { title: "Steward" };
 // Steward is where a member lands.
 //
 // Owner decision: the conversation is the front door, with the Blueprint reached
-// either by asking Steward or by the nav link. The committed next step still
-// sits above the conversation, so opening the app shows what you already decided
-// rather than only an invitation to talk more.
+// either by asking Steward or from the rail. The committed next step lives in
+// the rail rather than above the transcript, so the first screen is the
+// conversation itself — as the mock has it.
 
 export default async function StewardLanding({
   searchParams,
@@ -22,14 +21,9 @@ export default async function StewardLanding({
   const nextStep = EXAMPLE_BLUEPRINT["starting-plan"]?.entries?.[0]?.value;
 
   return (
-    <>
-      <div className="mx-auto w-full max-w-2xl px-5 pt-8">
-        <PrototypeBanner />
-      </div>
-      <Conversation
-        nextStep={nextStep}
-        pageContext={context ? { title: context.title, href: `/steward/blueprint/${context.slug}` } : undefined}
-      />
-    </>
+    <Conversation
+      nextStep={nextStep}
+      pageContext={context ? { title: context.title, href: `/steward/blueprint/${context.slug}` } : undefined}
+    />
   );
 }
