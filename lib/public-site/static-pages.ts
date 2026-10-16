@@ -3,6 +3,7 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { INSTALL_GUIDES, SHARE_ICON_SVG } from "@/lib/pwa/install-guide";
 import { ACCOUNT_LABEL, RESOURCES_LABEL, joinJourneyHref, publicNavItems } from "@/lib/public-site/nav-items";
+import { renderStewardFab } from "@/lib/public-site/steward-fab";
 
 // The primary domain is the apex michaeljgauthier.com. The my.* sub-domain still resolves but
 // is no longer the canonical host, so it must not be the fallback. Override per environment
@@ -419,7 +420,8 @@ export function renderSiteFooter(siteUrl: string) {
         </span>
       </div>
     </div>
-  </footer>`;
+  </footer>
+  ${renderStewardFab({ siteUrl, appUrl: app })}`;
 }
 
 /** Nav JS — place just before </body> */
@@ -774,9 +776,25 @@ function transformStaticHtml(html: string) {
   }
 
   return injectFrontendNav(
-    injectMobileNavStyle(injectViewport(injectLegalFooterColumn(injectPwa(injectFaviconLinks(output))))),
+    injectStewardFab(
+      injectMobileNavStyle(injectViewport(injectLegalFooterColumn(injectPwa(injectFaviconLinks(output))))),
+      siteUrl,
+      app,
+    ),
     siteUrl,
   );
+}
+
+// The exported main/*.html pages carry their own hardcoded footer and never call
+// renderSiteFooter(), so the Steward button is added here instead. Guarded on
+// the root id, because a page that already has one must not get a second.
+function injectStewardFab(html: string, siteUrl: string, app: string) {
+  if (html.includes('id="mjg-steward-fab"')) return html;
+  const markup = renderStewardFab({ siteUrl, appUrl: app });
+  // Several of these files are head-less Bricks fragments with no </body>
+  // either; appending is correct there, and the browser sorts out the rest.
+  if (/<\/body>/i.test(html)) return html.replace(/<\/body>/i, `${markup}\n</body>`);
+  return `${html}\n${markup}`;
 }
 
 // The exported main/*.html pages carry their own nav CSS; on phones the "Michael J. Gauthier"

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { SiteNav } from "@/components/public-site/site-nav";
+import { StewardFab } from "@/components/public-site/steward-fab";
 import type { NavItem } from "@/lib/public-site/nav-items";
-import { publicSiteUrl } from "@/lib/public-site/static-pages";
+import { appUrl, publicSiteUrl } from "@/lib/public-site/static-pages";
 
 /**
  * Public page chrome for the React app pages that belong to the marketing site rather than
@@ -66,6 +67,8 @@ export function SiteShell({
           </p>
         </div>
       </footer>
+
+      <StewardFab siteUrl={siteUrl} appUrl={appUrl()} />
     </div>
   );
 }
