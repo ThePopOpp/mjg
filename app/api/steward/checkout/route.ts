@@ -18,6 +18,29 @@ import { getStripe, isStripeConfigured } from "@/lib/steward/stripe";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Where to send the browser back to after Checkout.
+ *
+ * NOT `new URL(request.url).origin`: Next reconstructs that URL, and it can
+ * report https for a plain-http dev server — which sent a local test to
+ * https://localhost:3000 and died with ERR_SSL_PROTOCOL_ERROR. The forwarded
+ * headers are what the request actually arrived on, which is also what works
+ * behind Coolify's proxy, where the app itself speaks http.
+ *
+ * A bare loopback host with no proxy in front is http; anything else is https,
+ * since Stripe will not redirect to an insecure public URL anyway.
+ */
+function resolveOrigin(request: Request): string {
+  const first = (value: string | null) => value?.split(",")[0]?.trim() || null;
+  const host = first(request.headers.get("x-forwarded-host")) ?? first(request.headers.get("host"));
+  if (!host) return new URL(request.url).origin;
+
+  const forwardedProto = first(request.headers.get("x-forwarded-proto"));
+  const isLoopback = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(host);
+  const proto = forwardedProto ?? (isLoopback ? "http" : "https");
+  return `${proto}://${host}`;
+}
+
 export async function POST(request: Request) {
   try {
     if (!isStripeConfigured()) {
@@ -52,7 +75,7 @@ export async function POST(request: Request) {
 
     const stripe = getStripe();
     const tax = await getTaxPolicy();
-    const origin = new URL(request.url).origin;
+    const origin = resolveOrigin(request);
 
     // The $299 offer is one year PREPAID (owner, 2026-10-13), so the only
     // subscription modes left are the genuinely recurring ones. That removes the
