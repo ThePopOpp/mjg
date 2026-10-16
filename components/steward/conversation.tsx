@@ -287,7 +287,7 @@ export function Conversation({
       </div>
 
       {/* Transcript */}
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto px-5 pb-2 pt-6 md:px-7 md:pt-7">
+      <div ref={scrollRef} className="scroll-slim min-h-0 flex-1 overflow-auto px-5 pb-2 pt-6 md:px-7 md:pt-7">
         <div className="mx-auto flex w-full max-w-[760px] flex-col gap-6">
           {messages.length === 0 && !thinking ? (
             <div className="flex flex-col items-start gap-4 py-6">

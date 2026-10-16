@@ -31,10 +31,10 @@ export default async function StewardMemberLayout({ children }: { children: Reac
     <div className="flex h-screen flex-col overflow-hidden bg-background">
       <SiteNav siteUrl={publicSiteUrl()} />
 
-      <div className="mx-auto grid min-h-0 w-full max-w-[1280px] flex-1 grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)]">
+      <div className="mx-auto grid min-h-0 w-full max-w-[1160px] flex-1 grid-cols-1 md:grid-cols-[244px_minmax(0,1fr)] md:px-8">
         <MemberSidebar {...rail} />
 
-        <section className="flex min-h-0 flex-col overflow-y-auto">
+        <section className="scroll-slim flex min-h-0 flex-col overflow-y-auto">
           <MemberSidebarMobile {...rail} />
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         </section>

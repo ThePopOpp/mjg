@@ -304,3 +304,66 @@
 .dark .gantt-line-head { fill: rgba(236, 217, 160, 0.55); }
 .gantt-today { background-color: rgba(176, 137, 74, 0.85); }
 .dark .gantt-today { background-color: rgba(236, 217, 160, 0.7); }
+
+/* Slim scrollbars for the Steward member shell -----------------------------
+   The platform scrollbar on Windows is a white track with stepper arrows,
+   which reads as a browser chrome artefact sitting inside the app — most
+   visibly against the dark theme. This replaces it with a thin, rounded thumb
+   on a transparent track that takes its colour from the theme.
+
+   Applied per container rather than globally, so the rest of the app keeps the
+   scrollbar the operating system gives it.
+
+   `scrollbar-width`/`scrollbar-color` cover Firefox and Chromium 121+; the
+   ::-webkit rules cover Safari and older Chromium. Both are declared because
+   neither covers everything on its own, and a browser that honours neither
+   simply keeps its default. */
+.scroll-slim {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--foreground) / 0.22) transparent;
+}
+.scroll-slim::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.scroll-slim::-webkit-scrollbar-track {
+  background: transparent;
+}
+/* The stepper arrows at each end. */
+.scroll-slim::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.scroll-slim::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--foreground) / 0.2);
+  border-radius: 999px;
+  /* A transparent border inset by the background clip is what makes the thumb
+     narrower than the track without the track showing through. */
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.scroll-slim::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--foreground) / 0.35);
+}
+.scroll-slim::-webkit-scrollbar-thumb:active {
+  background-color: hsl(var(--foreground) / 0.45);
+}
+
+/* Dark mode wants slightly more contrast: a cream thumb on near-black reads
+   fainter than an ink thumb on cream at the same alpha. */
+.dark .scroll-slim {
+  scrollbar-color: hsl(var(--foreground) / 0.26) transparent;
+}
+.dark .scroll-slim::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--foreground) / 0.24);
+}
+.dark .scroll-slim::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--foreground) / 0.4);
+}
+.dark .scroll-slim::-webkit-scrollbar-thumb:active {
+  background-color: hsl(var(--foreground) / 0.5);
+}

@@ -39,19 +39,22 @@ function SidebarBody({
   planLabel,
   nextStep,
   onNavigate,
+  className,
 }: {
   displayName: string;
   initials: string;
   planLabel: string;
   nextStep?: string;
   onNavigate?: () => void;
+  /** Padding differs between the docked rail and the phone sheet. */
+  className?: string;
 }) {
   const pathname = usePathname();
   const isActive = (href: string) =>
     href === "/steward" ? pathname === "/steward" : pathname.startsWith(href);
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-3.5">
+    <div className={cn("flex h-full min-h-0 flex-col gap-4", className)}>
       <Button asChild variant="outline" className="w-full justify-center gap-2 font-semibold">
         <Link href="/steward" onClick={onNavigate}>
           <Plus className="h-4 w-4" /> New conversation
@@ -82,7 +85,7 @@ function SidebarBody({
         })}
       </nav>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-auto">
+      <div className="scroll-slim flex min-h-0 flex-1 flex-col gap-0.5 overflow-auto">
         <p className="px-2.5 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
           Recent
         </p>
@@ -133,7 +136,7 @@ type SidebarProps = { displayName: string; initials: string; planLabel: string; 
 export function MemberSidebar(props: SidebarProps) {
   return (
     <aside className="hidden min-h-0 border-r md:block">
-      <SidebarBody {...props} />
+      <SidebarBody {...props} className="py-3.5 pr-3.5" />
     </aside>
   );
 }
@@ -152,7 +155,7 @@ export function MemberSidebarMobile(props: SidebarProps) {
         </SheetTrigger>
         <SheetContent side="left" className="w-[85%] max-w-[300px] p-0 sm:max-w-[300px]">
           <SheetTitle className="sr-only">Steward menu</SheetTitle>
-          <SidebarBody {...props} onNavigate={() => setOpen(false)} />
+          <SidebarBody {...props} className="p-3.5" onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
 
