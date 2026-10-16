@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { ArrowRight, Check, Clock, Loader2 } from "lucide-react";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getActivationPolicy } from "@/lib/steward/config";
-import { formatPrice } from "@/lib/steward/catalogue";
+import { describeBilling, formatPrice, getOffer } from "@/lib/steward/catalogue";
 import { addCalendarDays } from "@/lib/steward/lifecycle";
 import { ActivateButton } from "@/components/steward/activate-button";
+import { SITE_CONTENT_BOX, SiteShell } from "@/components/public-site/site-shell";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Thank you — Steward" };
@@ -19,6 +20,9 @@ export const metadata = { title: "Thank you — Steward" };
 // rather than guessing, because "pending" and "paid" are different facts and the
 // docset's persistence axis says a result is reported from its receipt, never
 // inferred.
+//
+// It carries the site chrome rather than floating on a blank page: someone who
+// has just paid should still be somewhere recognisable, with a way onward.
 
 export default async function StewardThankYouPage({
   searchParams,
@@ -51,89 +55,151 @@ export default async function StewardThankYouPage({
     : { data: null };
 
   const policy = await getActivationPolicy().catch(() => null);
+  // The offer row, so the page names what was bought and repeats the billing
+  // sentence from the catalogue rather than describing it in its own words.
+  const offer = order ? await getOffer(order.offer_key as string).catch(() => null) : null;
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-5 py-12">
-      {!order ? (
-        <section className="rounded-xl border bg-card p-6 text-center">
-          <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
-          <h1 className="mt-3 text-xl font-semibold">Confirming your payment…</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            We are waiting for Stripe to confirm. This usually takes a few seconds — refresh in a moment. Nothing is
-            lost if you close this page; your receipt is emailed by Stripe either way.
-          </p>
-        </section>
-      ) : order.status !== "paid" ? (
-        <section className="rounded-xl border bg-card p-6">
-          <Clock className="h-6 w-6 text-amber-600" />
-          <h1 className="mt-3 text-xl font-semibold">Payment is still settling</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Your payment method confirms after a short delay rather than instantly. We will email you as soon as it
-            clears, and your plan becomes available to activate then.
-          </p>
-        </section>
-      ) : (
-        <section className="rounded-xl border bg-card p-6">
-          <CheckCircle2 className="h-7 w-7 text-emerald-600" />
-          <h1 className="mt-3 text-2xl font-semibold tracking-tight">Thank you</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            We received {formatPrice(order.amount_minor as number, (order.currency as string) ?? "USD")}. Stripe has
-            emailed your receipt.
-          </p>
-
-          {activation ? (
-            <div className="mt-5 rounded-lg border bg-muted/40 p-4 text-sm">
-              <p className="font-medium">Your plan is active.</p>
-              <ul className="mt-2 space-y-1 text-muted-foreground">
-                <li>
-                  Build window runs until{" "}
-                  <strong className="text-foreground">{formatDate(activation.build_ends_at as string)}</strong>
-                </li>
-                <li>
-                  Premium runs until{" "}
-                  <strong className="text-foreground">{formatDate(activation.premium_ends_at as string)}</strong>
-                </li>
-              </ul>
-            </div>
+    <SiteShell>
+      <section className={`${SITE_CONTENT_BOX} py-14 md:py-20`}>
+        <div className="mx-auto w-full max-w-2xl">
+          {!order ? (
+            <Pending />
+          ) : order.status !== "paid" ? (
+            <Settling />
           ) : (
-            <div className="mt-5 rounded-lg border bg-muted/40 p-4">
-              <p className="text-sm font-medium">One more step: activate when you are ready</p>
-              <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
-                Your build window and your first year of Premium both start the moment you activate — not now. That
-                means you can take your time: nothing is ticking yet.
-                {policy && order.paid_at ? (
-                  <>
-                    {" "}
-                    You have until{" "}
-                    <strong className="text-foreground">
-                      {formatDate(
-                        addCalendarDays(new Date(order.paid_at as string), policy.activationDeadlineDays).toISOString(),
-                      )}
-                    </strong>{" "}
-                    to activate.
-                  </>
-                ) : null}
-              </p>
-              <div className="mt-4">
-                <ActivateButton orderId={order.id as string} />
-              </div>
-              <p className="mt-3 text-[11px] leading-snug text-muted-foreground">
-                Before you activate you can still request a full refund. Activating starts your term.
-              </p>
-            </div>
-          )}
+            <>
+              <header className="text-center">
+                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#b88a4a] text-white">
+                  <Check className="h-7 w-7" strokeWidth={2.5} />
+                </span>
+                <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.16em] text-[#b88a4a]">
+                  Steward
+                </p>
+                <h1 className="mt-2.5 font-serif text-4xl leading-tight md:text-5xl">Thank you</h1>
+                <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-muted-foreground">
+                  We received{" "}
+                  <strong className="font-semibold text-foreground">
+                    {formatPrice(order.amount_minor as number, (order.currency as string) ?? "USD")}
+                  </strong>
+                  . Stripe has emailed your receipt.
+                </p>
+              </header>
 
-          <div className="mt-6 flex flex-wrap gap-3 text-sm">
-            <Link href="/dashboard" className="underline underline-offset-2">
-              Go to your dashboard
-            </Link>
-            <Link href="/terms" className="underline underline-offset-2">
-              Terms
-            </Link>
-          </div>
-        </section>
-      )}
-    </main>
+              {/* What was bought, in the catalogue's own words. */}
+              {offer ? (
+                <div className="mt-9 rounded-xl border bg-card">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b px-5 py-4">
+                    <p className="font-serif text-lg">{offer.label}</p>
+                    <p className="font-serif text-lg tabular-nums">
+                      {formatPrice(order.amount_minor as number, (order.currency as string) ?? "USD")}
+                    </p>
+                  </div>
+                  <p className="px-5 py-4 text-[13px] leading-relaxed text-muted-foreground">
+                    {describeBilling(offer)}
+                  </p>
+                </div>
+              ) : null}
+
+              {activation ? (
+                <div className="mt-6 rounded-xl border border-[#b88a4a]/50 bg-[#b88a4a]/[0.06] p-5">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#b88a4a]">
+                    Your plan is active
+                  </p>
+                  <dl className="mt-3 space-y-2.5 text-[14px]">
+                    <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5">
+                      <dt className="text-muted-foreground">Build window runs until</dt>
+                      <dd className="font-medium">{formatDate(activation.build_ends_at as string)}</dd>
+                    </div>
+                    <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5">
+                      <dt className="text-muted-foreground">Premium runs until</dt>
+                      <dd className="font-medium">{formatDate(activation.premium_ends_at as string)}</dd>
+                    </div>
+                  </dl>
+                  <Link
+                    href="/steward"
+                    className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#b88a4a] px-4 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#a67c42]"
+                  >
+                    Start with Steward <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              ) : (
+                <div className="mt-6 rounded-xl border border-[#b88a4a]/50 bg-[#b88a4a]/[0.06] p-5">
+                  <p className="font-serif text-lg leading-snug">One more step: activate when you are ready</p>
+                  <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+                    Your build window and your first year of Premium both start the moment you activate — not now.
+                    That means you can take your time: nothing is ticking yet.
+                    {policy && order.paid_at ? (
+                      <>
+                        {" "}
+                        You have until{" "}
+                        <strong className="font-semibold text-foreground">
+                          {formatDate(
+                            addCalendarDays(
+                              new Date(order.paid_at as string),
+                              policy.activationDeadlineDays,
+                            ).toISOString(),
+                          )}
+                        </strong>{" "}
+                        to activate.
+                      </>
+                    ) : null}
+                  </p>
+                  <div className="mt-5">
+                    <ActivateButton orderId={order.id as string} />
+                  </div>
+                  <p className="mt-3.5 border-t border-[#b88a4a]/25 pt-3.5 text-[12px] leading-relaxed text-muted-foreground">
+                    Before you activate you can still request a full refund. Activating starts your term.
+                  </p>
+                </div>
+              )}
+
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t pt-6 text-[13px]">
+                <Link href="/dashboard" className="text-muted-foreground hover:text-[#b88a4a]">
+                  Go to your dashboard
+                </Link>
+                <Link href="/steward/more" className="text-muted-foreground hover:text-[#b88a4a]">
+                  Receipts and billing
+                </Link>
+                <Link href="/terms" className="text-muted-foreground hover:text-[#b88a4a]">
+                  Terms
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+    </SiteShell>
+  );
+}
+
+/** The webhook has not landed yet. Says so rather than guessing. */
+function Pending() {
+  return (
+    <div className="rounded-xl border bg-card p-8 text-center">
+      <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#b88a4a]" />
+      <h1 className="mt-4 font-serif text-2xl">Confirming your payment…</h1>
+      <p className="mx-auto mt-3 max-w-md text-[14px] leading-relaxed text-muted-foreground">
+        We are waiting for Stripe to confirm. This usually takes a few seconds — refresh in a moment. Nothing is lost
+        if you close this page; your receipt is emailed by Stripe either way.
+      </p>
+    </div>
+  );
+}
+
+/** A payment method that confirms on a delay. */
+function Settling() {
+  return (
+    <div className="rounded-xl border bg-card p-8 text-center">
+      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#b88a4a]/40 bg-[#b88a4a]/10 text-[#b88a4a]">
+        <Clock className="h-6 w-6" />
+      </span>
+      <h1 className="mt-4 font-serif text-2xl">Payment is still settling</h1>
+      <p className="mx-auto mt-3 max-w-md text-[14px] leading-relaxed text-muted-foreground">
+        Your payment method confirms after a short delay rather than instantly. We will email you as soon as it
+        clears, and your plan becomes available to activate then.
+      </p>
+    </div>
   );
 }
 

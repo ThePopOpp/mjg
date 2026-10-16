@@ -38,7 +38,11 @@ export function ActivateButton({ orderId }: { orderId: string }) {
 
   return (
     <div className="space-y-2">
-      <Button onClick={() => void activate()} disabled={busy}>
+      <Button
+        onClick={() => void activate()}
+        disabled={busy}
+        className="bg-[#b88a4a] font-semibold text-white hover:bg-[#a67c42]"
+      >
         {busy ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : null}
         Activate and start my term
       </Button>
