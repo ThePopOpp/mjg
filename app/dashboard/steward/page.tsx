@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { ROLES } from "@/lib/rbac/roles";
 import { listStewardConfigGroup } from "@/lib/steward/config";
+import { SectionHeader } from "@/components/dashboard/section-header";
 import { StewardSettings, type ConfigRow } from "@/components/steward/steward-settings";
 
 export const dynamic = "force-dynamic";
@@ -21,20 +22,17 @@ export default async function StewardSettingsPage() {
   const rows = await listStewardConfigGroup(["agent", "retention"]);
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-6 py-8">
-      <header>
-        <h1 className="font-serif text-3xl">Steward</h1>
-        <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-          How long Steward keeps what members tell it, and which AI provider is allowed to see it. Changes take
-          effect without a redeploy.
-        </p>
-      </header>
+    // Same shell as every other dashboard page: the layout owns the gutters and
+    // the width, so Steward lines up with Workspace, Plans and the rest.
+    <div className="space-y-6">
+      <SectionHeader
+        title="Steward"
+        description="How long Steward keeps what members tell it, and which AI provider is allowed to see it. Changes take effect without a redeploy."
+      />
 
-      <div className="mt-8">
-        <StewardSettings rows={rows as ConfigRow[]} />
-      </div>
+      <StewardSettings rows={rows as ConfigRow[]} />
 
-      <p className="mt-10 border-t pt-6 text-[12.5px] leading-relaxed text-muted-foreground">
+      <p className="border-t pt-6 text-[12.5px] leading-relaxed text-muted-foreground">
         Every change is versioned — the previous value is kept, with who changed it and when, so a reply can be read
         back against the settings that were in force at the time.
       </p>

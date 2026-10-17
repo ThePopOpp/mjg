@@ -120,10 +120,10 @@ export function StewardSettings({ rows }: { rows: ConfigRow[] }) {
   const groups = Array.from(new Set(state.map((r) => r.config_group)));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {unset.length > 0 ? (
         <Card className="border-amber-500/40 bg-amber-500/5">
-          <CardContent className="flex items-start gap-2.5 p-4">
+          <CardContent className="flex items-start gap-3 p-5">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
             <div>
               <p className="text-sm font-semibold">
@@ -148,17 +148,19 @@ export function StewardSettings({ rows }: { rows: ConfigRow[] }) {
         <section key={group}>
           <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{group}</h2>
 
-          <Card className="mt-2">
-            <ul className="divide-y">
-              {state
-                .filter((r) => r.config_group === group)
-                .map((row) => {
+          {/* Two up on a wide dashboard: these cards are short and the page is
+              full width, so a single column leaves most of it empty. */}
+          <div className="mt-3 grid gap-5 lg:grid-cols-2">
+            {state
+              .filter((r) => r.config_group === group)
+              .map((row) => {
                   const isUnset = row.value === null || row.value === undefined;
                   const choices = CHOICES[row.key];
                   const isRetention = row.key === "retention.conversation_days";
 
-                  return (
-                    <li key={row.key} className="p-4">
+                return (
+                  <Card key={row.key} className="flex h-full flex-col">
+                    <CardContent className="flex flex-1 flex-col p-5">
                       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
@@ -182,7 +184,7 @@ export function StewardSettings({ rows }: { rows: ConfigRow[] }) {
                         ) : null}
                       </div>
 
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <div className="mb-5 mt-4 flex flex-wrap items-center gap-2">
                         {choices ? (
                           choices.map((choice) => (
                             <Button
@@ -257,7 +259,7 @@ export function StewardSettings({ rows }: { rows: ConfigRow[] }) {
                       {/* Separate from the value on purpose: a setting can be in
                           use on staging while the provider review this depends
                           on is still outstanding. */}
-                      <div className="mt-3 flex items-center gap-2.5 border-t pt-3">
+                      <div className="mt-auto flex items-center gap-2.5 border-t pt-4">
                         <Switch
                           id={`prod-${row.key}`}
                           checked={row.production_enabled}
@@ -268,11 +270,11 @@ export function StewardSettings({ rows }: { rows: ConfigRow[] }) {
                           Cleared for real member content
                         </Label>
                       </div>
-                    </li>
-                  );
-                })}
-            </ul>
-          </Card>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+          </div>
         </section>
       ))}
     </div>
