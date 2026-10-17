@@ -67,3 +67,17 @@ EXPOSE 4274
 # database. The world factory reads it at runtime, so no credential is compiled
 # into the bundle.
 CMD ["npx", "eve", "start"]
+
+# ── One-time, per database ────────────────────────────────────────────────────
+# @workflow/world-postgres needs its own schema before the server can start. It
+# is NOT created automatically: without it the container boots, queries
+# workflow.workflow_runs, and exits code 1 with
+# `relation "workflow.workflow_runs" does not exist`.
+#
+# From the repo root, against the target database:
+#
+#     npm run steward:db:bootstrap
+#
+# Creates the workflow, graphile_worker and workflow_drizzle schemas. Additive
+# and namespaced — it does not touch `public`. Run it once per database, and
+# again after an eve or world-postgres upgrade that ships new migrations.
