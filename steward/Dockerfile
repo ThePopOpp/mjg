@@ -29,7 +29,10 @@ WORKDIR /app/steward
 # without the package the build dies with "The just-bash sandbox provider
 # requires the `just-bash` package". It is inert at runtime — nothing can reach
 # a shell, because no tool exposes one.
-COPY steward/package.json ./
+# `npm install`, not `npm ci`: the lockfile is generated on Windows and omits
+# Linux-only optional deps, which makes strict `ci` fail. Same reason the root
+# Dockerfile does it this way.
+COPY steward/package.json steward/package-lock.json ./
 RUN npm install --no-audit --no-fund
 
 COPY steward/ ./
