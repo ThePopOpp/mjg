@@ -42,6 +42,34 @@ import type { NextConfig } from "next";
  */
 const agentUrl = process.env.STEWARD_AGENT_URL?.trim().replace(/\/+$/, "");
 
+/**
+ * Steward as a standalone product, on its own host.
+ *
+ * steward.michaeljgauthier.com serves the member app with no /steward prefix
+ * in the URL, so it reads as its own product rather than a section of the
+ * marketing site. It is the SAME deployment: one codebase, one database, one
+ * Supabase session.
+ *
+ * That last point is why this is a subdomain and not an independent domain. A
+ * cookie set for michaeljgauthier.com reaches steward.michaeljgauthier.com, so
+ * a member signs in once and moves between the dashboard and Steward without
+ * noticing. A different registrable domain cannot share that cookie, and would
+ * mean signing in twice.
+ *
+ * WHAT MUST NOT BE REWRITTEN, and why each one is here:
+ *   _next, favicon, manifest, sw.js, icons   framework and PWA assets
+ *   api, auth, eve                           endpoints, including the agent proxy
+ *   login, register, reset-password          auth pages the member app links to
+ *   steward                                  already prefixed; would double up
+ *   anything with a dot                      static files served from /public
+ *
+ * Scoped by `has: host`, so the main site is untouched whatever this matches.
+ */
+const stewardHost = process.env.STEWARD_HOST?.trim() || "steward.michaeljgauthier.com";
+
+const STEWARD_HOST_PASSTHROUGH =
+  "_next|api|auth|eve|login|register|reset-password|accept-invite|steward|favicon|manifest|sw\\.js|icons";
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // pdfkit reads its built-in font metrics (.afm) from disk at runtime. Bundling it breaks
@@ -49,19 +77,32 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["pdfkit"],
 
   async rewrites() {
-    if (!agentUrl) return [];
-    return {
-      // beforeFiles: /eve/v1/* must reach the agent rather than 404 against a
-      // route that does not exist in this app.
-      beforeFiles: [
-        {
-          source: "/eve/v1/:path+",
-          destination: `${agentUrl}/eve/v1/:path+`,
-        },
-      ],
-      afterFiles: [],
-      fallback: [],
-    };
+    const beforeFiles = [];
+
+    // /eve/v1/* must reach the agent rather than 404 against a route that does
+    // not exist in this app.
+    if (agentUrl) {
+      beforeFiles.push({
+        source: "/eve/v1/:path+",
+        destination: `${agentUrl}/eve/v1/:path+`,
+      });
+    }
+
+    // The Steward host: / -> /steward, /blueprint -> /steward/blueprint.
+    beforeFiles.push(
+      {
+        source: "/",
+        has: [{ type: "host" as const, value: stewardHost }],
+        destination: "/steward",
+      },
+      {
+        source: `/:path((?!${STEWARD_HOST_PASSTHROUGH}).*)`,
+        has: [{ type: "host" as const, value: stewardHost }],
+        destination: "/steward/:path",
+      },
+    );
+
+    return { beforeFiles, afterFiles: [], fallback: [] };
   },
 };
 
