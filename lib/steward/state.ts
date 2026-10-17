@@ -145,3 +145,20 @@ export const DEFINITION_STATE_LABEL: Record<DefinitionState, string> = {
   taking_shape: "Taking Shape",
   defined_for_this_season: "Defined for This Season",
 };
+
+/**
+ * Definition state for a DERIVED page — one that summarises others.
+ *
+ * My North Star is the only one today. It "summarizes the underlying Blueprint
+ * rather than redefining it", so it is exactly as settled as the least settled
+ * page it draws on. Taking the lowest rather than an average is deliberate: an
+ * overview that reads as finished while a page beneath it is empty is the
+ * "finished-looking participant" the docset forbids.
+ */
+export function evaluateDerivedSectionState(sourceStates: DefinitionState[]): DefinitionState {
+  if (sourceStates.length === 0) return "not_yet_explored";
+  const order: DefinitionState[] = ["not_yet_explored", "taking_shape", "defined_for_this_season"];
+  return sourceStates.reduce((lowest, state) =>
+    order.indexOf(state) < order.indexOf(lowest) ? state : lowest,
+  );
+}
