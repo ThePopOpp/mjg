@@ -4,6 +4,7 @@ import * as React from "react";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { PlanDetailsDialog } from "@/components/steward/plan-details-dialog";
 
 // The monthly/annual toggle, the plan cards, and the full-width band.
 //
@@ -138,7 +139,10 @@ export function PricingPlans({ plans, signedIn }: { plans: PlanCard[]; signedIn:
                 {busyKey === plan.offerKey ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : null}
                 {ctaLabel(plan)}
               </Button>
-              <p className="mt-2.5 text-[11.5px] leading-relaxed text-muted-foreground">{plan.billingSummary}</p>
+              <div className="mt-1.5">
+                <PlanDetailsDialog offerKey={plan.offerKey} planLabel={plan.label} />
+              </div>
+              <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted-foreground">{plan.billingSummary}</p>
               {signedIn && !plan.purchasable && plan.reason ? (
                 <p className="mt-2 text-[11.5px] leading-relaxed text-amber-600 dark:text-amber-500">{plan.reason}</p>
               ) : null}
@@ -265,6 +269,10 @@ export function PricingPlans({ plans, signedIn }: { plans: PlanCard[]; signedIn:
                   {busyKey === plan.offerKey ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : null}
                   {ctaLabel(plan)}
                 </Button>
+
+                <div className="mt-1.5">
+                  <PlanDetailsDialog offerKey={plan.offerKey} planLabel={plan.label} />
+                </div>
               </div>
             </section>
           ))}
