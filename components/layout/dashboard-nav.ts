@@ -79,6 +79,9 @@ export const dashboardNav: NavEntry[] = [
     ],
   },
   { kind: "item", href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
+  // Steward (the member product) settings — retention and provider. Super-Admin
+  // only, enforced in app/dashboard/steward/page.tsx and on the API route.
+  { kind: "item", href: "/dashboard/steward", label: "Steward", icon: Sparkles, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
   {

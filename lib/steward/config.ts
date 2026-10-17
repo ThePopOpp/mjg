@@ -142,3 +142,83 @@ export async function getTaxPolicy() {
     behavior: await requireString("tax.behavior"),
   };
 }
+
+// == Writes ===================================================================
+
+export type StewardConfigAdminRow = StewardConfigRow & {
+  id: string;
+  source_ref: string | null;
+  updated_at: string;
+};
+
+/** Every row in a group, for the Super Admin console. */
+export async function listStewardConfigGroup(groups: string[]): Promise<StewardConfigAdminRow[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("steward_config")
+    .select("id, key, value, value_type, label, description, config_group, production_enabled, source_ref, updated_at")
+    .in("config_group", groups)
+    .order("config_group")
+    .order("key");
+  if (error) throw error;
+  return (data ?? []) as StewardConfigAdminRow[];
+}
+
+/**
+ * Sets one config value, keeping a version row behind it.
+ *
+ * `value` of null means "unset", which is a meaningful state rather than an
+ * empty one: the typed readers throw StewardConfigUnset for a null, so a
+ * feature that needs a value cannot quietly run on a guessed default. Clearing
+ * a value is therefore a real action, not a mistake to be normalised away.
+ */
+export async function setStewardConfig(args: {
+  key: string;
+  value: unknown;
+  productionEnabled?: boolean;
+  actorId: string;
+  note?: string;
+}): Promise<StewardConfigAdminRow> {
+  const supabase = createSupabaseAdminClient();
+
+  const { data: current, error: readError } = await supabase
+    .from("steward_config")
+    .select("id, value")
+    .eq("key", args.key)
+    .maybeSingle();
+  if (readError) throw readError;
+  if (!current) throw new Error(`"${args.key}" is not a Steward setting.`);
+
+  const { count } = await supabase
+    .from("steward_config_versions")
+    .select("id", { count: "exact", head: true })
+    .eq("config_id", current.id as string);
+
+  // The previous value is archived before the change, so a setting can be read
+  // back against the value that was in force at the time.
+  await supabase.from("steward_config_versions").insert({
+    config_id: current.id as string,
+    version_number: (count ?? 0) + 1,
+    value: current.value ?? null,
+    note: args.note ?? "",
+    actor_id: args.actorId,
+  });
+
+  const patch: Record<string, unknown> = {
+    value: args.value ?? null,
+    updated_by: args.actorId,
+    updated_at: new Date().toISOString(),
+  };
+  if (args.productionEnabled !== undefined) patch.production_enabled = args.productionEnabled;
+
+  const { data, error } = await supabase
+    .from("steward_config")
+    .update(patch)
+    .eq("id", current.id as string)
+    .select("id, key, value, value_type, label, description, config_group, production_enabled, source_ref, updated_at")
+    .single();
+  if (error) throw error;
+
+  invalidateStewardConfigCache();
+  return data as StewardConfigAdminRow;
+}
