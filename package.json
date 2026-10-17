@@ -13,7 +13,8 @@
     "db:migrate:check": "node scripts/apply-migrations.mjs --check",
     "dev:requests": "node scripts/dev-requests.mjs",
     "legal:import": "node scripts/import-legal-docs.mjs",
-    "stripe:sync": "node scripts/stripe-sync-catalogue.mjs"
+    "stripe:sync": "node scripts/stripe-sync-catalogue.mjs",
+    "test:steward": "node --experimental-strip-types lib/steward/lifecycle.test.mjs && node --experimental-strip-types lib/steward/state.test.mjs"
   },
   "dependencies": {
     "@platejs/basic-nodes": "^53.0.0",
