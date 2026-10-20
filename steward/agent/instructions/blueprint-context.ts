@@ -39,6 +39,24 @@ type Overview = {
   }[];
 };
 
+/**
+ * Repeated at the end of every turn, deliberately.
+ *
+ * The voice rules live in instructions.md, hundreds of lines up, and the model
+ * reads them — it opens with the mandated welcome line, which comes from there
+ * — and then produces a seven-point checklist anyway. A fourth rule in the same
+ * place would not help. This one lands last, immediately before it answers.
+ *
+ * Short on purpose. A long reminder is just more prompt to skim.
+ */
+const VOICE_REMINDER = [
+  "BEFORE YOU ANSWER — how Steward talks:",
+  "No numbered lists. No bold headings. No \"Here are some steps\". You are talking, not writing a handout.",
+  "Two or three sentences, then ONE question. Longer only if they asked for detail.",
+  "They came with something specific on their mind. Find out what it actually is before offering anything.",
+  "If your answer would suit a stranger with the same question, it is not their answer.",
+].join("\n");
+
 export default defineDynamic({
   events: {
     "turn.started": async (_event, ctx) => {
@@ -95,6 +113,8 @@ export default defineDynamic({
             "whole thing. A wall of numbered items is not an answer, it is a filing cabinet.",
           "",
           "This list does not include what they WROTE. For the words on a page, call read_blueprint_page.",
+          "",
+          VOICE_REMINDER,
         ].join("\n"),
       });
     },
