@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { getStewardConfigOrNull } from "@/lib/steward/config";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 // Which model Steward uses, resolved at session start.
 //
@@ -48,6 +49,23 @@ export async function GET(request: Request) {
     instructionVersion: typeof instructionVersion === "string" ? instructionVersion : null,
     usedFallback: !(typeof model === "string" && model),
   };
+
+  // Recorded, because "which model is actually running" turned out to be a
+  // question nobody could answer from outside — and master08 requires the
+  // requested model to be logged per session, with a fallback treated as a
+  // changed execution context rather than a detail.
+  try {
+    const db = createSupabaseAdminClient();
+    await db.from("steward_agent_runs").insert({
+      provider: resolved.provider,
+      requested_model: resolved.model,
+      instruction_version: resolved.instructionVersion,
+      status: "started",
+      error: resolved.usedFallback ? "no model configured; served a fallback" : null,
+    });
+  } catch {
+    // Telemetry must never stop a member's conversation starting.
+  }
 
   return NextResponse.json(resolved);
 }
