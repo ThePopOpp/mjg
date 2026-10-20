@@ -5,6 +5,8 @@ main/.claude/
 !.env.example
 node_modules/
 .next/
+.next-verify/
+.playwright-mcp/
 out/
 dist/
 npm-debug.log*

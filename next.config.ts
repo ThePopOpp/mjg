@@ -71,6 +71,15 @@ const STEWARD_HOST_PASSTHROUGH =
   "_next|api|auth|eve|login|register|reset-password|accept-invite|steward|favicon|manifest|sw\\.js|icons";
 
 const nextConfig: NextConfig = {
+  // Normally `.next`. A production build and `next dev` share that directory and
+  // corrupt each other's output — running `npm run build` while the dev server
+  // is up has taken local dev down more than once, and the symptom (a page that
+  // simply stops loading) looks nothing like the cause. Setting NEXT_DIST_DIR
+  // lets a verification build run in its own directory alongside dev.
+  //
+  // One cost: such a build rewrites tsconfig.json and next-env.d.ts to point at
+  // the override. Run `git checkout -- tsconfig.json next-env.d.ts` afterwards.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   reactStrictMode: true,
   // pdfkit reads its built-in font metrics (.afm) from disk at runtime. Bundling it breaks
   // those file lookups, so keep it external and let Node require it from node_modules.

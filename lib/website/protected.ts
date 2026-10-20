@@ -27,6 +27,10 @@ export const PROTECTED_ROUTES = [
   "/billing",
   "/_next",
   "/website-preview",
+  // The homepage review page: a full marketing page at its own URL, shared for
+  // approval before anything replaces main/index.html. Code-owned, so a CMS
+  // page must never shadow it.
+  "/steward-preview",
   // Existing code-owned public routes (React pages + static-HTML routes).
   "/about",
   "/mission",

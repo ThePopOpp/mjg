@@ -31,7 +31,13 @@ export function stewardFabLinks({ siteUrl, appUrl }: { siteUrl: string; appUrl: 
       label: "Talk to Steward",
       // Opens the member app with the conversation in view. Signed out, that
       // lands on sign-in and returns here afterwards.
-      href: `${appUrl}/steward?page=guardrails`,
+      //
+      // This used to carry `?page=guardrails`, which only ever meant something
+      // to the scripted prototype — the live page returns <LiveConversation />
+      // and never reads searchParams, so it was a parameter that promised
+      // context and delivered none. Opening a Blueprint page in context is a
+      // real feature; when it exists, the link can say so again.
+      href: `${appUrl}/steward`,
       note: "Open the chat and start where you are",
     },
     {
