@@ -28,6 +28,17 @@ import { getBlueprint, proposeWording } from "@/lib/steward/blueprint-service";
 
 const ALL_PAGES = [...BLUEPRINT_PAGES, FREE_PAGES[2]];
 
+/**
+ * The three pages a Free member actually has.
+ *
+ * Every page exists as a row for every member — an unfinished page keeps its
+ * purpose and framework visible, which the docset requires — but a Free
+ * member's BLUEPRINT is three pages, not thirteen. Telling them otherwise
+ * misrepresents what they have, and quietly promises the Full Build's contents
+ * as something they already own.
+ */
+const FREE_SLUGS = new Set(FREE_PAGES.map((page) => page.slug));
+
 export class StewardToolError extends Error {
   constructor(message: string) {
     super(message);
@@ -74,6 +85,9 @@ export async function blueprintOverview(profileId: string) {
         number: section.page_number,
         title: page?.title ?? section.page_slug,
         purpose: page?.purpose ?? "",
+        // False for a page this member does not have yet. Steward must not
+        // present the Full Build's pages as part of a Free Blueprint.
+        in_edition: blueprint.edition === "full" || FREE_SLUGS.has(section.page_slug),
         state: DEFINITION_STATE_LABEL[section.definition_state],
         fields_total: section.fields.length,
         fields_with_wording: written,

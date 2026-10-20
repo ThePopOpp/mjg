@@ -34,6 +34,8 @@ type Overview = {
     fields_with_wording: number;
     fields_total: number;
     summarises_other_pages: boolean;
+    /** False for a page this member's edition does not include. */
+    in_edition: boolean;
   }[];
 };
 
@@ -58,11 +60,17 @@ export default defineDynamic({
         });
       }
 
-      const lines = overview.pages
+      // Only the pages this member actually has. On Free that is three, not
+      // thirteen — listing the Full Build's pages as theirs misrepresents what
+      // they own and quietly promises content they have not bought.
+      const theirs = overview.pages.filter((page) => page.in_edition);
+      const notYetTheirs = overview.pages.length - theirs.length;
+
+      const lines = theirs
         .map((page) => {
           const written = page.summarises_other_pages
-            ? "summarises the other pages"
-            : `${page.fields_with_wording} of ${page.fields_total} fields written`;
+            ? "summarises the others"
+            : `${page.fields_with_wording}/${page.fields_total} fields written`;
           return `${page.number}. ${page.title} — ${page.state}, ${written}`;
         })
         .join("\n");
@@ -73,9 +81,18 @@ export default defineDynamic({
           "",
           lines,
           "",
+          notYetTheirs > 0
+            ? `They are on the Free Blueprint, which is these ${theirs.length} pages. The Full Build adds ` +
+              `${notYetTheirs} more. Do not describe those as part of their Blueprint — they do not have them ` +
+              "yet — and do not turn this into a sales pitch either. Mention it only if they ask."
+            : "They have the full thirteen-page Blueprint.",
+          "",
           "This is their real record. When they ask what is on their Blueprint, answer from this list and " +
-            "nothing else — these page names, these states. Never substitute a general description of what a " +
-            "Stewardship Blueprint contains; that would be inventing their life.",
+            "nothing else. Never substitute a general description of what a Stewardship Blueprint contains.",
+          "",
+          "Answer conversationally: say where they are in a sentence or two and name the page worth starting " +
+            "with. Do not reproduce this list page by page with a description of each unless they ask for the " +
+            "whole thing. A wall of numbered items is not an answer, it is a filing cabinet.",
           "",
           "This list does not include what they WROTE. For the words on a page, call read_blueprint_page.",
         ].join("\n"),
