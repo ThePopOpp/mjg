@@ -4,6 +4,7 @@ import { SiteNav } from "@/components/public-site/site-nav";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
 import { MemberSidebar, MemberSidebarMobile } from "@/components/steward/member-sidebar";
 import { EXAMPLE_BLUEPRINT } from "@/lib/steward/blueprint";
+import { listActiveEntitlements } from "@/lib/steward/orders";
 
 // The authenticated Steward app shell.
 //
@@ -25,7 +26,19 @@ export default async function StewardMemberLayout({ children }: { children: Reac
     `${profile.firstName.trim().charAt(0)}${profile.lastName.trim().charAt(0)}`.toUpperCase() ||
     displayName.slice(0, 2).toUpperCase();
   const nextStep = EXAMPLE_BLUEPRINT["starting-plan"]?.entries?.[0]?.value;
-  const rail = { displayName, initials, planLabel: "Free · Steward", nextStep };
+
+  // Read from entitlements, not written here. This label said "Free · Steward"
+  // for everyone because it was a string literal — including for members who
+  // actually held the Full Blueprint, which made a correct grant look broken.
+  const entitlements = await listActiveEntitlements(profile.id).catch(() => []);
+  const held = new Set(entitlements.map((entitlement) => entitlement.benefit));
+  const planLabel = held.has("premium")
+    ? "Premium · Steward"
+    : held.has("full_acquisition")
+      ? "Full Blueprint · Steward"
+      : "Free · Steward";
+
+  const rail = { displayName, initials, planLabel, nextStep };
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
