@@ -37,14 +37,37 @@ export type ConfigRow = {
   updated_at: string;
 };
 
-/** Options for keys where free text would invite a typo with consequences. */
+/**
+ * Options for keys where free text would invite a typo with consequences.
+ *
+ * A mistyped model id does not fail loudly — the session falls back and the
+ * member keeps talking to the wrong model — so the common ones are buttons.
+ * `allowCustom` keeps the text field as well, because the list of models that
+ * exist is not ours to freeze.
+ */
 const CHOICES: Record<string, { value: string; label: string; note?: string }[]> = {
   "agent.model.provider": [
     { value: "openai", label: "OpenAI", note: "In use today" },
     { value: "anthropic", label: "Anthropic (Claude)" },
     { value: "openrouter", label: "OpenRouter", note: "Routes to third parties — widens the privacy review" },
   ],
+  "agent.model.id": [
+    { value: "gpt-4o", label: "gpt-4o", note: "Stronger. Holds Steward's voice better" },
+    { value: "gpt-4o-mini", label: "gpt-4o-mini", note: "Cheaper and faster. Drifts into generic-assistant voice" },
+  ],
+  "promotion.max_per_conversation": [
+    { value: "0", label: "Never" },
+    { value: "1", label: "1" },
+    { value: "2", label: "2", note: "The docset's ceiling" },
+  ],
+  "promotion.max_per_turn": [
+    { value: "0", label: "Never" },
+    { value: "1", label: "1", note: "The docset's ceiling" },
+  ],
 };
+
+/** Keys whose list is a shortcut, not the whole set. */
+const ALLOW_CUSTOM = new Set(["agent.model.id"]);
 
 const RETENTION_PRESETS = [
   { days: 30, label: "30 days" },
@@ -185,7 +208,19 @@ export function StewardSettings({ rows }: { rows: ConfigRow[] }) {
                       </div>
 
                       <div className="mb-5 mt-4 flex flex-wrap items-center gap-2">
-                        {choices ? (
+                        {row.value_type === "boolean" ? (
+                          <div className="flex items-center gap-2.5">
+                            <Switch
+                              id={`value-${row.key}`}
+                              checked={toDisplay(row) === "true"}
+                              disabled={busyKey !== null}
+                              onCheckedChange={(checked) => void save(row.key, checked ? "true" : "false")}
+                            />
+                            <Label htmlFor={`value-${row.key}`} className="text-[13px] font-normal">
+                              {toDisplay(row) === "true" ? "On" : "Off"}
+                            </Label>
+                          </div>
+                        ) : choices ? (
                           choices.map((choice) => (
                             <Button
                               key={choice.value}
@@ -202,7 +237,30 @@ export function StewardSettings({ rows }: { rows: ConfigRow[] }) {
                               {choice.label}
                             </Button>
                           ))
-                        ) : (
+                        ) : null}
+
+                        {choices && ALLOW_CUSTOM.has(row.key) ? (
+                          <>
+                            <Input
+                              value={drafts[row.key] ?? ""}
+                              onChange={(e) => setDrafts((d) => ({ ...d, [row.key]: e.target.value }))}
+                              aria-label={`${row.label} (other)`}
+                              placeholder="or type another"
+                              className="h-8 max-w-[12rem] text-sm"
+                            />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8"
+                              disabled={busyKey !== null || (drafts[row.key] ?? "") === toDisplay(row)}
+                              onClick={() => void save(row.key, drafts[row.key] ?? "")}
+                            >
+                              Save
+                            </Button>
+                          </>
+                        ) : null}
+
+                        {!choices && row.value_type !== "boolean" ? (
                           <>
                             {isRetention
                               ? RETENTION_PRESETS.map((preset) => (
@@ -241,9 +299,9 @@ export function StewardSettings({ rows }: { rows: ConfigRow[] }) {
                               Save
                             </Button>
                           </>
-                        )}
+                        ) : null}
 
-                        {!isUnset ? (
+                        {!isUnset && row.value_type !== "boolean" ? (
                           <Button
                             size="sm"
                             variant="ghost"

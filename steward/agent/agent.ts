@@ -1,4 +1,5 @@
-import { defineAgent } from "eve";
+import { defineAgent, defineDynamic } from "eve";
+import { anthropic } from "eve/models/anthropic";
 import { openai } from "eve/models/openai";
 
 /**
@@ -31,15 +32,80 @@ import { openai } from "eve/models/openai";
  * directly, which sends you hunting for a Vercel gateway key you do not need.
  * Check the provider key first: a real OPENAI_API_KEY is ~164 characters.
  */
+/** Pinned fallback. Must stay a real id — never eve's default. */
+const FALLBACK = { model: "gpt-4o-mini", provider: "openai" };
+
+/**
+ * Asks the application which model to use.
+ *
+ * Read at session start rather than baked in at build, which is what makes the
+ * dashboard setting real. Failure is non-fatal by design; see the comment on
+ * `model` below.
+ */
+async function resolveModel(): Promise<{ provider: string; model: string }> {
+  const base = process.env.MJG_APP_URL?.trim().replace(/\/+$/, "");
+  const secret = process.env.STEWARD_AGENT_SECRET;
+  if (!base || !secret) {
+    console.warn("[steward] model config unreachable (MJG_APP_URL or STEWARD_AGENT_SECRET unset); using", FALLBACK);
+    return FALLBACK;
+  }
+
+  try {
+    const response = await fetch(`${base}/api/steward/agent/model`, {
+      headers: { "x-steward-agent-secret": secret },
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const payload = (await response.json()) as {
+      provider?: string;
+      model?: string;
+      usedFallback?: boolean;
+    };
+    if (!payload.model) throw new Error("no model in response");
+
+    // Requested vs served is the distinction master08 cares about. This records
+    // what we ASKED for; the provider's actual served model is recorded by the
+    // application when it is returned.
+    console.info(
+      `[steward] model requested: ${payload.provider ?? "openai"}/${payload.model}` +
+        (payload.usedFallback ? " (application had no setting; it chose a fallback)" : ""),
+    );
+    return { model: payload.model, provider: payload.provider ?? "openai" };
+  } catch (error) {
+    console.warn("[steward] could not resolve model, using fallback", FALLBACK, error);
+    return FALLBACK;
+  }
+}
+
 export default defineAgent({
   defaultTools: false,
 
-  // The model id is pinned deliberately. Calling `openai()` with no argument
-  // picks eve's own default, which on eve 0.74.0 is `gpt-6-luna-fast` — a model
-  // this account cannot reach, so every turn fails with `model_not_found`. An
-  // unpinned default also drifts with each eve upgrade, which is exactly the
-  // silent change of execution context master08 forbids (test V2-X08).
-  model: openai("gpt-4o-mini"),
+  /**
+   * The model is resolved per session from the Agent Manager, so a Super Admin
+   * can change it from the dashboard and have the next conversation use it —
+   * no redeploy, and no code change to try a different one.
+   *
+   * It is always an explicit id, never eve's own default. Calling `openai()`
+   * with no argument picks `gpt-6-luna-fast` on eve 0.74.0, which this account
+   * cannot reach, so every turn would fail with `model_not_found`. An unpinned
+   * default also drifts with each eve upgrade, which is precisely the silent
+   * change of execution context master08 forbids (test V2-X08).
+   *
+   * If the application is unreachable or the setting is unset, this falls back
+   * to a pinned id rather than failing the session: a member mid conversation
+   * should not lose Steward because a setting was cleared. The fallback is
+   * logged, so it is visible rather than looking like a choice someone made.
+   */
+  model: defineDynamic({
+    events: {
+      "session.started": async () => {
+        const selection = await resolveModel();
+        return selection.provider === "anthropic"
+          ? anthropic(selection.model)
+          : openai(selection.model);
+      },
+    },
+  }),
 
   experimental: {
     workflow: {
