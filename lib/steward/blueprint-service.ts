@@ -44,8 +44,19 @@ export class StewardBlueprintError extends Error {
   }
 }
 
-/** Every page a Blueprint has, Free's third page included. */
-const ALL_PAGES = [...BLUEPRINT_PAGES, FREE_PAGES[2]];
+/**
+ * Every page a Blueprint has, Free's third page included.
+ *
+ * My Starting Plan is numbered 3 in lib/steward/blueprint.ts because it is the
+ * THIRD PAGE OF THE FREE BLUEPRINT. It is not page 3 of the thirteen — that is
+ * What I Stand On — so storing its own number would put two pages at 3 and make
+ * the ordering ambiguous. It is stored after the thirteen; the Free view
+ * renumbers it for display.
+ */
+const ALL_PAGES = [
+  ...BLUEPRINT_PAGES,
+  { ...FREE_PAGES[2], number: BLUEPRINT_PAGES.length + 1 },
+];
 
 // == Receipts =================================================================
 
