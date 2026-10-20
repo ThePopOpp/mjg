@@ -1,4 +1,4 @@
-import type { ToolContext } from "eve/tools";
+import { memberState } from "./member.ts";
 
 // Calling back into the MJG application.
 //
@@ -33,24 +33,25 @@ function secret(): string {
 /**
  * The member this turn belongs to.
  *
- * `principalId` is the Supabase `auth.users.id` this container verified for
- * itself when the session opened. A turn with no principal is not a member's
- * turn, and gets no tools rather than a default identity.
+ * Read from session state the `session.started` hook wrote out of the verified
+ * Supabase principal — NOT from tool arguments, and not from anything the model
+ * can influence. A session with no principal gets no tools rather than a
+ * default identity.
  */
-function principalId(ctx: ToolContext): string {
-  const id = (ctx as { session?: { auth?: { principalId?: string } } }).session?.auth?.principalId;
+function principalId(): string {
+  const id = memberState.get().principalId;
   if (!id) throw new Error("This conversation has no signed-in member, so the Blueprint is not available.");
   return id;
 }
 
-export async function callApp<T>(ctx: ToolContext, tool: string, args: Record<string, unknown> = {}): Promise<T> {
+export async function callApp<T>(tool: string, args: Record<string, unknown> = {}): Promise<T> {
   const response = await fetch(`${appUrl()}${TOOL_ENDPOINT}`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
       "x-steward-agent-secret": secret(),
     },
-    body: JSON.stringify({ tool, principalId: principalId(ctx), args }),
+    body: JSON.stringify({ tool, principalId: principalId(), args }),
   });
 
   const payload = (await response.json().catch(() => ({}))) as { ok?: boolean; result?: T; error?: string };

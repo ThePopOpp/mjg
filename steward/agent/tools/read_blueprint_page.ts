@@ -18,5 +18,5 @@ export default defineTool({
       .string()
       .describe('The page slug from read_blueprint, e.g. "guardrails", "what-i-stand-on", "four-pillars".'),
   }),
-  execute: (input, options) => callApp(options.context, "blueprint.page", { page: input.page }),
+  execute: (input) => callApp("blueprint.page", { page: input.page }),
 });

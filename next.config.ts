@@ -96,7 +96,11 @@ const nextConfig: NextConfig = {
         destination: "/steward",
       },
       {
-        source: `/:path((?!${STEWARD_HOST_PASSTHROUGH}).*)`,
+        // The second lookahead excludes any path containing a dot, which is
+        // how every file under /public is served — /mjg-logos/mjg_white.png,
+        // /media/*, /icons/*. Without it the logo on this host rewrote to
+        // /steward/mjg-logos/... and 404ed, which is exactly what happened.
+        source: `/:path((?!${STEWARD_HOST_PASSTHROUGH})(?!.*\.).*)`,
         has: [{ type: "host" as const, value: stewardHost }],
         destination: "/steward/:path",
       },

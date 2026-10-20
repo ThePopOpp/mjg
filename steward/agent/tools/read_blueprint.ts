@@ -17,5 +17,5 @@ export default defineTool({
     "wording. Does NOT return what they wrote — use read_blueprint_page for one page. Use this to orient yourself " +
     "before suggesting where to work.",
   inputSchema: z.object({}),
-  execute: (_input, options) => callApp(options.context, "blueprint.overview"),
+  execute: () => callApp("blueprint.overview"),
 });

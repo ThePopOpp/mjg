@@ -38,6 +38,40 @@ const MODE_PREAMBLE: Record<ConversationChoice, string> = {
   step: "Help me take one step.",
 };
 
+/**
+ * Minimal formatting for Steward's replies.
+ *
+ * Steward is told to write prose, not markdown — a four-point list with bold
+ * headings is the generic-assistant voice the docset is trying to avoid. But a
+ * model will occasionally emit `**bold**` anyway, and raw asterisks on screen
+ * look broken, so this renders the two things that actually slip through:
+ * paragraph breaks and bold spans.
+ *
+ * Deliberately NOT a markdown renderer. Model output is rendered as text, never
+ * as HTML, so there is no path from a reply to markup in the page.
+ */
+function Formatted({ text }: { text: string }) {
+  const paragraphs = text.split(/\n{2,}/).filter((p) => p.trim().length > 0);
+
+  return (
+    <>
+      {paragraphs.map((paragraph, i) => (
+        <p key={i} className={i > 0 ? "mt-3" : undefined}>
+          {paragraph.split(/(\*\*[^*]+\*\*)/g).map((piece, j) =>
+            piece.startsWith("**") && piece.endsWith("**") && piece.length > 4 ? (
+              <strong key={j} className="font-semibold">
+                {piece.slice(2, -2)}
+              </strong>
+            ) : (
+              <React.Fragment key={j}>{piece}</React.Fragment>
+            ),
+          )}
+        </p>
+      ))}
+    </>
+  );
+}
+
 export function LiveConversation() {
   const agent = useEveAgent();
   const [draft, setDraft] = React.useState("");
@@ -240,10 +274,10 @@ export function LiveConversation() {
                   className={cn(
                     isMember
                       ? "max-w-[78%] rounded-[16px_16px_4px_16px] bg-foreground px-4 py-2.5 text-[15px] leading-relaxed text-background"
-                      : "min-w-0 flex-1 whitespace-pre-wrap text-[15px] leading-[1.6]",
+                      : "min-w-0 flex-1 text-[15px] leading-[1.6]",
                   )}
                 >
-                  {text}
+                  {isMember ? text : <Formatted text={text} />}
                 </div>
               </div>
             );

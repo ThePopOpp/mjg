@@ -37,8 +37,8 @@ export default defineTool({
           "and keeps the field from counting as settled.",
       ),
   }),
-  execute: (input, options) =>
-    callApp(options.context, "blueprint.propose", {
+  execute: (input) =>
+    callApp("blueprint.propose", {
       page: input.page,
       field: input.field,
       wording: input.wording,
