@@ -176,6 +176,7 @@ export function LiveConversation() {
   // knows both the session id and what the member actually typed, and their own
   // session authenticates it. The title is their first words, never a summary.
   const registered = React.useRef(false);
+  const pendingTitle = React.useRef<string | null>(null);
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
@@ -215,6 +216,7 @@ export function LiveConversation() {
     function startFresh() {
       agent.reset();
       registered.current = false;
+      pendingTitle.current = null;
       setMode(null);
       setDraft("");
       setDecided({});
@@ -241,18 +243,31 @@ export function LiveConversation() {
     setDraft("");
     if (inputRef.current) inputRef.current.style.height = "auto";
 
+    // Held until registration actually succeeds. The session id does not exist
+    // on the very first turn, so that attempt registers nothing; without this
+    // the title was lost and every conversation in the rail read
+    // "New conversation".
+    if (firstMessage && !pendingTitle.current) pendingTitle.current = trimmed;
+
     void agent.send(trimmed).then(() => {
       const sessionId = agent.session?.sessionId;
-      if (!sessionId || (registered.current && !firstMessage)) return;
-      registered.current = true;
+      if (!sessionId || registered.current) return;
+
       void fetch("/api/steward/conversations", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ sessionId, title: firstMessage ? trimmed : undefined }),
-      }).catch(() => {
-        // A conversation missing from the list is a cosmetic loss; it must not
-        // interrupt the conversation itself.
-      });
+        body: JSON.stringify({ sessionId, title: pendingTitle.current ?? undefined }),
+      })
+        .then((res) => {
+          if (!res.ok) return;
+          registered.current = true;
+          pendingTitle.current = null;
+        })
+        .catch(() => {
+          // A conversation missing from the rail is cosmetic; it must never
+          // interrupt the conversation itself. Left unregistered so the next
+          // message tries again, title intact.
+        });
     });
   }
 
