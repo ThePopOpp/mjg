@@ -13,9 +13,11 @@ import { callApp } from "../lib/app-tools.ts";
  */
 export default defineTool({
   description:
-    "Look at the member's Blueprint: all pages, each page's purpose, how settled it is, and how many fields have " +
-    "wording. Does NOT return what they wrote — use read_blueprint_page for one page. Use this to orient yourself " +
-    "before suggesting where to work.",
+    "REQUIRED whenever the member asks anything about their Blueprint — what is on it, how far along it is, what " +
+    "they have written, where to work next. Returns their real pages, each page's purpose, how settled it is, and " +
+    "how many fields have wording. Does NOT return what they wrote: use read_blueprint_page for one page. " +
+    "Never describe a member's Blueprint without calling this first; answering from general knowledge of what a " +
+    "Stewardship Blueprint contains invents their record.",
   inputSchema: z.object({}),
   execute: () => callApp("blueprint.overview"),
 });

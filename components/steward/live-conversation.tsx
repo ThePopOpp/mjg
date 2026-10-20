@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowUp, BookOpen, Check, Loader2 } from "lucide-react";
+import { ArrowUp, BookOpen, Check, Loader2, Mic, Square } from "lucide-react";
 import { useEveAgent } from "eve/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,6 +72,97 @@ function Formatted({ text }: { text: string }) {
   );
 }
 
+/**
+ * Speech-to-text, on the member's own device.
+ *
+ * Uses the browser's SpeechRecognition where it exists. Audio never leaves the
+ * machine and nothing is sent to a provider — which matters more here than
+ * usual, because the things people say to Steward out loud are the things they
+ * find hardest to type.
+ *
+ * Returns `supported: false` where the API is missing (Firefox, and some
+ * locked-down builds), and the button is hidden rather than shown broken. A
+ * dictation button that silently does nothing is worse than no button, which is
+ * why the prototype's microphone was never wired to anything real.
+ */
+type Recognition = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: { resultIndex: number; results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+};
+
+function useDictation(onText: (text: string) => void) {
+  const [supported, setSupported] = React.useState(false);
+  const [listening, setListening] = React.useState(false);
+  const recognitionRef = React.useRef<Recognition | null>(null);
+  const onTextRef = React.useRef(onText);
+  onTextRef.current = onText;
+
+  React.useEffect(() => {
+    const w = window as unknown as {
+      SpeechRecognition?: new () => Recognition;
+      webkitSpeechRecognition?: new () => Recognition;
+    };
+    const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    if (!Ctor) return;
+
+    setSupported(true);
+    const recognition = new Ctor();
+    recognition.continuous = true;
+    // Interim results make it feel live; only final ones are appended, so a
+    // half-heard word never lands in the box.
+    recognition.interimResults = true;
+    recognition.lang = navigator.language || "en-US";
+
+    recognition.onresult = (event) => {
+      let finalText = "";
+      for (let i = event.resultIndex; i < event.results.length; i += 1) {
+        const result = event.results[i];
+        if (result.isFinal) finalText += result[0].transcript;
+      }
+      if (finalText.trim()) onTextRef.current(finalText);
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+
+    recognitionRef.current = recognition;
+    return () => {
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      try {
+        recognition.stop();
+      } catch {
+        // Already stopped; nothing to do.
+      }
+    };
+  }, []);
+
+  const toggle = React.useCallback(() => {
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
+    if (listening) {
+      recognition.stop();
+      setListening(false);
+      return;
+    }
+    try {
+      recognition.start();
+      setListening(true);
+    } catch {
+      // start() throws if it is already running; treat it as running.
+      setListening(true);
+    }
+  }, [listening]);
+
+  return { supported, listening, toggle };
+}
+
 export function LiveConversation() {
   const agent = useEveAgent();
   const [draft, setDraft] = React.useState("");
@@ -82,6 +173,12 @@ export function LiveConversation() {
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
+
+  // Dictation appends to the draft rather than sending: the member still reads
+  // what was heard and presses send themselves.
+  const dictation = useDictation((text) => {
+    setDraft((current) => (current ? `${current.trimEnd()} ${text.trim()}` : text.trim()));
+  });
 
   const busy = agent.status === "submitted" || agent.status === "streaming";
   // Flat, UIMessage-shaped projection. `conversation.turns` is a record of
@@ -432,6 +529,22 @@ export function LiveConversation() {
                 }}
                 className="max-h-40 min-h-0 flex-1 resize-none overflow-hidden border-0 bg-transparent px-0 py-2 text-[15px] leading-relaxed shadow-none focus-visible:ring-0"
               />
+              {dictation.supported ? (
+                <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label={dictation.listening ? "Stop dictation" : "Dictate a message"}
+                  aria-pressed={dictation.listening}
+                  onClick={dictation.toggle}
+                  className={cn(
+                    "h-9 w-9 shrink-0 rounded-full",
+                    dictation.listening && "animate-pulse border-[#b88a4a] bg-[#b88a4a]/15 text-[#b88a4a]",
+                  )}
+                >
+                  {dictation.listening ? <Square className="h-3.5 w-3.5" /> : <Mic className="h-4 w-4" />}
+                </Button>
+              ) : null}
+
               <Button
                 size="icon"
                 aria-label="Send"
@@ -446,6 +559,12 @@ export function LiveConversation() {
               </Button>
             </div>
           </div>
+
+          {dictation.listening ? (
+            <p className="mt-2 px-1 text-[12px] text-[#b88a4a]" role="status">
+              Listening — speak, then press stop. Nothing is sent until you do.
+            </p>
+          ) : null}
 
           <p className="mt-2.5 px-1 text-[11.5px] leading-relaxed text-muted-foreground">
             Steward is not a counsellor, doctor or crisis service. In the US you can call or text{" "}
