@@ -42,7 +42,14 @@ const FALLBACK = { model: "gpt-4o-mini", provider: "openai" };
  * dashboard setting real. Failure is non-fatal by design; see the comment on
  * `model` below.
  */
+let cached: { at: number; value: { provider: string; model: string } } | null = null;
+
+/** Short enough that a dashboard change lands within a conversation. */
+const CACHE_MS = 30_000;
+
 async function resolveModel(): Promise<{ provider: string; model: string }> {
+  if (cached && Date.now() - cached.at < CACHE_MS) return cached.value;
+
   const base = process.env.MJG_APP_URL?.trim().replace(/\/+$/, "");
   const secret = process.env.STEWARD_AGENT_SECRET;
   if (!base || !secret) {
@@ -70,7 +77,9 @@ async function resolveModel(): Promise<{ provider: string; model: string }> {
       `[steward] model requested: ${payload.provider ?? "openai"}/${payload.model}` +
         (payload.usedFallback ? " (application had no setting; it chose a fallback)" : ""),
     );
-    return { model: payload.model, provider: payload.provider ?? "openai" };
+    const value = { model: payload.model, provider: payload.provider ?? "openai" };
+    cached = { at: Date.now(), value };
+    return value;
   } catch (error) {
     console.warn("[steward] could not resolve model, using fallback", FALLBACK, error);
     return FALLBACK;
@@ -98,7 +107,18 @@ export default defineAgent({
    */
   model: defineDynamic({
     events: {
-      "session.started": async () => {
+      // "step.started", NOT "session.started". A session-level selection has to
+      // be SERIALIZABLE — eve stores it durably — and a provider handle is a
+      // live object, so returning one there fails the turn before the model is
+      // ever called:
+      //
+      //   DynamicModelSelectionError: Dynamic model selection returned a
+      //   provider object, but durable model selections must be serializable.
+      //
+      // That failure is silent from the member's side: they see "something went
+      // wrong", with no clue that it broke before any model or tool ran.
+      // A step-level resolver may return the handle itself.
+      "step.started": async () => {
         const selection = await resolveModel();
         return selection.provider === "anthropic"
           ? anthropic(selection.model)

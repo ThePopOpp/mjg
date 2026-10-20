@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { BookOpen, Check, Menu, MessageCircle, MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -28,6 +28,9 @@ import { cn } from "@/lib/utils";
 // Until a retention duration is set, these accumulate. That is visible here on
 // purpose: a growing list is a better prompt to decide than a setting nobody
 // looks at.
+
+/** Fired at the open conversation, which owns the eve session. */
+export const NEW_CONVERSATION_EVENT = "steward:new-conversation";
 
 type Conversation = { sessionId: string; title: string; lastActiveAt: string };
 
@@ -63,6 +66,7 @@ function SidebarBody({
   className?: string;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const isActive = (href: string) =>
     href === "/steward" ? pathname === "/steward" : pathname.startsWith(href);
 
@@ -86,10 +90,22 @@ function SidebarBody({
 
   return (
     <div className={cn("flex h-full min-h-0 flex-col gap-4", className)}>
-      <Button asChild variant="outline" className="w-full justify-center gap-2 font-semibold">
-        <Link href="/steward" onClick={onNavigate}>
-          <Plus className="h-4 w-4" /> New conversation
-        </Link>
+      {/* Not a link: on /steward a link to /steward does nothing, which is
+          exactly what this button appeared to do. It now resets the live
+          session, and only navigates when you are somewhere else. */}
+      <Button
+        variant="outline"
+        className="w-full justify-center gap-2 font-semibold"
+        onClick={() => {
+          onNavigate?.();
+          if (pathname === "/steward") {
+            window.dispatchEvent(new Event(NEW_CONVERSATION_EVENT));
+          } else {
+            router.push("/steward");
+          }
+        }}
+      >
+        <Plus className="h-4 w-4" /> New conversation
       </Button>
 
       <nav className="flex flex-col gap-0.5">

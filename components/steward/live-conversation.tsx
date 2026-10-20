@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { CONVERSATION_CHOICES, STEWARD_OPENING_LINE, type ConversationChoice } from "@/lib/steward/blueprint";
+import { NEW_CONVERSATION_EVENT } from "@/components/steward/member-sidebar";
 
 // Steward, talking for real.
 //
@@ -171,6 +172,11 @@ export function LiveConversation() {
   const [deciding, setDeciding] = React.useState<string | null>(null);
   const [decided, setDecided] = React.useState<Record<string, "approved" | "declined" | "failed">>({});
 
+  // Registered from here rather than by the agent: this is the only place that
+  // knows both the session id and what the member actually typed, and their own
+  // session authenticates it. The title is their first words, never a summary.
+  const registered = React.useRef(false);
+
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -203,6 +209,21 @@ export function LiveConversation() {
     void refreshPending();
   }, [refreshPending]);
 
+  // "New conversation" detaches the current eve session and clears the screen.
+  // Nothing is deleted — the previous conversation stays in the rail.
+  React.useEffect(() => {
+    function startFresh() {
+      agent.reset();
+      registered.current = false;
+      setMode(null);
+      setDraft("");
+      setDecided({});
+      void refreshPending();
+    }
+    window.addEventListener(NEW_CONVERSATION_EVENT, startFresh);
+    return () => window.removeEventListener(NEW_CONVERSATION_EVENT, startFresh);
+  }, [agent, refreshPending]);
+
   // Steward only proposes during a turn, so this is when the record changes.
   React.useEffect(() => {
     if (agent.status === "ready") void refreshPending();
@@ -212,11 +233,6 @@ export function LiveConversation() {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages.length, agent.status, pending.length]);
-
-  // Registered from here rather than by the agent: this is the only place that
-  // knows both the session id and what the member actually typed, and their own
-  // session authenticates it. The title is their first words, never a summary.
-  const registered = React.useRef(false);
 
   function send(text: string) {
     const trimmed = text.trim();
