@@ -3,6 +3,7 @@ import { getCurrentProfile } from "@/lib/auth/server";
 import { ROLES } from "@/lib/rbac/roles";
 import { listStewardConfigGroup } from "@/lib/steward/config";
 import { SectionHeader } from "@/components/dashboard/section-header";
+import { StewardAccess } from "@/components/steward/steward-access";
 import { StewardSettings, type ConfigRow } from "@/components/steward/steward-settings";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +30,8 @@ export default async function StewardSettingsPage() {
         title="Steward"
         description="How long Steward keeps what members tell it, and which AI provider is allowed to see it. Changes take effect without a redeploy."
       />
+
+      <StewardAccess />
 
       <StewardSettings rows={rows as ConfigRow[]} />
 

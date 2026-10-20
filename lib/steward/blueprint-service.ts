@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { hasBenefit } from "@/lib/steward/orders";
 import { BLUEPRINT_PAGES, FREE_PAGES } from "@/lib/steward/blueprint";
 import { SECTION_FIELDS, fieldsForSection, sectionSpec } from "@/lib/steward/blueprint-fields";
 import {
@@ -253,11 +254,14 @@ export async function getBlueprint(profileId: string): Promise<{
   const db = createSupabaseAdminClient();
   const blueprintId = await ensureBlueprint(profileId);
 
-  const { data: blueprint } = await db
-    .from("steward_blueprints")
-    .select("id, edition")
-    .eq("id", blueprintId)
-    .single();
+  // Edition is DERIVED from entitlement, never read from the Blueprint row.
+  //
+  // Clause D25 puts entitlement in the commerce service and forbids deriving it
+  // from anything else — so the reverse must hold too: what a member may see
+  // follows from what they are entitled to, at read time. A stored edition
+  // column would be a second copy that drifts the moment a term ends, and would
+  // silently keep showing Full pages to someone whose access has lapsed.
+  const fullAcquisition = await hasBenefit(profileId, "full_acquisition");
 
   const { data: sections } = await db
     .from("steward_sections")
@@ -326,7 +330,7 @@ export async function getBlueprint(profileId: string): Promise<{
 
   return {
     id: blueprintId,
-    edition: (blueprint?.edition as "free" | "full") ?? "free",
+    edition: fullAcquisition ? "full" : "free",
     sections: sectionViews,
   };
 }
