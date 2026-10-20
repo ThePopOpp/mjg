@@ -116,12 +116,31 @@ export function LiveConversation() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages.length, agent.status, pending.length]);
 
+  // Registered from here rather than by the agent: this is the only place that
+  // knows both the session id and what the member actually typed, and their own
+  // session authenticates it. The title is their first words, never a summary.
+  const registered = React.useRef(false);
+
   function send(text: string) {
     const trimmed = text.trim();
     if (!trimmed || busy) return;
+    const firstMessage = messages.length === 0;
     setDraft("");
     if (inputRef.current) inputRef.current.style.height = "auto";
-    void agent.send(trimmed);
+
+    void agent.send(trimmed).then(() => {
+      const sessionId = agent.session?.sessionId;
+      if (!sessionId || (registered.current && !firstMessage)) return;
+      registered.current = true;
+      void fetch("/api/steward/conversations", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ sessionId, title: firstMessage ? trimmed : undefined }),
+      }).catch(() => {
+        // A conversation missing from the list is a cosmetic loss; it must not
+        // interrupt the conversation itself.
+      });
+    });
   }
 
   function pickMode(next: ConversationChoice) {

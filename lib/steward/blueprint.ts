@@ -261,23 +261,6 @@ export const EXAMPLE_BLUEPRINT: Record<string, PageState> = {
   },
 };
 
-/**
- * Example conversation titles for the rail. Illustrative only — nothing reads a
- * stored conversation yet, and whether a persistent list of past conversations
- * exists at all is an open decision: the docset asks for "selected purpose-bound
- * continuity, not blanket transcripts", and the retention duration that would
- * govern it is one of the values the owner has not set.
- *
- * Deliberately titled after what the person was working on rather than after a
- * financial or calendar question, which would imply data Steward does not hold.
- */
-export const EXAMPLE_THREADS = [
-  { title: "Saying yes before I mean it", when: "Now" },
-  { title: "What I actually stand on", when: "2d" },
-  { title: "Thursday mornings with Dave", when: "1w" },
-  { title: "Where my energy goes", when: "3w" },
-];
-
 export const STATE_ORDER: DefinitionState[] = ["Not Yet Explored", "Taking Shape", "Defined for This Season"];
 
 /** Tailwind classes per state. Gold for settled, warm neutral for in progress. */

@@ -7,7 +7,7 @@ import { BookOpen, Check, Menu, MessageCircle, MoreHorizontal, Plus } from "luci
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { EXAMPLE_THREADS } from "@/lib/steward/blueprint";
+
 
 // The Steward rail.
 //
@@ -21,11 +21,24 @@ import { EXAMPLE_THREADS } from "@/lib/steward/blueprint";
 //   2. The committed next step sits above the identity card, so opening Steward
 //      shows what you already decided rather than only an invitation to talk.
 //
-// The recent list is example content. It is also a real product decision in
-// disguise: named threads going back weeks imply retained transcripts, where the
-// docset asks for "selected purpose-bound continuity, not blanket transcripts".
-// Retention duration is one of the values the owner has not set, so nothing here
-// reads or writes a stored conversation yet.
+// The recent list is real: the member's own conversations, newest first, titled
+// with their own first words. It holds no transcript — only a session id, a
+// title and when it was last active.
+//
+// Until a retention duration is set, these accumulate. That is visible here on
+// purpose: a growing list is a better prompt to decide than a setting nobody
+// looks at.
+
+type Conversation = { sessionId: string; title: string; lastActiveAt: string };
+
+/** "Now", "2d", "3w" — enough to place a conversation without a full date. */
+function relativeDay(iso: string): string {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+  if (days < 1) return "Now";
+  if (days < 7) return `${days}d`;
+  if (days < 56) return `${Math.floor(days / 7)}w`;
+  return `${Math.floor(days / 30)}mo`;
+}
 
 const DESTINATIONS = [
   { href: "/steward", label: "Steward", icon: MessageCircle },
@@ -52,6 +65,24 @@ function SidebarBody({
   const pathname = usePathname();
   const isActive = (href: string) =>
     href === "/steward" ? pathname === "/steward" : pathname.startsWith(href);
+
+  const [conversations, setConversations] = React.useState<Conversation[]>([]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/steward/conversations", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { conversations: [] }))
+      .then((json: { conversations?: Conversation[] }) => {
+        if (!cancelled) setConversations(json.conversations ?? []);
+      })
+      .catch(() => {
+        // An empty rail is better than a broken one; the conversation itself
+        // does not depend on this list.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
 
   return (
     <div className={cn("flex h-full min-h-0 flex-col gap-4", className)}>
@@ -89,21 +120,25 @@ function SidebarBody({
         <p className="px-2.5 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
           Recent
         </p>
-        {EXAMPLE_THREADS.map((thread, i) => (
-          <button
-            key={thread.title}
-            type="button"
-            title={thread.title}
-            aria-current={i === 0 ? "true" : undefined}
-            className={cn(
-              "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13.5px] transition-colors",
-              i === 0 ? "bg-muted" : "hover:bg-muted",
-            )}
-          >
-            <span className="min-w-0 flex-1 truncate">{thread.title}</span>
-            <span className="shrink-0 text-[11px] text-muted-foreground">{thread.when}</span>
-          </button>
-        ))}
+        {conversations.length === 0 ? (
+          <p className="px-2.5 py-1 text-[12.5px] leading-relaxed text-muted-foreground">
+            Nothing here yet. Conversations you have with Steward appear in this list.
+          </p>
+        ) : (
+          conversations.map((conversation) => (
+            <button
+              key={conversation.sessionId}
+              type="button"
+              title={conversation.title}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13.5px] transition-colors hover:bg-muted"
+            >
+              <span className="min-w-0 flex-1 truncate">{conversation.title}</span>
+              <span className="shrink-0 text-[11px] text-muted-foreground">
+                {relativeDay(conversation.lastActiveAt)}
+              </span>
+            </button>
+          ))
+        )}
       </div>
 
       {nextStep ? (
