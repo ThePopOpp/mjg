@@ -46,7 +46,16 @@ RUN npx eve build
 # ── Runtime ───────────────────────────────────────────────────────────────────
 FROM node:24-bookworm-slim AS runner
 WORKDIR /app/steward
-ENV NODE_ENV=production PORT=4274
+ENV NODE_ENV=production PORT=4274     # Graphile Worker's default concurrency is 50 against a Postgres pool of 10.
+    # It warns about this at boot and then, under real use, stops claiming jobs
+    # entirely: turns queue a job, nothing picks it up, and the member sees a
+    # question that never gets answered. Observed with 28 jobs sitting at
+    # attempts=0, unlocked, for over an hour.
+    #
+    # Kept below the pool size deliberately. Steward's work is one turn per
+    # member at a time, not a batch queue, so headroom matters more than
+    # parallelism.
+    WORKFLOW_POSTGRES_WORKER_CONCURRENCY=8
 
 COPY --from=builder /app/steward/node_modules ./node_modules
 COPY --from=builder /app/steward/package.json ./
