@@ -1,5 +1,6 @@
 import { defineDynamic, defineInstructions } from "eve/instructions";
 import { callApp } from "../lib/app-tools.ts";
+import { principalFromAuth } from "../lib/member.ts";
 
 // The member's Blueprint, SUPPLIED rather than fetched.
 //
@@ -38,10 +39,12 @@ type Overview = {
 
 export default defineDynamic({
   events: {
-    "turn.started": async () => {
+    "turn.started": async (_event, ctx) => {
       let overview: Overview;
       try {
-        overview = await callApp<Overview>("blueprint.overview");
+        // Read from this resolver's own context rather than the tools' session
+        // state, which is documented as not exposed here.
+        overview = await callApp<Overview>("blueprint.overview", {}, principalFromAuth(ctx.session.auth));
       } catch (error) {
         // Say so rather than leaving a silence the model will fill. A turn that
         // could not read the Blueprint must produce "I couldn't reach it",

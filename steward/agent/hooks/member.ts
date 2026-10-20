@@ -1,5 +1,5 @@
 import { defineHook } from "eve/hooks";
-import { memberState } from "../lib/member.ts";
+import { memberState, principalFromAuth } from "../lib/member.ts";
 
 /**
  * Captures the signed-in member when the session opens.
@@ -13,7 +13,12 @@ import { memberState } from "../lib/member.ts";
 export default defineHook({
   events: {
     "session.started": (_event, ctx) => {
-      const principalId = ctx.session.auth?.principalId ?? null;
+      const principalId = principalFromAuth(ctx.session.auth);
+      if (!principalId) {
+        // Loud, because the symptom is otherwise invisible: tools fail, and a
+        // model covers the failure with something plausible.
+        console.warn("[steward] session started with no principal; Blueprint tools will refuse");
+      }
       memberState.update((current) => ({ ...current, principalId }));
     },
   },

@@ -38,20 +38,29 @@ function secret(): string {
  * can influence. A session with no principal gets no tools rather than a
  * default identity.
  */
-function principalId(): string {
-  const id = memberState.get().principalId;
+function principalId(explicit?: string | null): string {
+  const id = explicit ?? memberState.get().principalId;
   if (!id) throw new Error("This conversation has no signed-in member, so the Blueprint is not available.");
   return id;
 }
 
-export async function callApp<T>(tool: string, args: Record<string, unknown> = {}): Promise<T> {
+/**
+ * `principal` is passed by callers that hold the session context themselves —
+ * the instructions resolver, which receives it on its own ctx and cannot rely
+ * on the tools' session state.
+ */
+export async function callApp<T>(
+  tool: string,
+  args: Record<string, unknown> = {},
+  principal?: string | null,
+): Promise<T> {
   const response = await fetch(`${appUrl()}${TOOL_ENDPOINT}`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
       "x-steward-agent-secret": secret(),
     },
-    body: JSON.stringify({ tool, principalId: principalId(), args }),
+    body: JSON.stringify({ tool, principalId: principalId(principal), args }),
   });
 
   const payload = (await response.json().catch(() => ({}))) as { ok?: boolean; result?: T; error?: string };
