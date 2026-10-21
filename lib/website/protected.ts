@@ -31,6 +31,10 @@ export const PROTECTED_ROUTES = [
   // approval before anything replaces main/index.html. Code-owned, so a CMS
   // page must never shadow it.
   "/steward-preview",
+  // The two homepage candidates under review: the same page with the Steward
+  // demo in the hero, played on a loop and scrubbed by the scrollbar.
+  "/steward-homepage-autoplay",
+  "/steward-homepage-scroll",
   // Existing code-owned public routes (React pages + static-HTML routes).
   "/about",
   "/mission",
