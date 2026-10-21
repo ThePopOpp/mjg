@@ -128,16 +128,16 @@ export function StewardHeroAutoplay() {
             goes in your Blueprint.
           </p>
 
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <div className="mt-7 mx-auto grid w-full max-w-[20rem] grid-cols-1 gap-3 sm:inline-grid sm:w-auto sm:max-w-none sm:grid-cols-2">
             <Link
               href="/steward"
-              className="inline-flex items-center gap-2 rounded-md bg-[#b88a4a] px-6 py-3 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#a67c42]"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#b88a4a] px-6 py-3 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#a67c42]"
             >
               Talk to Steward <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/created-for-more-check-in"
-              className="inline-flex items-center gap-2 rounded-md border border-white/25 px-6 py-3 text-sm font-semibold text-[#f4f1ea] no-underline transition-colors hover:bg-white/10"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-white/25 px-6 py-3 text-sm font-semibold text-[#f4f1ea] no-underline transition-colors hover:bg-white/10"
             >
               Take the Check-In
             </Link>

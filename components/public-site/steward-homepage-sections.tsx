@@ -64,16 +64,16 @@ export function StewardHomepageSections() {
               ))}
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 grid w-full grid-cols-1 gap-3 sm:inline-grid sm:w-auto sm:grid-cols-2">
               <Link
                 href="/steward"
-                className="inline-flex items-center gap-2 rounded-md bg-[#b88a4a] px-5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#a67c42]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#b88a4a] px-5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#a67c42]"
               >
                 Talk to Steward <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/steward/pricing"
-                className="inline-flex items-center gap-2 rounded-md border px-5 py-2.5 text-sm font-semibold no-underline transition-colors hover:bg-muted"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-md border px-5 py-2.5 text-sm font-semibold no-underline transition-colors hover:bg-muted"
               >
                 See the plans
               </Link>
@@ -185,10 +185,10 @@ export function StewardHomepageSections() {
               It is being written now. Join the waitlist and you will hear first, including the
               chapters as they are ready.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7 grid w-full grid-cols-1 gap-3 sm:inline-grid sm:w-auto">
               <Link
                 href="/book-waitlist"
-                className="inline-flex items-center gap-2 rounded-md bg-[#b88a4a] px-5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#a67c42]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#b88a4a] px-5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#a67c42]"
               >
                 <BookOpen className="h-4 w-4" /> Join the book waitlist
               </Link>
@@ -231,16 +231,16 @@ export function StewardHomepageSections() {
             The Created for More check-in takes a few minutes and gives you somewhere honest to
             begin.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 mx-auto grid w-full max-w-[20rem] grid-cols-1 gap-3 sm:inline-grid sm:w-auto sm:max-w-none sm:grid-cols-2">
             <Link
               href="/created-for-more-check-in"
-              className="inline-flex items-center gap-2 rounded-md bg-foreground px-6 py-3 text-sm font-semibold text-background no-underline transition-opacity hover:opacity-90"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-6 py-3 text-sm font-semibold text-background no-underline transition-opacity hover:opacity-90"
             >
               Take the Created for More Check-In
             </Link>
             <Link
               href="/steward"
-              className="inline-flex items-center gap-2 rounded-md border px-6 py-3 text-sm font-semibold no-underline transition-colors hover:bg-muted"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md border px-6 py-3 text-sm font-semibold no-underline transition-colors hover:bg-muted"
             >
               Talk to Steward
             </Link>
