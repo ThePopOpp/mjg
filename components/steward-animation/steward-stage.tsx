@@ -13,9 +13,15 @@ import type { StewardSceneProps } from "./steward-scene";
 // also why this is a transform rather than a flexible layout: at any other size
 // the camera would frame the wrong things.
 //
-// It scales to COVER, not contain. A hero with letterbox bars down the sides is
-// a video player, not a hero. Covering crops the edges of the stage instead,
-// and the composition's own vignette already darkens exactly those edges.
+// `fit` decides what happens when the box is not the stage's shape:
+//
+//   cover    fill the box and crop the overhang. Right for a full-bleed hero,
+//            where bars down the sides would look like a video player.
+//   contain  shrink until the whole composition is visible. Right whenever the
+//            composition is the thing being read — a crop takes live text off
+//            the edges, and the conversation runs close to them. Any spare room
+//            is the stage's own background colour, so it does not read as
+//            letterboxing.
 //
 // This is also the lazy boundary. three.js is around 150 kB and the hero's
 // words should not wait behind it, so the scene is loaded here rather than
@@ -28,10 +34,12 @@ const Scene = nextDynamic(() => import("./steward-scene").then((m) => m.StewardS
 type Props = Omit<StewardSceneProps, "layout"> & {
   /** Omit to pick from the container's shape. */
   layout?: SceneLayout;
+  /** How to handle a box that is not the stage's shape. Defaults to "cover". */
+  fit?: "cover" | "contain";
   className?: string;
 };
 
-export function StewardStage({ layout, className, ...scene }: Props) {
+export function StewardStage({ layout, fit = "cover", className, ...scene }: Props) {
   const hostRef = React.useRef<HTMLDivElement>(null);
   const [box, setBox] = React.useState<{ w: number; h: number } | null>(null);
 
@@ -51,7 +59,11 @@ export function StewardStage({ layout, className, ...scene }: Props) {
   const auto: SceneLayout = box && box.h > box.w * 1.05 ? "mobile" : "desktop";
   const pick = layout ?? auto;
   const { w: SW, h: SH } = STAGE[pick];
-  const scale = box ? Math.max(box.w / SW, box.h / SH) : 0;
+  const scale = box
+    ? fit === "contain"
+      ? Math.min(box.w / SW, box.h / SH)
+      : Math.max(box.w / SW, box.h / SH)
+    : 0;
 
   return (
     <div ref={hostRef} className={className} style={{ position: "relative", overflow: "hidden" }}>

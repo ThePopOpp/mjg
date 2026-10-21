@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteNav } from "@/components/public-site/site-nav";
 import { StewardFab } from "@/components/public-site/steward-fab";
+import { SITE_CONTENT_BOX } from "@/lib/public-site/content-box";
 import type { NavItem } from "@/lib/public-site/nav-items";
 import { appUrl, publicSiteUrl } from "@/lib/public-site/static-pages";
 
@@ -74,7 +75,8 @@ export function SiteShell({
 }
 
 /** The page-content box that lines up with the nav bar. */
-export const SITE_CONTENT_BOX = "mx-auto w-full max-w-[1160px] px-8";
+// Re-exported so the many pages that already import it from here keep working.
+export { SITE_CONTENT_BOX };
 
 /**
  * The standard frontend hero: eyebrow chip, serif headline with the last word in gold,

@@ -1,14 +1,25 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Check, MessageCircle, Sparkles, Users } from "lucide-react";
+import { JoinTheJourney } from "@/components/public-site/join-the-journey";
 import { SITE_CONTENT_BOX } from "@/components/public-site/site-shell";
+import { StewardHomepageLead } from "@/components/public-site/steward-homepage-lead";
 import { BLUEPRINT_PAGES, CONVERSATION_CHOICES, FREE_PAGES } from "@/lib/steward/blueprint";
 
-// Everything on the homepage below the hero.
+// Everything on the homepage below the animation.
 //
-// Shared, because the two candidates being reviewed differ ONLY in how the hero
+// Shared, because the two candidates being reviewed differ ONLY in how the
 // animation is driven — one plays itself, one is scrubbed by the scrollbar. If
 // the body were duplicated per candidate, a copy fix during review would land
 // on one of them and the comparison would quietly stop being a comparison.
+//
+// Order: the live homepage's opening (headline, positioning, the video) comes
+// first, directly under the demo, so the page runs show → tell → detail. The
+// sign-up closes it, just above the footer.
+//
+// NOTE ON THE HEADLINE. "What Kind of Life Are You Actually Building?" lives
+// here, in StewardHomepageLead, and nowhere else. The animation heroes above
+// deliberately carry no <h1> of their own: when both had one the page opened
+// with the same sentence twice, sixty pixels apart.
 
 function Section({
   eyebrow,
@@ -40,6 +51,8 @@ export function StewardHomepageSections() {
 
   return (
     <>
+      <StewardHomepageLead />
+
       {/* ── Steward ───────────────────────────────────────────────────────── */}
       <Section eyebrow="Steward" title="A guide that proposes. You decide what's true.">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-start">
@@ -198,28 +211,57 @@ export function StewardHomepageSections() {
       </Section>
 
       {/* ── Michael ───────────────────────────────────────────────────────── */}
-      <Section eyebrow="Who's behind it" title="Michael J. Gauthier">
-        <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/media/mike-gauthier-profile-photo.png"
-            alt="Michael J. Gauthier"
-            // object-top, not the default centre: the source is a portrait, and
-            // a centred square crop lands on his shirt rather than his face.
-            className="h-44 w-44 rounded-xl object-cover object-top"
-          />
-          <div className="max-w-2xl space-y-4 text-[16px] leading-relaxed text-muted-foreground">
-            <p>
-              Michael has spent his career helping people steward what they have been entrusted
-              with — their families, their work, their resources and their faith.
-            </p>
-            <p>
-              The Stewardship Blueprint grew out of that work: a way to decide, in advance and on
-              purpose, what kind of life you are actually building.
-            </p>
+      {/* Not the shared Section wrapper: this one has no bottom padding, because
+          the photo is full-length and stands ON the section's floor. The live
+          homepage does the same thing (main/index.html, `.author` has
+          padding-bottom: 0 and `.author-avatar` is align-self: flex-end) and it
+          is the difference between Michael standing in the section and Michael
+          floating in it. Copy is his, verbatim from that page. */}
+      <section className="border-y bg-muted/30">
+        <div className={`${SITE_CONTENT_BOX} pt-16 md:pt-20`}>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#b88a4a]">
+            Who&apos;s behind it
+          </p>
+          <div className="mt-6 grid items-end gap-8 md:grid-cols-[240px_1fr] md:gap-12">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/media/mike-gauthier-profile-photo.png"
+              alt="Michael J. Gauthier"
+              // Natural height, no crop — the whole photo, resting on the baseline.
+              className="order-2 w-[200px] justify-self-center md:order-1 md:w-[240px] md:justify-self-start"
+            />
+            <div className="order-1 max-w-2xl pb-12 md:order-2 md:pb-20">
+              <h2 className="font-serif text-3xl font-medium leading-tight md:text-4xl">
+                Michael J. Gauthier
+              </h2>
+              <p className="mt-1.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Author &middot; Financial Planner &middot; Life Designer
+              </p>
+              <p className="mt-5 text-[16px] leading-relaxed text-muted-foreground">
+                In 2013, I stepped away from a secure career on Wall Street to pursue something more
+                aligned with my values. That leap taught me that success without purpose is hollow
+                &mdash; and that a meaningful life doesn&rsquo;t happen by accident.
+              </p>
+              <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground">
+                I&rsquo;m now writing The Stewardship Blueprint to share what I&rsquo;ve learned
+                about designing a life that integrates faith, family, finances, and legacy into
+                something whole.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
+                <Link href="/about" className="text-[#b88a4a] underline-offset-4 hover:underline">
+                  Read My Story
+                </Link>
+                <Link href="/mission" className="text-[#b88a4a] underline-offset-4 hover:underline">
+                  Our Mission
+                </Link>
+                <Link href="/contact" className="text-[#b88a4a] underline-offset-4 hover:underline">
+                  Get in Touch
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
-      </Section>
+      </section>
 
       {/* ── Closing ───────────────────────────────────────────────────────── */}
       <section className="border-t">
@@ -247,6 +289,8 @@ export function StewardHomepageSections() {
           </div>
         </div>
       </section>
+
+      <JoinTheJourney />
     </>
   );
 }

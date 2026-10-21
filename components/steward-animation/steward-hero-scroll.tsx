@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { AUTHORED_TOTAL } from "./steward-script";
 import { StewardStage } from "./steward-stage";
 import { clamp } from "./motion";
@@ -19,59 +18,50 @@ import { clamp } from "./motion";
 // picture to disagree with the scrollbar. The same component that autoplays on
 // the other candidate is handed a different number here and does the rest.
 //
-// WHY THE HEADLINE IS ABOVE THE ANIMATION AND NOT OVER IT
-// -------------------------------------------------------
-// The composition is a whole application and the first thing it renders is its
-// own welcome screen, in large type, dead centre. A headline laid over that
-// collides with it word for word — both sets of text are centred, both are
-// large, and the result is unreadable. The words get their own screen, and
-// scrolling moves from the claim into the evidence.
+// THE POINT OF THIS VERSION IS READING SPEED
+// ------------------------------------------
+// Steward's replies type themselves out, and so do the member's two questions.
+// On a clock those beats run at whatever pace they were authored at. Here the
+// reader sets it — hold still and the sentence stops mid-word; scroll back and
+// it un-types. So three things are tuned for reading rather than for drama:
 //
-// Two refinements that are not decoration:
-//   - T eases toward the scroll target rather than snapping to it. A trackpad
-//     delivers scroll in coarse jumps and the camera moves are slow; without
-//     easing the picture stutters against a page that looks smooth.
-//   - The particle field runs on its own clock. If everything froze the moment
-//     you stopped scrolling, a held frame would read as a crash, not a pause.
+//   - The composition is `contain` inside the navigation bar's own width. It is
+//     never cropped, so the composer — where the typing happens — is always on
+//     screen. Cropping it was the actual reason the typing looked missing.
+//   - The caption sits BELOW the demo, not over it. Nothing covers the
+//     conversation at the moment it is being written.
+//   - 130px of scroll per authored second, up from 95. The two typing beats run
+//     2.5s and 1.9s; at the old rate they were about one flick of a wheel.
+//
+// And T eases toward the scroll target rather than snapping to it: a trackpad
+// delivers scroll in coarse jumps, and without easing the picture stutters
+// against a page that looks smooth.
+//
+// This carries no headline, for the same reason the autoplay version does not:
+// the live homepage's opening sits directly beneath it and owns those words.
 
-/**
- * Scroll distance, in pixels, for the whole 37 seconds.
- *
- * ~95px per authored second on a desktop: low enough that the beats do not
- * drag, high enough that the typing and camera moves are readable rather than
- * flicked past. Phones get roughly half, because the same distance that is two
- * flicks of a wheel is a dozen thumb swipes, and a hero nobody can get past is
- * worse than one nobody watches.
- */
-const PX_PER_SECOND = { desktop: 95, phone: 48 };
+const PX_PER_SECOND = { desktop: 130, phone: 68 };
 
 /** Scroll distance for the whole sequence at a given viewport width. */
 function scrubFor(width: number) {
   return Math.round(AUTHORED_TOTAL * (width < 768 ? PX_PER_SECOND.phone : PX_PER_SECOND.desktop));
 }
 
-/**
- * Where the caption track hands over to the closing call, as a fraction of the
- * scrub. Placed after the approval beat lands (~T=35) so the moment the whole
- * demo builds to is read with its own caption rather than under a pair of
- * buttons.
- */
-const HANDOFF = 0.97;
+/** Height of the site's sticky navigation, so the stage sits under it rather than behind it. */
+const NAV_PX = 61;
 
 /**
  * Where the scrub stops, in authored seconds.
  *
  * Short of the full 37 on purpose. The composition's last beat pulls the camera
- * back to the whole application so the loop can restart — which is right for a
- * loop and wrong for a scroll, because nothing restarts here. Ending at 35.4
- * leaves the final frame on the approved wording at conversation zoom, which is
- * the note to finish on, and keeps the demo's own navigation bar out of a frame
- * that already has the site's real one at the top of it.
+ * back so a loop can restart — right for a loop, wrong for a scroll, because
+ * nothing restarts here. Ending at 35.4 leaves the final frame on the approved
+ * wording at conversation zoom, which is the note to finish on.
  */
 const SCRUB_END = 35.4;
 
-/** Height of the site's sticky navigation, so the stage can sit under it rather than behind it. */
-const NAV_PX = 61;
+/** The still frame for reduced motion: just after approval. */
+const STILL_AT = 34.6;
 
 /** What is happening, in the viewer's language, keyed to the authored beats. */
 const CAPTIONS: { from: number; to: number; title: string; body: string }[] = [
@@ -181,131 +171,81 @@ export function StewardHeroScroll() {
   const caption = CAPTIONS.find((k) => t >= k.from && t < k.to) ?? CAPTIONS[CAPTIONS.length - 1];
 
   return (
-    <>
-      {/* The claim. Its own screen, so it never fights the demo's own words. */}
-      <section className="relative isolate overflow-hidden bg-[#141211] text-[#f4f1ea]">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 70% 70% at 50% 35%, rgba(184,138,74,0.15) 0%, rgba(184,138,74,0.04) 50%, rgba(0,0,0,0) 75%)",
-          }}
-        />
-        <div className="relative mx-auto flex min-h-[calc(72vh-61px)] w-full max-w-[1160px] flex-col items-center justify-center px-6 py-20 text-center md:px-8">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#b88a4a]/50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#d8bd86]">
-            <span aria-hidden>✦</span> You were created for more
-          </span>
+    <section
+      ref={sectionRef}
+      className="relative isolate border-b bg-[#141211] text-[#f4f1ea]"
+      style={{ height: reduced ? undefined : `calc(100vh + ${scrub}px)` }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-screen"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 60% at 50% 40%, rgba(184,138,74,0.13) 0%, rgba(184,138,74,0.04) 50%, rgba(0,0,0,0) 75%)",
+        }}
+      />
 
-          <h1 className="mx-auto mt-6 max-w-3xl font-serif text-[clamp(2.1rem,5.2vw,4rem)] leading-[1.08]">
-            What kind of life are you{" "}
-            <em className="not-italic text-[#d8bd86]">actually building?</em>
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-xl text-[16px] leading-relaxed text-[#cfc7ba] md:text-[17px]">
-            Most people don&rsquo;t drift on purpose. Life simply gets full. Steward is a personal
-            guide for designing and living a life that matters.
-          </p>
-
-          <p className="mt-12 flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-[#9d948a]">
-            Scroll to watch it work <ChevronDown className="h-4 w-4 animate-bounce" />
-          </p>
-        </div>
-      </section>
-
-      {/* The demo, scrubbed. */}
-      <section
-        ref={sectionRef}
-        className="relative isolate border-b bg-[#141211] text-[#f4f1ea]"
-        style={{ height: reduced ? undefined : `calc(100vh + ${scrub}px)` }}
+      <div
+        className="sticky w-full overflow-hidden"
+        style={{ top: NAV_PX, height: `calc(100vh - ${NAV_PX}px)` }}
       >
-        <div
-          className="sticky w-full overflow-hidden"
-          style={{ top: NAV_PX, height: `calc(100vh - ${NAV_PX}px)` }}
-        >
-          {/* On a desktop the demo runs full bleed: the camera is zoomed into
-              the conversation for all but a second of the runtime, so the
-              interface fills the frame and reads as immersion.
-
-              On a phone it cannot. The authored phone composition pans but
-              never zooms — the whole app always fits the stage — so its own
-              navigation bar is on screen the entire time, directly beneath the
-              site's real one. Framing it as a device says "this is the app on a
-              phone" and the two bars stop competing. It is also inset to its
-              exact aspect ratio, because cropping a 390px-wide layout sideways
-              cuts live text off both edges. */}
-          <div className="absolute inset-x-6 top-3 aspect-[9/16] overflow-hidden rounded-2xl border border-white/10 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)] md:inset-0 md:aspect-auto md:rounded-none md:border-0 md:shadow-none">
-            {reduced === null ? null : reduced ? (
-              <StewardStage className="h-full w-full" t={34.6} particles={false} tilt={false} />
-            ) : (
-              <StewardStage className="h-full w-full" t={t} particleTime={t + drift} />
+        {/* The navigation bar's own box, so the demo starts at the logo and ends
+            at the theme toggle. The stage takes whatever height is left after
+            the caption and contains itself inside it, which is what guarantees
+            nothing is cropped at any window size. */}
+        <div className="relative mx-auto flex h-full w-full max-w-[1160px] flex-col px-8 py-5 md:py-7">
+          <div className="relative min-h-0 flex-1">
+            {reduced === null ? null : (
+              <StewardStage
+                className="absolute inset-0 h-full w-full"
+                fit="contain"
+                t={reduced ? STILL_AT : t}
+                particleTime={reduced ? undefined : t + drift}
+                particles={!reduced}
+                tilt={!reduced}
+              />
             )}
           </div>
 
-          {/* A floor for the caption. It has to go nearly solid at the bottom:
-              the demo's own composer and legal line sit exactly there, and at
-              anything less they read straight through the caption. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-[55%] md:block"
-            style={{
-              background:
-                "linear-gradient(to bottom, rgba(20,18,17,0) 0%, rgba(20,18,17,0.35) 32%, rgba(20,18,17,0.80) 58%, rgba(20,18,17,0.96) 78%, #141211 100%)",
-            }}
-          />
-
-          {/* Caption track — what is happening, in the viewer's language. */}
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0"
-            style={{ opacity: reduced ? 1 : clamp((HANDOFF - progress) * 22, 0, 1) }}
-          >
-            <div className="mx-auto w-full max-w-[1160px] px-6 pb-6 md:px-8 md:pb-14">
-              <div className="max-w-lg pr-24 md:pr-0">
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#d8bd86]">
-                  {caption.title}
-                </p>
-                <p className="mt-1.5 text-[15px] leading-relaxed text-[#e8e2d8] md:mt-2 md:text-[19px]">
-                  {caption.body}
-                </p>
-              </div>
+          {/* The caption band. A fixed minimum height so the stage above does not
+              resize every time the text wraps to a different number of lines —
+              a demo that grows and shrinks as you scroll is worse than a little
+              empty space under a short caption. */}
+          <div className="relative mt-5 flex min-h-[5.5rem] shrink-0 items-start md:min-h-[5rem]">
+            {/* pr-24 on a phone: the site's help button sits bottom-right and
+                the last line of a caption wraps underneath it otherwise. */}
+            <div
+              className="pr-24 transition-opacity duration-200 md:pr-0"
+              style={{ opacity: reduced ? 1 : clamp(progress * 24, 0, 1) }}
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#d8bd86]">
+                {caption.title}
+              </p>
+              <p className="mt-1.5 max-w-2xl text-[15px] leading-relaxed text-[#e8e2d8] md:mt-2 md:text-[17px]">
+                {caption.body}
+              </p>
             </div>
-          </div>
 
-          {/* The closing call, as the sequence lands. */}
-          <div
-            className="absolute inset-x-0 bottom-0"
-            style={{
-              opacity: clamp((progress - HANDOFF) * 22, 0, 1),
-              pointerEvents: progress > HANDOFF + 0.02 ? "auto" : "none",
-            }}
-          >
-            <div className="mx-auto w-full max-w-[1160px] px-6 pb-12 md:px-8 md:pb-14">
-              <div className="mx-auto grid w-full max-w-[20rem] grid-cols-1 gap-3 sm:inline-grid sm:w-auto sm:max-w-none sm:grid-cols-2">
-              <Link
-                href="/steward"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#b88a4a] px-6 py-3 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#a67c42]"
+            {/* The invitation, until it has been taken. */}
+            {reduced ? null : (
+              <p
+                className="absolute inset-x-0 top-1 flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-[#9d948a] transition-opacity duration-200"
+                style={{ opacity: clamp(1 - progress * 24, 0, 1) }}
               >
-                Talk to Steward <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/created-for-more-check-in"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-white/25 bg-[#141211]/50 px-6 py-3 text-sm font-semibold text-[#f4f1ea] no-underline backdrop-blur-sm transition-colors hover:bg-white/10"
-              >
-                Take the Check-In
-              </Link>
-              </div>
-            </div>
+                Scroll to watch it work <ChevronDown className="h-4 w-4 animate-bounce" />
+              </p>
+            )}
           </div>
-
-          {/* Where you are in the sequence. */}
-          {reduced ? null : (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-white/10">
-              <div className="h-full bg-[#b88a4a]" style={{ width: `${progress * 100}%` }} />
-            </div>
-          )}
         </div>
-      </section>
-    </>
+
+        {/* Where you are in the sequence. */}
+        {reduced ? null : (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-white/10">
+            <div className="h-full bg-[#b88a4a]" style={{ width: `${progress * 100}%` }} />
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
