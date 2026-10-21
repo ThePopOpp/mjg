@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import { AUTHORED_TOTAL } from "./steward-script";
 import { StewardStage } from "./steward-stage";
 import { clamp } from "./motion";
+import { SITE_CONTENT_BOX } from "@/lib/public-site/content-box";
 
 // Option two: the scrollbar is the playhead.
 //
@@ -25,9 +26,9 @@ import { clamp } from "./motion";
 // reader sets it — hold still and the sentence stops mid-word; scroll back and
 // it un-types. So three things are tuned for reading rather than for drama:
 //
-//   - The composition is `contain` inside the navigation bar's own width. It is
-//     never cropped, so the composer — where the typing happens — is always on
-//     screen. Cropping it was the actual reason the typing looked missing.
+//   - The composition is `contain`, and full width. It is never cropped, so the
+//     composer — where the typing happens — is always on screen. Cropping it
+//     was the actual reason the typing looked missing.
 //   - The caption sits BELOW the demo, not over it. Nothing covers the
 //     conversation at the moment it is being written.
 //   - 130px of scroll per authored second, up from 95. The two typing beats run
@@ -189,11 +190,12 @@ export function StewardHeroScroll() {
         className="sticky w-full overflow-hidden"
         style={{ top: NAV_PX, height: `calc(100vh - ${NAV_PX}px)` }}
       >
-        {/* The navigation bar's own box, so the demo starts at the logo and ends
-            at the theme toggle. The stage takes whatever height is left after
-            the caption and contains itself inside it, which is what guarantees
-            nothing is cropped at any window size. */}
-        <div className="relative mx-auto flex h-full w-full max-w-[1160px] flex-col px-8 py-5 md:py-7">
+        {/* Full width, edge to edge — this is the option that is supposed to
+            take over the screen. It stays `contain`, so going full width makes
+            the composition BIGGER rather than cropping it: the stage takes
+            whatever height is left after the caption and fits itself inside,
+            which is what guarantees nothing is cut off at any window size. */}
+        <div className="relative flex h-full w-full flex-col py-5 md:py-7">
           <div className="relative min-h-0 flex-1">
             {reduced === null ? null : (
               <StewardStage
@@ -211,7 +213,7 @@ export function StewardHeroScroll() {
               resize every time the text wraps to a different number of lines —
               a demo that grows and shrinks as you scroll is worse than a little
               empty space under a short caption. */}
-          <div className="relative mt-5 flex min-h-[5.5rem] shrink-0 items-start md:min-h-[5rem]">
+          <div className={`relative mt-5 flex min-h-[5.5rem] shrink-0 items-start md:min-h-[5rem] ${SITE_CONTENT_BOX}`}>
             {/* pr-24 on a phone: the site's help button sits bottom-right and
                 the last line of a caption wraps underneath it otherwise. */}
             <div

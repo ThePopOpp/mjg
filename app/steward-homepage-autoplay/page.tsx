@@ -1,4 +1,5 @@
 import { SiteShell } from "@/components/public-site/site-shell";
+import { StewardAgentIntro } from "@/components/public-site/steward-agent-intro";
 import { StewardHomepageSections } from "@/components/public-site/steward-homepage-sections";
 import { StewardHeroAutoplay } from "@/components/steward-animation/steward-hero-autoplay";
 
@@ -26,6 +27,7 @@ export const metadata = {
 export default function StewardHomepageAutoplayPage() {
   return (
     <SiteShell>
+      <StewardAgentIntro />
       <StewardHeroAutoplay />
       <StewardHomepageSections />
     </SiteShell>

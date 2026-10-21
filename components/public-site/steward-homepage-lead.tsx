@@ -2,15 +2,19 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SITE_CONTENT_BOX } from "@/components/public-site/site-shell";
 
-// The live homepage's opening section, carried across.
+// Section three: the live homepage's opening, carried across.
 //
 // Copy is verbatim from main/index.html:1605-1610 — this is the positioning
 // that is already working, and a review page is the wrong place to quietly
 // rewrite it.
 //
 // The one deliberate change is the media: the live page opens with an audio
-// player, and this has the video in its place. It sits directly under the
-// Steward demo, so the page runs show → tell → detail.
+// player, and the video sits in exactly that position instead — under the
+// buttons, beneath the same "The Stewardship Blueprint" label.
+//
+// This is no longer the top of the page. Section one introduces Steward and
+// section two demonstrates it, so by the time anyone reads this they know what
+// the product is and have watched it work.
 
 const VIMEO_ID = "1237401025";
 const VIMEO_HASH = "c37d5b82d1";
@@ -23,10 +27,10 @@ export function StewardHomepageLead() {
           You Were Created For More
         </span>
 
-        <h1 className="mx-auto mt-6 max-w-4xl font-serif text-[clamp(2.1rem,5.2vw,4rem)] font-medium leading-[1.08]">
+        <h2 className="mx-auto mt-6 max-w-4xl font-serif text-[clamp(2.1rem,5.2vw,4rem)] font-medium leading-[1.08]">
           What Kind of Life Are You{" "}
           <em className="not-italic text-[#b88a4a]">Actually Building?</em>
-        </h1>
+        </h2>
 
         <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-muted-foreground">
           Most people don&rsquo;t intentionally drift. Life simply gets full.
@@ -42,7 +46,7 @@ export function StewardHomepageLead() {
             href="/created-for-more-check-in"
             className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-6 py-3 text-sm font-semibold text-background no-underline transition-opacity hover:opacity-90"
           >
-            Take the Created for More Check-In
+            Created For More Check-in
           </Link>
           <Link
             href="/steward"

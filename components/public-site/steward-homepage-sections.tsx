@@ -54,7 +54,7 @@ export function StewardHomepageSections() {
       <StewardHomepageLead />
 
       {/* ── Steward ───────────────────────────────────────────────────────── */}
-      <Section eyebrow="Steward" title="A guide that proposes. You decide what's true.">
+      <Section eyebrow="How Steward works" title="It proposes. You decide what's true.">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-start">
           <div>
             <p className="max-w-xl text-[16px] leading-relaxed text-muted-foreground">
