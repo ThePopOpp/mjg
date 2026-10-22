@@ -59,6 +59,22 @@ export default async function StewardThankYouPage({
   // sentence from the catalogue rather than describing it in its own words.
   const offer = order ? await getOffer(order.offer_key as string).catch(() => null) : null;
 
+  // What activation actually starts, from the offer's own benefits — a monthly
+  // subscription has no build window and no "first year".
+  const benefits = offer?.benefits ?? [];
+  const hasBuild = benefits.includes("build_window");
+  const isSubscription = offer?.billing === "RECURRING";
+  const premiumLabel = benefits.includes("premium_first_year")
+    ? "your first year of Premium"
+    : benefits.includes("premium")
+      ? "your Premium"
+      : null;
+  const buildLabel = hasBuild ? `your ${offer?.build_days ?? policy?.buildDays ?? 30}-day build window` : null;
+  const starts = [buildLabel, premiumLabel].filter(Boolean) as string[];
+  const startsSentence = starts.length
+    ? `${capitalize(starts.join(" and "))} ${starts.length > 1 ? "both start" : "starts"} the moment you activate — not now.`
+    : "Your plan starts the moment you activate — not now.";
+
   return (
     <SiteShell>
       <section className={`${SITE_CONTENT_BOX} py-14 md:py-20`}>
@@ -107,14 +123,20 @@ export default async function StewardThankYouPage({
                     Your plan is active
                   </p>
                   <dl className="mt-3 space-y-2.5 text-[14px]">
-                    <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5">
-                      <dt className="text-muted-foreground">Build window runs until</dt>
-                      <dd className="font-medium">{formatDate(activation.build_ends_at as string)}</dd>
-                    </div>
-                    <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5">
-                      <dt className="text-muted-foreground">Premium runs until</dt>
-                      <dd className="font-medium">{formatDate(activation.premium_ends_at as string)}</dd>
-                    </div>
+                    {hasBuild ? (
+                      <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5">
+                        <dt className="text-muted-foreground">Build window runs until</dt>
+                        <dd className="font-medium">{formatDate(activation.build_ends_at as string)}</dd>
+                      </div>
+                    ) : null}
+                    {premiumLabel ? (
+                      <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5">
+                        <dt className="text-muted-foreground">
+                          {isSubscription ? "Premium paid through" : "Premium runs until"}
+                        </dt>
+                        <dd className="font-medium">{formatDate(activation.premium_ends_at as string)}</dd>
+                      </div>
+                    ) : null}
                   </dl>
                   <Link
                     href="/steward"
@@ -127,8 +149,7 @@ export default async function StewardThankYouPage({
                 <div className="mt-6 rounded-xl border border-[#b88a4a]/50 bg-[#b88a4a]/[0.06] p-5">
                   <p className="font-serif text-lg leading-snug">One more step: activate when you are ready</p>
                   <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                    Your build window and your first year of Premium both start the moment you activate — not now.
-                    That means you can take your time: nothing is ticking yet.
+                    {startsSentence} That means you can take your time: nothing is ticking yet.
                     {policy && order.paid_at ? (
                       <>
                         {" "}
@@ -212,4 +233,8 @@ function formatDate(iso: string): string {
     day: "numeric",
     timeZone: "UTC",
   });
+}
+
+function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }

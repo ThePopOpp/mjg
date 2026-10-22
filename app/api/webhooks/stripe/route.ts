@@ -152,10 +152,19 @@ async function handleEvent(event: Stripe.Event): Promise<void> {
       // and the granted interval is the invoice's ACTUAL reconciled period —
       // not a period we compute — so the two can never drift.
       const invoice = event.data.object as Stripe.Invoice;
+
+      // Only renewals. The FIRST period is granted at activation, which the
+      // member chooses when to start; granting it here as well would start
+      // their Premium before they asked.
+      if (invoice.billing_reason !== "subscription_cycle") return;
+
+      // Since the 2025 API versions the subscription lives under
+      // parent.subscription_details; older payloads carry it at the top level.
+      // Reading only the old field silently skipped every renewal.
+      const legacy = (invoice as { subscription?: unknown }).subscription;
+      const nested = invoice.parent?.subscription_details?.subscription;
       const subscriptionId =
-        typeof (invoice as { subscription?: unknown }).subscription === "string"
-          ? ((invoice as { subscription?: string }).subscription as string)
-          : null;
+        typeof nested === "string" ? nested : nested?.id ?? (typeof legacy === "string" ? legacy : null);
       if (!subscriptionId) return;
 
       const order = await findOrderBySubscription(subscriptionId);

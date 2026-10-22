@@ -2,6 +2,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getOffer } from "./catalogue";
 import { getActivationPolicy } from "./config";
 import { computeActivationWindows } from "./lifecycle";
+import { getStripe } from "./stripe";
 
 // Order and entitlement writes.
 //
@@ -220,7 +221,7 @@ export async function activateOrder(input: {
   // is not ours to disclose.
   const { data: order, error: orderError } = await supabase
     .from("steward_orders")
-    .select("id, user_id, offer_key, status, paid_at")
+    .select("id, user_id, offer_key, status, paid_at, stripe_subscription_id")
     .eq("id", input.orderId)
     .maybeSingle();
   if (orderError) throw orderError;
@@ -253,6 +254,19 @@ export async function activateOrder(input: {
 
   const windows = computeActivationWindows(at, policy);
 
+  // Benefits from the offer, each with the window the docset gives it.
+  const offer = await getOffer(order.offer_key as string);
+  const benefits = offer?.benefits ?? [];
+
+  // A subscription's Premium runs to the end of the period actually paid for —
+  // a month for monthly, a year for annual — not the bundle's fixed 12-month
+  // first term. Later periods are granted by invoice.paid as each one renews.
+  if (offer?.billing === "RECURRING") {
+    const paidThrough = await subscriptionPaidThrough(order.stripe_subscription_id as string | null);
+    windows.premiumEndsAt = paidThrough;
+    windows.renewalAnchorAt = paidThrough;
+  }
+
   const { data: activation, error } = await supabase
     .from("steward_activations")
     .insert({
@@ -269,10 +283,6 @@ export async function activateOrder(input: {
     .select("id")
     .single();
   if (error) throw error;
-
-  // Benefits from the offer, each with the window the docset gives it.
-  const offer = await getOffer(order.offer_key as string);
-  const benefits = offer?.benefits ?? [];
 
   if (benefits.includes("full_acquisition")) {
     // No expiry: paid_expiry.retain_legitimate_created_blueprint — the full
@@ -296,7 +306,7 @@ export async function activateOrder(input: {
       endsAt: windows.buildEndsAt,
     });
   }
-  if (benefits.includes("premium_first_year") || benefits.includes("premium")) {
+  if ((benefits.includes("premium_first_year") || benefits.includes("premium")) && windows.premiumEndsAt > windows.activatedAt) {
     await grantEntitlement({
       userId: order.user_id as string,
       benefit: "premium",
@@ -308,4 +318,23 @@ export async function activateOrder(input: {
   }
 
   return { activationId: activation.id as string, alreadyActivated: false };
+}
+
+/**
+ * The end of the subscription period the member has paid for (or is trialling).
+ *
+ * Read from Stripe rather than computed, so a trial, a proration or a billing
+ * anchor is reflected exactly. Fails closed: no answer from Stripe means no
+ * activation, rather than guessing a term.
+ */
+async function subscriptionPaidThrough(subscriptionId: string | null): Promise<Date> {
+  if (!subscriptionId) throw new ActivationError("This order has no subscription to activate.");
+  try {
+    const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
+    const ends = subscription.items.data.map((item) => item.current_period_end).filter(Boolean);
+    if (!ends.length) throw new Error("no period");
+    return new Date(Math.max(...ends) * 1000);
+  } catch {
+    throw new ActivationError("We couldn't confirm your subscription with Stripe. Please try again in a moment.");
+  }
 }
