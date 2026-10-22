@@ -112,11 +112,16 @@ async function handleEvent(event: Stripe.Event): Promise<void> {
         currency: (session.currency ?? "usd").toUpperCase(),
         status: paid ? "paid" : "pending",
         paidAt: paid ? new Date(event.created * 1000) : null,
+        couponId: session.metadata?.steward_coupon_id ?? null,
+        couponCode: session.metadata?.steward_coupon_code ?? null,
+        discountMinor: session.total_details?.amount_discount ?? 0,
         // Frozen copy of what was agreed. purchased_terms_immutable: a later
         // catalogue edit must never change what this person bought.
         acceptedTerms: {
           offer_key: offerKey,
           amount_total: session.amount_total,
+          amount_subtotal: session.amount_subtotal,
+          coupon_code: session.metadata?.steward_coupon_code ?? null,
           currency: session.currency,
           mode: session.mode,
           billing_summary: session.metadata?.steward_billing_summary ?? null,

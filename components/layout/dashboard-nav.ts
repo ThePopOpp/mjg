@@ -10,6 +10,7 @@ import {
   CheckSquare,
   CircleUserRound,
   ClipboardList,
+  CreditCard,
   Download,
   FileText,
   FileBarChart,
@@ -82,6 +83,8 @@ export const dashboardNav: NavEntry[] = [
   // Steward (the member product) settings — retention and provider. Super-Admin
   // only, enforced in app/dashboard/steward/page.tsx and on the API route.
   { kind: "item", href: "/dashboard/steward", label: "Steward", icon: Sparkles, permission: PERMISSIONS.MANAGE_SETTINGS },
+  // Commerce: coupons today, products/orders later. Super-Admin only.
+  { kind: "item", href: "/dashboard/stripe", label: "Stripe", icon: CreditCard, permission: PERMISSIONS.MANAGE_STRIPE },
   { kind: "item", href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
   {

@@ -34,6 +34,9 @@ export async function upsertOrderFromSession(input: {
   status: OrderStatus;
   paidAt: Date | null;
   acceptedTerms: Record<string, unknown>;
+  couponId?: string | null;
+  couponCode?: string | null;
+  discountMinor?: number;
 }): Promise<{ id: string }> {
   const supabase = createSupabaseAdminClient();
 
@@ -52,6 +55,9 @@ export async function upsertOrderFromSession(input: {
         status: input.status,
         paid_at: input.paidAt ? input.paidAt.toISOString() : null,
         accepted_terms: input.acceptedTerms,
+        coupon_id: input.couponId ?? null,
+        coupon_code: input.couponCode ?? null,
+        discount_minor: input.discountMinor ?? 0,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "stripe_checkout_session_id" },

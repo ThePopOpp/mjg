@@ -28,8 +28,9 @@ export function getStripe(): Stripe {
   if (!secret) throw new StripeNotConfigured();
 
   // A live key reaching a deployment that was not deliberately switched to live
-  // takes real money. Cheap insurance against a mis-pasted key.
-  if (secret.startsWith("sk_live_") && process.env.STRIPE_MODE !== "live") {
+  // takes real money. Cheap insurance against a mis-pasted key. Restricted keys
+  // (rk_live_) take real money too.
+  if (/^(sk|rk)_live_/.test(secret) && process.env.STRIPE_MODE !== "live") {
     throw new Error(
       "STRIPE_SECRET_KEY is a LIVE key but STRIPE_MODE is not 'live'. Refusing to initialise Stripe.",
     );
@@ -41,7 +42,7 @@ export function getStripe(): Stripe {
 
 /** True when running against test keys. Surfaced in the UI so nobody is unsure. */
 export function isStripeTestMode(): boolean {
-  return (process.env.STRIPE_SECRET_KEY ?? "").startsWith("sk_test_");
+  return /^(sk|rk)_test_/.test(process.env.STRIPE_SECRET_KEY ?? "");
 }
 
 /**

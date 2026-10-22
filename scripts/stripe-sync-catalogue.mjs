@@ -43,7 +43,7 @@ if (!secret) {
 }
 // Refuse live keys unless someone deliberately said so. A mis-pasted live key
 // would create real products on a real account mid-review.
-if (secret.startsWith("sk_live_") && process.env.STRIPE_MODE !== "live") {
+if (/^(sk|rk)_live_/.test(secret) && process.env.STRIPE_MODE !== "live") {
   console.error("Refusing to run: STRIPE_SECRET_KEY is a LIVE key but STRIPE_MODE is not 'live'.");
   process.exit(1);
 }

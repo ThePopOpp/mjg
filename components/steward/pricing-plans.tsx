@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Check, Loader2, Sparkles } from "lucide-react";
+import { Check, Loader2, Sparkles, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { PlanDetailsDialog } from "@/components/steward/plan-details-dialog";
 
@@ -41,6 +42,10 @@ export function PricingPlans({ plans, signedIn }: { plans: PlanCard[]; signedIn:
   const [period, setPeriod] = React.useState<"monthly" | "annual">("annual");
   const [busyKey, setBusyKey] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [promo, setPromo] = React.useState<PromoPreview | null>(null);
+
+  /** The discounted first payment, when the applied code covers this plan. */
+  const promoPrice = (plan: PlanCard) => (promo ? promo.prices[plan.offerKey]?.label ?? null : null);
 
   const visible = plans.filter((p) => p.billingPeriod === "any" || p.billingPeriod === period);
 
@@ -72,7 +77,11 @@ export function PricingPlans({ plans, signedIn }: { plans: PlanCard[]; signedIn:
       const res = await fetch("/api/steward/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ offerKey: plan.offerKey }),
+        body: JSON.stringify({
+          offerKey: plan.offerKey,
+          // Only sent for plans the code covers; the server re-checks regardless.
+          couponCode: promoPrice(plan) ? promo?.code : undefined,
+        }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.url) throw new Error(json.error || "Could not start checkout.");
@@ -110,6 +119,7 @@ export function PricingPlans({ plans, signedIn }: { plans: PlanCard[]; signedIn:
                 <span className="text-3xl font-semibold tabular-nums tracking-tight">{plan.priceLabel}</span>
                 {plan.priceSuffix ? <span className="text-sm text-muted-foreground">{plan.priceSuffix}</span> : null}
               </p>
+              <PromoNote price={promoPrice(plan)} code={promo?.code} />
             </div>
 
             {/* What it is */}
@@ -186,6 +196,8 @@ export function PricingPlans({ plans, signedIn }: { plans: PlanCard[]; signedIn:
         </div>
       </div>
 
+      <PromoCodeField applied={promo} onApplied={setPromo} />
+
       {error ? (
         <p className="mt-5 text-center text-sm text-destructive" role="alert">
           {error}
@@ -222,6 +234,8 @@ export function PricingPlans({ plans, signedIn }: { plans: PlanCard[]; signedIn:
                 <span className="text-4xl font-semibold tabular-nums tracking-tight">{plan.priceLabel}</span>
                 {plan.priceSuffix ? <span className="text-sm text-muted-foreground">{plan.priceSuffix}</span> : null}
               </p>
+
+              <PromoNote price={promoPrice(plan)} code={promo?.code} />
 
               {plan.savingLabel ? (
                 <p className="mt-1.5 text-[13px] font-semibold text-[#b88a4a]">{plan.savingLabel}</p>
@@ -281,5 +295,107 @@ export function PricingPlans({ plans, signedIn }: { plans: PlanCard[]; signedIn:
         {bandSection}
       </div>
     </div>
+  );
+}
+
+type PromoPreview = { code: string; summary: string; prices: Record<string, { minor: number; label: string }> };
+
+/**
+ * "Have a code?" — checks the code against the server and shows which plans it
+ * covers. Purely advisory: checkout re-checks every rule for the chosen plan.
+ */
+function PromoCodeField({
+  applied,
+  onApplied,
+}: {
+  applied: PromoPreview | null;
+  onApplied: (preview: PromoPreview | null) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [code, setCode] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  async function apply(e: React.FormEvent) {
+    e.preventDefault();
+    if (!code.trim()) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/steward/coupon", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || "That code could not be applied.");
+      onApplied(json as PromoPreview);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "That code could not be applied.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (applied) {
+    return (
+      <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm">
+        <Tag className="h-4 w-4 text-[#b88a4a]" />
+        <span>
+          <span className="font-mono font-semibold">{applied.code}</span> applied — {applied.summary}
+        </span>
+        <button
+          type="button"
+          onClick={() => {
+            onApplied(null);
+            setCode("");
+          }}
+          className="inline-flex items-center gap-0.5 text-muted-foreground hover:text-foreground"
+          aria-label="Remove code"
+        >
+          <X className="h-3.5 w-3.5" />
+          Remove
+        </button>
+      </div>
+    );
+  }
+
+  if (!open) {
+    return (
+      <div className="mt-5 text-center">
+        <button type="button" onClick={() => setOpen(true)} className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+          Have a promo code?
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={(e) => void apply(e)} className="mx-auto mt-5 max-w-sm">
+      <div className="flex gap-2">
+        <Input
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          placeholder="Promo code"
+          aria-label="Promo code"
+          className="font-mono uppercase"
+          autoFocus
+        />
+        <Button type="submit" variant="outline" disabled={busy || !code.trim()}>
+          {busy ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : null}
+          Apply
+        </Button>
+      </div>
+      {error ? <p className="mt-1.5 text-center text-[12px] text-destructive">{error}</p> : null}
+    </form>
+  );
+}
+
+function PromoNote({ price, code }: { price: string | null; code?: string }) {
+  if (!price || !code) return null;
+  return (
+    <p className="mt-1 text-[13px] font-semibold text-[#b88a4a]">
+      {price} with {code}
+    </p>
   );
 }

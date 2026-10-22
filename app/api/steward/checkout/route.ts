@@ -3,6 +3,7 @@ import { getCurrentProfile } from "@/lib/auth/server";
 import { checkOfferAvailability, describeBilling, getOffer } from "@/lib/steward/catalogue";
 import { getTaxPolicy } from "@/lib/steward/config";
 import { getStripe, isStripeConfigured } from "@/lib/steward/stripe";
+import { CouponRejected, resolveCouponForCheckout } from "@/lib/stripe-admin/coupons";
 
 // Creates a Stripe Checkout session for one offer.
 //
@@ -73,6 +74,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "The free plan does not require checkout." }, { status: 400 });
     }
 
+    // Every coupon rule — dates, limits, spend range, once per customer — is
+    // checked here, for this offer and this buyer. Stripe only ever receives a
+    // coupon that passed.
+    const couponCode = typeof body?.couponCode === "string" && body.couponCode.trim() ? body.couponCode : null;
+    let coupon: Awaited<ReturnType<typeof resolveCouponForCheckout>> | null = null;
+    if (couponCode) {
+      try {
+        coupon = await resolveCouponForCheckout(couponCode, offer, profile.id);
+      } catch (error) {
+        if (error instanceof CouponRejected) {
+          return NextResponse.json({ error: error.message }, { status: 400 });
+        }
+        throw error;
+      }
+    }
+
     const stripe = getStripe();
     const tax = await getTaxPolicy();
     const origin = resolveOrigin(request);
@@ -91,6 +108,7 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       mode,
       line_items: [lineItem],
+      ...(coupon ? { discounts: [{ coupon: coupon.stripe_coupon_id }] } : {}),
       client_reference_id: profile.id,
       customer_email: profile.email,
 
@@ -100,12 +118,17 @@ export async function POST(request: Request) {
         steward_user_id: profile.id,
         steward_offer_key: offer.offer_key,
         steward_billing_summary: describeBilling(offer),
+        ...(coupon ? { steward_coupon_id: coupon.id, steward_coupon_code: coupon.code } : {}),
       },
       ...(mode === "subscription"
         ? {
             subscription_data: {
               ...(offer.trial_days ? { trial_period_days: offer.trial_days } : {}),
-              metadata: { steward_user_id: profile.id, steward_offer_key: offer.offer_key },
+              metadata: {
+                steward_user_id: profile.id,
+                steward_offer_key: offer.offer_key,
+                ...(coupon ? { steward_coupon_code: coupon.code } : {}),
+              },
             },
           }
         : {}),

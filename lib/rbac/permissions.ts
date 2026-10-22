@@ -15,6 +15,9 @@ export const PERMISSIONS = {
   MANAGE_CMS: "manage_cms",
   // Super-Admin-only (same pattern as MANAGE_CMS): the Workspace module.
   MANAGE_WORKSPACE: "manage_workspace",
+  // Super-Admin-only (same pattern as MANAGE_CMS): the Stripe section — coupons
+  // now, products, orders and reporting as it grows.
+  MANAGE_STRIPE: "manage_stripe",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
