@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -45,7 +46,7 @@ function fmtDateTime(iso: string | null) {
   return new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
-/** ISO → the value a datetime-local input wants, in the admin's own timezone. */
+/** ISO → the form's "YYYY-MM-DDTHH:MM", in the admin's own timezone. */
 function toLocalInput(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
@@ -55,6 +56,15 @@ function toLocalInput(iso: string | null): string {
 
 function fromLocalInput(value: string): string | null {
   return value ? new Date(value).toISOString() : null;
+}
+
+/**
+ * The form keeps "YYYY-MM-DDTHH:MM" (local time); DateTimePicker deals in a
+ * separate date and time. A date picked without a time takes `fallbackTime` —
+ * start of day for a start date, end of day for an expiry.
+ */
+function joinDateTime(date: string, time: string, fallbackTime: string): string {
+  return date ? `${date}T${time || fallbackTime}` : "";
 }
 
 function dollarsToMinor(value: string): number | null {
@@ -533,7 +543,7 @@ function CouponDialog({
             <Field label="Applies to">
               <div className="space-y-2 rounded-md border p-3">
                 <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={form.allOffers} onChange={(e) => set("allOffers", e.target.checked)} disabled={!isNew} />
+                  <input type="checkbox" className="h-4 w-4 accent-[#b88a4a]" checked={form.allOffers} onChange={(e) => set("allOffers", e.target.checked)} disabled={!isNew} />
                   All plans
                 </label>
                 {!form.allOffers ? (
@@ -542,6 +552,7 @@ function CouponDialog({
                       <label key={o.offerKey} className={cn("flex items-center gap-2 text-sm", !o.inStripe && "text-muted-foreground")}>
                         <input
                           type="checkbox"
+                          className="h-4 w-4 accent-[#b88a4a]"
                           disabled={!isNew || !o.inStripe}
                           checked={form.offerKeys.includes(o.offerKey)}
                           onChange={(e) =>
@@ -562,10 +573,22 @@ function CouponDialog({
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Rules — editable any time</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Starts" hint="Blank = usable right away.">
-                <Input type="datetime-local" value={form.startsAt} onChange={(e) => set("startsAt", e.target.value)} />
+                <DateTimePicker
+                  date={form.startsAt.slice(0, 10)}
+                  time={form.startsAt.slice(11, 16)}
+                  onChange={(d, t) => set("startsAt", joinDateTime(d, t, "00:00"))}
+                  placeholder="Right away"
+                  className="h-10 px-3 text-sm"
+                />
               </Field>
               <Field label="Expires" hint="Blank = never expires.">
-                <Input type="datetime-local" value={form.expiresAt} onChange={(e) => set("expiresAt", e.target.value)} />
+                <DateTimePicker
+                  date={form.expiresAt.slice(0, 10)}
+                  time={form.expiresAt.slice(11, 16)}
+                  onChange={(d, t) => set("expiresAt", joinDateTime(d, t, "23:59"))}
+                  placeholder="Never"
+                  className="h-10 px-3 text-sm"
+                />
               </Field>
               <Field label="Usage limit" hint="Total uses across everyone. Blank = unlimited.">
                 <Input type="number" min={1} step="1" value={form.maxRedemptions} onChange={(e) => set("maxRedemptions", e.target.value)} placeholder="Unlimited" />

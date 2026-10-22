@@ -1,12 +1,16 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { CalendarClock, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Branded, theme-aware combined Date & Time field (no native browser UI).
 // date = "YYYY-MM-DD", time = "HH:MM" (24h). Panel is position:fixed so it never
-// gets clipped inside scroll containers (e.g. the Project Tracker table).
+// gets clipped inside scroll containers (e.g. the Project Tracker table), and it is
+// portalled to <body> because inside a Dialog the content's CSS transform would make
+// "fixed" relative to the dialog. The data-floating-panel attribute tells DialogContent
+// that clicks here are not "outside" the dialog.
 
 function ymd(d: Date) { return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`; }
 function parse(s?: string) { if (!s) return null; const d = new Date(`${s}T00:00:00Z`); return isNaN(d.getTime()) ? null : d; }
@@ -57,7 +61,8 @@ export function DateTimePicker({
   React.useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => { const t = e.target as Node; if (wrapRef.current?.contains(t) || panelRef.current?.contains(t)) return; setOpen(false); };
-    const close = () => setOpen(false);
+    // Scrolling the time columns inside the panel must not close it.
+    const close = (e: Event) => { if (panelRef.current?.contains(e.target as Node)) return; setOpen(false); };
     document.addEventListener("mousedown", onDoc);
     window.addEventListener("scroll", close, true);
     window.addEventListener("resize", close);
@@ -92,8 +97,8 @@ export function DateTimePicker({
         <CalendarClock className="h-3.5 w-3.5 shrink-0 opacity-50" />
       </button>
 
-      {open && pos ? (
-        <div ref={panelRef} style={{ position: "fixed", top: pos.top, left: pos.left, width: 260 }} className="z-50 rounded-md border bg-popover p-2 text-popover-foreground shadow-lg">
+      {open && pos ? createPortal(
+        <div ref={panelRef} data-floating-panel="" style={{ position: "fixed", top: pos.top, left: pos.left, width: 260, pointerEvents: "auto" }} className="z-[60] rounded-md border bg-popover p-2 text-popover-foreground shadow-lg">
           <div className="mb-1 flex items-center justify-between">
             <button type="button" onClick={() => setCursor(new Date(Date.UTC(year, mon - 1, 1)))} className="rounded p-1 hover:bg-accent"><ChevronLeft className="h-4 w-4" /></button>
             <span className="text-sm font-medium">{cursor.toLocaleDateString([], { month: "long", year: "numeric", timeZone: "UTC" })}</span>
@@ -137,7 +142,8 @@ export function DateTimePicker({
             <button type="button" onClick={() => { onChange("", ""); setOpen(false); }} className="text-muted-foreground hover:text-foreground">Clear</button>
             <button type="button" onClick={() => setOpen(false)} className="font-medium text-primary hover:underline">Done</button>
           </div>
-        </div>
+        </div>,
+        document.body,
       ) : null}
     </div>
   );
