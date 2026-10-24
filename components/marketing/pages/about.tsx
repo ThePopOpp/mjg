@@ -11,9 +11,11 @@ export async function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <Band>
-        <Split>
-          <div>
+      {/* Text (2/3, left); the portrait (1/3, right) stands on the section's bottom edge,
+          like the homepage's "09 · Michael". On phones only the text shows. */}
+      <Band flush>
+        <Split align="end" className="md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="pb-16 md:pb-[72px]">
             <Eyebrow pill>{hero.eyebrow}</Eyebrow>
             <Heading title={hero.title} level={1} className="mt-6" />
             <Prose text={hero.body} className="mt-6 text-[17px] leading-8 text-muted-foreground" />
@@ -21,7 +23,20 @@ export async function AboutPage() {
               <ButtonLink cta={hero.primaryCta} />
             </Actions>
           </div>
-          <MediaFrame media={hero.photo} ratio="4/5" priority sizes="(min-width: 1024px) 520px, 100vw" className="mx-auto w-full max-w-md lg:max-w-none" />
+          {/* The cut-out portrait at the homepage's scale: no box, 320px. */}
+          {/* Hidden on phones for now (owner's call); shown from md up. */}
+          <div className="hidden md:flex md:justify-end">
+            <MediaFrame
+              media={hero.photo}
+              ratio="4/5"
+              rounded="rounded-none"
+              fit="contain"
+              priority
+              className="w-full max-w-[320px] bg-transparent"
+              imageClassName="object-bottom"
+              sizes="320px"
+            />
+          </div>
         </Split>
       </Band>
 
@@ -33,7 +48,14 @@ export async function AboutPage() {
             <Heading title={question.title} italic className="mt-3" />
             <Prose text={question.body} className="mt-6 text-[16px] leading-8 text-muted-foreground" />
           </div>
-          <MediaFrame media={question.image} ratio="4/3" sizes="(min-width: 1024px) 520px, 100vw" />
+          {/* The family photo is portrait (about 4:5); a landscape frame cut off their heads. */}
+          <MediaFrame
+            media={question.image}
+            ratio="4/5"
+            imageClassName="object-top"
+            sizes="(min-width: 1024px) 440px, 100vw"
+            className="mx-auto w-full max-w-[440px]"
+          />
         </Split>
       </Band>
 

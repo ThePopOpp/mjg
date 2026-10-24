@@ -15,7 +15,7 @@ const hero = defineSection<Hero>({
     title: "I’m Still Building, Too.",
     body: "I’m Michael J. Gauthier. I’m a husband, father, follower of Jesus, financial planner, business leader, and someone who is still learning to live what matters most.\n\nThe Stewardship Blueprint is not a theory I developed from a distance. It grew out of my own questions, successes, misplaced scoreboards, relationships, faith journey, and ongoing desire to steward the life God has entrusted to me.",
     primaryCta: { label: "Explore the Framework", href: "/stewardship-blueprint" },
-    photo: { ...photo("/marketing/brand/michael-gauthier.webp", "Michael J. Gauthier"), position: "top" },
+    photo: photo("/marketing/brand/michael-gauthier.webp", "Michael J. Gauthier"),
   },
 });
 
