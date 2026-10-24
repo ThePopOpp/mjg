@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Check, Loader2, Mail, MapPin, Phone } from "lucide-react";
 import type { ContactContent } from "@/lib/marketing/content/scopes/page-contact";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MARKETING_FONT_VARS } from "@/lib/marketing/fonts";
 import { cn } from "@/lib/utils";
 import { Eyebrow, Heading, keepTogether } from "./primitives";
 
@@ -137,14 +139,23 @@ function ContactInner({ content, param }: { content: ContactContent; param: stri
                 </a>
               </li>
             ) : null}
-            {content.email ? (
-              <li className="flex items-start gap-3">
-                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden />
-                <a href={`mailto:${content.email}`} className="break-all underline-offset-4 hover:underline">
-                  {content.email}
-                </a>
-              </li>
-            ) : null}
+            {/* Each inbox with what it is for: support first, then privacy requests. */}
+            {[
+              { address: content.email, label: content.emailLabel },
+              { address: content.privacyEmail, label: content.privacyLabel },
+            ]
+              .filter((e) => e.address)
+              .map((e) => (
+                <li key={e.address} className="flex items-start gap-3">
+                  <Mail className="mt-1 h-4 w-4 shrink-0 text-gold" aria-hidden />
+                  <span className="min-w-0">
+                    <a href={`mailto:${e.address}`} className="break-all underline-offset-4 hover:underline">
+                      {e.address}
+                    </a>
+                    {e.label ? <span className="mt-0.5 block text-pretty text-[13.5px] leading-snug text-muted-foreground">{e.label}</span> : null}
+                  </span>
+                </li>
+              ))}
             {content.address ? (
               <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden />
@@ -211,14 +222,28 @@ function ContactInner({ content, param }: { content: ContactContent; param: stri
                 <label htmlFor="contact-topic" className={labelCls}>
                   Topic *
                 </label>
-                <select id="contact-topic" name="topic" required value={topic} onChange={(e) => setTopic(e.target.value)} className={field}>
-                  {content.topics.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {/* "General Question" → "General question", as in the mockup's select. */}
-                      {t.label.charAt(0) + t.label.slice(1).toLowerCase()}
-                    </option>
-                  ))}
-                </select>
+                {/* The branded select (not the browser's), styled like the fields around it. Its
+                    list renders in a portal outside the marketing layout, so it carries the fonts. */}
+                <Select value={topic} onValueChange={setTopic}>
+                  <SelectTrigger
+                    id="contact-topic"
+                    className="h-12 rounded-md border-input bg-background px-3.5 text-[15px] shadow-none focus:border-gold focus:ring-2 focus:ring-gold/30 focus:ring-offset-0 [&>svg]:opacity-70"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className={cn(MARKETING_FONT_VARS, "font-marketing")}>
+                    {content.topics.map((t) => (
+                      <SelectItem
+                        key={t.id}
+                        value={t.id}
+                        className="py-2.5 text-[15px] focus:bg-[#b88a4a]/15 focus:text-foreground data-[state=checked]:font-semibold [&_svg]:text-gold"
+                      >
+                        {/* "General Question" → "General question", as in the mockup's select. */}
+                        {t.label.charAt(0) + t.label.slice(1).toLowerCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label htmlFor="contact-organization" className={labelCls}>
@@ -261,12 +286,6 @@ function ContactInner({ content, param }: { content: ContactContent; param: stri
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {content.submitLabel}
               </button>
-              <p className="text-pretty text-center text-[13px] leading-relaxed text-muted-foreground">
-                Privacy requests:{" "}
-                <a href={`mailto:${content.privacyEmail}`} className="font-medium text-foreground underline-offset-4 hover:underline">
-                  {content.privacyEmail}
-                </a>
-              </p>
             </form>
           </>
         )}

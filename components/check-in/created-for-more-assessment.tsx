@@ -76,7 +76,7 @@ export function CreatedForMoreAssessment({ redirectTo, dashboardHref }: { redire
           <span className="font-semibold">Step {step + 1} of {LAYERS.length}</span>
           <span className="text-muted-foreground">{answeredIn(step)} of {layer.statements.length} answered</span>
         </div>
-        <ol className="grid grid-cols-7 gap-1.5">
+        <ol className="grid grid-cols-7 gap-2">
           {LAYERS.map((l, i) => {
             const done = answeredIn(i) === l.statements.length;
             return (
@@ -87,18 +87,18 @@ export function CreatedForMoreAssessment({ redirectTo, dashboardHref }: { redire
                   aria-current={i === step ? "step" : undefined}
                   aria-label={`Step ${i + 1}: ${l.title}${done ? " (complete)" : ""}`}
                   title={`${l.title} · ${l.subtitle}`}
-                  className="block w-full py-1"
+                  className={cn(
+                    // The step's name sits inside its block (the number on phones, where a
+                    // block is too narrow for "Keystone Rhythms"). Finished steps fill gold.
+                    "flex h-9 w-full items-center justify-center rounded-md px-1.5 text-center text-[11.5px] leading-tight transition-colors md:h-11",
+                    done ? "bg-[#b88a4a] text-white" : "bg-muted text-muted-foreground hover:text-foreground",
+                    i === step && "font-semibold ring-2 ring-[#b88a4a] ring-offset-2 ring-offset-background",
+                    i === step && !done && "text-foreground",
+                  )}
                 >
-                  <span
-                    className={cn(
-                      "block h-2 rounded-full transition-colors",
-                      done ? "bg-[#b88a4a]" : "bg-muted",
-                      i === step && "ring-2 ring-[#b88a4a]/50 ring-offset-2 ring-offset-background",
-                    )}
-                  />
-                  <span className={cn("mt-1.5 hidden truncate text-[11px] sm:block", i === step ? "font-semibold text-foreground" : "text-muted-foreground")}>
-                    {l.title}
-                  </span>
+                  <span className="md:hidden">{i + 1}</span>
+                  {/* Long names ("Keystone Rhythms") wrap to two lines; every block stays the same height. */}
+                  <span className="hidden text-balance md:line-clamp-2">{l.title}</span>
                 </button>
               </li>
             );

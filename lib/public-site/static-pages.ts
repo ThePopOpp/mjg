@@ -388,7 +388,7 @@ export function renderSiteFooter(siteUrl: string) {
             <li><a href="${app}/register">Register</a></li>
             <li><a href="${siteUrl}/#join">Join the Journey</a></li>
             <li><a href="tel:+14804667070">Call Us</a></li>
-            <li><a href="mailto:mike@strategicincomegroup.com">Email Us</a></li>
+            <li><a href="mailto:support@michaeljgauthier.com">Email Us</a></li>
           </ul>
         </div>
         <div>

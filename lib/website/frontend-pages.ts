@@ -62,8 +62,8 @@ export const CODE_OWNED_PAGES: CodeOwnedPage[] = [
   { slug: "meet-steward", label: "Meet Steward", path: "/meet-steward", source: "components/marketing/pages/meet-steward.tsx", group: "Marketing site" },
   { slug: "six-week-challenge-videos", label: "6-Week Challenge — Videos", path: "/6-week-challenge/videos", source: "app/6-week-challenge/videos/page.tsx", group: "App pages" },
 
-  { slug: "privacy", label: "Privacy Policy", path: "/privacy", source: "app/privacy", group: "Legal" },
-  { slug: "terms", label: "Terms", path: "/terms", source: "app/terms", group: "Legal" },
+  { slug: "privacy", label: "Privacy Policy", path: "/privacy", source: "CMS → Legal (components/marketing/pages/legal.tsx)", group: "Legal" },
+  { slug: "terms", label: "Terms", path: "/terms", source: "CMS → Legal (components/marketing/pages/legal.tsx)", group: "Legal" },
 ];
 
 /** One row in the page picker, whichever kind of page it describes. */
