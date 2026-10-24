@@ -63,6 +63,22 @@ export const PROTECTED_ROUTES = [
   "/stewardship-blueprint-pastor-review",
   "/6-week-challenge",
   "/manifest.webmanifest",
+  // The Steward member app (and everything under it). Its known pages are real
+  // routes, but without this a CMS page could claim an unused /steward/* path.
+  "/steward",
+  // The marketing-site rebuild: preview copies of the redesigned pages, and the
+  // new code-built pages (content edited through lib/marketing/content).
+  "/site-preview",
+  "/start",
+  "/assessments",
+  "/learn-and-grow",
+  "/the-life-youre-building",
+  "/studies",
+  "/meet-steward",
+  "/churches",
+  "/lead-a-group",
+  "/personal-blueprint",
+  "/join",
 ] as const;
 
 /** Slugs that must never be taken by a CMS page (the homepage is code-owned). */

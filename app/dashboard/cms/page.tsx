@@ -12,7 +12,7 @@ const PUBLIC_PAGES: FrontendPage[] = [
   { slug: "about", label: "About", url: "/about" },
   { slug: "mission", label: "Mission", url: "/mission" },
   { slug: "created-for-more", label: "Created for More", url: "/created-for-more" },
-  { slug: "join-the-movement", label: "Join the Movement", url: "/join-the-movement" },
+  { slug: "join", label: "Join the Journey", url: "/join" },
   { slug: "resources", label: "Resources", url: "/resources" },
   { slug: "contact", label: "Contact", url: "/contact" },
   { slug: "events", label: "Events", url: "/events" },

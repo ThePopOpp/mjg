@@ -12,6 +12,24 @@ type Consent = {
   followUpPermission?: boolean;
 };
 
+/**
+ * Consent columns for a participant upsert. Only answers that were actually
+ * given are written: an omitted key leaves an existing record unchanged (and a
+ * new record gets the column default, false) rather than being reset to false.
+ */
+function consentColumns(consent: Consent = {}) {
+  const columns: Record<string, boolean> = {};
+  const set = (column: string, value: boolean | undefined) => {
+    if (value !== undefined) columns[column] = value;
+  };
+  set("email_journey_opt_in", consent.emailJourneyOptIn);
+  set("future_updates_opt_in", consent.futureUpdatesOptIn);
+  set("anonymous_feedback_permission", consent.anonymousFeedbackPermission);
+  set("story_permission_granted", consent.storyInterviewPermission);
+  set("follow_up_permission_granted", consent.followUpPermission);
+  return columns;
+}
+
 type ContactInput = {
   firstName: string;
   lastName: string;
@@ -39,11 +57,7 @@ export async function upsertParticipant(input: ContactInput) {
         source: input.waveSource || null,
         relationship_category: input.relationshipCategory || null,
         participant_type: input.participantType || PARTICIPANT_TYPES.GENERAL,
-        email_journey_opt_in: Boolean(input.consent?.emailJourneyOptIn),
-        future_updates_opt_in: Boolean(input.consent?.futureUpdatesOptIn),
-        anonymous_feedback_permission: Boolean(input.consent?.anonymousFeedbackPermission),
-        story_permission_granted: Boolean(input.consent?.storyInterviewPermission),
-        follow_up_permission_granted: Boolean(input.consent?.followUpPermission),
+        ...consentColumns(input.consent),
         updated_at: new Date().toISOString(),
       },
       { onConflict: "email" },

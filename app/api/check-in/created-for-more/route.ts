@@ -43,7 +43,9 @@ export async function POST(request: Request) {
         email: validEmail,
         waveSource: "created_for_more_check_in",
         participantType: PARTICIPANT_TYPES.GENERAL,
-        consent: { futureUpdatesOptIn: true, followUpPermission: true },
+        // The taker gave an email to receive their results, not permission for
+        // updates or follow-up, so no consent is set here.
+        consent: {},
       })
         .then((p) => p.id)
         .catch((e) => { console.error("[created-for-more] participant upsert failed", e instanceof Error ? e.message : e); return null; });

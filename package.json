@@ -14,6 +14,7 @@
     "dev:requests": "node scripts/dev-requests.mjs",
     "legal:import": "node scripts/import-legal-docs.mjs",
     "stripe:sync": "node scripts/stripe-sync-catalogue.mjs",
+    "test:marketing": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --test lib/marketing/content/content.test.mjs",
     "test:steward": "node --experimental-strip-types lib/steward/lifecycle.test.mjs && node --experimental-strip-types lib/steward/state.test.mjs",
     "steward:db:bootstrap": "node steward/node_modules/@workflow/world-postgres/bin/setup.js"
   },

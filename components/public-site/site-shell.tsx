@@ -1,74 +1,46 @@
 import Link from "next/link";
-import { SiteNav } from "@/components/public-site/site-nav";
+import { MarketingFooter } from "@/components/marketing/footer";
+import { MarketingNav } from "@/components/marketing/nav";
 import { StewardFab } from "@/components/public-site/steward-fab";
 import { SITE_CONTENT_BOX } from "@/lib/public-site/content-box";
 import type { NavItem } from "@/lib/public-site/nav-items";
 import { appUrl, publicSiteUrl } from "@/lib/public-site/static-pages";
+import { getScopeContent } from "@/lib/marketing/content/read";
+import { globalFooter, globalNav } from "@/lib/marketing/content/scopes/global";
+import { MARKETING_FONT_VARS } from "@/lib/marketing/fonts";
 
 /**
- * Public page chrome for the React app pages that belong to the marketing site rather than
- * the pilot micro-site — /book-waitlist and /stewardship-blueprint/energy-audit. It puts the
- * real frontend navigation on them instead of the PilotShell nav (Home/Pilot/Check-In/Survey).
+ * Public page chrome for the React pages that sit outside the marketing route
+ * group — /book-waitlist, /6-week-challenge, /steward/pricing, the Energy Audit,
+ * Frontend Editor pages and their draft previews. It renders the same navigation
+ * and footer as the marketing pages (components/marketing/nav + footer, from the
+ * global:nav and global:footer content), so every public page shares one header.
  *
- * `contentClassName` defaults to the same box as the nav bar (max-width 1160px, 2rem gutters)
- * so page content lines up with the logo on the left and the theme toggle on the right.
+ * The Frontend Editor's own navigation tables (website_navigation_items) held a
+ * copy of the old menu; the site navigation is now edited as content, so those
+ * props are accepted for compatibility and ignored. The footer note still applies.
  */
-export function SiteShell({
+export async function SiteShell({
   children,
-  contentClassName = "mx-auto w-full max-w-[1160px] px-8",
-  navItems,
-  footerLinks,
   footerNote,
 }: {
   children: React.ReactNode;
+  /** @deprecated Ignored; pages lay out their own content. */
   contentClassName?: string;
-  /** Frontend-Editor-managed navigation. Omit to use the code-owned nav. */
+  /** @deprecated Ignored; the site navigation (global:nav) is used everywhere. */
   navItems?: NavItem[];
+  /** @deprecated Ignored; the site footer (global:footer) is used everywhere. */
   footerLinks?: { label: string; href: string }[];
+  /** Replaces the footer's copyright line. */
   footerNote?: string;
 }) {
   const siteUrl = publicSiteUrl();
-
+  const [{ nav }, { footer }] = await Promise.all([getScopeContent(globalNav), getScopeContent(globalFooter)]);
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <SiteNav siteUrl={siteUrl} items={navItems} />
+    <div className={`${MARKETING_FONT_VARS} flex min-h-screen flex-col bg-background text-foreground`}>
+      <MarketingNav nav={nav} />
       <main className="flex-1">{children}</main>
-
-      <footer className="mt-16 border-t">
-        <div className="mx-auto flex w-full max-w-[1160px] flex-col items-center justify-between gap-4 px-8 py-8 text-sm sm:flex-row">
-          <Link href="/" className="flex items-center gap-3 no-underline">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mjg-logos/mjg_black_white.png" alt="Michael J. Gauthier" className="h-7 w-auto dark:hidden" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mjg-logos/mjg_white.png" alt="" aria-hidden className="hidden h-7 w-auto dark:block" />
-            <span className="font-serif text-sm italic">
-              Michael <span className="text-[#b88a4a]">J.</span> Gauthier
-            </span>
-          </Link>
-          <nav className="flex flex-wrap items-center justify-center gap-5 text-muted-foreground">
-            {footerLinks?.length ? (
-              footerLinks.map((item) => (
-                <a key={`${item.label}-${item.href}`} href={item.href} className="hover:text-[#b88a4a]">{item.label}</a>
-              ))
-            ) : (
-              <>
-                <a href={`${siteUrl}/about`} className="hover:text-[#b88a4a]">About</a>
-                <a href={`${siteUrl}/mission`} className="hover:text-[#b88a4a]">Mission</a>
-                <a href={`${siteUrl}/resources`} className="hover:text-[#b88a4a]">Resources</a>
-                <a href={`${siteUrl}/contact`} className="hover:text-[#b88a4a]">Contact</a>
-                <Link href="/privacy" className="hover:text-[#b88a4a]">Privacy</Link>
-                <Link href="/terms" className="hover:text-[#b88a4a]">Terms</Link>
-              </>
-            )}
-          </nav>
-          {/* Kept as the original JSX children (not a template string) so pages that
-              do not pass footerNote render byte-identical markup to before. */}
-          <p className="text-xs text-muted-foreground">
-            {footerNote || <>© {new Date().getFullYear()} Michael J. Gauthier</>}
-          </p>
-        </div>
-      </footer>
-
+      <MarketingFooter footer={footerNote ? { ...footer, copyright: footerNote } : footer} />
       <StewardFab siteUrl={siteUrl} appUrl={appUrl()} />
     </div>
   );
@@ -114,7 +86,7 @@ export function SiteHero({
             <span aria-hidden>✦</span> {eyebrow}
           </span>
         ) : null}
-        <h1 className="mt-6 text-balance font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+        <h1 className="mt-6 text-balance font-display text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
           {lead ? `${lead} ` : ""}
           {/* whitespace-nowrap keeps a hyphenated accent word whole — without it a
               browser happily breaks "Check-In" after the hyphen. It only ever wraps
@@ -122,7 +94,7 @@ export function SiteHero({
           <em className="whitespace-nowrap not-italic text-[#b88a4a]">{last}</em>
         </h1>
         {description ? (
-          <p className={`mt-5 text-lg leading-8 text-muted-foreground ${centered ? "mx-auto max-w-2xl" : "max-w-2xl"}`}>
+          <p className={`mt-5 text-pretty text-lg leading-8 text-muted-foreground ${centered ? "mx-auto max-w-2xl" : "max-w-2xl"}`}>
             {description}
           </p>
         ) : null}

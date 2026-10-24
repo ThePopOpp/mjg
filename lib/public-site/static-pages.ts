@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { INSTALL_GUIDES, SHARE_ICON_SVG } from "@/lib/pwa/install-guide";
-import { ACCOUNT_LABEL, RESOURCES_LABEL, joinJourneyHref, publicNavItems } from "@/lib/public-site/nav-items";
+import { ACCOUNT_LABEL, joinJourneyHref, publicNavItems } from "@/lib/public-site/nav-items";
 import { renderStewardFab } from "@/lib/public-site/steward-fab";
 
 // The primary domain is the apex michaeljgauthier.com. The my.* sub-domain still resolves but
@@ -21,7 +21,7 @@ const STATIC_ROUTES: Record<string, string> = {
   "contact.html": "/contact",
   "resources.html": "/resources",
   "post.html": "/post",
-  "join-the-movement.html": "/join-the-movement",
+  "join-the-movement.html": "/join",
   "created-for-more.html": "/created-for-more",
 };
 
@@ -227,11 +227,11 @@ export function renderNavListItems(siteUrl: string, themeToggleHtml?: string) {
     })
     .join("\n        ");
 
-  // Mobile-only rows: the Resources children flattened, then the CTA and account buttons.
-  const resources = items.find((i) => i.label === RESOURCES_LABEL);
+  // Mobile-only rows: every menu's links flattened, then the CTA and account buttons.
+  const menus = items.filter((i) => i.children && i.label !== ACCOUNT_LABEL);
   const account = items.find((i) => i.label === ACCOUNT_LABEL);
   const mobileExtras = `
-        ${(resources?.children ?? []).map((c) => `<li class="nav-mobile-only nav-mobile-child"><a href="${c.href}">${c.label}</a></li>`).join("\n        ")}
+        ${menus.flatMap((m) => m.children ?? []).map((c) => `<li class="nav-mobile-only nav-mobile-child"><a href="${c.href}">${c.label}</a></li>`).join("\n        ")}
         <li class="nav-mobile-only nav-mobile-join"><a href="${joinJourneyHref(siteUrl)}">Join the Journey</a></li>
         <li class="nav-mobile-only nav-mobile-auth">
           ${(account?.children ?? []).map((c) => `<a href="${c.href}" class="mjg-nav-auth-btn">${c.label}</a>`).join("\n          ")}

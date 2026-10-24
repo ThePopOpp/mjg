@@ -85,6 +85,30 @@ const nextConfig: NextConfig = {
   // those file lookups, so keep it external and let Node require it from node_modules.
   serverExternalPackages: ["pdfkit"],
 
+  // Marketing images (components/marketing/primitives/marketing-image.tsx) go
+  // through next/image. Local files need nothing; uploads come from Supabase
+  // storage, and stock placeholders were downloaded into /public.
+  images: {
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" }],
+  },
+
+  async redirects() {
+    // The old signup page; Join the Journey now lives at /join.
+    return [{ source: "/join-the-movement", destination: "/join", permanent: true }];
+  },
+
+  async headers() {
+    // Preview copies of the redesigned pages are for review only. noindex in
+    // the page metadata covers crawlers that render; the header covers the rest.
+    return [
+      {
+        source: "/site-preview/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
+
   async rewrites() {
     const beforeFiles = [];
 

@@ -1,0 +1,121 @@
+/* The Stewardship Blueprint temple (FrameworkTemple.dc.html), ported. */
+
+.temple {
+  --marble: #efeae0;
+  --marble-hi: #faf7f0;
+  --marble-lo: #dcd5c7;
+  --cella: #1c1917;
+  --flute: rgba(255, 255, 255, 0.55);
+  --flute-dk: rgba(20, 20, 20, 0.12);
+  --line: hsl(var(--border));
+  --gold: #b88a4a;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  /* The bedrock's lowest step reaches 16px past the temple on each side. */
+  padding: 8px 16px 6px;
+  container-type: inline-size;
+}
+
+:global(.dark) .temple {
+  --marble: #2a2623;
+  --marble-hi: #3a3531;
+  --marble-lo: #1f1c19;
+  --cella: #0e0d0c;
+  --flute: rgba(255, 255, 255, 0.07);
+  --flute-dk: rgba(0, 0, 0, 0.35);
+}
+
+.part {
+  position: relative;
+  cursor: pointer;
+  font-family: inherit;
+  transition: box-shadow 0.25s, border-color 0.2s, opacity 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.part:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.pinned {
+  animation: tmGlow 2.2s ease-in-out infinite;
+}
+
+.apex {
+  position: absolute;
+  left: calc(50% - 6px);
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: var(--gold);
+  animation: tmPulse 2.8s ease-in-out infinite;
+}
+
+.triangle {
+  position: absolute;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.fluted {
+  background-color: var(--marble);
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--flute-dk) 0 2px,
+    var(--marble) 2px 7px,
+    var(--flute) 7px 9px,
+    var(--marble) 9px 12px
+  );
+}
+
+.railBars {
+  background-image: repeating-linear-gradient(90deg, var(--flute-dk) 0 4px, transparent 4px 11px);
+}
+
+.vertical {
+  writing-mode: vertical-rl;
+}
+
+.bedrockNote {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+@container (max-width: 420px) {
+  .bedrockNote {
+    display: none;
+  }
+}
+
+@keyframes tmGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(184, 138, 74, 0), 0 8px 28px rgba(184, 138, 74, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(184, 138, 74, 0.14), 0 12px 36px rgba(184, 138, 74, 0.4);
+  }
+}
+
+@keyframes tmPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(184, 138, 74, 0.18);
+    opacity: 0.95;
+  }
+  50% {
+    box-shadow: 0 0 0 9px rgba(184, 138, 74, 0.08);
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pinned,
+  .apex {
+    animation: none;
+  }
+  .part {
+    transition: none;
+  }
+}

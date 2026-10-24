@@ -228,7 +228,7 @@ function renderEmptyState(siteUrl: string) {
           The first readings from The Stewardship Blueprint are being recorded now. Join the
           journey and we&rsquo;ll let you know the moment they&rsquo;re here.
         </p>
-        <a class="l-empty-cta" href="${siteUrl}/join-the-movement">Join the Journey</a>
+        <a class="l-empty-cta" href="${siteUrl}/join">Join the Journey</a>
       </div>`;
 }
 

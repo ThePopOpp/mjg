@@ -6,6 +6,7 @@ import { PARTICIPANT_TYPES } from "@/lib/pilot/constants";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { isAppRole, ROLES } from "@/lib/rbac/roles";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
+import { SMS_OPT_IN_DISCLOSURE } from "@/lib/sms/constants";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { logUserActivity, upsertProfile } from "@/lib/user-management/repository";
 
@@ -34,7 +35,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: "First name, last name, and email are required." }, { status: 400 });
     }
 
+    // The redesigned form (components/marketing/join-journey-form) sends explicit
+    // consent choices and a consent_version. Older forms still on the site
+    // (main/*.html, /join-the-movement) do not, and keep working as before.
+    const explicitConsent = Boolean(stringValue(payload.consent_version));
+    const emailConsent = isTrue(payload.email_consent);
+    const smsConsent = isTrue(payload.sms_consent);
+    if (explicitConsent) {
+      if (!phone) {
+        return NextResponse.json({ ok: false, error: "A phone number is required." }, { status: 400 });
+      }
+      if (!emailConsent) {
+        return NextResponse.json({ ok: false, error: "Please agree to receive email updates to join." }, { status: 400 });
+      }
+    }
+
     const supabase = createSupabaseAdminClient();
+    // Whether this person is new decides what an unticked SMS box means: a new
+    // record starts opted OUT, an existing one is left exactly as it was.
+    const { data: priorRows } = await supabase.from("participants").select("id").eq("email", email).limit(1);
+    const priorParticipant = priorRows?.[0] ?? null;
     const participant = await upsertParticipant({
       firstName,
       lastName,
@@ -46,8 +66,10 @@ export async function POST(request: NextRequest) {
       consent: {
         emailJourneyOptIn: true,
         futureUpdatesOptIn: true,
-        anonymousFeedbackPermission: true,
-        followUpPermission: true,
+        // Only the visitor grants these (optional, unticked boxes). An unticked box
+        // leaves an existing record as it was rather than revoking an earlier yes.
+        anonymousFeedbackPermission: isTrue(payload.anonymous_feedback_permission) || undefined,
+        followUpPermission: isTrue(payload.follow_up_permission) || undefined,
       },
     });
 
@@ -66,6 +88,20 @@ export async function POST(request: NextRequest) {
       email,
       phone,
       participantId: participant.id,
+    });
+
+    await recordConsent({
+      participantId: participant.id,
+      profileId: profileResult.profile.id,
+      newParticipant: !priorParticipant,
+      newProfile: !profileResult.existingAccount,
+      explicit: explicitConsent,
+      email: emailConsent,
+      sms: smsConsent,
+      emailDisclosure: stringValue(payload.email_consent_text),
+      consentVersion: stringValue(payload.consent_version),
+      source: stringValue(payload.source),
+      request,
     });
 
     await supabase.from("participant_user_links").upsert(
@@ -142,6 +178,85 @@ export async function POST(request: NextRequest) {
     const message = error instanceof Error ? error.message : "Join The Journey signup failed.";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
+}
+
+/**
+ * Writes what the person actually agreed to.
+ *
+ * Explicit (new form): email consent is required to get here, so it is recorded
+ * as an opt-in with the wording they saw; SMS is recorded only when ticked, with
+ * the approved A2P disclosure. An unticked SMS box opts a NEW record out and
+ * never touches an existing one — not ticking a box is not an opt-out request.
+ *
+ * Legacy forms carry no consent fields. They keep enrolling people in the email
+ * journey as before, but a new record no longer inherits the column default of
+ * sms_opt_in = true: nobody is opted into texts without asking.
+ */
+async function recordConsent(input: {
+  participantId: string;
+  profileId: string;
+  newParticipant: boolean;
+  newProfile: boolean;
+  explicit: boolean;
+  email: boolean;
+  sms: boolean;
+  emailDisclosure: string;
+  consentVersion: string;
+  source: string;
+  request: NextRequest;
+}) {
+  const supabase = createSupabaseAdminClient();
+  const now = new Date().toISOString();
+
+  const patchFor = (isNew: boolean) => {
+    const patch: Record<string, unknown> = {};
+    if (input.explicit && input.email) {
+      Object.assign(patch, { email_opt_in: true, email_opt_in_at: now, email_opt_in_source: "web_form", email_opt_out_at: null });
+    }
+    if (input.explicit && input.sms) {
+      Object.assign(patch, { sms_opt_in: true, sms_opt_in_at: now, sms_opt_in_source: "web_form", sms_opt_out_at: null });
+    } else if (isNew) {
+      patch.sms_opt_in = false;
+    }
+    return patch;
+  };
+
+  const participantPatch = patchFor(input.newParticipant);
+  const profilePatch = patchFor(input.newProfile);
+  await Promise.all([
+    Object.keys(participantPatch).length
+      ? supabase.from("participants").update(participantPatch).eq("id", input.participantId)
+      : null,
+    Object.keys(profilePatch).length ? supabase.from("profiles").update(profilePatch).eq("id", input.profileId) : null,
+  ]);
+
+  if (!input.explicit) return;
+
+  const ip = input.request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
+  const userAgent = input.request.headers.get("user-agent");
+  const base = {
+    event_type: "opt_in",
+    source: "web_form",
+    ip_address: ip,
+    user_agent: userAgent,
+    form_type: "join_the_journey",
+    metadata: { consent_version: input.consentVersion, source: input.source },
+  };
+  const events: Record<string, unknown>[] = [];
+  for (const [entity_type, entity_id] of [
+    ["participant", input.participantId],
+    ["profile", input.profileId],
+  ] as const) {
+    events.push({ ...base, entity_type, entity_id, channel: "email", disclosure_text: input.emailDisclosure || null });
+    if (input.sms) events.push({ ...base, entity_type, entity_id, channel: "sms", disclosure_text: SMS_OPT_IN_DISCLOSURE });
+  }
+  const { error } = await supabase.from("consent_events").insert(events);
+  // The audit row must not undo an enrolment that already happened — but it must be visible.
+  if (error) console.error("[join-journey] consent_events insert failed", error.message);
+}
+
+function isTrue(value: unknown) {
+  return value === true || value === "true" || value === "on" || value === "1";
 }
 
 async function savePublicFormSubmission(input: {

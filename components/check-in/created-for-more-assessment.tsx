@@ -1,84 +1,169 @@
 "use client";
 
 import { forwardRef, useMemo, useRef, useState } from "react";
-import { Check, ArrowRight, RotateCcw } from "lucide-react";
+import { Check, ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LAYERS, SCALE, MAX_SCORE, TOTAL_STATEMENTS, PATHWAYS, NEXT_STEP_OPTIONS, LOWEST_LAYER_GUIDANCE, PILLAR_GUIDANCE, scoreCheckIn, type CheckInScore } from "@/lib/check-in/created-for-more";
 
+/** Rating guide — shown in the "Check-In Form 101" dialog on the Check-In pages. */
+export function CheckInScaleGuide() {
+  return (
+    <div className="grid gap-1.5 sm:grid-cols-5">
+      {SCALE.map((s) => (
+        <div key={s.value} className="rounded-md border bg-muted/40 p-2 text-center">
+          <div className="text-lg font-bold text-foreground">{s.value}</div>
+          <div className="text-[11px] font-medium text-foreground">{s.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The Created for More Check-In, one layer per step.
+ *
+ * Seven steps of four statements. Answering a layer's last statement moves on to
+ * the next step by itself; Back and Next move freely, and the stepper jumps to
+ * any layer. The answers, their keys, the scoring and what is saved are exactly
+ * as before — only the presentation is stepped.
+ */
 export function CreatedForMoreAssessment({ redirectTo, dashboardHref }: { redirectTo?: string | null; dashboardHref?: string | null } = {}) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [step, setStep] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const answeredCount = Object.keys(answers).length;
   const complete = answeredCount >= TOTAL_STATEMENTS;
   const score = useMemo(() => (showResults ? scoreCheckIn(answers) : null), [showResults, answers]);
+  const layer = LAYERS[step];
+  const last = step === LAYERS.length - 1;
+  const answeredIn = (index: number, a = answers) => LAYERS[index].statements.filter((_, i) => a[`${LAYERS[index].key}:${i}`]).length;
 
-  const setAnswer = (key: string, value: number) => setAnswers((a) => ({ ...a, [key]: value }));
+  const goTo = (next: number) => {
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    setStep(Math.max(0, Math.min(LAYERS.length - 1, next)));
+    // Bring the top of the step back into view when it has scrolled away.
+    setTimeout(() => {
+      const top = topRef.current?.getBoundingClientRect().top ?? 0;
+      if (top < 0 || top > window.innerHeight * 0.4) topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 30);
+  };
+
+  const setAnswer = (key: string, value: number) => {
+    const before = answeredIn(step);
+    const next = { ...answers, [key]: value };
+    setAnswers(next);
+    // Completing a layer (its last unanswered statement) moves on after a beat, so the choice registers visually.
+    if (!last && before < layer.statements.length && answeredIn(step, next) === layer.statements.length) {
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+      advanceTimer.current = setTimeout(() => goTo(step + 1), 450);
+    }
+  };
   const seeResults = () => { setShowResults(true); setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); };
-  const retake = () => { setAnswers({}); setShowResults(false); setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); };
+  const retake = () => { setAnswers({}); setStep(0); setShowResults(false); setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); };
 
   return (
-    <div ref={topRef} className="space-y-6">
-      {/* How to use / scale */}
-      <Card>
-        <CardContent className="space-y-3 p-5 text-sm leading-6 text-muted-foreground">
-          <p className="text-base font-semibold text-foreground">How to use this Check-In</p>
-          <p>Set aside about 15 quiet minutes. For each statement, rate yourself from 1 to 5 based on what is actually true, not what you wish were true. A lower score is not a reason for shame — it is an invitation to notice what needs attention next.</p>
-          <div className="grid gap-1.5 sm:grid-cols-5">
-            {SCALE.map((s) => (
-              <div key={s.value} className="rounded-md border bg-muted/40 p-2 text-center">
-                <div className="text-lg font-bold text-primary">{s.value}</div>
-                <div className="text-[11px] font-medium text-foreground">{s.label}</div>
-              </div>
-            ))}
+    <div ref={topRef} className="scroll-mt-24 space-y-6">
+      {/* Stepper — one segment per layer; finished layers fill, the current one is ringed. */}
+      <nav aria-label="Check-In steps">
+        <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+          <span className="font-semibold">Step {step + 1} of {LAYERS.length}</span>
+          <span className="text-muted-foreground">{answeredIn(step)} of {layer.statements.length} answered</span>
+        </div>
+        <ol className="grid grid-cols-7 gap-1.5">
+          {LAYERS.map((l, i) => {
+            const done = answeredIn(i) === l.statements.length;
+            return (
+              <li key={l.key}>
+                <button
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-current={i === step ? "step" : undefined}
+                  aria-label={`Step ${i + 1}: ${l.title}${done ? " (complete)" : ""}`}
+                  title={`${l.title} · ${l.subtitle}`}
+                  className="block w-full py-1"
+                >
+                  <span
+                    className={cn(
+                      "block h-2 rounded-full transition-colors",
+                      done ? "bg-[#b88a4a]" : "bg-muted",
+                      i === step && "ring-2 ring-[#b88a4a]/50 ring-offset-2 ring-offset-background",
+                    )}
+                  />
+                  <span className={cn("mt-1.5 hidden truncate text-[11px] sm:block", i === step ? "font-semibold text-foreground" : "text-muted-foreground")}>
+                    {l.title}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+
+      {/* The current layer */}
+      <Card key={layer.key}>
+        <CardContent className="p-5">
+          <div className="mb-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Layer {layer.index}</p>
+            <h3 className="text-lg font-bold">{layer.title} <span className="font-medium text-muted-foreground">· {layer.subtitle}</span></h3>
+            <p className="mt-0.5 text-sm italic text-muted-foreground">{layer.coreQuestion}</p>
+          </div>
+          <div className="space-y-2">
+            {layer.statements.map((st, i) => {
+              const key = `${layer.key}:${i}`;
+              const val = answers[key];
+              return (
+                <div key={key} className={cn("flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between", val ? "border-primary/30 bg-primary/[0.03]" : "")}>
+                  <p className="text-sm">{st.text}{st.pillar ? <span className="ml-1 text-xs text-muted-foreground">({st.pillar})</span> : null}</p>
+                  <div className="flex shrink-0 gap-1">
+                    {SCALE.map((s) => (
+                      <button
+                        key={s.value}
+                        type="button"
+                        onClick={() => setAnswer(key, s.value)}
+                        title={s.label}
+                        aria-label={`${s.value} — ${s.label}`}
+                        aria-pressed={val === s.value}
+                        className={cn("h-9 w-9 rounded-md border text-sm font-semibold transition-colors", val === s.value ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:border-primary hover:text-foreground")}
+                      >{s.value}</button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Back / Next */}
+          <div className="mt-5 grid grid-cols-2 gap-3 border-t pt-4 sm:flex sm:justify-between">
+            <Button type="button" variant="outline" onClick={() => goTo(step - 1)} disabled={step === 0} className="sm:min-w-[9rem]">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+            </Button>
+            {!last ? (
+              <Button type="button" variant="outline" onClick={() => goTo(step + 1)} className="sm:min-w-[9rem]">
+                Next <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button type="button" onClick={seeResults} disabled={!complete} className="sm:min-w-[9rem]">
+                See my results <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Layers */}
-      {LAYERS.map((layer) => (
-        <Card key={layer.key}>
-          <CardContent className="p-5">
-            <div className="mb-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Layer {layer.index}</p>
-              <h3 className="text-lg font-bold">{layer.title} <span className="font-medium text-muted-foreground">· {layer.subtitle}</span></h3>
-              <p className="mt-0.5 text-sm italic text-muted-foreground">{layer.coreQuestion}</p>
-            </div>
-            <div className="space-y-2">
-              {layer.statements.map((st, i) => {
-                const key = `${layer.key}:${i}`;
-                const val = answers[key];
-                return (
-                  <div key={key} className={cn("flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between", val ? "border-primary/30 bg-primary/[0.03]" : "")}>
-                    <p className="text-sm">{st.text}{st.pillar ? <span className="ml-1 text-xs text-muted-foreground">({st.pillar})</span> : null}</p>
-                    <div className="flex shrink-0 gap-1">
-                      {SCALE.map((s) => (
-                        <button
-                          key={s.value}
-                          type="button"
-                          onClick={() => setAnswer(key, s.value)}
-                          title={s.label}
-                          aria-label={`${s.value} — ${s.label}`}
-                          className={cn("h-9 w-9 rounded-md border text-sm font-semibold transition-colors", val === s.value ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:border-primary hover:text-foreground")}
-                        >{s.value}</button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-
-      {/* Score bar */}
-      <div className="sticky bottom-4 z-10 flex flex-col items-center gap-2 rounded-lg border bg-card/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:justify-between">
-        <p className="text-sm text-muted-foreground"><span className="font-semibold text-foreground">{answeredCount}</span> of {TOTAL_STATEMENTS} answered{!complete ? " — rate every statement to see your results." : ""}</p>
+      {/* Results bar — the same on every step, pinned to the bottom of the form while it scrolls. */}
+      {/* Sits above the floating "Ask Steward" button (fixed at the bottom right), so it never covers "See my results". */}
+      <div className="sticky bottom-[5.5rem] z-10 flex flex-col items-center gap-2 rounded-lg border bg-card/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:justify-between">
+        <p className="text-sm text-muted-foreground">
+          <span className="font-semibold text-foreground">{answeredCount}</span> of {TOTAL_STATEMENTS} answered
+          {!complete ? " — rate every statement to see your results." : " — you are ready to see your results."}
+        </p>
         <Button onClick={seeResults} disabled={!complete}>See my results <ArrowRight className="ml-2 h-4 w-4" /></Button>
       </div>
 

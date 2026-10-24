@@ -44,6 +44,24 @@ const config: Config = {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
+        // Brand gold and the dark band, as HEX on purpose: opacity modifiers
+        // (bg-gold/10) compile to nothing on Tailwind 3.4 when the colour is a
+        // CSS variable.
+        gold: {
+          DEFAULT: "#b88a4a",
+          hover: "#a67c42",
+          light: "#d8bd86",
+          deep: "#8a6532",
+        },
+        band: {
+          DEFAULT: "#141211",
+          text: "#cfc7ba",
+          muted: "#9d948a",
+        },
+        status: {
+          live: "#2f7d5b",
+          soon: "#8a6630",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -52,6 +70,9 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["Inter", "Arial", "sans-serif"],
+        // Marketing pages only: loaded with next/font in app/(marketing)/layout.tsx.
+        display: ["var(--font-fraunces)", "Fraunces", "Georgia", "serif"],
+        marketing: ["var(--font-geist)", "Geist", "Arial", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
