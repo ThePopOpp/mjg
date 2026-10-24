@@ -1,0 +1,8 @@
+{
+  "status": "disabled_example",
+  "activation_required": true,
+  "unused_activation_window_days": 90,
+  "initial_refund_window_after_activation_days": 14,
+  "renewal_refund_window_days": 14,
+  "first_and_later_renewal_grace_days": 7
+}

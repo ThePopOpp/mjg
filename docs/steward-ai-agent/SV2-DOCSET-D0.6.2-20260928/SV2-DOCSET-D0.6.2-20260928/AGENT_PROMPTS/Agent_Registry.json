@@ -1,0 +1,17 @@
+{
+  "package_id": "SV2-DOCSET-D0.5.1-20260928",
+  "status": "extracts_not_runtime_deployment",
+  "functions": [
+    "S00",
+    "AG01",
+    "AG02",
+    "AG03",
+    "AG04",
+    "AG05",
+    "AG06",
+    "AG07",
+    "AG08",
+    "AG09"
+  ],
+  "source": "08_Engineering_Experience_Operations.md E03-E04"
+}

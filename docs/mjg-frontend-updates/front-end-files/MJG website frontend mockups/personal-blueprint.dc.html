@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="Your Personal Stewardship Blueprint" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="blueprint" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 72px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ Your Personal Stewardship Blueprint</span>
+    <h1 style="margin:24px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">Make the Life You’re Building <em style="font-style:normal;color:#b88a4a;">Visible.</em></h1>
+    <p style="margin:20px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">You may have financial plans, calendars, work goals, and lists of things to accomplish. But do they point toward one clear picture of the life you want to build?</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">A Personal Stewardship Blueprint captures the commitments, priorities, relationships, and rhythms that matter in this season so you can use them to guide real decisions.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;">
+      <a href="#sample" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">See a Sample Blueprint</a>
+      <a href="start.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Explore How to Begin</a>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px;align-items:start;">
+    <div style="aspect-ratio:8.5/11;border-radius:10px;overflow:hidden;box-shadow:0 18px 48px rgba(20,20,20,.12);background:#141211;"><image-slot id="pb-hero-cover" shape="rect" placeholder="Generic sample Blueprint cover (no private details)"></image-slot></div>
+    <div style="aspect-ratio:8.5/11;border-radius:10px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="pb-hero-northstar" shape="rect" placeholder="North Star overview page"></image-slot></div>
+  </div>
+</section>
+
+<!-- WHAT IT INCLUDES -->
+<section id="sample" style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">What It Includes</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;max-width:760px;">A Living Guide, Not Just Another Document.</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;margin-top:24px;align-items:start;">
+      <div>
+        <p style="margin:0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Your Blueprint can bring together your faith and identity; your mission, values, and purpose; the person you are becoming; Family, Fitness, Fun, and Finances; financial direction; guardrails; drift signals; accountability; keystone habits; energy; and the legacy your life is multiplying through others.</p>
+        <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The standard Personal Blueprint structure includes a cover and twelve supporting pages. Each section helps answer a practical question: <em style="font-family:Fraunces,Georgia,serif;color:var(--ink,#1c1917);">What should I remember, protect, decide, practice, or revisit?</em></p>
+        <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">It should be personal enough to recognize yourself and usable enough to open on a difficult Tuesday.</p>
+        <a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:15px;font-weight:600;color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Explore the Framework →</a>
+      </div>
+      <div>
+        <ol style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 24px;">
+          <sc-for list="{{ pages }}" as="p" hint-placeholder-count="13">
+            <li style="display:flex;gap:12px;font-size:14.5px;line-height:1.5;padding:6px 0;border-bottom:1px solid var(--border,#e1dbd0);"><span style="width:22px;flex:none;text-align:right;font-family:Fraunces,Georgia,serif;color:var(--muted-fg,#6d6660);font-variant-numeric:tabular-nums;">{{ p.n }}</span><span>{{ p.t }}</span></li>
+          </sc-for>
+        </ol>
+      </div>
+    </div>
+    <div style="margin-top:40px;display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;">
+      <div style="flex:none;width:200px;aspect-ratio:8.5/11;border-radius:8px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="pb-gallery-1" shape="rect" placeholder="Sample page 1"></image-slot></div>
+      <div style="flex:none;width:200px;aspect-ratio:8.5/11;border-radius:8px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="pb-gallery-2" shape="rect" placeholder="Sample page 2"></image-slot></div>
+      <div style="flex:none;width:200px;aspect-ratio:8.5/11;border-radius:8px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="pb-gallery-3" shape="rect" placeholder="Sample page 3"></image-slot></div>
+      <div style="flex:none;width:200px;aspect-ratio:8.5/11;border-radius:8px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="pb-gallery-4" shape="rect" placeholder="Sample page 4"></image-slot></div>
+      <div style="flex:none;width:200px;aspect-ratio:8.5/11;border-radius:8px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="pb-gallery-5" shape="rect" placeholder="Sample page 5"></image-slot></div>
+    </div>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:18px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Page-turn gallery using 3–5 sanitized sample pages from the thirteen-page template. The page list above should read from <code>BLUEPRINT_PAGES</code> in <code>lib/steward/blueprint</code> — do not hard-code a second copy.</div></sc-if>
+  </div>
+</section>
+
+<!-- BUILDING PROCESS -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Building Process</p>
+  <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Notice. Clarify. Build. Live. Revisit.</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:36px;">
+    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+      <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:22px;">
+        <div style="width:36px;height:36px;border-radius:9999px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);display:flex;align-items:center;justify-content:center;font-family:Fraunces,Georgia,serif;font-size:15px;">{{ s.n }}</div>
+        <p style="margin:16px 0 0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">{{ s.t }}</p>
+        <p style="margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">{{ s.b }}</p>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;">
+    <a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Begin with the Free Check-In</a>
+    <a href="steward.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Meet Steward</a>
+  </div>
+</section>
+
+<!-- CHOOSING A PATH -->
+<section style="border-top:1px solid var(--border,#e1dbd0);background:var(--bg,#fbfaf7);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:start;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Choosing a Path</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">Start Simply. Go Deeper When You’re Ready.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">You do not need to purchase a complete program to begin examining your life. The free Check-In creates a practical starting point.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Deeper Blueprint-building options and ongoing Steward guidance may be available based on the current offering.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+        <a href="steward.dc.html#access" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">View Current Blueprint Options</a>
+        <a href="start.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Start Here</a>
+      </div>
+    </div>
+    <div style="display:grid;gap:14px;">
+      <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:22px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start;">
+        <div><p style="margin:0;font-family:Fraunces,Georgia,serif;font-size:20px;">Free Check-In</p><p style="margin:6px 0 0;font-size:14px;line-height:1.6;color:var(--muted-fg,#6d6660);">28 questions · seven layers · a practical starting point.</p></div>
+        <span style="flex:none;font-size:11px;font-weight:700;padding:5px 12px;border-radius:9999px;background:rgba(47,125,91,.14);color:#2f7d5b;">LIVE · FREE</span>
+      </div>
+      <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:22px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start;">
+        <div><p style="margin:0;font-family:Fraunces,Georgia,serif;font-size:20px;">Personal Blueprint + Steward</p><p style="margin:6px 0 0;font-size:14px;line-height:1.6;color:var(--muted-fg,#6d6660);">Full Blueprint build with ongoing guidance. See what is included and the current price at checkout.</p></div>
+        <span style="flex:none;font-size:11px;font-weight:700;padding:5px 12px;border-radius:9999px;background:var(--muted,#f4f1ea);color:var(--muted-fg,#6d6660);">VERIFY AT CHECKOUT</span>
+      </div>
+      <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Show only currently functioning access levels and pricing on the live page; clearly mark anything not yet launched. No guarantee of a free downloadable thirteen-page Blueprint unless Jeremy confirms it is available. Paid price is changeable; authoritative terms at checkout.</div></sc-if>
+    </div>
+  </div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const titles = ["Cover", "Faith & Identity", "Mission, Values & Purpose", "The Person I Am Becoming", "Family · Fitness · Fun · Finances", "Financial Direction", "Guardrails", "Drift Signals", "Accountability", "Keystone Habits", "Energy", "Living Legacy", "Next Faithful Step"];
+    const pages = titles.map((t, i) => ({ n: String(i + 1).padStart(2, "0"), t }));
+    const steps = [
+      { n: "1", t: "Start with Awareness", b: "Take the Created for More Check-In or reflect on a current area of drift." },
+      { n: "2", t: "Clarify What Matters", b: "Identify the convictions, people, responsibilities, and priorities that need to guide this season." },
+      { n: "3", t: "Build the Plan", b: "Capture meaningful statements, boundaries, habits, and next steps rather than generic aspirations." },
+      { n: "4", t: "Put It Into Life", b: "Let your calendar, conversations, and decisions reflect what you have written." },
+      { n: "5", t: "Revisit & Refine", b: "Your identity and enduring mission may remain steady while your calling, roles, and commitments change." },
+    ];
+    return { pages, steps, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

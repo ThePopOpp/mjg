@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="Start Your Journey" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="learn" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 48px;text-align:center;">
+  <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ Start Your Journey</span>
+  <h1 style="margin:24px auto 0;max-width:900px;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">Start Where You Actually <em style="font-style:normal;color:#b88a4a;">Are.</em></h1>
+  <p style="margin:20px auto 0;max-width:680px;font-size:18px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">You do not need to know exactly what is wrong—or have a detailed life plan—to take a meaningful first step.</p>
+  <p style="margin:14px auto 0;max-width:680px;font-size:18px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Some people begin because they sense drift. Others are changing seasons, joining a group, reading a book, or ready to build a personal plan. Wherever you’re starting, choose the next step that fits.</p>
+  <div style="display:flex;justify-content:center;margin-top:30px;"><a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Take the Free Check-In</a></div>
+</section>
+
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Choose a Path</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Find the Next Step That Fits.</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:36px;">
+      <sc-for list="{{ paths }}" as="p" hint-placeholder-count="5">
+        <a href="{{ p.href }}" style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;text-decoration:none;color:var(--ink,#1c1917);display:flex;flex-direction:column;gap:10px;" style-hover="border-color:#b88a4a;box-shadow:0 18px 50px rgba(12,20,25,.06);">
+          <span style="font-family:Fraunces,Georgia,serif;font-size:13px;color:var(--muted-fg,#6d6660);">{{ p.n }}</span>
+          <h3 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:21px;line-height:1.25;">{{ p.t }}</h3>
+          <p style="margin:0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);flex:1;">{{ p.b }}</p>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#b88a4a;">{{ p.cta }} →</span>
+        </a>
+      </sc-for>
+    </div>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:24px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Five clean cards or simple guided selection. Avoid creating a complicated intake questionnaire just to route visitors.</div></sc-if>
+  </div>
+</section>
+
+<section style="max-width:1160px;margin:0 auto;padding:80px 32px;text-align:center;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Reassurance</p>
+  <h2 style="margin:12px auto 0;max-width:720px;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;">You Only Need One Faithful Next Step.</h2>
+  <p style="margin:16px auto 0;max-width:600px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The goal is not to fix everything today. Begin with what is true, choose what matters most, and take a step you can actually live.</p>
+  <div style="display:flex;justify-content:center;margin-top:28px;"><a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Begin the Check-In</a></div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const paths = [
+      { n: "01", t: "I want to see where I am", b: "Take the Created for More Check-In and identify an area deserving attention.", cta: "Check-In", href: "created-for-more-check-in.dc.html" },
+      { n: "02", t: "I want to understand the framework", b: "Explore how faith, purpose, the four pillars, habits, energy, and living legacy fit together.", cta: "The Framework", href: "stewardship-blueprint.dc.html" },
+      { n: "03", t: "I want to learn on my own", b: "Explore reflections, the upcoming book, and practical resources.", cta: "Learn & Grow", href: "learn-and-grow.dc.html" },
+      { n: "04", t: "I want to grow with others", b: "Find a six-week study or church/group experience.", cta: "Studies", href: "studies.dc.html" },
+      { n: "05", t: "I am ready to build a personal plan", b: "See what goes into a Personal Blueprint and how Steward can guide the process.", cta: "Personal Blueprint", href: "personal-blueprint.dc.html" },
+    ];
+    return { paths, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

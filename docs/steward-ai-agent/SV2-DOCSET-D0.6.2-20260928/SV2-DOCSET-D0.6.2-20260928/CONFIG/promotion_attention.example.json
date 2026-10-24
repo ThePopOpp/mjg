@@ -1,0 +1,21 @@
+{
+  "status": "CANDIDATE_CONFIG_NOT_DEPLOYED",
+  "shared_upgrade_referral_budget": true,
+  "max_unsolicited_invitations_per_conversation": 2,
+  "normal_first_invitation_count": 1,
+  "second_requires_material_new_relevance_and_no_refusal": true,
+  "max_invitations_per_turn": 1,
+  "counts_include": [
+    "chat",
+    "banners",
+    "optional_promotional_reminders"
+  ],
+  "reset_on_new_tab_or_agent": false,
+  "refusal_policy": "NO_NEW_UNSOLICITED_PITCH_WITHOUT_RENEWED_PARTICIPANT_INTEREST_OR_EXPLICIT_SELECTED_FUTURE_REMINDER",
+  "stop_asking_policy": "UNTIL_PARTICIPANT_CHANGES_PREFERENCE",
+  "store_sensitive_reason": false,
+  "automatic_reengagement_after_days": null,
+  "optional_outbound_without_choice": false,
+  "production_enabled": false,
+  "package_id": "SV2-DOCSET-D0.4-20260926"
+}

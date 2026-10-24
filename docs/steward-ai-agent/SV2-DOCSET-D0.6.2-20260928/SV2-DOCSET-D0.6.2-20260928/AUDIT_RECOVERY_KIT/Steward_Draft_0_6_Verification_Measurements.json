@@ -1,0 +1,1384 @@
+{
+  "files": 106,
+  "zip_sha256": "aaf352978c5e83268f5c6193768659edd76eae8951bdeedb5641e383350c9f51",
+  "zip_integrity_bad_member": null,
+  "baseline_zip_sha256": "c8c4ac2d4d9997bccc4d01fe4d9ad4c4e60942213b63cab0490ae31464642688",
+  "baseline_files": 122,
+  "source_files": [
+    "PROJECT_SOURCES/00_Control_Register.md",
+    "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+    "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+    "PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+    "PROJECT_SOURCES/05_Data_Privacy_Security.md",
+    "PROJECT_SOURCES/06_Safety_Support_Release.md",
+    "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+    "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+    "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+    "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+    "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+    "PROJECT_SOURCES/Statement-of-Faith.txt"
+  ],
+  "duplicate_members": [],
+  "manifest_count": 105,
+  "manifest_mismatches": [
+    {
+      "path": "MANIFESTS/SHA256SUMS.json",
+      "recorded": "062f8d000954ea1e89f57e913585cd9337ccf15ebd6de5640d951a2591104c71",
+      "actual": "019cdb04a38c62ca70ce9e8552b0542ad5ad54a0c0cdfdc24a689ce280f70b1a"
+    },
+    {
+      "path": "MANIFESTS/SHA256SUMS.txt",
+      "recorded": "3a7bef329a9f1f6b0453c1de0b0c9a33f891465616be919ba9d6a1017c2074e4",
+      "actual": "0d4c6a8d0b24b396e98d89896a037d849ac8d1804b8008d84d60613da31b6836"
+    }
+  ],
+  "unmanifested_members": [
+    "MANIFESTS/ZIP_SHA256.txt"
+  ],
+  "embedded_zip_hash": "a7730b4d10ebdd6d8eeae0d6895f0f361e440c94704c5516a8bca092b9efcccc  SV2-DOCSET-D0.6-20260928.zip",
+  "instructions": {
+    "lf_chars": 6205,
+    "crlf_chars": 6227,
+    "sha256": "c6399dea1cb5dcf4e1389499bc2a18de5717c915797c8bc01fc7ef96ff26c880"
+  },
+  "faith_unchanged": true,
+  "faith_sha256": "b587d8af30ad22d695e48d78608cc6cbbf05d928cd3c6527c58ca305ac9e4e87",
+  "source_modules": [
+    {
+      "file": "PROJECT_SOURCES/00_Control_Register.md",
+      "id": "SR4",
+      "blocks": 116,
+      "unchanged": true,
+      "sha256_utf8": "21b590e0ed4b5b50a49b8feaf045fa06178b9e6419c49ba6ea3afea992346b55"
+    },
+    {
+      "file": "PROJECT_SOURCES/00_Control_Register.md",
+      "id": "CTX3",
+      "blocks": 123,
+      "unchanged": true,
+      "sha256_utf8": "a5ab03a8fbe9c67582dbe4a04cd81da9beee2a14cf19e3882c9510ca91734355"
+    },
+    {
+      "file": "PROJECT_SOURCES/00_Control_Register.md",
+      "id": "INSTR4",
+      "blocks": 1,
+      "unchanged": true,
+      "sha256_utf8": "217f1026559c60495aa697b1424db53f48be9d22328e4763222865e237d35962"
+    },
+    {
+      "file": "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "id": "T4",
+      "blocks": 216,
+      "unchanged": true,
+      "sha256_utf8": "a72f07cf523d6b8182eb1130b544e235eade481815e8e4d0d3fe1f6688b7daa7"
+    },
+    {
+      "file": "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "id": "LG",
+      "blocks": 83,
+      "unchanged": true,
+      "sha256_utf8": "4099376d2543f649126503be8cc930fbcbca31acb617f4351eada6693edff5fa"
+    },
+    {
+      "file": "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "id": "CFM4",
+      "blocks": 159,
+      "unchanged": true,
+      "sha256_utf8": "0d6137b0e1ed953aab830eceb96280d90407153b28c31edacf1c7d22a760dbb4"
+    },
+    {
+      "file": "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "id": "EA",
+      "blocks": 160,
+      "unchanged": true,
+      "sha256_utf8": "7e9b01b26ce566ab5181c5e78c41f5c4b2ac943d9b3cacf57879324b367a6ff1"
+    },
+    {
+      "file": "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+      "id": "OI4",
+      "blocks": 92,
+      "unchanged": true,
+      "sha256_utf8": "f642f383fc5ae16f12ffa55470bea91fefcdf3151d717a92b0a9f7eb7f2234ee"
+    },
+    {
+      "file": "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+      "id": "SC3",
+      "blocks": 1,
+      "unchanged": true,
+      "sha256_utf8": "5b88ee628c723cfcc4aeb219ecb8fe50b5632de3667cee56432a45328b96cc9e"
+    },
+    {
+      "file": "PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+      "id": "PJ",
+      "blocks": 305,
+      "unchanged": true,
+      "sha256_utf8": "a4174557349e9c80f4ac3180bffd09096e3de7dd11dc65dc0400b319cf75ed49"
+    },
+    {
+      "file": "PROJECT_SOURCES/05_Data_Privacy_Security.md",
+      "id": "ARCH",
+      "blocks": 433,
+      "unchanged": true,
+      "sha256_utf8": "eae8e7007f6fbf40a3c1cc85d8704721a95902e011de48c96d8959d5f1af236c"
+    },
+    {
+      "file": "PROJECT_SOURCES/05_Data_Privacy_Security.md",
+      "id": "PRIV",
+      "blocks": 437,
+      "unchanged": true,
+      "sha256_utf8": "babd2198d197dfb9aaeea072ff8dd6cf93ced3eee25bdb7fcc2629cabdb02ce6"
+    },
+    {
+      "file": "PROJECT_SOURCES/06_Safety_Support_Release.md",
+      "id": "SAF",
+      "blocks": 678,
+      "unchanged": true,
+      "sha256_utf8": "87c6eada74ebe03e35405a71c9cc47a31f91e1e3e28293fd79d049f0ebc68cb6"
+    },
+    {
+      "file": "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+      "id": "COM",
+      "blocks": 413,
+      "unchanged": true,
+      "sha256_utf8": "ea5fe1483aa2d590ea32c0b7a0844fdd596d4eb53ed5dd56ae8ed700c7c05a73"
+    },
+    {
+      "file": "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+      "id": "RIGHTS",
+      "blocks": 326,
+      "unchanged": true,
+      "sha256_utf8": "c1825b9a07ec203738e65033e54b03df739f0f786c1a20ca05b4c7de02414605"
+    },
+    {
+      "file": "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "id": "UX",
+      "blocks": 238,
+      "unchanged": true,
+      "sha256_utf8": "77ac0355a4bf773f13eb6953d0be872ac1e569c507ce03b5a9b7ff14eaaebdb7"
+    },
+    {
+      "file": "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "id": "ADMIN",
+      "blocks": 133,
+      "unchanged": true,
+      "sha256_utf8": "dac7bf003a472aa47834925ccc8c82c7ef404b6ddabaa25f994a009291a9f56d"
+    },
+    {
+      "file": "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "id": "KICKOFF",
+      "blocks": 80,
+      "unchanged": true,
+      "sha256_utf8": "b6bcf0a307360c3784829261ac7c16dd1c50a5b6eed0862009ea72c94a7fa04c"
+    },
+    {
+      "file": "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "id": "CFM-WEB",
+      "blocks": 1,
+      "unchanged": true,
+      "sha256_utf8": "63c0e49806d65903aa20d06d9906c3f30e49ba617edf9ecb69d569a81b4c8a66"
+    },
+    {
+      "file": "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+      "id": "TS2",
+      "blocks": 1,
+      "unchanged": true,
+      "sha256_utf8": "fa832af8452e63326c18a625439f669303ac81feed9b17397a6f5fd827f415e4"
+    },
+    {
+      "file": "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+      "id": "TS-HIST",
+      "blocks": 1,
+      "unchanged": true,
+      "sha256_utf8": "58f99529f3428112d0bdf978267e59e10b2d1784a8d26d499ac4204f2c8020d6"
+    },
+    {
+      "file": "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "id": "BOOK",
+      "blocks": 2745,
+      "unchanged": true,
+      "sha256_utf8": "fd71d42c79315fd0dca09d095b8a1dd0e5f1d17541b4a6d55451aae515ecdf58"
+    },
+    {
+      "file": "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "id": "STUDY5",
+      "blocks": 293,
+      "unchanged": true,
+      "sha256_utf8": "8de2ffe5ff5e1ce0c86fbe1aa8156c0a5ffee1e00431a2eb9b2c267d6069ad9a"
+    },
+    {
+      "file": "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "id": "FE",
+      "blocks": 313,
+      "unchanged": true,
+      "sha256_utf8": "fd4bbad099598765e8854649ce6576a7acefb0bc7112ff56aa79d9bfd0cacf08"
+    },
+    {
+      "file": "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "id": "BRAND",
+      "blocks": 126,
+      "unchanged": true,
+      "sha256_utf8": "7cff447e6507c37ce9f2124711bcf89bac0c77df0fa7d76cbbfe2e299f6f2502"
+    },
+    {
+      "file": "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "id": "PD-PREMIUM",
+      "blocks": 1,
+      "unchanged": true,
+      "sha256_utf8": "1c399f351b3ceafdfc44772d162a29f7c4ab36c0d1dad5b5152a96a5de4c26c7"
+    },
+    {
+      "file": "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "id": "CN-PREMIUM",
+      "blocks": 1,
+      "unchanged": true,
+      "sha256_utf8": "b99fa2b1653452f83ad7bc3c0389ee35aa03a5964696f2c1bbd3e260e5d4f7b4"
+    },
+    {
+      "file": "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "id": "PD-SEASON",
+      "blocks": 195,
+      "unchanged": true,
+      "sha256_utf8": "8e0b16deca70f34ebbe4eb6ba25e8a05838d78f504eba3083b22b09bbfb55309"
+    },
+    {
+      "file": "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "id": "CN-SEASON",
+      "blocks": 12,
+      "unchanged": true,
+      "sha256_utf8": "96c7169624e1ab5c08773b1d22dc212d56db1519a87ae2760bde14b490cdc80f"
+    }
+  ],
+  "source_tail_comparison": [
+    {
+      "file": "PROJECT_SOURCES/00_Control_Register.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/05_Data_Privacy_Security.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/06_Safety_Support_Release.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "unchanged": true
+    },
+    {
+      "file": "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "unchanged": true
+    }
+  ],
+  "duplicate_current_heading_ids": {
+    "PROJECT_SOURCES/00_Control_Register.md": {},
+    "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md": {},
+    "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md": {},
+    "PROJECT_SOURCES/04_Product_Journey_New_Features.md": {},
+    "PROJECT_SOURCES/05_Data_Privacy_Security.md": {
+      "D23": 2
+    },
+    "PROJECT_SOURCES/06_Safety_Support_Release.md": {},
+    "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md": {},
+    "PROJECT_SOURCES/08_Engineering_Experience_Operations.md": {
+      "E14": 2
+    },
+    "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md": {},
+    "PROJECT_SOURCES/10_Teaching_Reference_Library.md": {},
+    "PROJECT_SOURCES/11_Change_Impact_Decisions.md": {}
+  },
+  "stale_current_lines": {
+    "PROJECT_SOURCES/00_Control_Register.md": [
+      {
+        "line": 15,
+        "text": "Draft 0.5.1 is the CHG-B01-UX-ACTION-001 coordinated Batch 01 revision candidate built from Draft 0.4, which was the targeted CHG-D02-001-001 documentation correction for D02-001's owner-reported Draft 0.3 conversational onboarding failure. It distinguishes participant input/choices from tester/harness application confirmations. It preserves the failed report and adds five unexecuted regressions. No full transcript or real application failure is asserted. Compact C2 is the fixed Batch 01 baseline; Draft 0.5.1 project instructions are the coordinated replacement instructions. See EVIDENCE/Instruction_Length.json for measured counts."
+      },
+      {
+        "line": 20,
+        "text": "## 1A. Draft 0.5.1 coordinated Batch 01 revision"
+      },
+      {
+        "line": 22,
+        "text": "**CHG-B01-UX-ACTION-001; owner approved September 28, 2026.** Draft 0.5.1 is a coordinated documentation candidate prepared from the fixed Draft 0.4 / Compact C2 baseline. It incorporates Batch 01 conversational findings about natural welcome/AI identification, notice presentation, Steward-led capture, stopping points, action honesty, referral status wording, commercial presentation clarity, and conversational tone. It does not reopen unrelated approved decisions, authorize production, or mark any corrected behavior as passed."
+      },
+      {
+        "line": 24,
+        "text": "The six Batch 01 conversation reports are preserved as reviewer-supplied evidence in `EVIDENCE/Batch01_Result_Register.md`. Their results remain scoped to the actual fictional exchanges. The prior Draft 0.3 D02-001 owner-reported conversational FAIL remains separate and is not overwritten. The B01-05 recipient-status overstatement remains open for retest. All Draft 0.5.1 behavioral executions and all real application functions remain NOT RUN."
+      },
+      {
+        "line": 26,
+        "text": "Draft 0.5.1 is a pre-installation correction of the reviewed Draft 0.5 package. It fixes live version routing, restores companion assets, repairs duplicate clause IDs, corrects compact instruction wording, resolves capture/referral-status wording, and supplies runnable focused retests. It is not a new product-scope decision."
+      },
+      {
+        "line": 28,
+        "text": "Compact instructions for this candidate are `PROJECT_INSTRUCTIONS.txt`. They are the replacement project instructions for Draft 0.5.1 installation and remain below 8,000 characters under both LF and Windows CRLF line-ending counts. Installation alone does not start participant testing."
+      },
+      {
+        "line": 35,
+        "text": "**CHG-B02-FREE-SCOPE-EVIDENCE-001; owner approved September 28, 2026.** Draft 0.6 is a corrected frozen handoff candidate for **Steward V1.0 \u2014 Initial Full Build** engineering specification review. It carries forward Draft 0.5.1 / Compact C3.1, incorporates the focused Batch 02 correction for Free/Premium service boundaries and controller-event evidence labeling, and repairs the package/evidence companion structure where source files are available in this workspace. It is not production authorization, live billing authorization, legal clearance, or a completed behavior/application test."
+      },
+      {
+        "line": 37,
+        "text": "The current installable source set remains exactly twelve `PROJECT_SOURCES` plus `PROJECT_INSTRUCTIONS.txt`. The full ZIP also includes companion prompts, configuration examples, release/evidence/test templates, acceptance scripts and manifests for engineering handoff. Companion files are not active governing sources unless explicitly routed by a future approved publisher. Draft 0.4 / Compact C2, reviewed Draft 0.5, reviewed Draft 0.5.1, the Draft 0.3 D02-001 owner-reported FAIL, and Batch 01/02 reports are preserved as history or evidence according to their labels."
+      },
+      {
+        "line": 53,
+        "text": "| Documentation snapshot | Draft 0.6; SV2-DOCSET-D0.6-20260928. Frozen handoff-candidate documentation package for Steward V1.0 \u2014 Initial Full Build engineering review. It carries forward Draft 0.5.1 plus CHG-B02-FREE-SCOPE-EVIDENCE-001. Generation proves neither installation nor a behavior/application pass. |"
+      },
+      {
+        "line": 97,
+        "text": "All twelve supplied Draft 0.3 masters match the preceding package byte-for-byte. They are archived at ARCHIVE/Draft_0_3_Inputs; the complete untouched ZIP is ARCHIVE/Draft_0_3_Previous_Candidate.zip. The separately available Draft 0.3 compact C1 is archived at ARCHIVE/Draft_0_3_C1 and is the replacement instruction baseline. Its use in the failed execution was not established by the supplied report."
+      },
+      {
+        "line": 147,
+        "text": "The 175 current definitions comprise the previous 170 plus D04-001\u2013D04-005; Draft 0.6 additionally carries Batch 01 exploratory result records and focused retest recommendations. D02-001's prior Draft 0.3 conversation is FAIL, supplied as an owner report of an executed test, without a full transcript. Real application authentication, grants and persistence remain NOT RUN. Every Draft 0.6 behavioral/application execution remains NOT RUN; Draft 0.4 Batch 01 reports remain scoped historical evidence for this revision. Preserve the prior result when logging a fresh rerun; correction documentation is not a PASS."
+      }
+    ],
+    "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md": [],
+    "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md": [],
+    "PROJECT_SOURCES/04_Product_Journey_New_Features.md": [],
+    "PROJECT_SOURCES/05_Data_Privacy_Security.md": [],
+    "PROJECT_SOURCES/06_Safety_Support_Release.md": [],
+    "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md": [],
+    "PROJECT_SOURCES/08_Engineering_Experience_Operations.md": [],
+    "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md": [
+      {
+        "line": 38,
+        "text": "**CHG-B01-UX-ACTION-001; owner approved September 28, 2026.** Batch 01 contains six fictional conversation reports against Draft 0.4 / Compact C2. They are preserved in `EVIDENCE/Batch01_Result_Register.md`. These reports inform Draft 0.5.1 documentation changes; they do not establish Draft 0.5.1 behavioral PASS, application integration PASS, release readiness or production authorization."
+      },
+      {
+        "line": 44,
+        "text": "Focused Draft 0.5.1 retests: D02-001 rerun for notice-before-acknowledgment, concise onboarding confirmations, value-led welcome/AI identification and selected-note separation; B01-02-style proactive selected-note invitation; B01-05 referral no-recipient-status retest; B01-03/B01-04 promotion-refusal rerun; B01-06 Listen First label-avoidance rerun. Real registration, authentication, persistence, offer-card, checkout, entitlement, referral backend, promotion-counter, notification and production functions remain NOT RUN until actual application evidence exists."
+      }
+    ],
+    "PROJECT_SOURCES/10_Teaching_Reference_Library.md": [],
+    "PROJECT_SOURCES/11_Change_Impact_Decisions.md": [
+      {
+        "line": 234,
+        "text": "Mike approved one coordinated Batch 01 revision under CHG-B01-UX-ACTION-001 from the fixed Draft 0.4 / Compact C2 baseline. Incorporate natural welcome and clear early AI identification; notice substance before acknowledgment; concise onboarding confirmations; Steward-led selected-note capture with ordinary-language approval and separate application confirmation; operation-specific action honesty including correction of DEF-B01-ACTION-STATUS-001; conversational refinements that reduce repetitive administrative language; natural messages to other people; promotion restraint; and annual-preferred/monthly-clearly-available commercial presentation without changing CHG-DEC09-001 terms."
+      },
+      {
+        "line": 236,
+        "text": "**Evidence boundary:** Incorporation into Draft 0.5.1 documentation does not prove behavioral correction, application implementation, legal clearance or release. The six Batch 01 reports remain scoped fictional conversation evidence with their qualifications. The B01-05 recipient-status defect remains awaiting retest. Draft 0.5.1 behavior and all untested application functions remain NOT RUN."
+      },
+      {
+        "line": 240,
+        "text": "### OD-23 \u2014 Draft 0.5.1 pre-installation correction"
+      },
+      {
+        "line": 244,
+        "text": "Prepare one corrected candidate from the actual fixed Draft 0.4 / Compact C2 baseline plus already-approved CHG-B01-UX-ACTION-001 changes. Preserve the reviewed Draft 0.5 package as history, repair live version routing and duplicate IDs, restore unaffected companion assets, correct compact instruction wording, resolve capture stopping-rule and recipient-status wording, preserve all Batch 01 reports/qualifications, and supply runnable focused retests. Draft 0.5.1 is a pre-installation correction of the same Batch 01 update, not a new product-scope decision."
+      },
+      {
+        "line": 246,
+        "text": "**Evidence boundary:** Documentation candidate only. Behavioral fixes and all unexecuted application functions remain NOT RUN. Testing project stays on Draft 0.4 / Compact C2 until Mike installs an accepted corrected candidate."
+      },
+      {
+        "line": 459,
+        "text": "**Owner basis:** OD-21 / CHG-D02-001-001. **Affected current clauses:** Draft 0.3 D02-001/Q07, interactive guide, simulation clauses in instructions/S00/AG01\u201303 and X01/D12."
+      },
+      {
+        "line": 474,
+        "text": "**Current requirement:** Draft 0.5.1 adds natural value-led welcome and AI identity; notice-before-acknowledgment; concise confirmations; Steward-led capture with exact wording, ordinary-language approval and separate persistence confirmation; operation-specific result wording; no unsupported recipient-status claims; annual-preferred/monthly-available presentation; and focused retest scope. Preserve privacy boundaries, promotion limits and all existing application/action-honesty controls."
+      },
+      {
+        "line": 476,
+        "text": "**Boundary:** Experience and wording correction only. No change to doctrine, Statement of Faith, CHG-DEC09-001 product terms, pricing, deferred features, application release, legal status or production authority. Correction remains behaviorally untested until Draft 0.5.1 retests execute."
+      },
+      {
+        "line": 612,
+        "text": "**Resolved/current direction:** Internal V2.0, eventual V1.0 \u2014 Initial Full Build. Draft 0.4 is the targeted CHG-D02-001-001 correction candidate, prepared to replace Draft 0.3 when installed by Mike; CHG-DEC09-001 remains unchanged. The prior conversational FAIL is retained and the corrected rerun remains NOT RUN. Product-term approval is recorded; installation, exact-candidate final acceptance and production approval are not claimed."
+      },
+      {
+        "line": 634,
+        "text": "This is the earlier notice, preserved as history. Section 10 records the historical Draft 0.3 change; section 11 records the current correction; the former DEC-09 review-next request below has been resolved by OD-20."
+      },
+      {
+        "line": 666,
+        "text": "## 11. Current controlled change notice \u2014 CN-SV2-004 (HISTORICAL NOTICE; superseded for installation routing by Draft 0.5.1) / Draft 0.4"
+      },
+      {
+        "line": 668,
+        "text": "**Change:** CHG-D02-001-001; OD-21; DEF-D02-001-001. Base SV2-DOCSET-D0.3-20260926; target SV2-DOCSET-D0.4-20260926. **Scope:** targeted onboarding/simulation contracts, S00/AG01\u201303, compact C1-derived C2 instructions, corrected D02-001 definition and five unexecuted regressions, evidence and package synchronization."
+      },
+      {
+        "line": 672,
+        "text": "**Install:** replace the twelve active source files and the project instruction field with the Draft 0.4 files; do not append oversized old instructions or activate archive/prompt/config copies. Verify compact C2's measured count. Keep development mode after installation. Rerun only in a fresh test chat on Mike's explicit request, following Q07; no automatic restart."
+      }
+    ]
+  },
+  "source_block_total": 7683,
+  "archived_d04_sources_unchanged": true,
+  "unique_test_ids": {
+    "d04": {
+      "count": 175,
+      "duplicate_ids": [],
+      "ids": [
+        "D02-001",
+        "D02-002",
+        "D02-003",
+        "D02-004",
+        "D02-005",
+        "D02-006",
+        "D02-007",
+        "D02-008",
+        "D02-009",
+        "D02-010",
+        "D02-011",
+        "D02-012",
+        "D02-013",
+        "D02-014",
+        "D02-015",
+        "D02-016",
+        "D02-017",
+        "D02-018",
+        "D02-019",
+        "D02-020",
+        "D02-021",
+        "D02-022",
+        "D02-023",
+        "D02-024",
+        "D02-025",
+        "D02-026",
+        "D02-027",
+        "D02-028",
+        "D02-029",
+        "D02-030",
+        "D02-031",
+        "D02-032",
+        "D02-033",
+        "D02-034",
+        "D02-035",
+        "D02-036",
+        "D02-037",
+        "D02-038",
+        "D02-039",
+        "D02-040",
+        "D02-041",
+        "D02-042",
+        "D02-043",
+        "D02-044",
+        "D02-045",
+        "D02-046",
+        "D02-047",
+        "D02-048",
+        "D02-049",
+        "D02-050",
+        "D02-051",
+        "D02-052",
+        "D02-053",
+        "D02-054",
+        "D02-055",
+        "D02-056",
+        "D02-057",
+        "D02-058",
+        "D02-059",
+        "D02-060",
+        "D02-061",
+        "D02-062",
+        "D02-063",
+        "D02-064",
+        "D02-065",
+        "D02-066",
+        "D02-067",
+        "D02-068",
+        "D02-069",
+        "D02-070",
+        "D02-071",
+        "D02-072",
+        "DEC09-T01",
+        "DEC09-T02",
+        "DEC09-T03",
+        "DEC09-T04",
+        "DEC09-T05",
+        "DEC09-T06",
+        "DEC09-T07",
+        "DEC09-T08",
+        "DEC09-T09",
+        "DEC09-T10",
+        "DEC09-T11",
+        "DEC09-T12",
+        "V2-P01-A",
+        "V2-P01-B",
+        "V2-P02-A",
+        "V2-P02-B",
+        "V2-P03-A",
+        "V2-P03-B",
+        "V2-P04-A",
+        "V2-P04-B",
+        "V2-P05-A",
+        "V2-P05-B",
+        "V2-P06-A",
+        "V2-P06-B",
+        "V2-P07-A",
+        "V2-P07-B",
+        "V2-P08-A",
+        "V2-P08-B",
+        "V2-P09-A",
+        "V2-P09-B",
+        "V2-P10-A",
+        "V2-P10-B",
+        "V2-P11-A",
+        "V2-P11-B",
+        "V2-P12-A",
+        "V2-P12-B",
+        "V2-P13-A",
+        "V2-P13-B",
+        "V2-P14-A",
+        "V2-P14-B",
+        "V2-P15-A",
+        "V2-P15-B",
+        "V2-S01-A",
+        "V2-S01-B",
+        "V2-S02-A",
+        "V2-S02-B",
+        "V2-S03-A",
+        "V2-S03-B",
+        "V2-S04-A",
+        "V2-S04-B",
+        "V2-S05-A",
+        "V2-S05-B",
+        "V2-S06-A",
+        "V2-S06-B",
+        "V2-S07-A",
+        "V2-S07-B",
+        "V2-S08-A",
+        "V2-S08-B",
+        "V2-S09-A",
+        "V2-S09-B",
+        "V2-S10-A",
+        "V2-S10-B",
+        "V2-S11-A",
+        "V2-S11-B",
+        "V2-S12-A",
+        "V2-S12-B",
+        "V2-C01",
+        "V2-C02",
+        "V2-C03",
+        "V2-C04",
+        "V2-C05",
+        "V2-C06",
+        "V2-C07",
+        "V2-C08",
+        "V2-C09",
+        "V2-C10",
+        "V2-C11",
+        "V2-C12",
+        "V2-C13",
+        "V2-C14",
+        "V2-C15",
+        "V2-C16",
+        "V2-C17",
+        "V2-C18",
+        "V2-C19",
+        "V2-C20",
+        "V2-X01",
+        "V2-X02",
+        "V2-X03",
+        "V2-X04",
+        "V2-X05",
+        "V2-X06",
+        "V2-X07",
+        "V2-X08",
+        "V2-X09",
+        "V2-X10",
+        "V2-X11",
+        "V2-X12",
+        "D04-001",
+        "D04-002",
+        "D04-003",
+        "D04-004",
+        "D04-005"
+      ]
+    },
+    "d06": {
+      "count": 175,
+      "duplicate_ids": [],
+      "ids": [
+        "D02-001",
+        "D02-002",
+        "D02-003",
+        "D02-004",
+        "D02-005",
+        "D02-006",
+        "D02-007",
+        "D02-008",
+        "D02-009",
+        "D02-010",
+        "D02-011",
+        "D02-012",
+        "D02-013",
+        "D02-014",
+        "D02-015",
+        "D02-016",
+        "D02-017",
+        "D02-018",
+        "D02-019",
+        "D02-020",
+        "D02-021",
+        "D02-022",
+        "D02-023",
+        "D02-024",
+        "D02-025",
+        "D02-026",
+        "D02-027",
+        "D02-028",
+        "D02-029",
+        "D02-030",
+        "D02-031",
+        "D02-032",
+        "D02-033",
+        "D02-034",
+        "D02-035",
+        "D02-036",
+        "D02-037",
+        "D02-038",
+        "D02-039",
+        "D02-040",
+        "D02-041",
+        "D02-042",
+        "D02-043",
+        "D02-044",
+        "D02-045",
+        "D02-046",
+        "D02-047",
+        "D02-048",
+        "D02-049",
+        "D02-050",
+        "D02-051",
+        "D02-052",
+        "D02-053",
+        "D02-054",
+        "D02-055",
+        "D02-056",
+        "D02-057",
+        "D02-058",
+        "D02-059",
+        "D02-060",
+        "D02-061",
+        "D02-062",
+        "D02-063",
+        "D02-064",
+        "D02-065",
+        "D02-066",
+        "D02-067",
+        "D02-068",
+        "D02-069",
+        "D02-070",
+        "D02-071",
+        "D02-072",
+        "DEC09-T01",
+        "DEC09-T02",
+        "DEC09-T03",
+        "DEC09-T04",
+        "DEC09-T05",
+        "DEC09-T06",
+        "DEC09-T07",
+        "DEC09-T08",
+        "DEC09-T09",
+        "DEC09-T10",
+        "DEC09-T11",
+        "DEC09-T12",
+        "V2-P01-A",
+        "V2-P01-B",
+        "V2-P02-A",
+        "V2-P02-B",
+        "V2-P03-A",
+        "V2-P03-B",
+        "V2-P04-A",
+        "V2-P04-B",
+        "V2-P05-A",
+        "V2-P05-B",
+        "V2-P06-A",
+        "V2-P06-B",
+        "V2-P07-A",
+        "V2-P07-B",
+        "V2-P08-A",
+        "V2-P08-B",
+        "V2-P09-A",
+        "V2-P09-B",
+        "V2-P10-A",
+        "V2-P10-B",
+        "V2-P11-A",
+        "V2-P11-B",
+        "V2-P12-A",
+        "V2-P12-B",
+        "V2-P13-A",
+        "V2-P13-B",
+        "V2-P14-A",
+        "V2-P14-B",
+        "V2-P15-A",
+        "V2-P15-B",
+        "V2-S01-A",
+        "V2-S01-B",
+        "V2-S02-A",
+        "V2-S02-B",
+        "V2-S03-A",
+        "V2-S03-B",
+        "V2-S04-A",
+        "V2-S04-B",
+        "V2-S05-A",
+        "V2-S05-B",
+        "V2-S06-A",
+        "V2-S06-B",
+        "V2-S07-A",
+        "V2-S07-B",
+        "V2-S08-A",
+        "V2-S08-B",
+        "V2-S09-A",
+        "V2-S09-B",
+        "V2-S10-A",
+        "V2-S10-B",
+        "V2-S11-A",
+        "V2-S11-B",
+        "V2-S12-A",
+        "V2-S12-B",
+        "V2-C01",
+        "V2-C02",
+        "V2-C03",
+        "V2-C04",
+        "V2-C05",
+        "V2-C06",
+        "V2-C07",
+        "V2-C08",
+        "V2-C09",
+        "V2-C10",
+        "V2-C11",
+        "V2-C12",
+        "V2-C13",
+        "V2-C14",
+        "V2-C15",
+        "V2-C16",
+        "V2-C17",
+        "V2-C18",
+        "V2-C19",
+        "V2-C20",
+        "V2-X01",
+        "V2-X02",
+        "V2-X03",
+        "V2-X04",
+        "V2-X05",
+        "V2-X06",
+        "V2-X07",
+        "V2-X08",
+        "V2-X09",
+        "V2-X10",
+        "V2-X11",
+        "V2-X12",
+        "D04-001",
+        "D04-002",
+        "D04-003",
+        "D04-004",
+        "D04-005"
+      ]
+    }
+  },
+  "test_ids_equal": true,
+  "d04_companion_detail": [
+    {
+      "path": "AGENT_PROMPTS/00_Common_Candidate_Instructions.md",
+      "bytes": 2744,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG01_orchestrator.md",
+      "bytes": 3008,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG02_blueprint_architect.md",
+      "bytes": 3050,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG03_memory_and_life_context.md",
+      "bytes": 2853,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG04_alignment_and_drift.md",
+      "bytes": 2201,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG05_rhythms_and_action.md",
+      "bytes": 2115,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG06_check-in_and_journey.md",
+      "bytes": 2381,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG07_assessment_and_insight.md",
+      "bytes": 2217,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG08_decision_and_discernment.md",
+      "bytes": 2210,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/AG09_legacy_and_multiplication.md",
+      "bytes": 2340,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/README.md",
+      "bytes": 678,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "AGENT_PROMPTS/S00_Participant_Steward.md",
+      "bytes": 2715,
+      "direct_path_present": true,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CHANGE_RECORDS/CHG-D02-001-001_Correction_Record.md",
+      "bytes": 2331,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CHANGE_RECORDS/CHG-D02-001-001_Documentation_Diff.patch",
+      "bytes": 184371,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CHANGE_RECORDS/CHG-DEC09-001_Documentation_Diff.patch",
+      "bytes": 181903,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CHANGE_RECORDS/CHG-DEC09-001_Owner_Approval.md",
+      "bytes": 2566,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CONFIG/README.md",
+      "bytes": 1129,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CONFIG/agent_registry.example.json",
+      "bytes": 20162,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CONFIG/dec09_benefits.example.json",
+      "bytes": 1297,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CONFIG/dec09_lifecycle_policies.example.json",
+      "bytes": 2897,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CONFIG/feature_catalogue.example.json",
+      "bytes": 17387,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CONFIG/grant_and_group_templates.example.json",
+      "bytes": 1798,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CONFIG/offer_catalogue.example.json",
+      "bytes": 4582,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "CONFIG/promotion_attention.example.json",
+      "bytes": 794,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/CHG-DEC09-001_Product_Approval.json",
+      "bytes": 792,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Change_Manifest_CHG-D02-001-001.json",
+      "bytes": 20888,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Change_Manifest_CHG-DEC09-001.json",
+      "bytes": 19808,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/D02-001_Draft_0_3_Owner_Report.json",
+      "bytes": 2415,
+      "direct_path_present": true,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Decision_Status_Register.json",
+      "bytes": 7635,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Defect_Register.json",
+      "bytes": 673,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Documentation_QA.json",
+      "bytes": 4148,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Feature_Scope_and_Impact.json",
+      "bytes": 15645,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Input_Master_Inventory.json",
+      "bytes": 3767,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Instruction_Length.json",
+      "bytes": 706,
+      "direct_path_present": true,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Native_Source_Availability.json",
+      "bytes": 13706,
+      "direct_path_present": true,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Original_Test_Catalogue_Preservation.json",
+      "bytes": 495,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Owner_Direction_Register.json",
+      "bytes": 15382,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Previous_Candidate_Preservation.json",
+      "bytes": 549,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Scoped_Amendments.json",
+      "bytes": 7341,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Source_Block_Carryforward_Ledger.csv",
+      "bytes": 1415459,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Source_Module_Preservation.json",
+      "bytes": 12446,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Test_Catalogue.json",
+      "bytes": 96672,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "EVIDENCE/Validator_Smoke_Checks.json",
+      "bytes": 2086,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "RELEASE_TEMPLATES/APPROVAL_RECORD.template.json",
+      "bytes": 407,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "RELEASE_TEMPLATES/CHANGE_MANIFEST.template.json",
+      "bytes": 1464,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "RELEASE_TEMPLATES/MIKE_CHANGE_BRIEF.md",
+      "bytes": 546,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "RELEASE_TEMPLATES/README.md",
+      "bytes": 868,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "RELEASE_TEMPLATES/RELEASE_NOTES.template.md",
+      "bytes": 1032,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "RELEASE_TEMPLATES/SERVING_MANIFEST.template.json",
+      "bytes": 580,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "RELEASE_TEMPLATES/TEST_RUN_RECORD.template.json",
+      "bytes": 527,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "TESTING/Controller_Event.template.json",
+      "bytes": 472,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "TESTING/D02-001_Interactive_Run_Guide.md",
+      "bytes": 6991,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "TESTING/D02-001_Run_State.json",
+      "bytes": 843,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "TESTING/FRESH_CHAT_RERUN_PROMPT.txt",
+      "bytes": 1012,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "TOOLS/README.md",
+      "bytes": 1210,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    },
+    {
+      "path": "TOOLS/validate_package.py",
+      "bytes": 17250,
+      "direct_path_present": false,
+      "same_bytes_if_present": false
+    }
+  ],
+  "acceptance_script_sizes": {
+    "ACCEPTANCE_SCRIPTS/AC-01_Free_Premium_Boundary.md": 1257,
+    "ACCEPTANCE_SCRIPTS/AC-02_Consent_Verification_Save_Unknown.md": 968,
+    "ACCEPTANCE_SCRIPTS/AC-03_Referral_Privacy_Status.md": 901,
+    "ACCEPTANCE_SCRIPTS/AC-04_Monthly_Choice_Refusal_Promotion.md": 782,
+    "ACCEPTANCE_SCRIPTS/AC-05_Capture_Stopping_Points.md": 865,
+    "ACCEPTANCE_SCRIPTS/AC-06_Full_Build_and_Premium_Positive_Controls.md": 921,
+    "ACCEPTANCE_SCRIPTS/README.md": 691
+  },
+  "diff_files_d051": [
+    {
+      "file": "ACCEPTANCE_SCRIPTS/AC-01_Free_Premium_Boundary.md",
+      "old_bytes": null,
+      "new_bytes": 1257
+    },
+    {
+      "file": "ACCEPTANCE_SCRIPTS/AC-02_Consent_Verification_Save_Unknown.md",
+      "old_bytes": null,
+      "new_bytes": 968
+    },
+    {
+      "file": "ACCEPTANCE_SCRIPTS/AC-03_Referral_Privacy_Status.md",
+      "old_bytes": null,
+      "new_bytes": 901
+    },
+    {
+      "file": "ACCEPTANCE_SCRIPTS/AC-04_Monthly_Choice_Refusal_Promotion.md",
+      "old_bytes": null,
+      "new_bytes": 782
+    },
+    {
+      "file": "ACCEPTANCE_SCRIPTS/AC-05_Capture_Stopping_Points.md",
+      "old_bytes": null,
+      "new_bytes": 865
+    },
+    {
+      "file": "ACCEPTANCE_SCRIPTS/AC-06_Full_Build_and_Premium_Positive_Controls.md",
+      "old_bytes": null,
+      "new_bytes": 921
+    },
+    {
+      "file": "ACCEPTANCE_SCRIPTS/README.md",
+      "old_bytes": null,
+      "new_bytes": 691
+    },
+    {
+      "file": "AGENT_PROMPTS/AG01_Orchestrator.md",
+      "old_bytes": 2831,
+      "new_bytes": 3360
+    },
+    {
+      "file": "AGENT_PROMPTS/AG02_Blueprint_Architect.md",
+      "old_bytes": 2873,
+      "new_bytes": 3402
+    },
+    {
+      "file": "AGENT_PROMPTS/AG03_Memory_Life_Context.md",
+      "old_bytes": 2674,
+      "new_bytes": 3203
+    },
+    {
+      "file": "AGENT_PROMPTS/S00_Participant_Steward.md",
+      "old_bytes": 2502,
+      "new_bytes": 3031
+    },
+    {
+      "file": "ARCHIVE/Reviewed_Draft_0_5_1/README.md",
+      "old_bytes": null,
+      "new_bytes": 226
+    },
+    {
+      "file": "ARCHIVE/Reviewed_Draft_0_5_1/SV2-DOCSET-D0.5.1-20260928.zip",
+      "old_bytes": null,
+      "new_bytes": 2582256
+    },
+    {
+      "file": "CONFIG/service_scope_boundary_examples.disabled.json",
+      "old_bytes": null,
+      "new_bytes": 811
+    },
+    {
+      "file": "CONTINUATION_PROMPT.txt",
+      "old_bytes": 700,
+      "new_bytes": 528
+    },
+    {
+      "file": "COVERAGE/Feature_Requirement_Test_Coverage_Map.json",
+      "old_bytes": null,
+      "new_bytes": 2259
+    },
+    {
+      "file": "COVERAGE/Feature_Requirement_Test_Coverage_Map.md",
+      "old_bytes": null,
+      "new_bytes": 1239
+    },
+    {
+      "file": "EVIDENCE/Batch02_Consolidated_Review.md",
+      "old_bytes": null,
+      "new_bytes": 1413
+    },
+    {
+      "file": "EVIDENCE/CHG-B02-FREE-SCOPE-EVIDENCE-001_Owner_Approval.md",
+      "old_bytes": null,
+      "new_bytes": 692
+    },
+    {
+      "file": "EVIDENCE/Instruction_Length.json",
+      "old_bytes": 134,
+      "new_bytes": 217
+    },
+    {
+      "file": "INSTALLATION/Installation_Instructions_Draft_0_6.md",
+      "old_bytes": null,
+      "new_bytes": 704
+    },
+    {
+      "file": "MANIFESTS/Companion_Asset_Disposition.md",
+      "old_bytes": 1210,
+      "new_bytes": 661
+    },
+    {
+      "file": "MANIFESTS/Document_Integrity_Results.md",
+      "old_bytes": 779,
+      "new_bytes": 999
+    },
+    {
+      "file": "MANIFESTS/SHA256SUMS.json",
+      "old_bytes": 10066,
+      "new_bytes": 12585
+    },
+    {
+      "file": "MANIFESTS/SHA256SUMS.txt",
+      "old_bytes": 9476,
+      "new_bytes": 11848
+    },
+    {
+      "file": "MANIFESTS/Source_Body_Preservation_Check.json",
+      "old_bytes": 1708,
+      "new_bytes": 2859
+    },
+    {
+      "file": "MANIFESTS/Source_Inventory.json",
+      "old_bytes": 2084,
+      "new_bytes": 548
+    },
+    {
+      "file": "MANIFESTS/ZIP_SHA256.txt",
+      "old_bytes": null,
+      "new_bytes": 95
+    },
+    {
+      "file": "OVERVIEW/Owner_Overview_Draft_0_6.md",
+      "old_bytes": null,
+      "new_bytes": 1020
+    },
+    {
+      "file": "PROJECT_INSTRUCTIONS.txt",
+      "old_bytes": 5644,
+      "new_bytes": 6231
+    },
+    {
+      "file": "PROJECT_SOURCES/00_Control_Register.md",
+      "old_bytes": 130731,
+      "new_bytes": 133444
+    },
+    {
+      "file": "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "old_bytes": 135767,
+      "new_bytes": 135783
+    },
+    {
+      "file": "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+      "old_bytes": 69832,
+      "new_bytes": 71939
+    },
+    {
+      "file": "PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+      "old_bytes": 163394,
+      "new_bytes": 165933
+    },
+    {
+      "file": "PROJECT_SOURCES/05_Data_Privacy_Security.md",
+      "old_bytes": 363059,
+      "new_bytes": 364052
+    },
+    {
+      "file": "PROJECT_SOURCES/06_Safety_Support_Release.md",
+      "old_bytes": 256870,
+      "new_bytes": 256886
+    },
+    {
+      "file": "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+      "old_bytes": 408266,
+      "new_bytes": 409247
+    },
+    {
+      "file": "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "old_bytes": 210205,
+      "new_bytes": 211201
+    },
+    {
+      "file": "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+      "old_bytes": 249932,
+      "new_bytes": 251196
+    },
+    {
+      "file": "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "old_bytes": 612971,
+      "new_bytes": 612987
+    },
+    {
+      "file": "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "old_bytes": 127929,
+      "new_bytes": 130620
+    },
+    {
+      "file": "READINESS/Readiness_Report_Draft_0_6.md",
+      "old_bytes": null,
+      "new_bytes": 2160
+    },
+    {
+      "file": "README.md",
+      "old_bytes": 566,
+      "new_bytes": 954
+    },
+    {
+      "file": "SOURCE_COMPLETENESS.md",
+      "old_bytes": 492,
+      "new_bytes": 1279
+    },
+    {
+      "file": "VALIDATOR/Model_Test_Runner_Status.md",
+      "old_bytes": null,
+      "new_bytes": 361
+    }
+  ],
+  "review_scope": "Independent archive/payload comparison and focused reading of D0.6 changed current clauses, instructions, prompt extracts, acceptance outlines, coverage and readiness materials. Not a full semantic audit or any model/application execution.",
+  "known_readiness_findings": [
+    "Full D0.4 companions not restored; original full ZIP now recovered in this review environment",
+    "D23 and E14 each duplicated in current authored sections",
+    "Checksum manifests contain stale self/cross hashes; embedded whole-ZIP hash is wrong",
+    "Acceptance files are outlines, not complete scripted fixtures; coverage is a compact 10-row map, not feature-level coverage of initial target",
+    "Some current installation/decision routing remains D0.4/D0.5.1",
+    "Required behavioral retests remain NOT RUN; no isolated runner executed"
+  ]
+}

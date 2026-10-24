@@ -1,0 +1,77 @@
+{
+  "package_id": "SV2-DOCSET-D0.4-20260926",
+  "status": "DESIGN_EXAMPLE_PRODUCT_TERMS_APPROVED",
+  "owner_approval_ref": "CHG-DEC09-001",
+  "policy_version_id": "dec09_lifecycle_v1",
+  "production_enabled": false,
+  "activation": {
+    "explicit": true,
+    "deadline_calendar_days_from_confirmed_payment": 90,
+    "timezone": "America/Phoenix",
+    "calendar_month_semantics": "LAST_VALID_DAY_IF_TARGET_ANNIVERSARY_INVALID",
+    "interval_bounds": "START_INCLUSIVE_END_EXCLUSIVE",
+    "store_utc_instants": true,
+    "display_timezone_change_moves_interval": false,
+    "service_must_be_available": true,
+    "idempotent": true,
+    "locks_against": [
+      "UNUSED_REFUND",
+      "CANCELLATION",
+      "DUPLICATE_ACTIVATION",
+      "QUALIFICATION_CHANGE"
+    ]
+  },
+  "refund": {
+    "before_activation": "FULL",
+    "initial_post_activation_request_calendar_days": 14,
+    "unused_unactivated_automatic_initiation_calendar_days": 90,
+    "annual_charge_request_calendar_days": 14,
+    "request_received_time_controls": true,
+    "initial_full_unwind_stops_linked_future_renewal": true,
+    "initial_full_unwind_source_qualification": "REMOVE_ONLY_AFFECTED_SOURCE",
+    "annual_refund_preserves_initial_full_qualification": true,
+    "routine_partial_bundle_allocation": false,
+    "mandatory_error_failure_remedies_preserved": true,
+    "private_content_inspection": false,
+    "pending_refund_is_not_success": true
+  },
+  "cancel": {
+    "direct_self_service": true,
+    "available_before_activation": true,
+    "default": "STOP_FUTURE_RENEWAL_PRESERVE_PURCHASED_TERM",
+    "activation_does_not_rearm_canceled_mandate": true,
+    "separate_immediate_termination": true,
+    "separate_refund_receipts": true,
+    "account_closure_billing_stop_survives_content_deletion": true
+  },
+  "renewal_grace": {
+    "calendar_days": 7,
+    "anchor": "PRIOR_PAID_THROUGH_END",
+    "includes_first_bundle_renewal": true,
+    "includes_later_renewals": true,
+    "initial_failed_purchase_eligible": false,
+    "retry_resets": false,
+    "after_end": "FREE_RETAINED_CONTENT_AND_REVIEWED_COLLECTION_DISPOSITION",
+    "provider_retry_schedule": null,
+    "final_invoice_disposition": null
+  },
+  "notices": {
+    "annual_advance_calendar_days": 30,
+    "product_default_status": "OWNER_SELECTED_SUBJECT_TO_QUALIFIED_APPLICABILITY_REVIEW",
+    "activation_receipt_exact_first_renewal_date": true,
+    "confirmed_charge_receipt": true,
+    "marketing_consent_separate": true,
+    "review_invitation_is_billing_assent": false,
+    "jurisdiction_channel_mapping": null
+  },
+  "cadence_change": {
+    "effective": "END_OF_CURRENT_PAID_TERM",
+    "fresh_assent": true,
+    "routine_midterm_proration": false,
+    "annual_failure_monthly_fallback": false
+  },
+  "purchased_terms_immutable": true,
+  "discount_scope_must_be_explicit": true,
+  "no_card_grants_auto_bill": false,
+  "actual_provider_price_ids": null
+}

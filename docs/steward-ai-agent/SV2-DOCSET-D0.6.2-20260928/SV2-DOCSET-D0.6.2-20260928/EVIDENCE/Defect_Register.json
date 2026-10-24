@@ -1,0 +1,16 @@
+[
+  {
+    "id": "DEF-D02-001-001",
+    "test_id": "D02-001",
+    "source_report": "EVIDENCE/D02-001_Draft_0_3_Owner_Report.json",
+    "status": "CORRECTION_DOCUMENTED_AWAITING_RETEST",
+    "severity": "HIGH",
+    "prior_conversation_result": "FAIL_OWNER_REPORTED",
+    "problem": "Steward promoted contact input to invented verification, acknowledgments and setup receipts twice.",
+    "required_boundary": "Participant input and choices differ from externally supplied controller/harness confirmations.",
+    "candidate_correction": "CHG-D02-001-001",
+    "correction_passed": false,
+    "real_application_failure_established": false,
+    "retest_result": "NOT RUN"
+  }
+]

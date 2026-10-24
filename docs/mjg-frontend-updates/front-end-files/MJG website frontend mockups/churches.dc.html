@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="For Churches & Groups" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="churches" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 72px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ For Churches & Groups</span>
+    <h1 style="margin:24px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,58px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">Help People Build Lives of Faithful <em style="font-style:normal;color:#b88a4a;">Stewardship.</em></h1>
+    <p style="margin:20px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">Churches help people form the faith, relationships, practices, and character that shape daily life. The Stewardship Blueprint offers a practical framework for connecting that formation to the realities people face all week long.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">Our studies and resources help participants examine their lives, identify drift, build wise boundaries, renew rhythms, and take meaningful next steps in community.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;">
+      <a href="studies.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore Current Studies</a>
+      <a href="contact.dc.html?topic=church" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Ask About a Church Experience</a>
+    </div>
+  </div>
+  <div style="aspect-ratio:4/3;border-radius:16px;overflow:hidden;border:1px solid var(--border,#e1dbd0);box-shadow:0 24px 80px rgba(12,20,25,.08);"><image-slot id="churches-hero" shape="rect" placeholder="Authentic approved group photo (optional Filmpool invitation video)"></image-slot></div>
+</section>
+
+<!-- WHAT GROUPS EXPLORE -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">What Groups Explore</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">Whole-Life Stewardship, Not Simply a Money Study.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Faith and identity; mission and values; relationships; health and joy; finances as one entrusted tool; boundaries and habits; energy; and the legacy being multiplied through people now.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Participants are invited to move from hearing information to reflecting honestly, talking with trusted people, and practicing what they learn.</p>
+      <a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:15px;font-weight:600;color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Explore the Framework →</a>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <sc-for list="{{ themes }}" as="t" hint-placeholder-count="8">
+        <span style="border:1px solid var(--border,#e1dbd0);border-radius:9999px;background:var(--card,#fff);padding:10px 16px;font-size:14px;">{{ t }}</span>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE OPTIONS -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Experience Options</p>
+  <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Choose a Setting That Fits Your Community.</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:36px;">
+    <sc-for list="{{ options }}" as="o" hint-placeholder-count="4">
+      <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;display:flex;flex-direction:column;gap:10px;">
+        <span style="align-self:flex-start;font-size:11px;font-weight:700;padding:4px 10px;border-radius:9999px;background:{{ o.bg }};color:{{ o.fg }};">{{ o.status }}</span>
+        <h3 style="margin:6px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:21px;line-height:1.25;">{{ o.t }}</h3>
+        <p style="margin:0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">{{ o.b }}</p>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;">
+    <a href="lead-a-group.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Lead a Group</a>
+    <a href="https://michaeljgauthier.com/6-week-challenge" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Explore the Six-Week Challenge</a>
+  </div>
+  <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:24px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Do not advertise unbuilt women’s/couples tracks or a complete church-wide campaign as currently available.</div></sc-if>
+</section>
+
+<!-- WHAT LEADERS RECEIVE -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">What Leaders Receive</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Support That Simplifies Facilitation.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Where available, leaders can access session outlines, participant materials, short teaching videos, discussion questions, and group setup guidance.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The leader’s role is to foster honest conversation and help people choose real next steps—not to have all the answers.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+        <a href="lead-a-group.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore Leader Resources</a>
+        <a href="contact.dc.html?topic=church" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--card,#fff);">Contact Our Team</a>
+      </div>
+    </div>
+    <ul style="margin:0;padding:0;list-style:none;display:grid;gap:10px;">
+      <sc-for list="{{ receive }}" as="r" hint-placeholder-count="5">
+        <li style="display:flex;gap:12px;align-items:flex-start;border:1px solid var(--border,#e1dbd0);border-radius:10px;background:var(--card,#fff);padding:14px 16px;font-size:15px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b88a4a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;"><path d="M20 6 9 17l-5-5"></path></svg>{{ r }}</li>
+      </sc-for>
+    </ul>
+  </div>
+</section>
+
+<!-- NEXT STEP -->
+<section style="background:#141211;color:#f4f1ea;">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;text-align:center;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d8bd86;">Next Step</p>
+    <h2 style="margin:12px auto 0;max-width:720px;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;">Let’s Talk About Your Community.</h2>
+    <p style="margin:16px auto 0;max-width:640px;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">Tell us a little about your church or group, the audience you hope to serve, and the timing you are considering. We can discuss which current resources fit and which ideas belong to a future season.</p>
+    <div style="display:flex;justify-content:center;margin-top:28px;"><a href="contact.dc.html?topic=church" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Church / Group Inquiry →</a></div>
+  </div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const themes = ["Faith & identity", "Mission & values", "Relationships", "Health & joy", "Finances as one entrusted tool", "Boundaries & habits", "Energy", "Legacy multiplied through people now"];
+    const LIVE = { bg: "rgba(47,125,91,.14)", fg: "#2f7d5b" }, UP = { bg: "rgba(181,130,30,.16)", fg: "#8a6630" }, FREE = { bg: "#f4f1ea", fg: "#6d6660" };
+    const options = [
+      { t: "Small Group Studies", b: "Guided discussion and weekly action supported by Participant and Leader Guides.", status: "AVAILABLE", ...LIVE },
+      { t: "Men’s Ministry Experience", b: "The existing six-week men’s challenge, with videos and practical group materials.", status: "LIVE", ...LIVE },
+      { t: "Leadership or Church-Wide Pathways", b: "Potential expansions to plan with ministry leaders based on availability and readiness.", status: "PLAN WITH US", ...UP },
+      { t: "Personal Reflection", b: "The free Check-In can support an individual starting point before or alongside a group.", status: "FREE", ...FREE },
+    ];
+    const receive = ["Session outlines", "Participant materials", "Short teaching videos", "Discussion questions", "Group setup guidance"];
+    return { themes, options, receive, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

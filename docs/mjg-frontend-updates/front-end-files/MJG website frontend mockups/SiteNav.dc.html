@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<nav onMouseLeave="{{ closeAll }}" style="position:sticky;top:0;z-index:50;width:100%;border-bottom:1px solid var(--border,#e1dbd0);background:var(--bg,#fbfaf7);font-family:Geist,Arial,sans-serif;font-size:14px;">
+  <div style="position:relative;max-width:1160px;margin:0 auto;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 32px;">
+    <a href="home.dc.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink,#1c1917);flex:none;">
+      <img src="{{ logoSrc }}" alt="Michael J. Gauthier" style="height:36px;width:auto;display:block;">
+      <span style="font-family:Fraunces,Georgia,serif;font-style:italic;font-size:15px;letter-spacing:-.01em;white-space:nowrap;">Michael <span style="color:#b88a4a;">J.</span> Gauthier</span>
+    </a>
+
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <ul style="display:flex;align-items:center;gap:24px;list-style:none;margin:0;padding:0;">
+        <!-- Discover (mega menu) -->
+        <li onMouseEnter="{{ openDiscover }}" style="display:flex;align-items:center;padding:20px 0;">
+          <button onClick="{{ toggleDiscover }}" aria-haspopup="true" aria-expanded="{{ discoverOpen }}" style="display:flex;align-items:center;gap:5px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;white-space:nowrap;font-weight:{{ discoverWeight }};color:{{ discoverColor }};" style-hover="color:#b88a4a;">Discover
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ discoverChevron }};transition:transform .15s;"><path d="m6 9 6 6 6-6"></path></svg>
+          </button>
+        </li>
+        <li onMouseEnter="{{ closeAll }}" style="padding:20px 0;"><a href="steward.dc.html" style="text-decoration:none;font-size:14px;white-space:nowrap;font-weight:{{ stewardWeight }};color:{{ stewardColor }};" style-hover="color:#b88a4a;">Steward</a></li>
+        <li onMouseEnter="{{ closeAll }}" style="padding:20px 0;"><a href="contact.dc.html" style="text-decoration:none;font-size:14px;white-space:nowrap;font-weight:{{ contactWeight }};color:{{ contactColor }};" style-hover="color:#b88a4a;">Contact</a></li>
+        <!-- My Account (dropdown) -->
+        <li onMouseEnter="{{ openAccount }}" style="position:relative;display:flex;align-items:center;padding:20px 0;">
+          <button onClick="{{ toggleAccount }}" aria-haspopup="true" aria-expanded="{{ accountOpen }}" style="display:flex;align-items:center;gap:5px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;white-space:nowrap;color:var(--muted-fg,#6d6660);" style-hover="color:#b88a4a;">My Account
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ accountChevron }};transition:transform .15s;"><path d="m6 9 6 6 6-6"></path></svg>
+          </button>
+          <sc-if value="{{ accountOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:100%;padding-top:0;">
+              <div style="min-width:180px;border:1px solid var(--border,#e1dbd0);border-radius:10px;background:var(--bg,#fbfaf7);padding:6px;box-shadow:0 18px 48px rgba(20,20,20,.12),0 6px 12px rgba(20,20,20,.06);display:flex;flex-direction:column;">
+                <a href="https://michaeljgauthier.com/login" style="display:block;padding:10px 12px;border-radius:6px;text-decoration:none;font-size:14px;color:var(--ink,#1c1917);" style-hover="background:var(--muted,#f4f1ea);color:#b88a4a;">Login</a>
+                <a href="https://michaeljgauthier.com/register" style="display:block;padding:10px 12px;border-radius:6px;text-decoration:none;font-size:14px;color:var(--ink,#1c1917);" style-hover="background:var(--muted,#f4f1ea);color:#b88a4a;">Register</a>
+              </div>
+            </div>
+          </sc-if>
+        </li>
+        <li onMouseEnter="{{ closeAll }}" style="display:flex;gap:8px;padding-left:4px;">
+          <a href="start.dc.html" style="display:inline-flex;align-items:center;height:40px;padding:0 16px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:14px;text-decoration:none;white-space:nowrap;" style-hover="background:var(--muted,#f4f1ea);color:var(--ink,#1c1917);">Get Started</a>
+          <a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;height:40px;padding:0 16px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:14px;text-decoration:none;white-space:nowrap;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Take the Free Check-In</a>
+        </li>
+        <li onMouseEnter="{{ closeAll }}" style="display:flex;">
+          <button onClick="{{ toggleTheme }}" aria-label="Toggle light/dark mode" title="{{ themeTitle }}" style="display:inline-flex;height:40px;width:40px;align-items:center;justify-content:center;border-radius:12px;border:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);color:var(--ink,#1c1917);cursor:pointer;flex:none;" style-hover="background:var(--hover,#e9e4d8);">
+            <sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></sc-if>
+            <sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg></sc-if>
+          </button>
+        </li>
+      </ul>
+
+      <!-- MEGA MENU -->
+      <sc-if value="{{ discoverOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:32px;right:32px;top:100%;">
+          <div style="border:1px solid var(--border,#e1dbd0);border-radius:14px;background:var(--bg,#fbfaf7);box-shadow:0 18px 48px rgba(20,20,20,.12),0 6px 12px rgba(20,20,20,.06);padding:22px 24px 20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;">
+            <sc-for list="{{ columns }}" as="col" hint-placeholder-count="4">
+              <div style="min-width:0;">
+                <a href="{{ col.href }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-decoration:none;padding-bottom:10px;border-bottom:1px solid var(--border,#e1dbd0);margin-bottom:8px;" style-hover="color:#b88a4a;">
+                  <span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">{{ col.label }}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b88a4a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                </a>
+                <div style="display:flex;flex-direction:column;">
+                  <sc-for list="{{ col.children }}" as="c" hint-placeholder-count="3">
+                    <a href="{{ c.href }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 8px;margin:0 -8px;border-radius:6px;text-decoration:none;font-size:14px;color:var(--ink,#1c1917);" style-hover="background:var(--muted,#f4f1ea);color:#b88a4a;"><span style="min-width:0;">{{ c.label }}</span><span style="flex:none;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:{{ c.tagColor }};">{{ c.tag }}</span></a>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ toggleMenu }}" aria-label="Menu" style="display:inline-flex;height:42px;width:42px;align-items:center;justify-content:center;border-radius:14px;border:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);color:var(--ink,#1c1917);cursor:pointer;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:0;right:0;top:60px;bottom:0;z-index:40;overflow-y:auto;background:var(--bg,#fbfaf7);padding:20px 24px 40px;">
+      <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Discover</p>
+      <sc-for list="{{ flat }}" as="row" hint-placeholder-count="14">
+        <a href="{{ row.href }}" style="display:block;border-bottom:1px solid var(--border,#e1dbd0);padding:13px 0;text-decoration:none;color:var(--ink,#1c1917);font-size:{{ row.size }};font-weight:{{ row.weight }};padding-left:{{ row.indent }};">{{ row.label }}</a>
+      </sc-for>
+      <a href="steward.dc.html" style="display:block;border-bottom:1px solid var(--border,#e1dbd0);padding:14px 0;font-size:17px;font-weight:600;text-decoration:none;color:var(--ink,#1c1917);">Steward</a>
+      <a href="contact.dc.html" style="display:block;border-bottom:1px solid var(--border,#e1dbd0);padding:14px 0;font-size:17px;font-weight:600;text-decoration:none;color:var(--ink,#1c1917);">Contact</a>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
+        <a href="https://michaeljgauthier.com/login" style="border:1px solid var(--border,#e1dbd0);border-radius:8px;padding:12px;text-align:center;font-weight:600;text-decoration:none;color:var(--ink,#1c1917);">Login</a>
+        <a href="https://michaeljgauthier.com/register" style="border:1px solid var(--border,#e1dbd0);border-radius:8px;padding:12px;text-align:center;font-weight:600;text-decoration:none;color:var(--ink,#1c1917);">Register</a>
+        <a href="start.dc.html" style="border:1px solid var(--ink,#1c1917);border-radius:8px;padding:12px;text-align:center;font-weight:600;text-decoration:none;color:var(--ink,#1c1917);">Get Started</a>
+        <a href="created-for-more-check-in.dc.html" style="border-radius:8px;padding:12px;text-align:center;font-weight:600;text-decoration:none;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);">Take the Free Check-In</a>
+      </div>
+      <button onClick="{{ toggleTheme }}" aria-label="Toggle light/dark mode" style="margin-top:16px;width:100%;height:46px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;border:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);color:var(--ink,#1c1917);cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;">{{ themeTitle }}</button>
+    </div>
+  </sc-if>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:64},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;&quot;,&quot;blueprint&quot;,&quot;learn&quot;,&quot;churches&quot;,&quot;about&quot;,&quot;steward&quot;,&quot;contact&quot;]}}">
+class Component extends DCLogic {
+  state = { open: null, menuOpen: false, width: typeof window !== "undefined" ? window.innerWidth : 1280, theme: (typeof window !== "undefined" && window.localStorage.getItem("mjg-mock-theme")) || "light" };
+  setTheme(next) {
+    try { window.localStorage.setItem("mjg-mock-theme", next); } catch (e) {}
+    document.documentElement.dataset.theme = next;
+    document.documentElement.classList.toggle("dark", next === "dark");
+    window.dispatchEvent(new CustomEvent("mjg-theme", { detail: next }));
+    this.setState({ theme: next });
+  }
+  componentDidMount() {
+    this._onResize = () => this.setState(s => ({ width: window.innerWidth, menuOpen: window.innerWidth > 1024 ? false : s.menuOpen }));
+    this._onResize();
+    window.addEventListener("resize", this._onResize);
+    document.documentElement.dataset.theme = this.state.theme;
+    document.documentElement.classList.toggle("dark", this.state.theme === "dark");
+  }
+  componentWillUnmount() { window.removeEventListener("resize", this._onResize); }
+  renderVals() {
+    const GOLD = "#b88a4a", INK = "var(--ink,#1c1917)", MUTED = "var(--muted-fg,#6d6660)";
+    const active = this.props.active ?? "";
+    const tag = (t) => ({ tag: t, tagColor: t === "Live" ? "#2f7d5b" : "#b5821e" });
+    const COLS = [
+      { label: "The Blueprint", key: "blueprint", href: "stewardship-blueprint.dc.html", children: [
+        { label: "The Stewardship Blueprint", href: "stewardship-blueprint.dc.html", ...tag("New") },
+        { label: "Your Personal Blueprint", href: "personal-blueprint.dc.html", ...tag("New") },
+        { label: "Assessments & Check-Ins", href: "assessments.dc.html", ...tag("New") },
+        { label: "Created for More Check-In", href: "created-for-more-check-in.dc.html", ...tag("Live") } ] },
+      { label: "Learn & Grow", key: "learn", href: "learn-and-grow.dc.html", children: [
+        { label: "The Life You’re Building", href: "the-life-youre-building.dc.html", ...tag("New") },
+        { label: "Studies & Experiences", href: "studies.dc.html", ...tag("New") },
+        { label: "Insights & Resources", href: "resources.dc.html", ...tag("Live") },
+        { label: "Start Your Journey", href: "start.dc.html", ...tag("New") } ] },
+      { label: "For Churches", key: "churches", href: "churches.dc.html", children: [
+        { label: "For Churches & Groups", href: "churches.dc.html", ...tag("New") },
+        { label: "Lead a Group", href: "lead-a-group.dc.html", ...tag("New") },
+        { label: "Six-Week Challenge", href: "https://michaeljgauthier.com/6-week-challenge", ...tag("Live") } ] },
+      { label: "About", key: "about", href: "about.dc.html", children: [
+        { label: "About Michael", href: "about.dc.html", ...tag("Live") },
+        { label: "Mission & Vision", href: "mission.dc.html", ...tag("Live") },
+        { label: "Join the Journey", href: "join.dc.html", ...tag("New") },
+        { label: "Prices & Plans", href: "https://michaeljgauthier.com/steward/pricing", ...tag("Live") } ] },
+    ];
+    const discoverActive = COLS.some(c => c.key === active);
+    const flat = [];
+    COLS.forEach(c => { flat.push({ label: c.label, href: c.href, indent: "0", size: "17px", weight: 600 }); c.children.forEach(ch => { if (ch.href !== c.href) flat.push({ label: ch.label, href: ch.href, indent: "16px", size: "15px", weight: 400 }); }); });
+    const narrow = this.state.width <= 1024;
+    const o = this.state.open;
+    return {
+      columns: COLS, flat, wide: !narrow, narrow, menuOpen: narrow && this.state.menuOpen,
+      discoverOpen: o === "discover", accountOpen: o === "account",
+      discoverChevron: o === "discover" ? "rotate(180deg)" : "none", accountChevron: o === "account" ? "rotate(180deg)" : "none",
+      discoverWeight: discoverActive ? 600 : 400, discoverColor: discoverActive ? GOLD : INK,
+      stewardWeight: active === "steward" ? 600 : 400, stewardColor: active === "steward" ? GOLD : INK,
+      contactWeight: active === "contact" ? 600 : 400, contactColor: active === "contact" ? GOLD : INK,
+      openDiscover: () => this.setState({ open: "discover" }), openAccount: () => this.setState({ open: "account" }),
+      toggleDiscover: () => this.setState(s => ({ open: s.open === "discover" ? null : "discover" })),
+      toggleAccount: () => this.setState(s => ({ open: s.open === "account" ? null : "account" })),
+      closeAll: () => this.setState({ open: null }),
+      toggleMenu: () => this.setState(s => ({ menuOpen: !s.menuOpen })),
+      logoSrc: this.state.theme === "dark" ? "docs/mjg-logos/mjg_white.png" : "docs/mjg-logos/mjg_black_white.png", isDark: this.state.theme === "dark", isLight: this.state.theme !== "dark",
+      themeTitle: this.state.theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+      toggleTheme: () => this.setTheme(this.state.theme === "dark" ? "light" : "dark"),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+# Exported by three-d-stage
+newmtl page_block
+Kd 0.9301 0.8963 0.8228
+Ks 0.2000 0.2000 0.2000
+Ns 10
+d 1.0000
+
+newmtl page_lines
+Kd 0.7605 0.7157 0.6240
+Ks 0.2000 0.2000 0.2000
+Ns 0
+d 1.0000
+
+newmtl board_edge
+Kd 0.0123 0.0232 0.0578
+Ks 0.2000 0.2000 0.2000
+Ns 80
+d 1.0000
+
+newmtl front_cover
+Kd 1.0000 1.0000 1.0000
+Ks 0.2000 0.2000 0.2000
+Ns 90
+d 1.0000
+
+newmtl back_cover
+Kd 1.0000 1.0000 1.0000
+Ks 0.2000 0.2000 0.2000
+Ns 90
+d 1.0000
+
+newmtl spine
+Kd 1.0000 1.0000 1.0000
+Ks 0.2000 0.2000 0.2000
+Ns 90
+d 1.0000
+
+newmtl headband_gold
+Kd 0.5841 0.3564 0.1119
+Ks 0.2000 0.2000 0.2000
+Ns 100
+d 1.0000
+

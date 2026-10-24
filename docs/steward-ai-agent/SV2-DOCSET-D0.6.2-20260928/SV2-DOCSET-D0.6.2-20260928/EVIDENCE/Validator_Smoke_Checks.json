@@ -1,0 +1,55 @@
+{
+  "status": "DOCUMENT_VALIDATOR_CHECKS_EXECUTED",
+  "package_id": "SV2-DOCSET-D0.4-20260926",
+  "performed_on": "2026-09-26",
+  "timezone": "America/Phoenix",
+  "checks": [
+    {
+      "check": "valid_document_directory",
+      "result": "PASS",
+      "observed": {
+        "status": "PASS_DOCUMENT_INTEGRITY_ONLY",
+        "package_id": "SV2-DOCSET-D0.4-20260926",
+        "files_verified": 122,
+        "source_modules_preserved": 29,
+        "source_blocks_preserved": 7683,
+        "previous_candidate_zip_exact": true,
+        "statement_of_faith_exact": true,
+        "preserved_test_definitions": 86,
+        "prior_D02_test_definitions": 72,
+        "prior_DEC09_test_definitions": 12,
+        "new_D04_test_definitions": 5,
+        "total_test_definitions": 175,
+        "instruction_characters": 7409,
+        "instruction_CRLF_characters": 7441,
+        "prior_D02_001_conversation": "FAIL_OWNER_REPORTED_DRAFT_0_3",
+        "current_candidate_execution": "NOT RUN",
+        "real_application_test_status": "NOT RUN",
+        "production_authorized": false,
+        "note": "Document verification only. No correction behavior or application test was executed; no deployment, legal/security certification or rights clearance."
+      }
+    },
+    {
+      "check": "tampered_payload_rejected",
+      "result": "PASS",
+      "observed": {
+        "status": "FAIL_DOCUMENT_VALIDATION",
+        "error": "Checksum/size mismatch: PROJECT_INSTRUCTIONS.txt"
+      }
+    },
+    {
+      "check": "unsafe_zip_path_rejected_without_extraction",
+      "result": "PASS",
+      "observed": {
+        "status": "FAIL_DOCUMENT_VALIDATION",
+        "error": "Unsafe path: '../outside.txt'"
+      }
+    }
+  ],
+  "scope": "Documentation integrity only; no simulated participant conversation or application execution.",
+  "prior_D02_001_conversation": "FAIL_OWNER_REPORTED_DRAFT_0_3",
+  "current_correction_and_regression_execution": "NOT RUN",
+  "real_application_execution": "NOT RUN",
+  "correction_passed": false,
+  "final_archive_check": "Run separately after frozen evidence/manifests."
+}

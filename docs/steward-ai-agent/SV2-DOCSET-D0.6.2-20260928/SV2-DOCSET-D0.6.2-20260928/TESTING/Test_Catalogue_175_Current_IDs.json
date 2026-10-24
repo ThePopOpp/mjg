@@ -1,0 +1,706 @@
+{
+  "package_id": "SV2-DOCSET-D0.5.1-20260928",
+  "count": 175,
+  "ids": [
+    {
+      "id": "D02-001",
+      "title": "Direct entry without assessment"
+    },
+    {
+      "id": "D02-002",
+      "title": "Existing identity returns through a different door"
+    },
+    {
+      "id": "D02-003",
+      "title": "Registration timeout and retry"
+    },
+    {
+      "id": "D02-004",
+      "title": "Assessment completed after direct onboarding"
+    },
+    {
+      "id": "D02-005",
+      "title": "Sponsored invitation does not create another participant"
+    },
+    {
+      "id": "D02-006",
+      "title": "Minimal signup and urgent public resources"
+    },
+    {
+      "id": "D02-007",
+      "title": "Simple request does not call all specialists"
+    },
+    {
+      "id": "D02-008",
+      "title": "Complex decision uses bounded relevant context"
+    },
+    {
+      "id": "D02-009",
+      "title": "Prompt injection cannot create owner authority"
+    },
+    {
+      "id": "D02-010",
+      "title": "Specialist failure and unknown action"
+    },
+    {
+      "id": "D02-011",
+      "title": "Helpful first upgrade invitation"
+    },
+    {
+      "id": "D02-012",
+      "title": "Refusal persists across sessions"
+    },
+    {
+      "id": "D02-013",
+      "title": "Upgrade and referral share one ceiling"
+    },
+    {
+      "id": "D02-014",
+      "title": "Vulnerable context suppresses promotion"
+    },
+    {
+      "id": "D02-015",
+      "title": "Confirmed upgrade resumes current work"
+    },
+    {
+      "id": "D02-016",
+      "title": "Canceled or failed checkout preserves Free value"
+    },
+    {
+      "id": "D02-017",
+      "title": "Delayed and duplicate payment callbacks"
+    },
+    {
+      "id": "D02-018",
+      "title": "Checkout does not extend raw-chat retention"
+    },
+    {
+      "id": "D02-019",
+      "title": "Requested participant referral link"
+    },
+    {
+      "id": "D02-020",
+      "title": "Named referral without prospect mining"
+    },
+    {
+      "id": "D02-021",
+      "title": "Referral refusal suppresses later sales pressure"
+    },
+    {
+      "id": "D02-022",
+      "title": "Referrer cannot inspect recipient conversion"
+    },
+    {
+      "id": "D02-023",
+      "title": "No invented referral reward"
+    },
+    {
+      "id": "D02-024",
+      "title": "Referral is not Legacy completion"
+    },
+    {
+      "id": "D02-025",
+      "title": "Owner configures percentage discounts"
+    },
+    {
+      "id": "D02-026",
+      "title": "Fixed discounts and custom offers"
+    },
+    {
+      "id": "D02-027",
+      "title": "Explicit no-expiry grant versus accidental null"
+    },
+    {
+      "id": "D02-028",
+      "title": "Free access ends without personal billing"
+    },
+    {
+      "id": "D02-029",
+      "title": "Catalogue changes preserve purchased snapshots"
+    },
+    {
+      "id": "D02-030",
+      "title": "Higher renewal or cadence needs acceptance"
+    },
+    {
+      "id": "D02-031",
+      "title": "Unprivileged grant/price attack"
+    },
+    {
+      "id": "D02-032",
+      "title": "Generic programs preserve Compass configuration"
+    },
+    {
+      "id": "D02-033",
+      "title": "Overlapping grants and existing paid agreement"
+    },
+    {
+      "id": "D02-034",
+      "title": "New first-year recurring terms not guessed"
+    },
+    {
+      "id": "D02-035",
+      "title": "Optional church affiliation can be skipped"
+    },
+    {
+      "id": "D02-036",
+      "title": "Affiliation removal does not remove grant"
+    },
+    {
+      "id": "D02-037",
+      "title": "Acquisition, referrer and sponsor are separate"
+    },
+    {
+      "id": "D02-038",
+      "title": "Church and small-cell reporting boundaries"
+    },
+    {
+      "id": "D02-039",
+      "title": "Chosen cadence is not channel consent"
+    },
+    {
+      "id": "D02-040",
+      "title": "No optional cadence means no default pursuit"
+    },
+    {
+      "id": "D02-041",
+      "title": "Shared scheduling and revocation"
+    },
+    {
+      "id": "D02-042",
+      "title": "Time zone, quiet hours and event change"
+    },
+    {
+      "id": "D02-043",
+      "title": "Experiment ends without becoming a failure"
+    },
+    {
+      "id": "D02-044",
+      "title": "Adopt experiment only after new approval"
+    },
+    {
+      "id": "D02-045",
+      "title": "No-action outcome remains valid"
+    },
+    {
+      "id": "D02-046",
+      "title": "Protect healthy area"
+    },
+    {
+      "id": "D02-047",
+      "title": "Protect does not become permanent prohibition"
+    },
+    {
+      "id": "D02-048",
+      "title": "Warm return after absence"
+    },
+    {
+      "id": "D02-049",
+      "title": "Stale relationship and deleted note on return"
+    },
+    {
+      "id": "D02-050",
+      "title": "Expired Premium does not force Full repurchase"
+    },
+    {
+      "id": "D02-051",
+      "title": "Participant-selected continuity only"
+    },
+    {
+      "id": "D02-052",
+      "title": "Unknown facts and incomplete assessments remain unknown"
+    },
+    {
+      "id": "D02-053",
+      "title": "Memory proposal does not overwrite Blueprint"
+    },
+    {
+      "id": "D02-054",
+      "title": "Living Legacy versus estate-only interpretation"
+    },
+    {
+      "id": "D02-055",
+      "title": "Group is not entitlement or consent"
+    },
+    {
+      "id": "D02-056",
+      "title": "Inner Circle benefits truthfulness"
+    },
+    {
+      "id": "D02-057",
+      "title": "Tester rollout cannot use real staging content"
+    },
+    {
+      "id": "D02-058",
+      "title": "Compatible document/config release"
+    },
+    {
+      "id": "D02-059",
+      "title": "Tampered package and unsafe paths"
+    },
+    {
+      "id": "D02-060",
+      "title": "New code cannot be installed by prose"
+    },
+    {
+      "id": "D02-061",
+      "title": "Feature flags cannot override gates"
+    },
+    {
+      "id": "D02-062",
+      "title": "Rollback preserves deletion/revocation/billing stop"
+    },
+    {
+      "id": "D02-063",
+      "title": "Session pinning still honors revocation"
+    },
+    {
+      "id": "D02-064",
+      "title": "Product/source/participant versions stay separate"
+    },
+    {
+      "id": "D02-065",
+      "title": "Year in Review with partial history"
+    },
+    {
+      "id": "D02-066",
+      "title": "Deferred features stay disabled"
+    },
+    {
+      "id": "D02-067",
+      "title": "Native preservation claims are bounded"
+    },
+    {
+      "id": "D02-068",
+      "title": "CFM4, EA and Blueprint structure unchanged"
+    },
+    {
+      "id": "D02-069",
+      "title": "Cost report includes unknowns and free grants"
+    },
+    {
+      "id": "D02-070",
+      "title": "Bounded agent cost/latency and isolation"
+    },
+    {
+      "id": "D02-071",
+      "title": "Autonomy without human-care impersonation"
+    },
+    {
+      "id": "D02-072",
+      "title": "Exact faith and no substituted doctrine"
+    },
+    {
+      "id": "DEC09-T01",
+      "title": "Agreement separation and publication gates"
+    },
+    {
+      "id": "DEC09-T02",
+      "title": "Recurring assent and initial qualification"
+    },
+    {
+      "id": "DEC09-T03",
+      "title": "Seamless activation and calendar clocks"
+    },
+    {
+      "id": "DEC09-T04",
+      "title": "Unused activation refund and race"
+    },
+    {
+      "id": "DEC09-T05",
+      "title": "Annual renewal and continued Full building"
+    },
+    {
+      "id": "DEC09-T06",
+      "title": "Cancellation before/after activation"
+    },
+    {
+      "id": "DEC09-T07",
+      "title": "Refund scope and retained content"
+    },
+    {
+      "id": "DEC09-T08",
+      "title": "First and later renewal grace"
+    },
+    {
+      "id": "DEC09-T09",
+      "title": "Cadence and mixed-source overlap"
+    },
+    {
+      "id": "DEC09-T10",
+      "title": "Immutable terms, discounts and tax configuration"
+    },
+    {
+      "id": "DEC09-T11",
+      "title": "Consistent disclosure and review separation"
+    },
+    {
+      "id": "DEC09-T12",
+      "title": "Rollback and protected service authority"
+    },
+    {
+      "id": "V2-P01-A",
+      "title": "Adaptive Steward Check-Ins \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P01-B",
+      "title": "Adaptive Steward Check-Ins \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P02-A",
+      "title": "Steward, Check Me \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P02-B",
+      "title": "Steward, Check Me \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P03-A",
+      "title": "Decision Mode \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P03-B",
+      "title": "Decision Mode \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P04-A",
+      "title": "Quarterly Blueprint Reset \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P04-B",
+      "title": "Quarterly Blueprint Reset \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P05-A",
+      "title": "Accountability Partner Mode \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P05-B",
+      "title": "Accountability Partner Mode \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P06-A",
+      "title": "Family/Spouse Conversation Mode \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P06-B",
+      "title": "Family/Spouse Conversation Mode \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P07-A",
+      "title": "My Stewardship Year in Review \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P07-B",
+      "title": "My Stewardship Year in Review \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P08-A",
+      "title": "Vision Casting / My Next Season \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P08-B",
+      "title": "Vision Casting / My Next Season \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P09-A",
+      "title": "Blueprint Version History / My Blueprint Journey \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P09-B",
+      "title": "Blueprint Version History / My Blueprint Journey \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P10-A",
+      "title": "Life Story / Steward Journal \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P10-B",
+      "title": "Life Story / Steward Journal \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P11-A",
+      "title": "Remember When Moments \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P11-B",
+      "title": "Remember When Moments \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P12-A",
+      "title": "Accomplishment & Progress Memory \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P12-B",
+      "title": "Accomplishment & Progress Memory \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P13-A",
+      "title": "Visual Steward Experience \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P13-B",
+      "title": "Visual Steward Experience \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P14-A",
+      "title": "Multi-Channel Communication \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P14-B",
+      "title": "Multi-Channel Communication \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-P15-A",
+      "title": "Inner Circle / Membership Benefits \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-P15-B",
+      "title": "Inner Circle / Membership Benefits \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S01-A",
+      "title": "Current Life Season record \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S01-B",
+      "title": "Current Life Season record \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S02-A",
+      "title": "Blueprint-area seasons / postures \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S02-B",
+      "title": "Blueprint-area seasons / postures \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S03-A",
+      "title": "Season right-sizing: overload and underreach \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S03-B",
+      "title": "Season right-sizing: overload and underreach \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S04-A",
+      "title": "Capacity Zones \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S04-B",
+      "title": "Capacity Zones \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S05-A",
+      "title": "Evidence of Alignment \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S05-B",
+      "title": "Evidence of Alignment \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S06-A",
+      "title": "For the Right Season memory \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S06-B",
+      "title": "For the Right Season memory \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S07-A",
+      "title": "Transition Mode \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S07-B",
+      "title": "Transition Mode \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S08-A",
+      "title": "Season completion and transition signals \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S08-B",
+      "title": "Season completion and transition signals \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S09-A",
+      "title": "Season Timeline \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S09-B",
+      "title": "Season Timeline \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S10-A",
+      "title": "Energy-aware season design and Restore posture \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S10-B",
+      "title": "Energy-aware season design and Restore posture \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S11-A",
+      "title": "Loving recognition before bold challenge \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S11-B",
+      "title": "Loving recognition before bold challenge \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-S12-A",
+      "title": "Season-aware Decision Mode \u2014 normal/limited-context case"
+    },
+    {
+      "id": "V2-S12-B",
+      "title": "Season-aware Decision Mode \u2014 boundary/adversarial case"
+    },
+    {
+      "id": "V2-C01",
+      "title": "Exact doctrine"
+    },
+    {
+      "id": "V2-C02",
+      "title": "Framework and living Legacy"
+    },
+    {
+      "id": "V2-C03",
+      "title": "Definition/content/practice separation"
+    },
+    {
+      "id": "V2-C04",
+      "title": "Exact participant approval"
+    },
+    {
+      "id": "V2-C05",
+      "title": "Assessment integrity"
+    },
+    {
+      "id": "V2-C06",
+      "title": "Useful Free and Full continuity"
+    },
+    {
+      "id": "V2-C07",
+      "title": "Human relationship and dignity safeguards"
+    },
+    {
+      "id": "V2-C08",
+      "title": "Safety priority and autonomy"
+    },
+    {
+      "id": "V2-C09",
+      "title": "Purpose-bound retention and deletion"
+    },
+    {
+      "id": "V2-C10",
+      "title": "Account isolation and authentication"
+    },
+    {
+      "id": "V2-C11",
+      "title": "Sharing and sponsor separation"
+    },
+    {
+      "id": "V2-C12",
+      "title": "Provider contractual fit"
+    },
+    {
+      "id": "V2-C13",
+      "title": "Payments and entitlements"
+    },
+    {
+      "id": "V2-C14",
+      "title": "Rights and serving-source separation"
+    },
+    {
+      "id": "V2-C15",
+      "title": "Privacy-preserving observability"
+    },
+    {
+      "id": "V2-C16",
+      "title": "Action honesty"
+    },
+    {
+      "id": "V2-C17",
+      "title": "Release gates and specialist review"
+    },
+    {
+      "id": "V2-C18",
+      "title": "Historical handoff and source status"
+    },
+    {
+      "id": "V2-C19",
+      "title": "Edition-specific teaching and privacy"
+    },
+    {
+      "id": "V2-C20",
+      "title": "Future-feature authorization"
+    },
+    {
+      "id": "V2-X01",
+      "title": "Permission revoked during review generation"
+    },
+    {
+      "id": "V2-X02",
+      "title": "Prompt-injected owner authority"
+    },
+    {
+      "id": "V2-X03",
+      "title": "Entitlement expires during a sensitive review"
+    },
+    {
+      "id": "V2-X04",
+      "title": "Rights do not follow personal approval"
+    },
+    {
+      "id": "V2-X05",
+      "title": "Crisis interrupts checkout or a family plan"
+    },
+    {
+      "id": "V2-X06",
+      "title": "Small-cohort inference"
+    },
+    {
+      "id": "V2-X07",
+      "title": "Deletion and backup restore"
+    },
+    {
+      "id": "V2-X08",
+      "title": "Model fallback changes execution context"
+    },
+    {
+      "id": "V2-X09",
+      "title": "Timeout, retry and duplicate mutation"
+    },
+    {
+      "id": "V2-X10",
+      "title": "Owner example leakage into a case"
+    },
+    {
+      "id": "V2-X11",
+      "title": "Evidence becomes stale after a source edit"
+    },
+    {
+      "id": "V2-X12",
+      "title": "Wrong package sent under a reused V1 label"
+    },
+    {
+      "id": "D04-001",
+      "title": "Name and email are input only"
+    },
+    {
+      "id": "D04-002",
+      "title": "Missing acknowledgment stays pending"
+    },
+    {
+      "id": "D04-003",
+      "title": "Reported click versus controller-confirmed verification"
+    },
+    {
+      "id": "D04-004",
+      "title": "Partial and batched results retain their scope"
+    },
+    {
+      "id": "D04-005",
+      "title": "Completed setup resumes concern; saving stays separate"
+    }
+  ]
+}

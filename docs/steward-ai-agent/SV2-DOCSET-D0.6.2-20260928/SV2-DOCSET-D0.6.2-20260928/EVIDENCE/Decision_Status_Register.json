@@ -1,0 +1,101 @@
+[
+  {
+    "id": "DEC-01",
+    "title": "Full-build scope and sequencing",
+    "status": "PRODUCT TARGET RECORDED; EXECUTION/FINAL ACCEPTANCE OPEN.",
+    "current_direction": "OD-01/02/15/17 and section3 select the complete initial target and express deferrals. Do not ask whether nine functions, direct entry or agreed Living features are wanted again.",
+    "remaining": "Engineering estimates/order, any proposed scope cut and candidate-specific rollout evidence remain open. Pilot gates still apply."
+  },
+  {
+    "id": "DEC-02",
+    "title": "Selected continuity and review purposes",
+    "status": "DIRECTION CONFIRMED; DETAILED LIFECYCLE/REVIEW OPEN.",
+    "current_direction": "Use approved Blueprint/selected notes/commitments/relationship context/milestones for the documented personal purposes. Raw history remains session-only; Story/Journal deferred.",
+    "remaining": "Exact purpose disclosures, data/derivative lifecycle and retention/provider acceptance before real use."
+  },
+  {
+    "id": "DEC-03",
+    "title": "Season, capacity, evidence and record contract",
+    "status": "DIRECTION CARRIED; DESIGN CONTRACT REVIEW OPEN.",
+    "current_direction": "Season/Right Season/evidence concepts retained; current field recommendations in master05 are not invented prior approvals.",
+    "remaining": "Finalize physical mapping, optional labels, migration and permission tests; no clinical thresholds or silent adoption."
+  },
+  {
+    "id": "DEC-04",
+    "title": "Attention, notifications and channels",
+    "status": "ATTENTION/OPT-IN DIRECTION CONFIRMED; CHANNEL CONFIG OPEN.",
+    "current_direction": "In-app and separately opted-in generic email are the candidate initial channels; SMS/push/fallback deferred. Promotion maximum and refusal rules are explicit.",
+    "remaining": "Exact supported notification timings, sender/processor, session definition, noncommercial outreach budgets and participant-facing disclosures. No optional sending before selection."
+  },
+  {
+    "id": "DEC-05",
+    "title": "Partner and family modes/sharing",
+    "status": "DEFERRAL CONFIRMED.",
+    "current_direction": "Named modes, portals and third-party access deferred; compatible baseline private preparation and T4 accountability remain.",
+    "remaining": "Future separate feature/sharing contract only when reopened; not a blocker to ordinary initial-target private support."
+  },
+  {
+    "id": "DEC-06",
+    "title": "Household/minor scope",
+    "status": "NO EXPANSION SELECTED.",
+    "current_direction": "Retain existing adult pilot and no child accounts/household record merging. Ordinary relationship context stays minimized.",
+    "remaining": "Any later minor-facing service or broader household plan needs its own choice and safeguarding/privacy/commerce review."
+  },
+  {
+    "id": "DEC-07",
+    "title": "Photographs and rich media",
+    "status": "DEFERRED.",
+    "current_direction": "No new participant photo importer, life-story media archive or recognition is in the initial target.",
+    "remaining": "Native source visual artifacts remain a documentation-availability issue; future participant media requires independent scope/review."
+  },
+  {
+    "id": "DEC-08",
+    "title": "Inner Circle and configurable groups",
+    "status": "CAPABILITY CONFIRMED; EXACT LAUNCH BENEFITS OPEN.",
+    "current_direction": "Provide administrative groups, selected benefits/offers, time-bound/nonexpiring membership and controlled early access.",
+    "remaining": "Choose initial eligibility/templates and actual available benefits; do not assume all Premium, a new paid tier or scheduled quarterly events."
+  },
+  {
+    "id": "DEC-09",
+    "title": "Retail renewal/initial Full/expiry",
+    "status": "PRODUCT TERMS APPROVED FOR DOCUMENTATION — CHG-DEC09-001; IMPLEMENTATION/QUALIFIED REVIEW/RELEASE OPEN.",
+    "current_direction": "OD-20 records approval of the proposal on September 26, 2026. New $299 Full + first 12 months Premium renews at $199 annually until canceled, plus applicable tax, on the explicit activation anniversary. Master07 M11 records all selected activation/cancellation/refund/grace/disclosure/purchased-term terms. Preserve the $149 one-time Build, qualified $19/$199 continuation and legacy nonrenewing contracts. Initial Full qualification remains. Active Premium includes continued building, completion and refinement without another Full charge. The seamless activation action follows confirmed payment and pending entitlement; no assessment or intake restart.",
+    "remaining": "Actual schema/provider mapping, approved customer disclosures and required qualified review, numerical usage/operating settings, implemented activation/cancellation/refund/renewal flows, executed tests and separate release authorization. These are evidence/design work; do not re-ask the selected price, cadence or product clocks. All example production flags remain false.",
+    "change_id": "CHG-DEC09-001"
+  },
+  {
+    "id": "DEC-10",
+    "title": "Views and exports",
+    "status": "T4 EXPORTS RETAINED; UI DESIGN OPEN.",
+    "current_direction": "Three-page Free, thirteen-page Full, one-page North Star and honest states retained. Basic history/review projections in target, advanced rich timeline deferred.",
+    "remaining": "Final accessible visual design and measured rendering proofs; no mandatory extra export pages selected."
+  },
+  {
+    "id": "DEC-11",
+    "title": "Actual operating/provider configuration",
+    "status": "REQUIRED EVIDENCE OPEN.",
+    "current_direction": "Preserve inherited provider/privacy/retention/authentication/safety/support gates; no new clinical/legal/availability claim.",
+    "remaining": "Actual contracts/settings, operational roles, geography/eligibility assurance, retention schedules, numerical usage budgets/SLOs and implementation evidence."
+  },
+  {
+    "id": "DEC-12",
+    "title": "Candidate promotion and handoff",
+    "status": "NAMING/PREPARATION CONFIRMED; FINAL DIGEST ACCEPTANCE OPEN.",
+    "current_direction": "Internal V2.0, eventual V1.0 — Initial Full Build. Draft 0.4 is the targeted CHG-D02-001-001 correction candidate, prepared to replace Draft 0.3 when installed by Mike; CHG-DEC09-001 remains unchanged. The prior conversational FAIL is retained and the corrected rerun remains NOT RUN. Product-term approval is recorded; installation, exact-candidate final acceptance and production approval are not claimed.",
+    "remaining": "Owner accepts the actual tested/qualified specification and remaining engineering queue; record Jeremy delivery/receipt separately when it occurs."
+  },
+  {
+    "id": "DEC-13",
+    "title": "Serving corpus and Scripture rights",
+    "status": "PREFERENCE/CONTROL RETAINED; SERVING CLEARANCE OPEN.",
+    "current_direction": "Exact Statement of Faith unchanged; NIV preferred; reference + original explanation posture until cleared. Preservation library not auto-served.",
+    "remaining": "Actual serving-source allowlist and applicable license/rights evidence for every enabled channel/output; do not reverify from an old source citation alone."
+  },
+  {
+    "id": "DEC-14",
+    "title": "Source fidelity and native availability",
+    "status": "SUPPLIED-BODY PRESERVATION MEASURED; NATIVE/VISUAL AUDIT LIMITED.",
+    "current_direction": "All supplied source bodies and exact faith bytes are preserved and hashed. Text-only Premium provenance remains explicit.",
+    "remaining": "Unprovided native originals/earlier evidence are listed in SOURCE_COMPLETENESS; no missing artifact is invented or treated as proof drafting cannot continue. Full original-page visual/semantic audit not claimed."
+  }
+]

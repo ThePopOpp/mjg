@@ -1,0 +1,179 @@
+# Current 175 Test IDs
+
+Count: 175
+
+- D02-001 — Direct entry without assessment
+- D02-002 — Existing identity returns through a different door
+- D02-003 — Registration timeout and retry
+- D02-004 — Assessment completed after direct onboarding
+- D02-005 — Sponsored invitation does not create another participant
+- D02-006 — Minimal signup and urgent public resources
+- D02-007 — Simple request does not call all specialists
+- D02-008 — Complex decision uses bounded relevant context
+- D02-009 — Prompt injection cannot create owner authority
+- D02-010 — Specialist failure and unknown action
+- D02-011 — Helpful first upgrade invitation
+- D02-012 — Refusal persists across sessions
+- D02-013 — Upgrade and referral share one ceiling
+- D02-014 — Vulnerable context suppresses promotion
+- D02-015 — Confirmed upgrade resumes current work
+- D02-016 — Canceled or failed checkout preserves Free value
+- D02-017 — Delayed and duplicate payment callbacks
+- D02-018 — Checkout does not extend raw-chat retention
+- D02-019 — Requested participant referral link
+- D02-020 — Named referral without prospect mining
+- D02-021 — Referral refusal suppresses later sales pressure
+- D02-022 — Referrer cannot inspect recipient conversion
+- D02-023 — No invented referral reward
+- D02-024 — Referral is not Legacy completion
+- D02-025 — Owner configures percentage discounts
+- D02-026 — Fixed discounts and custom offers
+- D02-027 — Explicit no-expiry grant versus accidental null
+- D02-028 — Free access ends without personal billing
+- D02-029 — Catalogue changes preserve purchased snapshots
+- D02-030 — Higher renewal or cadence needs acceptance
+- D02-031 — Unprivileged grant/price attack
+- D02-032 — Generic programs preserve Compass configuration
+- D02-033 — Overlapping grants and existing paid agreement
+- D02-034 — New first-year recurring terms not guessed
+- D02-035 — Optional church affiliation can be skipped
+- D02-036 — Affiliation removal does not remove grant
+- D02-037 — Acquisition, referrer and sponsor are separate
+- D02-038 — Church and small-cell reporting boundaries
+- D02-039 — Chosen cadence is not channel consent
+- D02-040 — No optional cadence means no default pursuit
+- D02-041 — Shared scheduling and revocation
+- D02-042 — Time zone, quiet hours and event change
+- D02-043 — Experiment ends without becoming a failure
+- D02-044 — Adopt experiment only after new approval
+- D02-045 — No-action outcome remains valid
+- D02-046 — Protect healthy area
+- D02-047 — Protect does not become permanent prohibition
+- D02-048 — Warm return after absence
+- D02-049 — Stale relationship and deleted note on return
+- D02-050 — Expired Premium does not force Full repurchase
+- D02-051 — Participant-selected continuity only
+- D02-052 — Unknown facts and incomplete assessments remain unknown
+- D02-053 — Memory proposal does not overwrite Blueprint
+- D02-054 — Living Legacy versus estate-only interpretation
+- D02-055 — Group is not entitlement or consent
+- D02-056 — Inner Circle benefits truthfulness
+- D02-057 — Tester rollout cannot use real staging content
+- D02-058 — Compatible document/config release
+- D02-059 — Tampered package and unsafe paths
+- D02-060 — New code cannot be installed by prose
+- D02-061 — Feature flags cannot override gates
+- D02-062 — Rollback preserves deletion/revocation/billing stop
+- D02-063 — Session pinning still honors revocation
+- D02-064 — Product/source/participant versions stay separate
+- D02-065 — Year in Review with partial history
+- D02-066 — Deferred features stay disabled
+- D02-067 — Native preservation claims are bounded
+- D02-068 — CFM4, EA and Blueprint structure unchanged
+- D02-069 — Cost report includes unknowns and free grants
+- D02-070 — Bounded agent cost/latency and isolation
+- D02-071 — Autonomy without human-care impersonation
+- D02-072 — Exact faith and no substituted doctrine
+- DEC09-T01 — Agreement separation and publication gates
+- DEC09-T02 — Recurring assent and initial qualification
+- DEC09-T03 — Seamless activation and calendar clocks
+- DEC09-T04 — Unused activation refund and race
+- DEC09-T05 — Annual renewal and continued Full building
+- DEC09-T06 — Cancellation before/after activation
+- DEC09-T07 — Refund scope and retained content
+- DEC09-T08 — First and later renewal grace
+- DEC09-T09 — Cadence and mixed-source overlap
+- DEC09-T10 — Immutable terms, discounts and tax configuration
+- DEC09-T11 — Consistent disclosure and review separation
+- DEC09-T12 — Rollback and protected service authority
+- V2-P01-A — Adaptive Steward Check-Ins — normal/limited-context case
+- V2-P01-B — Adaptive Steward Check-Ins — boundary/adversarial case
+- V2-P02-A — Steward, Check Me — normal/limited-context case
+- V2-P02-B — Steward, Check Me — boundary/adversarial case
+- V2-P03-A — Decision Mode — normal/limited-context case
+- V2-P03-B — Decision Mode — boundary/adversarial case
+- V2-P04-A — Quarterly Blueprint Reset — normal/limited-context case
+- V2-P04-B — Quarterly Blueprint Reset — boundary/adversarial case
+- V2-P05-A — Accountability Partner Mode — normal/limited-context case
+- V2-P05-B — Accountability Partner Mode — boundary/adversarial case
+- V2-P06-A — Family/Spouse Conversation Mode — normal/limited-context case
+- V2-P06-B — Family/Spouse Conversation Mode — boundary/adversarial case
+- V2-P07-A — My Stewardship Year in Review — normal/limited-context case
+- V2-P07-B — My Stewardship Year in Review — boundary/adversarial case
+- V2-P08-A — Vision Casting / My Next Season — normal/limited-context case
+- V2-P08-B — Vision Casting / My Next Season — boundary/adversarial case
+- V2-P09-A — Blueprint Version History / My Blueprint Journey — normal/limited-context case
+- V2-P09-B — Blueprint Version History / My Blueprint Journey — boundary/adversarial case
+- V2-P10-A — Life Story / Steward Journal — normal/limited-context case
+- V2-P10-B — Life Story / Steward Journal — boundary/adversarial case
+- V2-P11-A — Remember When Moments — normal/limited-context case
+- V2-P11-B — Remember When Moments — boundary/adversarial case
+- V2-P12-A — Accomplishment & Progress Memory — normal/limited-context case
+- V2-P12-B — Accomplishment & Progress Memory — boundary/adversarial case
+- V2-P13-A — Visual Steward Experience — normal/limited-context case
+- V2-P13-B — Visual Steward Experience — boundary/adversarial case
+- V2-P14-A — Multi-Channel Communication — normal/limited-context case
+- V2-P14-B — Multi-Channel Communication — boundary/adversarial case
+- V2-P15-A — Inner Circle / Membership Benefits — normal/limited-context case
+- V2-P15-B — Inner Circle / Membership Benefits — boundary/adversarial case
+- V2-S01-A — Current Life Season record — normal/limited-context case
+- V2-S01-B — Current Life Season record — boundary/adversarial case
+- V2-S02-A — Blueprint-area seasons / postures — normal/limited-context case
+- V2-S02-B — Blueprint-area seasons / postures — boundary/adversarial case
+- V2-S03-A — Season right-sizing: overload and underreach — normal/limited-context case
+- V2-S03-B — Season right-sizing: overload and underreach — boundary/adversarial case
+- V2-S04-A — Capacity Zones — normal/limited-context case
+- V2-S04-B — Capacity Zones — boundary/adversarial case
+- V2-S05-A — Evidence of Alignment — normal/limited-context case
+- V2-S05-B — Evidence of Alignment — boundary/adversarial case
+- V2-S06-A — For the Right Season memory — normal/limited-context case
+- V2-S06-B — For the Right Season memory — boundary/adversarial case
+- V2-S07-A — Transition Mode — normal/limited-context case
+- V2-S07-B — Transition Mode — boundary/adversarial case
+- V2-S08-A — Season completion and transition signals — normal/limited-context case
+- V2-S08-B — Season completion and transition signals — boundary/adversarial case
+- V2-S09-A — Season Timeline — normal/limited-context case
+- V2-S09-B — Season Timeline — boundary/adversarial case
+- V2-S10-A — Energy-aware season design and Restore posture — normal/limited-context case
+- V2-S10-B — Energy-aware season design and Restore posture — boundary/adversarial case
+- V2-S11-A — Loving recognition before bold challenge — normal/limited-context case
+- V2-S11-B — Loving recognition before bold challenge — boundary/adversarial case
+- V2-S12-A — Season-aware Decision Mode — normal/limited-context case
+- V2-S12-B — Season-aware Decision Mode — boundary/adversarial case
+- V2-C01 — Exact doctrine
+- V2-C02 — Framework and living Legacy
+- V2-C03 — Definition/content/practice separation
+- V2-C04 — Exact participant approval
+- V2-C05 — Assessment integrity
+- V2-C06 — Useful Free and Full continuity
+- V2-C07 — Human relationship and dignity safeguards
+- V2-C08 — Safety priority and autonomy
+- V2-C09 — Purpose-bound retention and deletion
+- V2-C10 — Account isolation and authentication
+- V2-C11 — Sharing and sponsor separation
+- V2-C12 — Provider contractual fit
+- V2-C13 — Payments and entitlements
+- V2-C14 — Rights and serving-source separation
+- V2-C15 — Privacy-preserving observability
+- V2-C16 — Action honesty
+- V2-C17 — Release gates and specialist review
+- V2-C18 — Historical handoff and source status
+- V2-C19 — Edition-specific teaching and privacy
+- V2-C20 — Future-feature authorization
+- V2-X01 — Permission revoked during review generation
+- V2-X02 — Prompt-injected owner authority
+- V2-X03 — Entitlement expires during a sensitive review
+- V2-X04 — Rights do not follow personal approval
+- V2-X05 — Crisis interrupts checkout or a family plan
+- V2-X06 — Small-cohort inference
+- V2-X07 — Deletion and backup restore
+- V2-X08 — Model fallback changes execution context
+- V2-X09 — Timeout, retry and duplicate mutation
+- V2-X10 — Owner example leakage into a case
+- V2-X11 — Evidence becomes stale after a source edit
+- V2-X12 — Wrong package sent under a reused V1 label
+- D04-001 — Name and email are input only
+- D04-002 — Missing acknowledgment stays pending
+- D04-003 — Reported click versus controller-confirmed verification
+- D04-004 — Partial and batched results retain their scope
+- D04-005 — Completed setup resumes concern; saving stays separate

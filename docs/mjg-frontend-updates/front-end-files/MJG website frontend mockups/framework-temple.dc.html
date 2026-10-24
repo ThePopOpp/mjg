@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:var(--ink,#1c1917)} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="See the Framework — Temple infographic" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="blueprint" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:48px 32px 80px;">
+  <div style="display:grid;grid-template-columns:repeat(7,minmax(100px,1fr));gap:6px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:2px 2px 14px;margin-bottom:40px;border-bottom:1px solid var(--border,#e1dbd0);">
+    <sc-for list="{{ tabs }}" as="d" hint-placeholder-count="7">
+      <button onClick="{{ d.click }}" aria-label="{{ d.label }}" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 8px;min-width:0;overflow:hidden;border-radius:8px;border:1px solid {{ d.border }};background:{{ d.bg }};color:{{ d.color }};font-family:inherit;font-size:12.5px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background .25s,color .25s,border-color .25s;"><span style="font-family:Fraunces,Georgia,serif;font-size:11px;font-weight:400;color:{{ d.num }};flex:none;">{{ d.n }}</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;">{{ d.label }}</span></button>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px;align-items:start;">
+  <div>
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">02 · See the Framework</p>
+    <h1 style="margin:14px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(34px,4.4vw,50px);line-height:1.06;letter-spacing:-.02em;text-wrap:balance;">A Life That Matters Is Built on <em style="font-style:normal;color:#b88a4a;">Purpose.</em></h1>
+    <!-- ACTIVE LAYER CARD (shadcn-style) -->
+    <div style="margin-top:28px;border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);box-shadow:0 1px 2px rgba(20,20,20,.04);overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+        <span style="display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;"><span style="width:6px;height:6px;border-radius:9999px;background:#b88a4a;"></span>{{ d.eyebrow }}</span>
+        <span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:9999px;border:1px solid var(--border,#e1dbd0);color:var(--muted-fg,#6d6660);background:var(--card,#fff);">{{ d.part }}</span>
+      </div>
+      <div style="padding:18px 18px 20px;">
+        <h2 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:24px;line-height:1.2;">{{ d.title }}</h2>
+        <p style="margin:10px 0 0;font-size:15px;line-height:1.7;color:var(--muted-fg,#6d6660);">{{ d.body }}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;">
+          <a href="{{ d.href }}" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:14px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore this layer</a>
+          <a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:14px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Explore the Framework →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div>
+    <div style="padding:0 28px;">
+      <dc-import name="FrameworkTemple" on-change="{{ onChange }}" select-key="{{ selectKey }}" autoplay-ms="{{ autoplayMs }}" hint-size="100%,560px"></dc-import>
+    </div>
+    <p style="margin:12px 0 0;text-align:center;font-size:12px;color:var(--muted-fg,#6d6660);">Hover a part of the building to explore · click to pin · plays on its own while in view</p>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:14px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note · Temple infographic</span><br>Flat CSS interpretation of the Blender monument: pediment = Legacy, frieze = Energy, architrave = Keystone Habits, four columns = Pillars, balustrades = Guardrails, stylobate = Foundation, stepped crepidoma = Bedrock. Autoplay pauses on hover and when scrolled out of view (IntersectionObserver). Keep accessible labels on every part; respects light/dark tokens.</div></sc-if>
+  </div>
+  </div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;},&quot;autoplayMs&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:3200,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:1500,&quot;max&quot;:8000,&quot;step&quot;:100,&quot;unit&quot;:&quot;ms&quot;,&quot;section&quot;:&quot;Infographic&quot;}}">
+class Component extends DCLogic {
+  state = { key: "bedrock", sel: "" };
+  renderVals() {
+    const L = {
+      legacy: { n: "07", name: "Legacy", part: "Pediment", eyebrow: "Layer 07 · Roof", title: "Legacy — What You Multiply While Living", body: "Your legacy takes shape in the people you influence, equip, serve, and encourage now. Generosity grows when others learn to practice and pass it on. Estate arrangements may support continuity but do not define Legacy Giving.", href: "stewardship-blueprint.dc.html#layer-7" },
+      energy: { n: "06", name: "Energy", part: "Frieze", eyebrow: "Layer 06", title: "Energy — Capacity to Live It", body: "Physical, emotional, mental, and spiritual energy must be received, invested, renewed, and protected.", href: "stewardship-blueprint.dc.html#layer-6" },
+      habits: { n: "05", name: "Keystone Habits", part: "Architrave", eyebrow: "Layer 05", title: "Keystone Habits — Rhythms That Strengthen", body: "Small, repeatable actions shape the life you live more than occasional bursts of motivation.", href: "stewardship-blueprint.dc.html#layer-5" },
+      rail: { n: "04", name: "Guardrails", part: "Balustrades", eyebrow: "Layer 04 · Both sides", title: "Guardrails — Boundaries That Protect", body: "Pre-decided limits protect your priorities, integrity, relationships, and freedom before pressure creates regret.", href: "stewardship-blueprint.dc.html#layer-4" },
+      pillars: { n: "03", name: "Four Pillars", part: "Columns", eyebrow: "Layer 03", title: "Four Pillars — Family, Fitness, Fun & Finances", body: "Relationships, health, joy, and financial resources are connected. Strengthening one while neglecting the others eventually affects the whole life.", href: "stewardship-blueprint.dc.html#layer-3" },
+      foundation: { n: "02", name: "Foundation", part: "Stylobate", eyebrow: "Layer 02", title: "Foundation — Mission, Values, Calling & Purpose", body: "What matters most to you? What does faithful living look like in this season? Foundation translates conviction into direction.", href: "stewardship-blueprint.dc.html#layer-2" },
+      bedrock: { n: "01", name: "Bedrock", part: "Crepidoma", eyebrow: "Layer 01", title: "Bedrock — Faith & Identity", body: "Your identity is deeper than what you accomplish, own, or produce. Faith is not just one room in the house; it shapes the entire structure.", href: "stewardship-blueprint.dc.html#layer-1" },
+    };
+    const order = ["bedrock", "foundation", "pillars", "rail", "habits", "energy", "legacy"];
+    const k = this.state.key;
+    const tabs = order.map((key, i) => ({ n: L[key].n, label: L[key].name, border: key === k ? "#b88a4a" : "var(--border,#e1dbd0)", bg: key === k ? "rgba(184,138,74,.1)" : "var(--card,#fff)", color: key === k ? "#b88a4a" : "var(--ink,#1c1917)", num: key === k ? "#b88a4a" : "var(--muted-fg,#6d6660)", click: () => this.setState({ key, sel: key + ":" + Date.now() }) }));
+    return { d: L[k], tabs, selectKey: this.state.sel || "", onChange: (key) => { if (key !== this.state.key) this.setState({ key }); }, autoplayMs: this.props.autoplayMs ?? 3200, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+[
+  {
+    "id": "AMD-01",
+    "owner_direction": "OD-03,OD-04",
+    "affected_sources": "PJ §2.3/§3; UX §6; E Stage1",
+    "earlier_rule": "Assessment-first describes the normal public path; account invitation follows results.",
+    "current_design": "Add independent direct registration/sign-in and no-assessment conversation. Both paths converge on one verified record.",
+    "boundary": "Expand pathway; preserve assessment results-before-signup on CFM path and all identity/consent controls.",
+    "target": "04 X01; 05 D12; 08 E06"
+  },
+  {
+    "id": "AMD-02",
+    "owner_direction": "OD-02",
+    "affected_sources": "08 Draft0.1 §4; ARCH modular services",
+    "earlier_rule": "Logical service families exist but nine specialist intelligence contracts were absent.",
+    "current_design": "S00 plus AG01–AG09 contracts; bounded invocation, permissioned tools, no compulsory nine calls.",
+    "boundary": "Add functional ownership; do not replace application authorization with AI.",
+    "target": "08 E01–E06"
+  },
+  {
+    "id": "AMD-03",
+    "owner_direction": "OD-09",
+    "affected_sources": "COM §2.2/§3.1/§17/§18; COM:CE19/CE20/disabled catalogue controls",
+    "earlier_rule": "Trials/coupons/lifetime/promotion offers broadly disabled; no intentional indefinite Steward grant.",
+    "current_design": "Permit selected configurable price/discount/free-period/nonexpiring administrative grants in the target.",
+    "boundary": "Narrow design change; unapproved offers still denied, model still cannot grant, public sold-lifetime/family/affiliate etc. not activated.",
+    "target": "07 M03–M05; 05 D17/D19"
+  },
+  {
+    "id": "AMD-04",
+    "owner_direction": "OD-10,OD-20; CHG-DEC09-001",
+    "affected_sources": "COM D02/2.1/5.2/6.1/11.3/14.2/CE04; D01/D08 adoption and D07 first-renewal extension; PJ7; UX17; ADMIN8",
+    "earlier_rule": "Legacy nonrenewing contract; Draft 0.2 exact new terms open",
+    "current_design": "Approved product schedule in master07 M11; explicit activation and continued Full development in active Premium; configuration remains DESIGN",
+    "boundary": "No legacy conversion, no owner approval as consent/clearance/test/release, all production flags false",
+    "target": "04 J02/X03/X05/J04; 05 D18–D20; 07 M02–M11; 08 E13; 09 DEC09-T01–T12; DEC-09"
+  },
+  {
+    "id": "AMD-05",
+    "owner_direction": "OD-06,OD-07,OD-08",
+    "affected_sources": "OI4 §7; PJ §§8–9; UX §17",
+    "earlier_rule": "Ethical paid invitations exist, no complete upgrade/resume/referral/shared-budget workflow.",
+    "current_design": "Add helpful chat upgrade, shared bounded promotion policy, durable minimal refusal, participant-controlled referrals.",
+    "boundary": "No renewed pitch after refusal; safety/Free value and no sensitive sales targeting retained.",
+    "target": "03 C05–C07; 04 X03/X04; 05 D14/D15/D18"
+  },
+  {
+    "id": "AMD-06",
+    "owner_direction": "OD-13",
+    "affected_sources": "ARCH class11; PRIV religious sensitivity; PJ §16; 08 reporting roadmap",
+    "earlier_rule": "Cohort sponsorship exists but optional self-declared affiliation not fully specified.",
+    "current_design": "Add optional affiliation separate from acquisition/referral/campaign/grants; explicitly defer church communications/dashboard integration.",
+    "boundary": "Affiliation grants no church access; retain private data and reviewed small-cell aggregate safeguards.",
+    "target": "04 X06; 05 D13/D14; 07 M07"
+  },
+  {
+    "id": "AMD-07",
+    "owner_direction": "OD-15,OD-16",
+    "affected_sources": "PRIV O03–O05; ARCH F; PD-PREMIUM PPD-CR01/08",
+    "earlier_rule": "Session-only raw history and selected notes; expanded review purposes proposed.",
+    "current_design": "Specify selected continuity/relationship/progress/review purposes for the initial full-build design.",
+    "boundary": "Do not enable automatic biography/raw-chat archiving; exact lifecycle/provider review remains required.",
+    "target": "03 C04; 05 D02/D04; DEC-02/03"
+  },
+  {
+    "id": "AMD-08",
+    "owner_direction": "OD-15,OD-17",
+    "affected_sources": "P05/P06/P10/P11/S09 earlier NEXT/LATER labels; engineering Stages3–4",
+    "earlier_rule": "Older proposal included later partner/family modes and rich memory possibilities.",
+    "current_design": "Named partner/family modes and rich story/photo/timeline features deferred; baseline preparation retained.",
+    "boundary": "No portal, household merge, minor access or media intake inferred.",
+    "target": "04 scope table; 03 C09; DEC-05/06/07"
+  },
+  {
+    "id": "AMD-09",
+    "owner_direction": "OD-15",
+    "affected_sources": "P01/P04/P07/P08/P09/P12/P13; OI4 §8",
+    "earlier_rule": "Many ongoing experiences marked later or only described as general principles.",
+    "current_design": "Initial full-build target includes adaptive reviews, selected-record Year in Review, history, Protect, Experiments, Re-engagement and Attention Budget.",
+    "boundary": "Earlier pilot verification limits are not the entire commercial product; no production activation by documentation.",
+    "target": "04 current feature contracts; 05; 08 E07"
+  },
+  {
+    "id": "AMD-10",
+    "owner_direction": "OD-11,OD-12",
+    "affected_sources": "P15/OBJ11; COM benefits; ADMIN flags",
+    "earlier_rule": "Benefits prospective; reusable member/tester group operations not complete.",
+    "current_design": "Add generic groups, membership and versioned benefits/rollouts, including expressly nonexpiring grants.",
+    "boundary": "No automatic event schedule, all-Premium eligibility or private-content access.",
+    "target": "04 X12; 05 D17; 07 M08; 08 E11"
+  },
+  {
+    "id": "AMD-11",
+    "owner_direction": "OD-14",
+    "affected_sources": "SR4 §10; SAF §14; ADMIN §12; 00/08 revision controls",
+    "earlier_rule": "Versions/staging/rollback exist but practical import/publish workflow incomplete.",
+    "current_design": "Define change package, manifest, compatible publisher validation, code/schema distinction and rollback/forward repair.",
+    "boundary": "A ZIP is not executable deployment; preserve purchased terms and deletion/revocation.",
+    "target": "08 E09–E12; RELEASE_TEMPLATES"
+  },
+  {
+    "id": "AMD-12",
+    "owner_direction": "OD-18",
+    "affected_sources": "ADMIN §§7–8; prior hardware discussion",
+    "earlier_rule": "Cloud/local sizing and full delivery cost not validated.",
+    "current_design": "Add measured load/SLO/cost evidence requirements and configurable usage, no hardware/user-count guarantee.",
+    "boundary": "No hardware purchase, model price or provider capacity conclusion.",
+    "target": "07 M10; 08 E08"
+  },
+  {
+    "id": "AMD-13",
+    "owner_direction": "OD-21; CHG-D02-001-001",
+    "affected_sources": "Current D02-001/Q07; X01; D12; S00/AG01–03; simulation guide/instructions",
+    "earlier_rule": "Labeled model-generated mock receipts left a simulation authority loophole; owner reports conversational failure.",
+    "current_design": "External controller/harness confirmations only; actual choices; partial pending states; existing auth gates; separate save confirmation; no automatic rerun.",
+    "boundary": "No source-body, authentication-policy, commercial or unrelated scope change; correction NOT RUN.",
+    "target": "09 Q07/Q08; 04 X01; 05 D12; 08 S00/AG01–03"
+  }
+]

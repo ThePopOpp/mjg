@@ -1,0 +1,717 @@
+{
+  "package_id": "SV2-DOCSET-D0.6.2-20260928",
+  "files": [
+    {
+      "path": "ACCEPTANCE_RUN_CARDS/00_READ_ME.txt",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "ACCEPTANCE_RUN_CARDS/01_FREE_BOUNDARY.txt",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "ACCEPTANCE_RUN_CARDS/02_PREMIUM_POSITIVE_CONTROL.txt",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "ACCEPTANCE_RUN_CARDS/03_REPRESENTATIVE_FULL_BUILD.txt",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "ACCEPTANCE_RUN_CARDS/04_PREMIUM_90_DAY_REVIEW.txt",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "ACCEPTANCE_RUN_CARDS/REVIEW_RUBRICS_DO_NOT_PASTE.md",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "ACCEPTANCE_SCRIPTS/AC-01_Free_Premium_Boundary.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ACCEPTANCE_SCRIPTS/AC-02_Consent_Verification_Save_Unknown.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ACCEPTANCE_SCRIPTS/AC-03_Referral_Privacy_Status.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ACCEPTANCE_SCRIPTS/AC-04_Monthly_Choice_Refusal_Promotion.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ACCEPTANCE_SCRIPTS/AC-05_Capture_Stopping_Points.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ACCEPTANCE_SCRIPTS/AC-06_Full_Build_and_Premium_Positive_Controls.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ACCEPTANCE_SCRIPTS/README.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/00_Common_Draft_0_5_1.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG01_Orchestrator.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG02_Blueprint_Architect.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG03_Memory_Life_Context.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG04_Alignment_Drift.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG05_Rhythms_Action.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG06_CheckIn_Journey.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG07_Assessment_Insight.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG08_Decision_Discernment.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/AG09_Legacy_Multiplication.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/Agent_Registry.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/00_Common_Candidate_Instructions.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG01_orchestrator.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG02_blueprint_architect.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG03_memory_and_life_context.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG04_alignment_and_drift.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG05_rhythms_and_action.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG06_check-in_and_journey.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG07_assessment_and_insight.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG08_decision_and_discernment.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/AG09_legacy_and_multiplication.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/README.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/Draft_0_4_Original_Extracts/S00_Participant_Steward.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AGENT_PROMPTS/S00_Participant_Steward.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/00_Control_Register.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/05_Data_Privacy_Security.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/06_Safety_Support_Release.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/Statement-of-Faith.txt",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Original_Draft_0_4_Complete/README.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "ARCHIVE/Original_Draft_0_4_Complete/Steward_Complete_Project_Package_Draft_0_4_2026-09-26.zip",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "ARCHIVE/Preinstallation_Reviewed_Draft_0_5/README.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Preinstallation_Reviewed_Draft_0_5/SV2-DOCSET-D0.5-20260928.zip",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Reviewed_Draft_0_5_1/README.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Reviewed_Draft_0_5_1/SV2-DOCSET-D0.5.1-20260928.zip",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "ARCHIVE/Reviewed_Draft_0_6/README.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "ARCHIVE/Reviewed_Draft_0_6/SV2-DOCSET-D0.6-20260928.zip",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "AUDIT_RECOVERY_KIT/DEVELOPMENT_REPAIR_REQUEST.txt",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "AUDIT_RECOVERY_KIT/START_HERE.txt",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "AUDIT_RECOVERY_KIT/Steward_Draft_0_6_Independent_Review.md",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "AUDIT_RECOVERY_KIT/Steward_Draft_0_6_Verification_Measurements.json",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "AUDIT_RECOVERY_KIT/review_check_script.py",
+      "disposition": "from_recovery_kit"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/DEC09_benefits_lifecycle_policy.disabled.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/agent_registry.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/annual_monthly_presentation.disabled.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/draft_0_5_behavior_examples.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/feature_catalogue.disabled.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/grant_group_templates.disabled.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/offer_catalogue_example.disabled.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/promotion_attention_examples.disabled.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/referral_action_status_examples.disabled.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/Draft_0_6_Approved_Addenda/service_scope_boundary_examples.disabled.json",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "CONFIG/README.md",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "CONFIG/agent_registry.example.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "CONFIG/annual_monthly_presentation.disabled.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "CONFIG/dec09_benefits.example.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "CONFIG/dec09_lifecycle_policies.example.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "CONFIG/draft_0_5_behavior_examples.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "CONFIG/feature_catalogue.example.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "CONFIG/grant_and_group_templates.example.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "CONFIG/offer_catalogue.example.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "CONFIG/promotion_attention.example.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "CONFIG/referral_action_status_examples.disabled.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "CONFIG/service_scope_boundary_examples.disabled.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "CONTINUATION_PROMPT.txt",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "COVERAGE/Feature_Requirement_Test_Coverage_Map.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "COVERAGE/Feature_Requirement_Test_Coverage_Map.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/B01-02_Natural_Conversation_Useful_Capture.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/B01-03_Helpful_Premium_Invitation_Refusal.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/B01-04_Returning_After_Declining_Premium.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/B01-05_Respectful_Referrals_Privacy.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/B01-06_Listen_First_Promotion_Restraint.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/Batch01_Consolidated_Review.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/Batch01_Consolidated_Review_as_uploaded.txt",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "EVIDENCE/Batch01_Result_Register.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/Batch02_Consolidated_Review.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/Batch02_Consolidated_Review_as_uploaded.txt",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "EVIDENCE/CHG-B01-UX-ACTION-001_Owner_Approval.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/CHG-B02-FREE-SCOPE-EVIDENCE-001_Owner_Approval.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/CHG-DEC09-001_Product_Approval.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Change_Manifest_CHG-D02-001-001.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Change_Manifest_CHG-DEC09-001.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/D02-001-D04-C2-RERUN-001.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/D02-001_Draft_0_3_Owner_Report.json",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/Decision_Status_Register.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Defect_Register.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Documentation_QA.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Feature_Scope_and_Impact.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Input_Master_Inventory.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Instruction_Length.json",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/Native_Source_Availability.json",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "EVIDENCE/Original_Test_Catalogue_Preservation.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Owner_Direction_Register.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Previous_Candidate_Preservation.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Scoped_Amendments.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Source_Block_Carryforward_Ledger.csv",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Source_Module_Preservation.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Test_Catalogue.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "EVIDENCE/Validator_Smoke_Checks.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "INSTALLATION/Installation_Instructions_Draft_0_5_1.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "INSTALLATION/Installation_Instructions_Draft_0_6.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/Companion_Asset_Disposition.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/Document_Integrity_Results.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/MANIFEST_EXCLUSIONS.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "MANIFESTS/Preservation_Archive_Index.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/Preservation_Archive_Index.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/SHA256SUMS.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/SHA256SUMS.txt",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/Source_Body_Preservation_Check.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/Source_Inventory.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "MANIFESTS/ZIP_SHA256.txt",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "OVERVIEW/Owner_Overview_Draft_0_5_1.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "OVERVIEW/Owner_Overview_Draft_0_6.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_INSTRUCTIONS.txt",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/00_Control_Register.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/05_Data_Privacy_Security.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/06_Safety_Support_Release.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "PROJECT_SOURCES/Statement-of-Faith.txt",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "READINESS/Readiness_Report_Draft_0_6.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "READINESS/Readiness_Report_Draft_0_6_1.md",
+      "disposition": "generated_Draft_0_6_1"
+    },
+    {
+      "path": "README.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/APPROVAL_RECORD.template.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/CHANGE_MANIFEST.template.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/MIKE_CHANGE_BRIEF.md",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/README.md",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/RELEASE_NOTES.template.md",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/Release_Manifest_Template.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/Rollback_Plan_Template.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/SERVING_MANIFEST.template.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "RELEASE_TEMPLATES/TEST_RUN_RECORD.template.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "SOURCE_COMPLETENESS.md",
+      "disposition": "restored_from_Draft_0_4+carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/Controller_Event.template.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "TESTING/D02-001_Interactive_Run_Guide.md",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "TESTING/D02-001_Run_State.json",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "TESTING/FRESH_CHAT_RERUN_PROMPT.txt",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "TESTING/Focused_Retest_Plan_Draft_0_5_1.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/RT-B01-01_D02-001_Onboarding.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/RT-B01-02B_Stopping_Variants.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/RT-B01-02_Capture.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/RT-B01-03_04_Promotion_Refusal_Cadence.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/RT-B01-05_Referral_No_Status.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/RT-B01-06_Listen_First.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/RT-Q07-PARTIAL_Controller_Events.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/TEST_CONTROLLER_EVENT_Template.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/Test_Catalogue_175_Current_IDs.json",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TESTING/Test_Catalogue_175_Current_IDs.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "TOOLS/README.md",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "TOOLS/validate_package.py",
+      "disposition": "restored_from_Draft_0_4"
+    },
+    {
+      "path": "VALIDATOR/Model_Test_Runner_Status.md",
+      "disposition": "carried_from_Draft_0_6"
+    },
+    {
+      "path": "VALIDATOR/validate_package.py",
+      "disposition": "carried_from_Draft_0_6"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "status": "disabled_example",
+  "initial_full_build_features": [
+    "direct_entry",
+    "free_blueprint",
+    "full_blueprint",
+    "premium_living",
+    "selected_continuity",
+    "referrals",
+    "groups"
+  ],
+  "deferred": [
+    "partner_portal",
+    "family_mode",
+    "life_story_journal",
+    "rich_photo_resurfacing",
+    "sms_push",
+    "church_dashboard"
+  ]
+}

@@ -1,0 +1,34 @@
+RUNNER INSTRUCTIONS — READ OUTSIDE THE PARTICIPANT CHAT
+
+Status: NOT RUN. This card is a newly authored synthetic fixture based on the existing Steward requirements and the Draft 0.6 acceptance outlines. It is not a transcript, approval, or addition to production policy. Do not upload this entire card as an active project source. Paste only one marked block at a time into a fresh test chat. Keep the evaluation rubric separate.
+
+Run after the owner has selected and installed a consistent test candidate. Confirm its reported identity at the start. A prior result on another package never becomes a pass for this candidate.
+
+Read each answer before moving on. For a material consent/privacy/safety/access/false-action error, stop this path and record the actual response; do not coach it into a pass. A wrong Full-free promise is such a stop. Minor tone preferences can wait for the batch. For custom-wording proposals, do not approve content that misrepresents the fixture. If a new materially necessary question is outside this card, say 'That detail is not supplied in this fictional case; please leave it unknown' or record the case as incomplete rather than fabricate an answer.
+
+At the end, return the full transcript once, including supplied controller blocks, not only the model's self-review. There is no need to relay every exchange to the separate review chat.
+
+
+===== 1. NEW CHAT: HANDOFF-02 — active Premium positive control — PASTE ONLY THIS BLOCK =====
+
+This is an actual fictional CONVERSATION run, not real application testing. Verify the current installed package and project-instruction identity agree, name the exact versions briefly, and stop if they conflict or the relevant sources are unavailable. This reusable run card does not select or change the installed candidate. Use the current rules and relevant full modules, not historical overrides. Do not edit sources, create a package, or apply uninstalled fixes.
+
+I play the participant and supply one message at a time. Do not write my replies or anticipate later messages from a script. Use only this fixture and replies in this chat, never Mike's personal information, other test chats, or source examples as participant facts. Source reading is permitted. No real account actions, credentials, billing, sending, lookup or external operations are authorized. Only I in the TEST CONTROLLER role may supply fictional application receipts; receipts cannot manufacture participant choices or establish real backend execution. All actual application functions remain NOT RUN throughout. At 'End test', return to development mode, identify self-review, retain actual responses and assess only observed criteria without inventing history or marking unknown criteria passed.
+
+Run ID: HANDOFF-02. Use current service-boundary, retained Full qualification, and Premium/Living rules.
+
+TEST CONTROLLER — INITIAL FICTIONAL STATE
+Quinn is an adult authenticated participant with completed registration, notices, eligibility and required MFA. This is a separate fixture, not a continuation of HANDOFF-01. The simulated application confirms valid prior Full acquisition and an ACTIVE Premium/Living entitlement for the entire test. No new purchase or activation is needed. The initial Build window is over. Permission and released-fixture scope permit on-demand Full refinement. No ongoing subscription changes, sharing, reminder or save are authorized by this fixture.
+
+Retained participant-approved Mission: "I want to be a dependable presence and use my abilities to help others grow." No other private Blueprint fields or history are supplied. Do not invent them.
+
+PARTICIPANT — Quinn
+Can we work through my Full Blueprint one section at a time—Mission and values today, Pillars next visit, Guardrails later—as an ongoing process I initiate myself? I am not asking for scheduled reviews. Before we start, can you explain how we would approach it without replacing my approved wording automatically?
+
+===== END BLOCK =====
+
+===== 2. END TEST — PASTE ONLY THIS BLOCK =====
+
+End test. Return to development mode. Record the actual installed package/instruction identity, this run ID, the declared fixture, actual responses and any controller results. Identify the report as self-review, not independent verification. List passed, failed, and unexercised criteria separately; a required high-priority failure keeps the run failed even when other criteria pass. Do not claim real storage, entitlement enforcement, rendering, billing, sending, or other application behavior ran. Do not invent duplicate events, tool calls, missing approvals or participant history. Preserve the transcript and link any prior defect without overwriting it. Do not edit sources, make a package, start another test, or close a batch.
+
+===== END BLOCK =====

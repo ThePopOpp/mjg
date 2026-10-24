@@ -1,0 +1,21 @@
+{
+  "production_enabled": false,
+  "candidate": "SV2-DOCSET-D0.5-20260928",
+  "offer_presentation": {
+    "annual_preferred_when_eligible": true,
+    "monthly_clearly_available_when_eligible": true,
+    "monthly_reference_price_usd": "19.00",
+    "annual_reference_price_usd": "199.00",
+    "source": "master07 M11/M12; authoritative catalogue required at runtime",
+    "must_not_change_CHG_DEC09_001": true
+  },
+  "referral_status_wording": {
+    "no_recipient_status_returned": "Generating the link has not created an account for the recipient, and Steward has not sent anything.",
+    "prohibited_without_authorized_status": [
+      "has no account",
+      "has no activity",
+      "has not signed up",
+      "has not paid"
+    ]
+  }
+}

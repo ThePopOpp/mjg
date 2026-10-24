@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="Lead a Group" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="churches" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 72px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ Lead a Group</span>
+    <h1 style="margin:24px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,58px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">You Don’t Have to Be the Expert in the <em style="font-style:normal;color:#b88a4a;">Room.</em></h1>
+    <p style="margin:20px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">Great group conversations often begin with one person willing to create space for honesty, Scripture, reflection, and practical action.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">Leading a Stewardship Blueprint study is not about giving six polished speeches. It is about serving people well and helping them move from insight to one meaningful next step.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;">
+      <a href="https://michaeljgauthier.com/6-week-challenge" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore the Current Challenge</a>
+      <a href="https://michaeljgauthier.com/register" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Register as Facilitator</a>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:14px;align-items:center;">
+    <div style="aspect-ratio:3/4;border-radius:10px;overflow:hidden;box-shadow:0 18px 48px rgba(20,20,20,.14);"><image-slot id="lead-leader-guide" shape="rect" placeholder="Approved Leader Guide cover"></image-slot></div>
+    <div style="aspect-ratio:16/10;border-radius:12px;overflow:hidden;border:1px solid var(--border,#e1dbd0);position:relative;"><image-slot id="lead-invite-video" shape="rect" placeholder="Optional invitation teaching video"></image-slot><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;"><span style="width:52px;height:52px;border-radius:9999px;background:#b88a4a;color:var(--card,#fff);display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></span></div></div>
+  </div>
+</section>
+
+<!-- WHAT LEADERS DO -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">What Leaders Do</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">Create Space. Ask Good Questions. Encourage Action.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Prepare with the participant materials, welcome the group, maintain confidentiality, guide discussion rather than dominate it, and invite each person to choose a manageable commitment.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Good leaders listen carefully, respect the right to pass, avoid acting as another person’s therapist or professional advisor, and know when to involve appropriate church or professional support.</p>
+      <a href="#faq" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:15px;font-weight:600;color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">View Facilitator FAQ →</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+      <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:20px;"><p style="margin:0;font-family:Fraunces,Georgia,serif;font-size:20px;">Create space</p><p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:var(--muted-fg,#6d6660);">Welcome, confidentiality, safety.</p></div>
+      <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:20px;"><p style="margin:0;font-family:Fraunces,Georgia,serif;font-size:20px;">Ask well</p><p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:var(--muted-fg,#6d6660);">Guide, don’t dominate. Listen.</p></div>
+      <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:20px;"><p style="margin:0;font-family:Fraunces,Georgia,serif;font-size:20px;">Encourage action</p><p style="margin:8px 0 0;font-size:13.5px;line-height:1.55;color:var(--muted-fg,#6d6660);">One manageable commitment each.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMPLE PATH -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Simple Path</p>
+  <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">How to Start a Group.</h2>
+  <ol style="margin:36px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;">
+    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="6">
+      <li style="display:flex;gap:16px;border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:20px;"><span style="flex:none;width:36px;height:36px;border-radius:9999px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);display:flex;align-items:center;justify-content:center;font-family:Fraunces,Georgia,serif;font-size:15px;">{{ s.n }}</span><p style="margin:0;font-size:15px;line-height:1.6;">{{ s.t }}</p></li>
+    </sc-for>
+  </ol>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;">
+    <a href="https://michaeljgauthier.com/register" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Create an Account</a>
+    <a href="https://michaeljgauthier.com/6-week-challenge/videos" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Open the Video Library</a>
+  </div>
+  <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:24px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>The current /register page supports Participant and Facilitator roles (components/auth/register-form.tsx); live permission and dashboards should be verified.</div></sc-if>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:start;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Frequent Questions</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Questions New Facilitators Ask.</h2>
+      <a href="contact.dc.html?topic=facilitator" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;margin-top:28px;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Contact Us About Leading</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;grid-column:span 1;">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+        <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);overflow:hidden;">
+          <button onClick="{{ f.toggle }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 20px;background:none;border:none;cursor:pointer;text-align:left;font-family:Fraunces,Georgia,serif;font-size:18px;color:var(--ink,#1c1917);">{{ f.q }}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b88a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;transform:{{ f.rot }};transition:transform .15s;"><path d="m6 9 6 6 6-6"></path></svg></button>
+          <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:0 20px 18px;font-size:15px;line-height:1.7;color:var(--muted-fg,#6d6660);">{{ f.a }}</p></sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  state = { open: 0 };
+  renderVals() {
+    const steps = [
+      "Choose the study and audience. The current men’s challenge has established materials.",
+      "Select the group schedule and location.",
+      "Register or sign in using the appropriate facilitator access.",
+      "Invite participants and distribute available materials.",
+      "Confirm all video links and session dates, then lead with humility and clarity.",
+      "Encourage each participant to name a practical next step and revisit it.",
+    ].map((t, i) => ({ n: i + 1, t }));
+    const QA = [
+      ["Do I need to be a trained teacher?", "No. Read the guide, prepare faithfully, and focus on helpful facilitation rather than performance."],
+      ["How long is the study?", "The current Life You’re Building men’s experience uses six sessions. Confirm the actual session schedule with your group."],
+      ["What if someone does not want to share?", "Respect their choice. The right to pass is part of healthy group culture."],
+      ["What if a conversation goes off topic?", "Follow the person and the purpose; bring the conversation gently back to the question or next step when needed."],
+      ["Can a church customize the experience?", "Ask about currently supported options before assuming custom content or white-label functionality."],
+      ["What if someone needs deeper care?", "Follow your church safeguarding policies and connect them to appropriate pastoral or professional support."],
+    ];
+    const faqs = QA.map(([q, a], i) => ({ q, a, open: this.state.open === i, rot: this.state.open === i ? "rotate(180deg)" : "none", toggle: () => this.setState(s => ({ open: s.open === i ? -1 : i })) }));
+    return { steps, faqs, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

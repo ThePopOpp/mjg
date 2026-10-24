@@ -1,0 +1,543 @@
+{
+  "package_id": "SV2-DOCSET-D0.6.2-20260928",
+  "source_catalogue": "CONFIG/feature_catalogue.example.json restored from Draft 0.4",
+  "feature_count": 48,
+  "rows": [
+    {
+      "feature_id": "P01",
+      "name": "Adaptive Steward Check-Ins",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P01-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P02",
+      "name": "Steward, Check Me",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P02-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P03",
+      "name": "Decision Mode",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P03-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P04",
+      "name": "Quarterly Blueprint Reset",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P04-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P05",
+      "name": "Accountability Partner Mode",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P05-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P06",
+      "name": "Family/Spouse Conversation Mode",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P06-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P07",
+      "name": "My Stewardship Year in Review",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P07-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P08",
+      "name": "Vision Casting / My Next Season",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P08-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P09",
+      "name": "Blueprint Version History / My Blueprint Journey",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P09-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P10",
+      "name": "Life Story / Steward Journal",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P10-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P11",
+      "name": "Remember When Moments",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P11-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P12",
+      "name": "Accomplishment & Progress Memory",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P12-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P13",
+      "name": "Visual Steward Experience",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P13-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P14",
+      "name": "Multi-Channel Communication",
+      "target_scope": "SPLIT",
+      "coverage_status": "specified_split_initial_and_deferred; implementation_dependent",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P14-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "P15",
+      "name": "Inner Circle / Membership Benefits",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-P15-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S01",
+      "name": "Current Life Season record",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S02",
+      "name": "Blueprint-area seasons / postures",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S03",
+      "name": "Season right-sizing: overload and underreach",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S04",
+      "name": "Capacity Zones",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S05",
+      "name": "Evidence of Alignment",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S06",
+      "name": "For the Right Season memory",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S07",
+      "name": "Transition Mode",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S08",
+      "name": "Season completion and transition signals",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S09",
+      "name": "Season Timeline",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S10",
+      "name": "Energy-aware season design and Restore posture",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S11",
+      "name": "Loving recognition before bold challenge",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "S12",
+      "name": "Season-aware Decision Mode",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X01",
+      "name": "Direct entry / registration",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-001\u2013D02-006",
+      "exercised_evidence": [
+        "D02-001-D04-C2-RERUN-001 scoped pass; B02-02 scoped pass"
+      ],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X02",
+      "name": "Progressive Blueprint and nine-function ownership",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-007\u2013D02-010",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X03",
+      "name": "Helpful chat upgrade / resume",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-011\u2013D02-018; B02-04R",
+      "exercised_evidence": [
+        "B02-04 pricing/monthly/refusal partial pass; DEF-B02-FREE-SCOPE-001 fail for service boundary"
+      ],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X04",
+      "name": "Participant referral / advocacy",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-019\u2013D02-024; B02-01/B01-05",
+      "exercised_evidence": [
+        "B02-01 targeted recipient-status retest pass; application controls not run"
+      ],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X05",
+      "name": "Configurable commercial / grants",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-025\u2013D02-034; DEC09-T01\u2013T12",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X06",
+      "name": "Optional church affiliation / acquisition",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-035\u2013D02-038",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X07",
+      "name": "Attention and shared promotion budget",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-039\u2013D02-042",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X08",
+      "name": "Experiments",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-043\u2013D02-045",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X09",
+      "name": "Protect Mode",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-046\u2013D02-047",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X10",
+      "name": "Re-engagement",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-048\u2013D02-050",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X11",
+      "name": "Relationship context / avoid repeated questions",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-051\u2013D02-054",
+      "exercised_evidence": [
+        "B02-03 selected-note capture pass; retrieval not run"
+      ],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X12",
+      "name": "Inner Circle / configurable groups",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-055\u2013D02-057",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "X13",
+      "name": "Controlled releases / import and rollback",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "coverage_status": "specified_initial_full_build; mostly untested unless listed evidence exists",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "D02-058\u2013D02-064",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "ORG_EVENTS",
+      "name": "Church events/resource feed",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "Deferred negative tests / future-scope tests",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "ORG_MESSAGES",
+      "name": "Church-admin broadcasts/notifications",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "Deferred negative tests / future-scope tests",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "ORG_DASHBOARD",
+      "name": "Church-integrated dashboard",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "Deferred negative tests / future-scope tests",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "PUSH",
+      "name": "Push notifications",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-PUSH-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "SMS",
+      "name": "SMS reminders",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2 seasonal/premium scenarios; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "FORGEDLIFE_SYNC",
+      "name": "Deep ForgedLife exchange",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "Deferred negative tests / future-scope tests",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "PARTNER_PORTAL",
+      "name": "Recipient/partner access",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-PARTNER_PORTAL-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    },
+    {
+      "feature_id": "PHOTO_JOURNAL",
+      "name": "Participant photo/life-story archive",
+      "target_scope": "DEFERRED",
+      "coverage_status": "deferred_not_enabled",
+      "requirements_source": "master04 disposition table and detailed feature clauses; master11 current disposition",
+      "representative_tests": "V2-PHOTO_JOURNAL-A/B where defined; D02 mapped regressions",
+      "exercised_evidence": [],
+      "implementation_status": "NOT RUN unless specific executed evidence listed; production_enabled=false in restored catalogue",
+      "notes": "Do not infer a pass from a broadly related conversation."
+    }
+  ]
+}

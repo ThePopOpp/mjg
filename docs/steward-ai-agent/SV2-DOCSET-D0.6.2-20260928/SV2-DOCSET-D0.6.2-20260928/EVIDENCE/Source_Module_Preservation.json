@@ -1,0 +1,292 @@
+[
+  {
+    "source_key": "SR4",
+    "master": "00_Control_Register.md",
+    "input_body_sha256": "21b590e0ed4b5b50a49b8feaf045fa06178b9e6419c49ba6ea3afea992346b55",
+    "output_body_sha256": "21b590e0ed4b5b50a49b8feaf045fa06178b9e6419c49ba6ea3afea992346b55",
+    "exact_body_match": true,
+    "block_count": 116,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "CTX3",
+    "master": "00_Control_Register.md",
+    "input_body_sha256": "a5ab03a8fbe9c67582dbe4a04cd81da9beee2a14cf19e3882c9510ca91734355",
+    "output_body_sha256": "a5ab03a8fbe9c67582dbe4a04cd81da9beee2a14cf19e3882c9510ca91734355",
+    "exact_body_match": true,
+    "block_count": 123,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "INSTR4",
+    "master": "00_Control_Register.md",
+    "input_body_sha256": "217f1026559c60495aa697b1424db53f48be9d22328e4763222865e237d35962",
+    "output_body_sha256": "217f1026559c60495aa697b1424db53f48be9d22328e4763222865e237d35962",
+    "exact_body_match": true,
+    "block_count": 1,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "T4",
+    "master": "02_Framework_Blueprint_Assessments.md",
+    "input_body_sha256": "a72f07cf523d6b8182eb1130b544e235eade481815e8e4d0d3fe1f6688b7daa7",
+    "output_body_sha256": "a72f07cf523d6b8182eb1130b544e235eade481815e8e4d0d3fe1f6688b7daa7",
+    "exact_body_match": true,
+    "block_count": 216,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "LG",
+    "master": "02_Framework_Blueprint_Assessments.md",
+    "input_body_sha256": "4099376d2543f649126503be8cc930fbcbca31acb617f4351eada6693edff5fa",
+    "output_body_sha256": "4099376d2543f649126503be8cc930fbcbca31acb617f4351eada6693edff5fa",
+    "exact_body_match": true,
+    "block_count": 83,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "CFM4",
+    "master": "02_Framework_Blueprint_Assessments.md",
+    "input_body_sha256": "0d6137b0e1ed953aab830eceb96280d90407153b28c31edacf1c7d22a760dbb4",
+    "output_body_sha256": "0d6137b0e1ed953aab830eceb96280d90407153b28c31edacf1c7d22a760dbb4",
+    "exact_body_match": true,
+    "block_count": 159,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "EA",
+    "master": "02_Framework_Blueprint_Assessments.md",
+    "input_body_sha256": "7e9b01b26ce566ab5181c5e78c41f5c4b2ac943d9b3cacf57879324b367a6ff1",
+    "output_body_sha256": "7e9b01b26ce566ab5181c5e78c41f5c4b2ac943d9b3cacf57879324b367a6ff1",
+    "exact_body_match": true,
+    "block_count": 160,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "OI4",
+    "master": "03_Conversation_Sensitive_Safety.md",
+    "input_body_sha256": "f642f383fc5ae16f12ffa55470bea91fefcdf3151d717a92b0a9f7eb7f2234ee",
+    "output_body_sha256": "f642f383fc5ae16f12ffa55470bea91fefcdf3151d717a92b0a9f7eb7f2234ee",
+    "exact_body_match": true,
+    "block_count": 92,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "SC3",
+    "master": "03_Conversation_Sensitive_Safety.md",
+    "input_body_sha256": "5b88ee628c723cfcc4aeb219ecb8fe50b5632de3667cee56432a45328b96cc9e",
+    "output_body_sha256": "5b88ee628c723cfcc4aeb219ecb8fe50b5632de3667cee56432a45328b96cc9e",
+    "exact_body_match": true,
+    "block_count": 1,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "PJ",
+    "master": "04_Product_Journey_New_Features.md",
+    "input_body_sha256": "a4174557349e9c80f4ac3180bffd09096e3de7dd11dc65dc0400b319cf75ed49",
+    "output_body_sha256": "a4174557349e9c80f4ac3180bffd09096e3de7dd11dc65dc0400b319cf75ed49",
+    "exact_body_match": true,
+    "block_count": 305,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "ARCH",
+    "master": "05_Data_Privacy_Security.md",
+    "input_body_sha256": "eae8e7007f6fbf40a3c1cc85d8704721a95902e011de48c96d8959d5f1af236c",
+    "output_body_sha256": "eae8e7007f6fbf40a3c1cc85d8704721a95902e011de48c96d8959d5f1af236c",
+    "exact_body_match": true,
+    "block_count": 433,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "PRIV",
+    "master": "05_Data_Privacy_Security.md",
+    "input_body_sha256": "babd2198d197dfb9aaeea072ff8dd6cf93ced3eee25bdb7fcc2629cabdb02ce6",
+    "output_body_sha256": "babd2198d197dfb9aaeea072ff8dd6cf93ced3eee25bdb7fcc2629cabdb02ce6",
+    "exact_body_match": true,
+    "block_count": 437,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "SAF",
+    "master": "06_Safety_Support_Release.md",
+    "input_body_sha256": "87c6eada74ebe03e35405a71c9cc47a31f91e1e3e28293fd79d049f0ebc68cb6",
+    "output_body_sha256": "87c6eada74ebe03e35405a71c9cc47a31f91e1e3e28293fd79d049f0ebc68cb6",
+    "exact_body_match": true,
+    "block_count": 678,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "COM",
+    "master": "07_Commerce_Scripture_Rights.md",
+    "input_body_sha256": "ea5fe1483aa2d590ea32c0b7a0844fdd596d4eb53ed5dd56ae8ed700c7c05a73",
+    "output_body_sha256": "ea5fe1483aa2d590ea32c0b7a0844fdd596d4eb53ed5dd56ae8ed700c7c05a73",
+    "exact_body_match": true,
+    "block_count": 413,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "RIGHTS",
+    "master": "07_Commerce_Scripture_Rights.md",
+    "input_body_sha256": "c1825b9a07ec203738e65033e54b03df739f0f786c1a20ca05b4c7de02414605",
+    "output_body_sha256": "c1825b9a07ec203738e65033e54b03df739f0f786c1a20ca05b4c7de02414605",
+    "exact_body_match": true,
+    "block_count": 326,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "UX",
+    "master": "08_Engineering_Experience_Operations.md",
+    "input_body_sha256": "77ac0355a4bf773f13eb6953d0be872ac1e569c507ce03b5a9b7ff14eaaebdb7",
+    "output_body_sha256": "77ac0355a4bf773f13eb6953d0be872ac1e569c507ce03b5a9b7ff14eaaebdb7",
+    "exact_body_match": true,
+    "block_count": 238,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "ADMIN",
+    "master": "08_Engineering_Experience_Operations.md",
+    "input_body_sha256": "dac7bf003a472aa47834925ccc8c82c7ef404b6ddabaa25f994a009291a9f56d",
+    "output_body_sha256": "dac7bf003a472aa47834925ccc8c82c7ef404b6ddabaa25f994a009291a9f56d",
+    "exact_body_match": true,
+    "block_count": 133,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "KICKOFF",
+    "master": "08_Engineering_Experience_Operations.md",
+    "input_body_sha256": "b6bcf0a307360c3784829261ac7c16dd1c50a5b6eed0862009ea72c94a7fa04c",
+    "output_body_sha256": "b6bcf0a307360c3784829261ac7c16dd1c50a5b6eed0862009ea72c94a7fa04c",
+    "exact_body_match": true,
+    "block_count": 80,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "CFM-WEB",
+    "master": "08_Engineering_Experience_Operations.md",
+    "input_body_sha256": "63c0e49806d65903aa20d06d9906c3f30e49ba617edf9ecb69d569a81b4c8a66",
+    "output_body_sha256": "63c0e49806d65903aa20d06d9906c3f30e49ba617edf9ecb69d569a81b4c8a66",
+    "exact_body_match": true,
+    "block_count": 1,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "TS2",
+    "master": "09_Test_Suite_Quality_Control.md",
+    "input_body_sha256": "fa832af8452e63326c18a625439f669303ac81feed9b17397a6f5fd827f415e4",
+    "output_body_sha256": "fa832af8452e63326c18a625439f669303ac81feed9b17397a6f5fd827f415e4",
+    "exact_body_match": true,
+    "block_count": 1,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "TS-HIST",
+    "master": "09_Test_Suite_Quality_Control.md",
+    "input_body_sha256": "58f99529f3428112d0bdf978267e59e10b2d1784a8d26d499ac4204f2c8020d6",
+    "output_body_sha256": "58f99529f3428112d0bdf978267e59e10b2d1784a8d26d499ac4204f2c8020d6",
+    "exact_body_match": true,
+    "block_count": 1,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "BOOK",
+    "master": "10_Teaching_Reference_Library.md",
+    "input_body_sha256": "fd71d42c79315fd0dca09d095b8a1dd0e5f1d17541b4a6d55451aae515ecdf58",
+    "output_body_sha256": "fd71d42c79315fd0dca09d095b8a1dd0e5f1d17541b4a6d55451aae515ecdf58",
+    "exact_body_match": true,
+    "block_count": 2745,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "STUDY5",
+    "master": "10_Teaching_Reference_Library.md",
+    "input_body_sha256": "8de2ffe5ff5e1ce0c86fbe1aa8156c0a5ffee1e00431a2eb9b2c267d6069ad9a",
+    "output_body_sha256": "8de2ffe5ff5e1ce0c86fbe1aa8156c0a5ffee1e00431a2eb9b2c267d6069ad9a",
+    "exact_body_match": true,
+    "block_count": 293,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "FE",
+    "master": "10_Teaching_Reference_Library.md",
+    "input_body_sha256": "fd4bbad099598765e8854649ce6576a7acefb0bc7112ff56aa79d9bfd0cacf08",
+    "output_body_sha256": "fd4bbad099598765e8854649ce6576a7acefb0bc7112ff56aa79d9bfd0cacf08",
+    "exact_body_match": true,
+    "block_count": 313,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "BRAND",
+    "master": "10_Teaching_Reference_Library.md",
+    "input_body_sha256": "7cff447e6507c37ce9f2124711bcf89bac0c77df0fa7d76cbbfe2e299f6f2502",
+    "output_body_sha256": "7cff447e6507c37ce9f2124711bcf89bac0c77df0fa7d76cbbfe2e299f6f2502",
+    "exact_body_match": true,
+    "block_count": 126,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "PD-PREMIUM",
+    "master": "11_Change_Impact_Decisions.md",
+    "input_body_sha256": "1c399f351b3ceafdfc44772d162a29f7c4ab36c0d1dad5b5152a96a5de4c26c7",
+    "output_body_sha256": "1c399f351b3ceafdfc44772d162a29f7c4ab36c0d1dad5b5152a96a5de4c26c7",
+    "exact_body_match": true,
+    "block_count": 1,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "CN-PREMIUM",
+    "master": "11_Change_Impact_Decisions.md",
+    "input_body_sha256": "b99fa2b1653452f83ad7bc3c0389ee35aa03a5964696f2c1bbd3e260e5d4f7b4",
+    "output_body_sha256": "b99fa2b1653452f83ad7bc3c0389ee35aa03a5964696f2c1bbd3e260e5d4f7b4",
+    "exact_body_match": true,
+    "block_count": 1,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "PD-SEASON",
+    "master": "11_Change_Impact_Decisions.md",
+    "input_body_sha256": "8e0b16deca70f34ebbe4eb6ba25e8a05838d78f504eba3083b22b09bbfb55309",
+    "output_body_sha256": "8e0b16deca70f34ebbe4eb6ba25e8a05838d78f504eba3083b22b09bbfb55309",
+    "exact_body_match": true,
+    "block_count": 195,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  },
+  {
+    "source_key": "CN-SEASON",
+    "master": "11_Change_Impact_Decisions.md",
+    "input_body_sha256": "96c7169624e1ab5c08773b1d22dc212d56db1519a87ae2760bde14b490cdc80f",
+    "output_body_sha256": "96c7169624e1ab5c08773b1d22dc212d56db1519a87ae2760bde14b490cdc80f",
+    "exact_body_match": true,
+    "block_count": 12,
+    "base_package_id": "SV2-DOCSET-D0.3-20260926",
+    "target_package_id": "SV2-DOCSET-D0.4-20260926"
+  }
+]

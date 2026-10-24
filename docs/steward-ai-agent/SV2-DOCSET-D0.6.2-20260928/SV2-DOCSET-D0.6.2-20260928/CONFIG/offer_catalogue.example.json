@@ -1,0 +1,135 @@
+{
+  "status": "DESIGN_ONLY_NOT_A_PUBLISHED_CATALOGUE",
+  "package_id": "SV2-DOCSET-D0.4-20260926",
+  "offers": [
+    {
+      "id": "free_reference",
+      "product_key": "free_blueprint",
+      "price_minor": 0,
+      "currency": "USD",
+      "billing": "NONE",
+      "card_required": false,
+      "benefits": [
+        "free_blueprint"
+      ],
+      "production_enabled": false
+    },
+    {
+      "id": "initial_full_reference",
+      "product_key": "full_blueprint_build",
+      "price_minor": 14900,
+      "currency": "USD",
+      "billing": "ONE_TIME",
+      "benefits": [
+        "full_acquisition",
+        "build_window"
+      ],
+      "build_days": 30,
+      "activation_purchase_deadline_days": 90,
+      "production_enabled": false,
+      "source": "COM D01; current M02"
+    },
+    {
+      "id": "premium_monthly_reference",
+      "product_key": "steward_premium",
+      "price_minor": 1900,
+      "currency": "USD",
+      "billing": "RECURRING",
+      "interval": "MONTH",
+      "requires_valid_full_acquisition": true,
+      "requires_explicit_recurring_assent": true,
+      "production_enabled": false
+    },
+    {
+      "id": "premium_annual_reference",
+      "product_key": "steward_premium",
+      "price_minor": 19900,
+      "currency": "USD",
+      "billing": "RECURRING",
+      "interval": "YEAR",
+      "requires_valid_full_acquisition": true,
+      "requires_explicit_recurring_assent": true,
+      "production_enabled": false
+    },
+    {
+      "id": "build_plus_first_year_recurring_v1",
+      "offer_version_id": "build_plus_first_year_recurring_v1",
+      "product_key": "build_plus_first_year",
+      "schema_status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED",
+      "product_terms_status": "APPROVED_FOR_DOCUMENTATION",
+      "owner_approval_ref": "CHG-DEC09-001",
+      "owner_approval_record": "EVIDENCE/CHG-DEC09-001_Product_Approval.json",
+      "price_minor": 29900,
+      "currency": "USD",
+      "billing": "INITIAL_BUNDLE_THEN_RECURRING_ANNUAL",
+      "tax_behavior": "PLUS_APPLICABLE_TAX_EXACT_TOTAL_BEFORE_ASSENT",
+      "benefits": [
+        "full_acquisition",
+        "build_window",
+        "premium_first_year"
+      ],
+      "requires_initial_full_not_already_acquired": true,
+      "assessment_required": false,
+      "requires_explicit_recurring_assent": true,
+      "recurring_assent_at": "CHECKOUT_WITH_EXACT_PHASES_AND_ACTIVATION_RULE",
+      "renewal_terms": {
+        "price_minor": 19900,
+        "interval": "YEAR",
+        "calendar_months": 12,
+        "until_canceled": true,
+        "anchor": "CONFIRMED_EXPLICIT_ACTIVATION",
+        "first_due": "ACTIVATION_PLUS_12_CALENDAR_MONTHS",
+        "higher_price_or_cadence_requires_fresh_assent": true,
+        "no_assent_to_increase": "STOP_AT_PAID_TERM_END"
+      },
+      "activation_and_refund_terms_ref": "CONFIG/dec09_lifecycle_policies.example.json",
+      "benefit_template_ref": "CONFIG/dec09_benefits.example.json",
+      "activation_ui": {
+        "label": "Activate Premium and continue with Steward",
+        "available_after": [
+          "PAYMENT_CONFIRMED",
+          "PENDING_ENTITLEMENT_COMMITTED"
+        ],
+        "start_clocks_after": "EXPLICIT_ACTION_AND_SERVER_ACTIVATION_COMMIT",
+        "resume_same_workflow": true,
+        "repeat_intake": false,
+        "assessment_required": false,
+        "show_exact_dates_and_accepted_terms": true,
+        "failure_preserves_existing_access": true
+      },
+      "production_enabled": false,
+      "blocking_decision": null,
+      "remaining_blocks": [
+        "ACTUAL_IMPLEMENTATION_AND_PROVIDER_MAPPING",
+        "QUALIFIED_TERMS_TAX_PRIVACY_SECURITY_REVIEWS",
+        "USAGE_AND_DUNNING_CONFIGURATION",
+        "EXECUTED_APPLICATION_TESTS",
+        "SEPARATE_RELEASE_AUTHORIZATION"
+      ]
+    },
+    {
+      "id": "build_first_year_LEGACY_REFERENCE_ONLY",
+      "product_key": "build_plus_first_year",
+      "price_minor": 29900,
+      "currency": "USD",
+      "billing": "ONE_TIME_PREPAID_NO_AUTORENEW",
+      "benefits": [
+        "full_acquisition",
+        "build_window",
+        "premium_first_year"
+      ],
+      "historical_scope": "preserve actual legacy purchased terms; not silent new recurring offer",
+      "production_enabled": false,
+      "historical_alias": "BUILD_LIVE_299_Y1",
+      "automatic_migration": false
+    }
+  ],
+  "global": {
+    "fixed_prices_in_prompts": false,
+    "existing_contract_mutation": false,
+    "tax_configuration": "REQUIRES_QUALIFIED_ACTUAL_CONFIGURATION",
+    "usage_allowance": null,
+    "live_provider_price_ids": null
+  },
+  "selected_change_id": "CHG-DEC09-001"
+}

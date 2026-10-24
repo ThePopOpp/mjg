@@ -1,0 +1,12 @@
+{
+  "package_id": "",
+  "base_package_id": "",
+  "target_package_id": "",
+  "changed_files": [],
+  "change_ids": [],
+  "approvals": [],
+  "tests_required": [],
+  "tests_executed": [],
+  "rollback_plan": "",
+  "release_authorized": false
+}

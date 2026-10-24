@@ -1,0 +1,11 @@
+{
+  "status": "TEMPLATE_ONLY_NOT_AN_EXECUTED_EVENT",
+  "purpose": "Optional event structure; plain-language TEST CONTROLLER EVENT from Mike as tester is sufficient. Steward never issues one during the test.",
+  "issuer_role": null,
+  "fixture_reference": null,
+  "operation_reference": null,
+  "participant_prerequisite_choice_refs": [],
+  "confirmed_application_results": {},
+  "unconfirmed_results_remain_pending": true,
+  "counts_as_real_application_evidence": false
+}

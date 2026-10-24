@@ -1,0 +1,9 @@
+{
+  "status": "disabled_example",
+  "max_unsolicited_invitations_per_conversation": 2,
+  "refusal_stops": true,
+  "shared_budget": [
+    "upgrade",
+    "referral"
+  ]
+}

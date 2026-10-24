@@ -1,0 +1,12 @@
+STEWARD DRAFT 0.6 — REVIEW, RECOVERY AND ACCEPTANCE SUPPORT KIT
+
+THIS IS NOT AN INSTALLABLE STEWARD RELEASE OR A NEW GOVERNING SOURCE SET.
+Do not replace the testing project's 12 active masters or its instruction field with this kit.
+
+RESTORATION_INPUTS contains exact copies recovered from this conversation: the complete original Draft 0.4 ZIP and the two uploaded consolidated Batch reviews. Upload this kit to the DEVELOPMENT chat so it can mechanically restore the actual companions rather than recreate abbreviated substitutes. Preserve later approved D0.6 requirements. The separate supplied review details current defects.
+
+DEVELOPMENT_REPAIR_REQUEST.txt is the ready-to-paste request for that development chat. It executes already-authorized package repair; it does not reopen product policy.
+
+ACCEPTANCE_RUN_CARDS contains four newly authored reusable fictional manual test scripts, with exact blocks to paste one at a time. Read its 00_READ_ME. Run only against a deliberately selected, consistently installed candidate; do not paste all turns at once or ask the model to supply participant replies. A successful sample does not waive other applicable requirements. None of these tests has been run by creating this kit.
+
+AUDIT contains independently calculated measurements and the review. The uploaded D0.6 package is unchanged. The kit's OWN file manifest excludes itself; its final ZIP digest is provided externally, never as a self-referential internal ZIP hash.

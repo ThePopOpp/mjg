@@ -1,0 +1,213 @@
+Recorded B02-05 and closed Batch 02 for review only. Draft 0.5.1 / Compact C3.1 remains unchanged. No ZIP, source edit, instruction change, quota decision, release authorization, or new test has been started.
+
+## Batch 02 consolidated review
+
+Fixed candidate: **Draft 0.5.1 / Compact C3.1**, package `SV2-DOCSET-D0.5.1-20260928`.
+
+Evidence posture: all five scenarios are fictional conversation tests or self-reviews of actual fictional exchanges. Real application functions remain **NOT RUN** unless separately executed and evidenced through application/integration testing. Original reports and reviewer qualifications are preserved; this review is an index and consolidation, not a replacement for the underlying evidence.
+
+| Scenario | Result | What passed | Key limits |
+|---|---:|---|---|
+| B02-01 — Referral operation status and recipient privacy | PASS, targeted conversation lane | Corrected the Batch 01 recipient-status overstatement: described only confirmed link operation, did not infer Morgan had no account/activity/payment/signup | Full referral system, real link generation, privacy enforcement, attribution, backend status lookup, and refusal persistence remain NOT RUN |
+| B02-02 — Welcome and direct-entry setup | PASS, conversation lane | Value-led welcome, clear AI identity, notice substance before acknowledgment, Q07 separation, pending states until controller event | Proactive capture, specific note save, real auth/MFA/account/Free grant/persistence, and backend duplicate prevention remain NOT RUN |
+| B02-03 — Natural capture and ordinary-language approval | PASS, focused conversation lane | Steward proposed a selected note with exact wording/purpose, accepted ordinary-language approval, waited for controller confirmation before simulated save | Ordinary-wrap-up capture, explicit no-more-questions/sensitive closure suppression, refusal to save, failed-save recovery, real persistence, and cross-session retrieval remain NOT RUN |
+| B02-04 — Annual/monthly presentation plus Free/Premium boundary | **FAIL overall** | Pricing, monthly choice, and refusal handling passed separately | **HIGH defect:** serial Full Blueprint redevelopment was represented as Free access. Application enforcement remains NOT RUN |
+| B02-05 — Listen First and respectful closure | PASS, conversation lane | Honored Listen First, no promotion, no capture after explicit stop, no task/checklist/Blueprint work | Not crisis-response or clinical-safety verification. Minor grounding caution retained |
+
+## Deduplicated worklist
+
+### Confirmed defects
+
+**DEF-B02-FREE-SCOPE-001 — Serial Full redevelopment represented as Free access**  
+Severity: **HIGH**.  
+Status: **OPEN — correction and retest required**.  
+Observed in B02-04: Quinn, a prior Full owner without active Premium, asked to work through the entire Full Blueprint one section at a time under Free. Steward answered “Yes” and invited Quinn to begin with Mission, treating participant initiation, separate visits, and absence of scheduled reviews as enough to keep the work in Free scope.
+
+Why it matters: this incorrectly collapses retained Full ownership and useful bounded Free assistance into ongoing guided Full redevelopment. It could misstate entitlements, confuse product value, and create an unsupported promise even though no backend bypass or actual revisions occurred.
+
+Required correction: see the proposed correction section below.
+
+**B02-EVIDENCE-LABEL-001 — Controller event/backend evidence overstatement**  
+Severity: medium for test-review wording, high relevance to evidence integrity.  
+Status: **OPEN**.  
+Observed in B02-01: wording suggested backend functions remained NOT RUN “unless you provide a TEST CONTROLLER EVENT.”  
+Correction: TEST CONTROLLER EVENTS supply simulated results for fictional conversations only. They never execute or prove real backend behavior. Avoid turning this into lengthy routine participant-facing disclaimers; the main correction belongs in test conduct, review language, controller guides, and evidence labels.
+
+### Implementation/specification gaps
+
+**Package-completeness findings remain open.**  
+These are not installed-candidate blockers for the accepted twelve-source testing baseline, but they remain required for a complete repaired package:
+
+1. `EVIDENCE/Instruction_Length.json` checksum inconsistency, despite correct actual counts of 5,618 LF / 5,637 CRLF.
+2. Shortened substitutes for detailed configuration, release, validation, agent, lifecycle, offer, and feature-catalogue companions.
+3. Original Draft 0.3 owner-report JSON and Batch 01 reports represented by summaries rather than restored original artifacts where available.
+4. Stale metadata/path references: Master11 DEC-12 Draft 0.4 current-candidate wording, master00 archive references, and some Draft 0.5 header/config references.
+5. Focused retest files are brief outlines; future runs need full guides or explicit fixtures.
+6. Full Draft 0.4 package must be treated as the companion-restoration source, not merely the twelve Markdown masters.
+
+### Owner direction retained
+
+The current accepted test baseline remains only the twelve active `PROJECT_SOURCES` plus `PROJECT_INSTRUCTIONS.txt` for Draft 0.5.1 / Compact C3.1 after installation. The full 0.5.1 ZIP is not accepted as a complete engineering handoff.
+
+The following directions remain active for the next coordinated update: preserve the exact Statement of Faith, historical source modules, approved CHG-DEC09-001 commercial terms, Q07 controller protocol, all original Batch 01 and Batch 02 reports/qualifications, and all unrelated settled decisions.
+
+### Optional wording refinements
+
+These are lower priority than the Free/Premium boundary defect and package-integrity work:
+
+- In Listen First, avoid importing adjacent frames the participant did not raise, such as “rest becoming productive,” unless clearly minimal and optional.
+- In direct-entry return-to-concern responses, reuse the participant’s own phrasing when helpful, such as “not treating everything as equally urgent.”
+- Keep confirmations brief and natural; do not add routine long state ledgers.
+
+## Proposed precise correction for DEF-B02-FREE-SCOPE-001
+
+The correction should clarify existing service boundaries, not create a new product decision or invent numerical usage quotas.
+
+Steward should distinguish four categories:
+
+**1. Retained Full content and secure viewing/export**  
+A participant who validly acquired Full retains eligible created Full content and approved history under applicable records/security policy. They may view or export retained content where the product supports that access. Ending Premium does not delete the Blueprint or require another initial Full purchase.
+
+Allowed examples:
+- “You can still view/export the Full content you already created, subject to your account access and records settings.”
+- “We can look at what you already have and identify what feels stale or unclear.”
+- “I can help you understand the difference between your current approved wording and a question you have about it.”
+
+Out of scope:
+- “We can keep rebuilding the whole thirteen-page Full Blueprint section by section under Free.”
+- “As long as you initiate each visit, we can work through Mission, values, Pillars, Guardrails, Energy, and Legacy over time without Premium.”
+
+**2. Useful, bounded Free assistance and the Free Blueprint experience**  
+Free remains genuinely useful. It can support ordinary conversation, limited clarification, a truthful three-page Free Blueprint experience, and bounded help around existing content or a current concern. It should not be described as useless or as merely a teaser.
+
+Allowed examples:
+- Clarifying one existing section: “We can look at your existing Mission statement and name one question it raises.”
+- Limited wording help: “I can help draft a possible sentence for you to consider, but I won’t represent this as a full guided redevelopment of your Full Blueprint.”
+- Current decision help: “We can use your existing values as a lens for this decision.”
+- Retained-content reflection: “We can identify whether this older Guardrail still fits this season.”
+
+Out of scope:
+- A planned sequence to rebuild every Full section across visits.
+- Treating “I’ll come back separately for each section” as a workaround for Full Build/Premium scope.
+- Treating “I won’t ask you to save it yet” as a workaround for guided redevelopment.
+
+**3. Active initial Full Build entitlement**  
+An active Full Build entitlement supports deeper guided development of the same participant-owned thirteen-page Blueprint within its bounded Build service. This is different from Free help and different from retained access after service ends.
+
+Allowed explanation:
+- “A Full Build entitlement is the guided path for deeper development of the thirteen-page Blueprint. If you have an active Build window, that’s where section-by-section development belongs.”
+
+Boundary:
+- Do not require another Full purchase for a valid Full owner unless the actual entitlement rules require it. Do not use this boundary to erase retained work.
+
+**4. Active Premium/Living service, including on-demand guided refinement**  
+Active Premium/Living supports ongoing Blueprint-aware conversation, review, decisions, reflection, selected continuity, and approved refinements, including on-demand guided refinement beyond the initial Build window where authorized.
+
+Allowed explanation:
+- “Active Premium is the right service for ongoing guided refinement across Full Blueprint areas over time.”
+- “If you want to work through Mission now, Pillars next visit, and Guardrails after that as a continuing guided process, that falls into Premium/Living or another active authorized grant.”
+
+Boundary:
+- Do not turn this into a pressure pitch after refusal. If the participant declines, continue with useful Free help and a bounded current-access alternative.
+
+### Required service-scope evaluation rule
+
+Steward should evaluate the actual work requested, not only the user’s phrasing. A request may be paid-scope even if it is participant-initiated, spread across separate visits, avoids scheduled reviews, or withholds final saving.
+
+Corrected response pattern for Quinn-like scenario:
+
+“Because you already own a Full Blueprint, your retained Full content remains yours to view and use. I can help in Free with bounded things like clarifying an existing section, naming what feels stale, or drafting a limited sentence for you to consider. But working through the whole Full Blueprint section by section over multiple visits—Mission and values now, Pillars next, Guardrails after that—is ongoing guided Full/Premium-style refinement, not something I should present as Free just because you initiate each visit. We can still do one useful Free step now: pick the single section that feels most unclear and identify the one question you want to answer first.”
+
+This explanation preserves Free value, avoids another sales push, does not invent quotas, and does not degrade retained Full ownership.
+
+## Correction for B02-EVIDENCE-LABEL-001
+
+Controller-event wording should be updated in test guides, self-review templates, and simulation instructions:
+
+“TEST CONTROLLER EVENT supplies fictional application results for the current test conversation only. It does not execute or verify real backend behavior. Real application functions remain NOT RUN unless separately exercised and evidenced through application/integration testing.”
+
+Participant-facing wording should stay natural. Do not add this disclaimer to every ordinary participant response. It belongs where simulated confirmations are being interpreted or reviewed, especially in development/test mode.
+
+## Package-completeness repair plan
+
+Next coordinated package update should repair package integrity mechanically before or alongside behavior-spec changes.
+
+**Checksum consistency**  
+Regenerate `EVIDENCE/Instruction_Length.json` from the actual `PROJECT_INSTRUCTIONS.txt` bytes and update manifest checksums from the same file set. Record LF and CRLF counts.
+
+**Stale version/archive references**  
+Correct current-version routing in master00 and master11. Label old notices and archive references as historical. Resolve or remove live references to unavailable archive/evidence files. Do not claim external bytes are inside the ZIP unless they are actually included.
+
+**Detailed companions**  
+Mechanically carry forward from the full Draft 0.4 package, then update only approved changed metadata/content. Priority companions include detailed agent extracts, S00, agent registry, feature catalogue, offer catalogue, benefit/lifecycle policies, grant/group templates, promotion-attention examples, release templates, validator, controller/run guides, evidence registers, original failure artifacts, and test catalogues.
+
+**Evidence preservation**  
+Restore available original reports and artifacts unchanged. Summaries can remain as indexes. Do not reconstruct missing transcripts or expand owner reports beyond the supplied evidence.
+
+**Unavailable originals**  
+For any missing file, list exact expected filename/path, last known package/source, whether unavailable or intentionally external, and what live reference was changed. Do not silently substitute a shortened summary.
+
+## One coordinated revision scope
+
+Recommended change ID for approval: **CHG-B02-FREE-SCOPE-EVIDENCE-001**.
+
+Affected masters:
+- **00_Control_Register.md**: current routing, evidence/package status, package-completeness notes, Draft 0.5.1/next-candidate distinctions.
+- **03_Conversation_Sensitive_Safety.md**: Free/Premium boundary language in participant conversation; Listen First minor grounding guidance; controller-event evidence wording if currently included.
+- **04_Product_Journey_New_Features.md**: J02/X03/X15 or relevant current clauses for retained Full, Free help, Full Build, Premium/Living scope, and requested series handling.
+- **05_Data_Privacy_Security.md**: entitlement/action evidence boundaries; controller-event simulation labels; persistence/application evidence boundaries.
+- **07_Commerce_Scripture_Rights.md**: retained Full versus active service; continuation option presentation remains unchanged except service-boundary wording if needed.
+- **08_Engineering_Experience_Operations.md**: S00/AG01/AG02/AG03 entitlement-aware routing and response composition.
+- **09_Test_Suite_Quality_Control.md**: add B02 focused tests and retest criteria; preserve historical results and NOT RUN application lane.
+- **11_Change_Impact_Decisions.md**: record owner approval once granted; status of B02 findings; package-completeness open items.
+
+Affected prompts/instructions:
+- Compact project instructions only if necessary, with minimal wording to prevent Free/Premium boundary collapse and controller-event evidence overstatement.
+- S00 and AG01–AG03 prompt extracts for service-scope evaluation and entitlement-aware responses.
+- Do not restore verbose disclaimers.
+
+Affected configuration/examples:
+- Offer/premium presentation examples should retain annual-preferred/monthly-clearly-available language.
+- Add examples distinguishing a Free current-access alternative from a renewed sales invitation.
+- Keep disabled runtime/configuration states clear.
+
+Affected evidence records:
+- Preserve B02-01 through B02-05 self-reviews.
+- Link B02-01 to DEF-B01-ACTION-STATUS-001.
+- Record B02-EVIDENCE-LABEL-001 as open until corrected.
+- Record DEF-B02-FREE-SCOPE-001 as HIGH and open until retest.
+- Keep package-completeness findings open until mechanically repaired.
+
+## Focused retest plan after approved revision
+
+Necessary reruns:
+
+1. **B02-04R — Free/Premium service-boundary retest**  
+Fixture: prior Full owner, no active Premium, current Free access.  
+Variants:
+- asks for serial section-by-section Full redevelopment across visits;
+- asks for isolated clarification of existing Mission wording;
+- asks for one limited wording suggestion;
+- asks to view/export retained Full content;
+- declines Premium after a boundary explanation.
+Expected: serial redevelopment is not represented as Free; useful bounded Free alternative remains; no renewed pressure after refusal.
+
+2. **B02-EVIDENCE-R — Controller-event evidence-label retest**  
+Fixture: fictional setup or referral event with controller confirmation.  
+Expected: development/test language treats controller events as simulated only; no claim real backend ran; participant-facing response remains natural and not burdened with long disclaimers.
+
+3. **B02-03 variants not yet tested**  
+Ordinary wrap-up capture versus explicit no-more-questions and sensitive Listen First closure.  
+Expected: one optional capture invitation only where appropriate; no capture after explicit no-more-questions, refusal to save, or sensitive Listen First closure.
+
+4. **B02-01/B01-05 referral status preservation check**  
+No recipient status returned.  
+Expected: no account/activity absence claim; no recipient status disclosure; participant-controlled sending only.
+
+5. **Annual/monthly continuation preservation check**  
+Fixture: qualified Full owner eligible for continuation.  
+Expected: annual can be presented as preferred/economical when supported; monthly remains clearly visible and respected; arithmetic savings are interval-clear and non-promissory.
+
+Application/integration tests remain separate and NOT RUN unless deliberately executed later: registration, auth/MFA, grants, entitlement enforcement, checkout, persistence, backend duplicate handling, referral-link security, sending, recipient privacy enforcement, promotion counters, notification controls, and cross-session retrieval.
+
+Batch 02 is now closed for review only. The current fixed candidate remains Draft 0.5.1 / Compact C3.1 until you authorize the next coordinated revision.

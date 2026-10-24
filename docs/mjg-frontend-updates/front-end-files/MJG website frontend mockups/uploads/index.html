@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Stewardship Blueprint - Monument 3D View</title>
+<style>
+html,body{margin:0;height:100%;background:#050914;color:#d9d3c2;font-family:Georgia,serif;overflow:hidden;user-select:none;-webkit-user-select:none}
+#stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none}
+#stage.drag{cursor:grabbing}
+#img{max-width:100%;max-height:100%;pointer-events:none}
+#hud{position:absolute;left:0;right:0;bottom:0;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;letter-spacing:.06em;background:linear-gradient(transparent,rgba(5,9,20,.85))}
+#hud b{color:#c9a24a}
+#load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;letter-spacing:.1em}
+button{background:transparent;border:1px solid #c9a24a;color:#c9a24a;padding:6px 12px;font-family:inherit;letter-spacing:.08em;cursor:pointer}
+</style></head><body>
+<div id="stage"><img id="img" draggable="false"></div>
+<div id="load">LOADING FRAMES&hellip;</div>
+<div id="hud"><span>Drag to rotate &nbsp;&middot;&nbsp; Drag up/down for elevation &nbsp;&middot;&nbsp; <b id="pos"></b></span><button id="auto">AUTO-SPIN</button></div>
+<script>
+const STEPS=72, ELEVS=3, LABEL=['Low','Eye level','Elevated'];
+let az=8, el=1, dragging=false, sx=0, sy=0, saz=0, sel=0, auto=false, timer=null;
+const img=document.getElementById('img'), stage=document.getElementById('stage'), pos=document.getElementById('pos');
+const src=(e,i)=>`frames/e${e}_${String(i).padStart(3,'0')}.jpg`;
+function show(){img.src=src(el,((az%STEPS)+STEPS)%STEPS);pos.textContent=`${LABEL[el]} · ${Math.round(((az%STEPS)+STEPS)%STEPS*5)}°`}
+let loaded=0,total=STEPS*ELEVS;
+for(let e=0;e<ELEVS;e++)for(let i=0;i<STEPS;i++){const im=new Image();im.onload=im.onerror=()=>{if(++loaded===total)document.getElementById('load').remove()};im.src=src(e,i)}
+show();
+const down=(x,y)=>{dragging=true;sx=x;sy=y;saz=az;sel=el;stage.classList.add('drag');stopAuto()};
+const move=(x,y)=>{if(!dragging)return;az=saz+Math.round((x-sx)/8);const d=Math.round((sy-y)/70);el=Math.max(0,Math.min(ELEVS-1,sel+d));show()};
+const up=()=>{dragging=false;stage.classList.remove('drag')};
+stage.addEventListener('mousedown',e=>down(e.clientX,e.clientY));window.addEventListener('mousemove',e=>move(e.clientX,e.clientY));window.addEventListener('mouseup',up);
+stage.addEventListener('touchstart',e=>down(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+stage.addEventListener('touchmove',e=>move(e.touches[0].clientX,e.touches[0].clientY),{passive:true});stage.addEventListener('touchend',up);
+window.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){az--;show()}if(e.key==='ArrowRight'){az++;show()}if(e.key==='ArrowUp'){el=Math.min(ELEVS-1,el+1);show()}if(e.key==='ArrowDown'){el=Math.max(0,el-1);show()}});
+function stopAuto(){auto=false;clearInterval(timer);document.getElementById('auto').textContent='AUTO-SPIN'}
+document.getElementById('auto').onclick=()=>{if(auto){stopAuto();return}auto=true;document.getElementById('auto').textContent='STOP';timer=setInterval(()=>{az++;show()},90)};
+</script></body></html>

@@ -1,0 +1,13 @@
+{
+  "status": "NOT_APPROVED",
+  "approver": null,
+  "role": null,
+  "approved_at": null,
+  "exact_package_digest": null,
+  "scope": null,
+  "conditions": [],
+  "evidence_refs": [],
+  "expires_or_review_at": null,
+  "production_release_authority": false,
+  "note": "Source direction, document acceptance, test result, specialist approval, recipient consent and production release are independent records."
+}

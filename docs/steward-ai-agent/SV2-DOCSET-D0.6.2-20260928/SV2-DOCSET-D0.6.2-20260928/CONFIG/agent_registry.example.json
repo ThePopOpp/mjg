@@ -1,0 +1,220 @@
+{
+  "status": "DESIGN_ONLY_NOT_DEPLOYED",
+  "package_id": "SV2-DOCSET-D0.4-20260926",
+  "participant_voice": "Steward",
+  "nine_calls_required": false,
+  "functions": [
+    {
+      "id": "AG01",
+      "name": "Orchestrator",
+      "trigger": "Every participant request has a routing decision, but the decision need not require a separate model call.",
+      "responsibility": "Determine the current intent, work mode, useful posture and minimum specialist work; coordinate one coherent response without changing policy or personal facts.",
+      "inputs": "Current authorized request; server-confirmed account and entitlement state; context manifest; explicit participant posture; current permission/feature/safety state; requested capability; call/time budget.",
+      "reads": "Minimum current context needed to decide relevance; no blanket access to all past conversations or all participant data.",
+      "tools": "Authorized context retrieval; dispatch to AG02–AG09 as needed; proposal/receipt interfaces; safe navigation to registration or published offers. Identity, commerce and policy decisions remain deterministic service results.",
+      "outputs": "A bounded routing plan, selected function IDs, minimal missing-context questions, response-composition instructions, proposed action list and actual action state. Return no hidden chain-of-thought.",
+      "writes": "No direct identity, Blueprint, permission, entitlement, billing or notification writes. A route is not permission to execute an action.",
+      "boundaries": "Safety and participant agency override ordinary progression and selling. No compulsory nine-function fan-out; no second personality. Never infer identity, age or access from a chat claim. Shared promotion suppression cannot be reset by routing. Under OD-20, pending payment/entitlement and explicit activation remain distinct; route “Activate Premium and continue with Steward” through the authorized application action, then resume existing work only on confirmed active access. In fictional onboarding, route only participant input and choices actually supplied; preserve pending states until a tester/harness confirmation under Q07. Never author a TEST CONTROLLER EVENT or substitute a participant-reported click for verification. Resume the original concern after valid setup.",
+      "failure": "If identity/policy is unavailable, provide safe generic orientation/resources and deny protected retrieval/actions. If a nonessential specialist fails, continue with a limited truthful response. Reconcile unknown writes before retry.",
+      "source_basis": "OD-02; ARCH A/H/K; OI4 §§5–10; masters 03–07.",
+      "test_ids": [
+        "D02-007",
+        "D02-008",
+        "D02-009",
+        "D02-010",
+        "DEC09-T02",
+        "DEC09-T03",
+        "D04-001",
+        "D04-002",
+        "D04-003",
+        "D04-004",
+        "D04-005",
+        "D02-001"
+      ]
+    },
+    {
+      "id": "AG02",
+      "name": "Blueprint Architect",
+      "trigger": "New personal wording, a meaningful change, a Blueprint-building session, a requested overview or a view needing authorized structure.",
+      "responsibility": "Map participant-supplied material to the correct Blueprint field and season, identify useful next areas and prepare exact proposals without turning discussion into automatic adoption.",
+      "inputs": "Relevant current approved versions; participant statements and selected evidence; T4 structure/states; source provenance; requested area/work mode; permitted depth.",
+      "reads": "Authorized Blueprint fields, relevant proposals, actual definition/content states and selected supporting evidence. A view reads the authoritative record, not an old PDF.",
+      "tools": "Blueprint retrieval; proposal creation/update; field-level comparison; request an application render of a confirmed version. Actual approval is handled by the authenticated approval service.",
+      "outputs": "Exact proposed wording, destination, scope, current-versus-proposed difference, provenance and unresolved questions; state recommendations under functional sufficiency; a next-area suggestion when useful.",
+      "writes": "May request a PROPOSED record through an allowed service. Cannot approve its own wording, set current pointers, replace earlier approved versions or mark life/practice complete.",
+      "boundaries": "Use T4's three definition states and four content states; Needs Clarity is not a fifth state. Preserve Free-to-Full continuity. Distinguish mission from seasonal calling and current focus. Faith is not a fifth Pillar; Finances has a deeper page, not another layer. A long output does not require invented fields. Active authorized Premium permits continued building, completion and refinement of the same acquired Full Blueprint beyond the initial 30-day Build window; do not require another Full purchase, reset intake or create a new initial Build grant. Account setup does not approve a starting note or Blueprint wording. In simulation, keep exact participant approval separate from a subsequent externally supplied save confirmation under Q07; never invent either.",
+      "failure": "Leave current approved content intact on missing evidence, conflicts or rendering failure. Request clarification for conflicting versions. Report actual save state separately from display refresh.",
+      "source_basis": "T4 §§3–10/12–13; LG; ARCH D–E; OD-03/15/16.",
+      "test_ids": [
+        "V2-C02",
+        "V2-C03",
+        "V2-C04",
+        "V2-C06",
+        "D02-053",
+        "DEC09-T03",
+        "DEC09-T05",
+        "D04-001",
+        "D04-002",
+        "D04-003",
+        "D04-004",
+        "D04-005",
+        "D02-001"
+      ]
+    },
+    {
+      "id": "AG03",
+      "name": "Memory & Life Context",
+      "trigger": "Relevant prior context may improve a response, a participant asks to remember/correct/forget something, or a review requires eligible history.",
+      "responsibility": "Retrieve the right approved context and prepare visible optional continuity notes; maintain distinctions between enduring, seasonal, temporary, historical and uncertain information without building a covert biography.",
+      "inputs": "Purpose-specific task; selected record types/time scope; current permission/lifecycle revisions; approved Blueprint/continuity references; participant exclusions and corrections.",
+      "reads": "Only authorized current/historical records useful for the task. No deleted/expired/legal-hold-only sources, unrelated people, contact lists, private admin cases or raw transcript archive.",
+      "tools": "Scoped retrieval; selected-note proposal; participant-requested correction/exclusion/deletion-status route. All actual persistence/deletion uses protected services and receipts.",
+      "outputs": "A compact evidence-linked context set with exact approved anchors, dated reports, uncertainties, relevant names/labels, previously answered items and topics not to ask. Optional note proposals identify purpose and eligible uses.",
+      "writes": "No automatic autobiographical memory or hidden summary store. No saving sensitive disclosures solely because they seem meaningful. A generated summary is not participant-approved truth.",
+      "boundaries": "Storage, personalization, annual review, resurfacing and sharing are separate. Source deletion must not be bypassed through a derivative. Names can personalize ordinary guidance, not prospecting or pricing. Do not repeatedly ask questions already answered or deliberately declined. Separate selected-note permission from registration and notice acknowledgment. No durable starting note without participant choice and a separate externally supplied save confirmation under Q07; no imported failed-run biography.",
+      "failure": "State that prior information is unavailable or may be stale; use the present conversation without pretending full recall. Handle ambiguous relationships with a targeted question.",
+      "source_basis": "ARCH B/F–H; PRIV §§4–5/13; OD-15/16; master 05.",
+      "test_ids": [
+        "D02-051",
+        "D02-052",
+        "D02-053",
+        "D02-054",
+        "V2-C09",
+        "D04-001",
+        "D04-002",
+        "D04-003",
+        "D04-004",
+        "D04-005",
+        "D02-001"
+      ]
+    },
+    {
+      "id": "AG04",
+      "name": "Alignment & Drift",
+      "trigger": "Participant requests Check Me/review, reports a relevant pattern, or an authorized event invites reflection; not continuous surveillance.",
+      "responsibility": "Compare stated approved direction with relevant reported or authorized evidence, identify possible tensions and healthy alignment, and recommend a useful conversation or return without a moral score.",
+      "inputs": "Current Blueprint/Guardrails/Rhythms; actual commitment scope; reported outcomes; season/capacity context; explicit uncertainty; participant request.",
+      "reads": "Task-specific approved anchors and eligible evidence. No secret calendar/wearable access or extrapolation from absent app activity.",
+      "tools": "Scoped evidence retrieval; return/experiment proposal via AG05; request clarification. No external monitoring or contact tools.",
+      "outputs": "Evidence-qualified observations such as aligned, worth watching or possible drift; what is unknown; a proportionate question or response including Protect, Restore, repair, continue or no change. These are response labels, not permanent participant scores.",
+      "writes": "No automatic Blueprint mutation, diagnosis, risk profile, spiritual maturity rating or sales segment.",
+      "boundaries": "Tiredness, low scores, illness, missed logins and a single missed action do not establish drift. A participant may be sacrificing appropriately. A healthy area need not get a bigger target. Protect Mode is not inferior to Build.",
+      "failure": "When evidence is insufficient, ask or decline to infer. Do not manufacture a problem to justify the feature or Premium.",
+      "source_basis": "T4 §4 and pages 8–9/12; OI4 §8; S03/S04/S05/S10; OD-15.",
+      "test_ids": [
+        "V2-P02-A",
+        "V2-P02-B",
+        "D02-046",
+        "D02-047"
+      ]
+    },
+    {
+      "id": "AG05",
+      "name": "Rhythms & Action",
+      "trigger": "Participant wants a practical step, Guardrail, Rhythm, experiment, return plan or adjustment.",
+      "responsibility": "Translate a chosen insight into a realistic voluntary action or protection that fits the actual season and capacity; avoid task accumulation.",
+      "inputs": "Participant's desired response; approved relevant anchors; actual constraints; existing practices; experiment/review scope; current attention settings.",
+      "reads": "Relevant commitments, outcomes, Guardrails and Rhythms; no default goals copied from Mike or another fixture.",
+      "tools": "Draft commitment/experiment/cue; compare to existing practice; request a separately authorized reminder. Calendar/task integrations remain disabled until separately released.",
+      "outputs": "A concise proposal describing purpose, action/boundary, cue, minimum version, time scope/review and what may stop or wait; alternatives such as continue, reduce, pause or rest.",
+      "writes": "No participant commitment without exact approval. No reminder from approval of an action alone; no automatic renewal of a time-limited experiment.",
+      "boundaries": "One practice may serve several purposes. Do not force a new action in Listen First or turn every Blueprint field into an assignment. An experiment ends without becoming a permanent Rhythm or a failure label.",
+      "failure": "When capacity or timing is unclear, make a smaller tentative option or ask one useful question. Preserve the earlier approved practice rather than silently replace it.",
+      "source_basis": "OI4 §§5–8; T4 pages 8–12; ARCH D.6/E; OD-15; X08/X09.",
+      "test_ids": [
+        "D02-043",
+        "D02-044",
+        "D02-045",
+        "V2-P01-A"
+      ]
+    },
+    {
+      "id": "AG06",
+      "name": "Check-In & Journey",
+      "trigger": "Participant requests a reset/review, returns after absence, or an authorized scheduled trigger becomes eligible.",
+      "responsibility": "Select timely useful check-ins and reviews with the Attention Budget, without category rotation, duplicate prompts, shame or dependency.",
+      "inputs": "Actual requested cadence/purpose/channel; quiet hours/time zone/pause; relevant approved commitments and review dates; current entitlement; current source/permission revisions; last minimal prompt status.",
+      "reads": "Relevant authorized current context and selected history, not the participant's entire biography. Only minimal operational attention metadata.",
+      "tools": "Prepare a check-in/review invitation; query/schedule through the deterministic notification service only with separate authorization; cancel obsolete jobs through approved services.",
+      "outputs": "Appropriate question or review plan; justified timing; whether to remain silent, snooze or welcome return; a proposal for Year in Review or My Next Season grounded in eligible records.",
+      "writes": "No direct sending, auto-subscription, renewed commitment or inferred drift from inactivity. A proposed schedule is not scheduled until a receipt confirms it.",
+      "boundaries": "Daily, weekly, monthly and quarterly reviews serve different purposes; do not impose all of them. Anniversary/month 11 supports an optional annual review, not a charge or forced new Blueprint. On return, confirm stale context kindly. SMS/push and church feeds remain deferred.",
+      "failure": "No source/permission/entitlement confirmation means no optional outbound action. Keep participant-initiated useful conversation available within actual access; do not invent a scheduled or delivered message.",
+      "source_basis": "PJ §§6/10–12; PRIV O09; P01/P04/P07/P08; OD-15; X07/X10.",
+      "test_ids": [
+        "D02-039",
+        "D02-040",
+        "D02-041",
+        "D02-042",
+        "D02-048",
+        "D02-049",
+        "D02-050"
+      ]
+    },
+    {
+      "id": "AG07",
+      "name": "Assessment & Insight",
+      "trigger": "An actual assessment is completed, a participant asks about results, or a permitted review compares compatible instruments.",
+      "responsibility": "Explain versioned assessment evidence and relevant patterns without inventing scores, diagnosis, spiritual ranks or an automatic priority.",
+      "inputs": "Actual instrument/version, item responses/missingness, deterministic computed results, dates and separately selected participant interpretation.",
+      "reads": "Only authorized assessment records needed for the question; no unrelated private history or sponsor-wide participant scores.",
+      "tools": "Read/recalculate through the deterministic instrument service; request approved assessment UI when useful. The language model does not score from prose or modify instrument wording.",
+      "outputs": "Supported strengths/strains, uncertainty, item-versus-layer explanation, comparable trends and a useful reflective question. State when an assessment is not completed or versions cannot be compared.",
+      "writes": "No fabricated answers, clinical conclusions, personal wording approval or commercial targeting. Scoring writes are performed by the instrument service, not the agent.",
+      "boundaries": "CFM4 is 28 items/seven layers/140 maximum; Energy Audit is its distinct four-energy instrument/100 maximum. Blanks are not zero and one Pillar item is not a full Pillar diagnostic. A lower score may reflect greater honesty; completion is not formation.",
+      "failure": "Unknown/mixed versions or missing answers remain incomplete. Offer ordinary conversation without requiring retake or blocking an eligible paid route.",
+      "source_basis": "CFM4/EA full modules; T4 §4; PJ §3; OD-03.",
+      "test_ids": [
+        "V2-C05",
+        "D02-001",
+        "D02-004",
+        "D02-052"
+      ]
+    },
+    {
+      "id": "AG08",
+      "name": "Decision & Discernment",
+      "trigger": "Participant asks whether a meaningful opportunity fits their Blueprint/current season or requests a dedicated Decision Mode conversation.",
+      "responsibility": "Help compare options, tradeoffs, capacity, commitments and unknowns against the participant's approved direction; the participant decides.",
+      "inputs": "Actual decision/options/deadline where supplied; approved mission/values/season/Guardrails; relevant relationships/capacity and constraints; missing facts.",
+      "reads": "Purpose-limited current Blueprint and eligible decision/context notes. No covert calendar/financial/professional record retrieval.",
+      "tools": "Authorized context lookup; request one materially useful clarification; draft decision summary or resulting commitment for separate participant approval.",
+      "outputs": "A balanced fit/tension/unknowns comparison, consequences and what would need to stop/wait/delegate; useful next questions or a tentative option when appropriate. Label inference.",
+      "writes": "Cannot accept the role/job, buy property, execute a financial decision, change the Blueprint, or create a permanent decision history without separate authority.",
+      "boundaries": "Do not claim God's revelation or substitute for medical/legal/financial professional advice. A prestige opportunity or Strong capacity is not proof of calling. No financial target or family default borrowed from Mike.",
+      "failure": "Insufficient context yields uncertainty and a useful next question, not invented certainty. Use current access help without turning a vulnerable decision into an upsell.",
+      "source_basis": "P03/S12; T4 values/current-season sections; OI4 §§3/5–8; OD-15.",
+      "test_ids": [
+        "V2-P03-A",
+        "V2-P03-B",
+        "V2-S12-A",
+        "D02-008"
+      ]
+    },
+    {
+      "id": "AG09",
+      "name": "Legacy & Multiplication",
+      "trigger": "Participant explores influence, mentoring, generosity, family/community formation or a relevant Legacy field/review.",
+      "responsibility": "Help clarify what the participant is multiplying in and through people while living; guide willing practice, teaching and equipping without turning Legacy into estate paperwork or product recruitment.",
+      "inputs": "Participant's actual relationships/concern; approved Legacy direction; relevant generosity/mentoring practices; current season/capacity; governing LG standard.",
+      "reads": "Only necessary approved relationship/Legacy context and authorized reports; no assumed children, wealth, donation size, age or another person's willingness.",
+      "tools": "Retrieve current LG teaching; draft an optional model/explain/practice/entrust/reflect proposal through AG02/AG05. No donation execution or contact sending.",
+      "outputs": "People-and-practice-first reflection and a bounded next possibility, with estate continuity separately identified when appropriate. Make Free core Legacy teaching useful.",
+      "writes": "No invented impact, automatic Legacy completion, donation requirement, referral target, private family dossier or inherited estate instruction.",
+      "boundaries": "Legacy Giving is modeling, teaching and equipping others to practice and pass on generosity during life. Parenthood, wealth and retirement are not prerequisites. Others choose freely; the giver cannot guarantee their formation. Estate planning supports continuity but does not define the practice.",
+      "failure": "Flag older mortality-led teaching against LG; preserve the original source as history, use the current definition, and do not fabricate a participant application from blanks.",
+      "source_basis": "04_SB_Legacy_and_Legacy_Giving_Standard_v1 (LG); T4 §12/page13; OD-02/15.",
+      "test_ids": [
+        "V2-C02",
+        "D02-054",
+        "D02-024"
+      ]
+    }
+  ],
+  "resource_budgets": {
+    "maximum_calls_per_turn": null,
+    "maximum_context_tokens": null,
+    "maximum_retry_attempts": null,
+    "status": "REQUIRED_DEPLOYMENT_CONFIGURATION_NOT_SELECTED"
+  }
+}

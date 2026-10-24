@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="The Life You're Building — Book" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="learn" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="background:#141211;color:#f4f1ea;">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px;align-items:center;">
+    <div>
+      <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(216,189,134,.5);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#d8bd86;">✦ The Book · Coming Soon</span>
+      <h1 style="margin:24px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(42px,5.4vw,64px);line-height:1.02;letter-spacing:-.02em;">The Life You’re <em style="font-style:normal;color:#d8bd86;">Building</em></h1>
+      <p style="margin:14px 0 0;font-family:Fraunces,Georgia,serif;font-style:italic;font-size:22px;line-height:1.35;color:#cfc7ba;">How to Stop Drifting and Design a Life That Matters</p>
+      <p style="margin:22px 0 0;font-size:17px;line-height:1.75;color:#cfc7ba;max-width:560px;text-wrap:pretty;">What if you are working hard, achieving meaningful goals, and doing what responsible people do—but you have not stopped to ask whether you are building the right life?</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:#cfc7ba;max-width:560px;text-wrap:pretty;">This book invites you to look more closely at the life taking shape and discover what faithful, intentional stewardship can look like across every area of life.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;">
+        <a href="https://michaeljgauthier.com/book-waitlist" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Join the Book Waitlist</a>
+      </div>
+      <p style="margin:14px 0 0;font-size:13px;color:#9d948a;">By Michael J. Gauthier</p>
+    </div>
+    <div style="display:flex;justify-content:center;">
+      <div style="width:min(340px,85%);aspect-ratio:2/3;border-radius:6px 16px 16px 6px;overflow:hidden;box-shadow:-14px 30px 70px rgba(0,0,0,.5);"><image-slot id="book-hero-cover" shape="rect" placeholder="Approved final book cover — no “bestseller” language unless earned"></image-slot></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSIDE THE BOOK -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Inside the Book</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">A Journey from Drift to Design.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The Life You’re Building begins with a wake-up call, introduces the Stewardship Blueprint, and helps readers evaluate relationships, health, joy, and finances; establish guardrails and habits; renew energy; rethink financial resources; and consider what their lives are multiplying through other people.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Each chapter combines story, Christian faith, questions, and practical next steps. The book is written for ordinary people with full calendars—not only financial professionals or seasoned church leaders.</p>
+    <a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:15px;font-weight:600;color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Explore the Framework →</a>
+  </div>
+  <div style="border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);padding:8px;">
+    <sc-for list="{{ parts }}" as="p" hint-placeholder-count="6">
+      <div style="display:grid;grid-template-columns:48px 1fr;gap:14px;align-items:baseline;padding:14px 16px;border-bottom:1px solid var(--muted,#f4f1ea);">
+        <span style="font-family:Fraunces,Georgia,serif;font-size:22px;color:#b88a4a;">{{ p.n }}</span>
+        <div><p style="margin:0;font-family:Fraunces,Georgia,serif;font-size:18px;">{{ p.t }}</p><p style="margin:4px 0 0;font-size:13.5px;color:var(--muted-fg,#6d6660);line-height:1.5;">{{ p.b }}</p></div>
+      </div>
+    </sc-for>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><p style="margin:10px 16px 8px;font-size:12px;color:var(--gold-text,#8a6630);">Dev note: numbered-parts graphic as stand-in; swap for a representative interior spread mockup when finalized. Part titles are illustrative — confirm with Mike.</p></sc-if>
+  </div>
+</section>
+
+<!-- AUTHOR NOTE -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:48px;align-items:stretch;">
+    <div style="display:flex;justify-content:center;align-items:flex-end;min-height:0;"><img src="public/media/mike-gauthier-profile-photo.png" alt="Michael J. Gauthier" style="display:block;height:100%;max-height:520px;width:auto;max-width:100%;object-fit:contain;object-position:bottom;"></div>
+    <div style="grid-column:span 1;padding-bottom:72px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Author Note</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Why I Wrote It.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">For a long time I measured progress through achievement and ambition. The birth of my first child prompted a different question: <em style="font-family:Fraunces,Georgia,serif;color:var(--ink,#1c1917);">If everything I am chasing works, will it actually matter?</em></p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The answer did not arrive in a day. It became a long journey of learning to see faith, relationships, purpose, money, time, and influence as connected responsibilities.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">I wrote this book to share the framework that continues to shape the life I am building.</p>
+      <a href="about.dc.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:15px;font-weight:600;color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Read My Story →</a>
+    </div>
+  </div>
+</section>
+
+<!-- GO DEEPER -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Go Deeper</p>
+  <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Keep Building Beyond the Last Page.</h2>
+  <p style="margin:16px 0 0;max-width:680px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The book introduces the framework. The assessments help you see your current reality. Group experiences bring the conversation to life. Your Personal Blueprint and Steward help you make the work personal and ongoing.</p>
+  <p style="margin:14px 0 0;max-width:680px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);">Each element is useful in its own right. Choose the next step that fits your season.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:32px;">
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:20px;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Book</p><p style="margin:8px 0 0;font-size:14.5px;line-height:1.55;">Introduces the framework</p></div>
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:20px;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Assessments</p><p style="margin:8px 0 0;font-size:14.5px;line-height:1.55;">See your current reality</p></div>
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:20px;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Groups</p><p style="margin:8px 0 0;font-size:14.5px;line-height:1.55;">Bring the conversation to life</p></div>
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:20px;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Blueprint + Steward</p><p style="margin:8px 0 0;font-size:14.5px;line-height:1.55;">Make it personal and ongoing</p></div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;">
+    <a href="studies.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore Studies</a>
+    <a href="personal-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Build My Blueprint</a>
+    <a href="https://michaeljgauthier.com/book-waitlist" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Join the Waitlist</a>
+  </div>
+  <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:24px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>The book is not claimed published. Current waitlist includes format preferences; keep /book-waitlist working (components/book-waitlist/book-waitlist-form.tsx).</div></sc-if>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const parts = [
+      { n: "I", t: "The Wake-Up Call", b: "Drift, the wrong scoreboard, and the life taking shape." },
+      { n: "II", t: "The Stewardship Blueprint", b: "Bedrock, Foundation, and a whole-life structure." },
+      { n: "III", t: "The Four Pillars", b: "Relationships, health, joy, and finances — connected." },
+      { n: "IV", t: "Guardrails & Habits", b: "Pre-decided boundaries and rhythms that strengthen." },
+      { n: "V", t: "Energy & Resources", b: "Renewing capacity and rethinking what money is for." },
+      { n: "VI", t: "Living Legacy", b: "What your life multiplies through other people now." },
+    ];
+    return { parts, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

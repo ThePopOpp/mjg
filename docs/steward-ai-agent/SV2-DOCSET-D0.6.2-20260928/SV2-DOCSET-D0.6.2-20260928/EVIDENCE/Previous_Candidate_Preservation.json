@@ -1,0 +1,12 @@
+{
+  "base_package_id": "SV2-DOCSET-D0.3-20260926",
+  "archive_path": "ARCHIVE/Draft_0_3_Previous_Candidate.zip",
+  "bytes": 15138657,
+  "input_sha256": "c2ee1439331f222c9691bd3b1c993db977b0fc0feff4893567cacce321ac1a95",
+  "archived_sha256": "c2ee1439331f222c9691bd3b1c993db977b0fc0feff4893567cacce321ac1a95",
+  "exact_zip_match": true,
+  "member_count": 100,
+  "all_twelve_masters_match_supplied_attachments": true,
+  "earlier_archives_unchanged": true,
+  "compact_C1_archive": "ARCHIVE/Draft_0_3_C1/PROJECT_INSTRUCTIONS_Draft_0_3_Under_8000.txt"
+}

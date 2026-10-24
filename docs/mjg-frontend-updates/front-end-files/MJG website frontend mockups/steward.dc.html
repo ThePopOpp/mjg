@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="Steward — Personal Guide" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="steward" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 72px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ Steward · Personal Stewardship Guide</span>
+    <h1 style="margin:24px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">Meet Steward, Your Personal Stewardship <em style="font-style:normal;color:#b88a4a;">Guide.</em></h1>
+    <p style="margin:22px 0 0;font-size:18px;line-height:1.7;max-width:600px;font-weight:500;">Your life is too important to navigate only when something goes wrong.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">Steward is a personal guide built around the Stewardship Blueprint. It helps you make space to think, clarify priorities, develop your personal plan, and return to the decisions that matter when life gets busy.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">Your thoughts, convictions, and choices lead. Steward helps organize them into a clearer path forward.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;">
+      <a href="#demo" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">See How Steward Works</a>
+      <a href="personal-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Explore Your Personal Blueprint</a>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px;align-items:stretch;">
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 18px 50px rgba(12,20,25,.06);">
+      <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-fg,#6d6660);"><span style="width:8px;height:8px;border-radius:9999px;background:#b88a4a;"></span>Steward · Guide conversation</div>
+      <div style="align-self:flex-end;max-width:85%;border-radius:12px 12px 2px 12px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);padding:10px 14px;font-size:13.5px;line-height:1.5;">I keep saying family comes first, but my calendar doesn’t show it.</div>
+      <div style="align-self:flex-start;max-width:90%;border-radius:12px 12px 12px 2px;background:var(--muted,#f4f1ea);padding:10px 14px;font-size:13.5px;line-height:1.5;">What would “first” look like on a normal Tuesday? Let’s name one concrete rhythm you could protect.</div>
+      <div style="align-self:flex-end;max-width:85%;border-radius:12px 12px 2px 12px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);padding:10px 14px;font-size:13.5px;line-height:1.5;">Dinner together without my phone.</div>
+      <div style="align-self:flex-start;border:1px dashed rgba(184,138,74,.6);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--muted-fg,#6d6660);background:rgba(184,138,74,.06);"><span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-text,#8a6630);">Draft keystone habit</span><br>“Weeknight dinner at the table, phones in the drawer.”<div style="display:flex;gap:6px;margin-top:8px;"><span style="font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);">Approve</span><span style="font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;border:1px solid var(--border,#e1dbd0);">Edit</span><span style="font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;border:1px solid var(--border,#e1dbd0);">Not now</span></div></div>
+    </div>
+    <div style="border-radius:12px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="steward-sample-blueprint" shape="rect" placeholder="Sample Blueprint page"></image-slot></div>
+  </div>
+</section>
+
+<!-- WHAT IT HELPS WITH -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">What It Helps With</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Clarity You Can Return To.</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:36px;">
+      <sc-for list="{{ helps }}" as="h" hint-placeholder-count="5">
+        <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:22px;">
+          <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">{{ h.t }}</p>
+          <p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">{{ h.b }}</p>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;"><a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Start with the Free Check-In</a></div>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:24px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Descriptions of proactive reminders and recurring check-ins must match deployed version/entitlements; do not claim upcoming premium features are live.</div></sc-if>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo" style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Demo</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">See a Realistic Conversation.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Imagine saying: <em style="font-family:Fraunces,Georgia,serif;color:var(--ink,#1c1917);">“My work calendar keeps crowding out family. Help me think through what needs to change.”</em></p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Steward helps clarify the real tension, reconnect it to the person’s stated priorities, and propose a short action or draft statement for their approval.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The participant reviews the suggestion, chooses what to use, and decides whether to add it to the Personal Blueprint.</p>
+    <a href="personal-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:15px;font-weight:600;color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Explore the Personal Blueprint →</a>
+  </div>
+  <div>
+    <div style="position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#141211;border:1px solid var(--border,#e1dbd0);">
+      <image-slot id="steward-demo-video" shape="rect" placeholder="Steward demo (20–35s, captions) — from steward-hero-autoplay"></image-slot>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;"><span style="width:64px;height:64px;border-radius:9999px;background:#b88a4a;color:var(--card,#fff);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(184,138,74,.45);"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></span></div>
+      <div style="position:absolute;left:16px;right:16px;bottom:14px;display:flex;justify-content:space-between;font-size:12px;color:#cfc7ba;pointer-events:none;"><span>Click to play · captions on</span><span>0:28</span></div>
+    </div>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:14px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Use Jeremy’s existing demo edited to 20–35 seconds with readable captions; offer an extended demo separately. Vimeo IDs 1237401025 / 1237334903 are Filmpool assets of unconfirmed titles — do not mislabel.</div></sc-if>
+  </div>
+</section>
+
+<!-- YOUR CONTROL -->
+<section style="background:#141211;color:#f4f1ea;">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d8bd86;">Your Control</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Your Life. Your Decisions. Your Blueprint.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">Steward offers structured reflection and suggestions. It does not replace trusted relationships, spiritual guidance, or qualified professional advice. You remain responsible for your decisions and approve changes saved to your personal plan.</p>
+      <a href="#" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:15px;font-weight:600;color:#d8bd86;text-decoration:none;" style-hover="text-decoration:underline;color:#d8bd86;">Read Privacy & Trust Details →</a>
+    </div>
+    <aside style="border:1px solid rgba(216,189,134,.4);border-radius:16px;background:rgba(216,189,134,.06);padding:28px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#d8bd86;">Plain disclosure</p>
+      <p style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-size:22px;line-height:1.35;">Steward is an interactive digital guide powered by AI.</p>
+      <p style="margin:12px 0 0;font-size:14.5px;line-height:1.65;color:#cfc7ba;">This technology supports the experience; it is not the purpose of the experience. The Stewardship Blueprint remains the foundation.</p>
+      <p style="margin:12px 0 0;font-size:14.5px;line-height:1.65;color:#cfc7ba;">Steward proposes the words. You approve them. Only then is anything saved.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ACCESS -->
+<section id="access" style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Access</p>
+  <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Begin at the Level That Fits.</h2>
+  <p style="margin:16px 0 0;max-width:680px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The free Check-In is a meaningful way to start. Options for a deeper Personal Blueprint and Steward access may be available according to the current offering.</p>
+  <p style="margin:14px 0 0;max-width:680px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Review exactly what is included and the current price before you begin. Your ability to reflect, learn, and join a group should not depend on purchasing premium access.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:36px;max-width:900px;">
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);padding:28px;display:flex;flex-direction:column;">
+      <span style="align-self:flex-start;font-size:11px;font-weight:700;padding:4px 10px;border-radius:9999px;background:rgba(47,125,91,.14);color:#2f7d5b;">FREE</span>
+      <h3 style="margin:14px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:24px;">Created for More Check-In</h3>
+      <p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);flex:1;">28 questions across seven layers. Your results and one faithful next step.</p>
+      <a href="created-for-more-check-in.dc.html" style="margin-top:22px;display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Take the Free Check-In</a>
+    </div>
+    <div style="border:1px solid rgba(184,138,74,.5);border-radius:16px;background:var(--card,#fff);padding:28px;display:flex;flex-direction:column;">
+      <span style="align-self:flex-start;font-size:11px;font-weight:700;padding:4px 10px;border-radius:9999px;background:rgba(184,138,74,.14);color:var(--gold-text,#8a6630);">PERSONAL BLUEPRINT + STEWARD</span>
+      <h3 style="margin:14px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:24px;">Full Build & Ongoing Guidance</h3>
+      <p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);flex:1;">The complete thirteen-page Personal Blueprint built with Steward, revisited as your season changes. See what is included and the current price at checkout.</p>
+      <a href="#" style="margin-top:22px;display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">View Current Access Options</a>
+    </div>
+  </div>
+  <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:24px 0 0;max-width:900px;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note · Pricing</span><br>Do not freeze early pricing in editorial copy. Proposed offering was $299 Full Build + 12 months and $199 annual renewal — requires current confirmation; read from <code>components/steward/pricing-plans.tsx</code>. “View Current Access Options” → live checkout/registration route once verified.</div></sc-if>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const helps = [
+      { t: "Reflect", b: "Think through the real questions behind your current season." },
+      { t: "Build", b: "Work through your Personal Stewardship Blueprint one meaningful section at a time." },
+      { t: "Decide", b: "Examine choices against your mission, values, commitments, and guardrails." },
+      { t: "Revisit", b: "Return to your Blueprint when you need renewed clarity or a change in direction." },
+      { t: "Follow Through", b: "Use reminders, check-ins, and reviews where enabled by your current account and permissions." },
+    ];
+    return { helps, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

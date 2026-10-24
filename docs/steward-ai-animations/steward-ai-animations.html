@@ -1,0 +1,745 @@
+<section class="mjg-stewardship-landing">
+  <style>
+    .mjg-stewardship-landing,
+    .mjg-stewardship-landing * {
+      box-sizing: border-box;
+    }
+
+    .mjg-stewardship-landing {
+      --mjg-black: #0f0f0f;
+      --mjg-dark: #10100f;
+      --mjg-card: #171714;
+      --mjg-white: #ffffff;
+      --mjg-offwhite: #f7f6f2;
+      --mjg-gold: #c8aa72;
+      --mjg-muted: #555555;
+      --mjg-dark-muted: #c8c3b8;
+      --mjg-border: rgba(0, 0, 0, 0.1);
+
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--mjg-black);
+      background:
+        linear-gradient(rgba(15, 15, 15, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 15, 15, 0.035) 1px, transparent 1px),
+        var(--mjg-white);
+      background-size: 44px 44px;
+      padding: 0;
+      margin: 0;
+    }
+
+    .mjg-container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 clamp(18px, 4vw, 32px);
+    }
+
+    .mjg-hero {
+      min-height: 86vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: clamp(64px, 10vw, 110px) 0 clamp(54px, 8vw, 80px);
+    }
+
+    .mjg-logo {
+      width: clamp(150px, 18vw, 190px);
+      max-width: 80%;
+      margin: 0 auto clamp(32px, 5vw, 46px);
+      display: block;
+      height: auto;
+    }
+
+    .mjg-eyebrow {
+      display: inline-block;
+      max-width: 100%;
+      margin: 0 0 clamp(22px, 4vw, 30px);
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: var(--mjg-gold);
+      color: var(--mjg-black);
+      font-size: clamp(10px, 1.6vw, 13px);
+      font-weight: 900;
+      letter-spacing: clamp(1.2px, 0.35vw, 2px);
+      text-transform: uppercase;
+      line-height: 1.1;
+      text-align: center;
+      white-space: normal;
+    }
+
+    .mjg-hero h1 {
+      max-width: 900px;
+      margin: 0 auto 24px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(52px, 9vw, 104px);
+      line-height: 0.94;
+      letter-spacing: -0.06em;
+      color: var(--mjg-black);
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    .mjg-hero h1 span {
+      display: block;
+      color: var(--mjg-gold);
+      font-style: italic;
+    }
+
+    .mjg-hero p {
+      max-width: 720px;
+      margin: 0 auto 34px;
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.7;
+      color: var(--mjg-muted);
+    }
+
+    .mjg-button-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .mjg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 15px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .mjg-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .mjg-btn-primary {
+      background: var(--mjg-black);
+      color: var(--mjg-white);
+      box-shadow: 0 14px 30px rgba(15, 15, 15, 0.18);
+    }
+
+    .mjg-btn-secondary {
+      background: transparent;
+      color: var(--mjg-black);
+      border: 1px solid var(--mjg-border);
+    }
+
+    .mjg-section {
+      padding: clamp(58px, 8vw, 100px) 0;
+    }
+
+    .mjg-section-header {
+      max-width: 760px;
+      margin: 0 auto 42px;
+      text-align: center;
+    }
+
+    .mjg-section-header h2 {
+      margin: 0 0 18px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(36px, 5vw, 62px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      color: var(--mjg-black);
+    }
+
+    .mjg-section-header p {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.75;
+      color: var(--mjg-muted);
+    }
+
+    /* Desktop card grid */
+    .mjg-card-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: clamp(16px, 2vw, 22px);
+      align-items: stretch;
+    }
+
+    .mjg-card {
+      width: 100%;
+      min-width: 0;
+      background: var(--mjg-white);
+      border: 1px solid var(--mjg-border);
+      border-radius: 22px;
+      padding: clamp(24px, 3vw, 30px);
+      box-shadow: 0 14px 34px rgba(15, 15, 15, 0.05);
+      overflow: hidden;
+    }
+
+    .mjg-card-number {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--mjg-black);
+      color: var(--mjg-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      margin-bottom: 18px;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .mjg-card h3 {
+      margin: 0 0 10px;
+      color: var(--mjg-black);
+      font-size: clamp(20px, 2vw, 23px);
+      line-height: 1.2;
+      font-weight: 900;
+      overflow-wrap: break-word;
+    }
+
+    .mjg-card p {
+      margin: 0;
+      color: var(--mjg-muted);
+      font-size: 15px;
+      line-height: 1.65;
+      overflow-wrap: break-word;
+    }
+
+    .mjg-steps {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .mjg-step {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 20px;
+      align-items: start;
+      background: var(--mjg-offwhite);
+      border: 1px solid rgba(200, 170, 114, 0.28);
+      border-radius: 20px;
+      padding: clamp(22px, 3vw, 28px);
+    }
+
+    .mjg-step-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--mjg-gold);
+      color: var(--mjg-black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .mjg-step h3 {
+      margin: 0 0 8px;
+      font-size: clamp(20px, 2vw, 23px);
+      color: var(--mjg-black);
+    }
+
+    .mjg-step p {
+      margin: 0;
+      color: var(--mjg-muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .mjg-dark-section {
+      background:
+        radial-gradient(circle at 50% 10%, rgba(200, 170, 114, 0.12), transparent 34%),
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        var(--mjg-dark);
+      background-size: auto, 44px 44px, 44px 44px, auto;
+      color: var(--mjg-white);
+      padding: clamp(70px, 8vw, 110px) 0;
+    }
+
+    .mjg-dark-box {
+      max-width: 920px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      padding: clamp(34px, 6vw, 64px);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .mjg-dark-box h2 {
+      margin: 0 0 18px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(36px, 5vw, 62px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      color: var(--mjg-white);
+    }
+
+    .mjg-dark-box p {
+      margin: 0 auto 24px;
+      max-width: 720px;
+      color: var(--mjg-dark-muted);
+      font-size: 17px;
+      line-height: 1.75;
+    }
+
+    .mjg-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 34px;
+      text-align: left;
+    }
+
+    .mjg-dashboard-card {
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .mjg-dashboard-card h3 {
+      margin: 0 0 8px;
+      color: var(--mjg-white);
+      font-size: 18px;
+    }
+
+    .mjg-dashboard-card p {
+      margin: 0;
+      color: var(--mjg-dark-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .mjg-quote {
+      margin: 44px auto;
+      max-width: 850px;
+      background: var(--mjg-offwhite);
+      border-left: 5px solid var(--mjg-gold);
+      border-radius: 22px;
+      padding: clamp(26px, 4vw, 36px);
+    }
+
+    .mjg-quote p {
+      margin: 0;
+      color: var(--mjg-black);
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1.3;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+    }
+
+    .mjg-final-cta {
+      text-align: center;
+      padding: clamp(70px, 8vw, 110px) 0;
+      background: var(--mjg-offwhite);
+    }
+
+    .mjg-final-cta h2 {
+      margin: 0 auto 18px;
+      max-width: 760px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(40px, 6vw, 78px);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+      color: var(--mjg-black);
+    }
+
+    .mjg-final-cta p {
+      max-width: 680px;
+      margin: 0 auto 32px;
+      font-size: 17px;
+      line-height: 1.75;
+      color: var(--mjg-muted);
+    }
+
+    /* Tablet: force cards to stack one per row */
+    @media (max-width: 1024px) {
+      .mjg-card-grid {
+        grid-template-columns: 1fr !important;
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .mjg-card {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .mjg-dashboard-grid {
+        grid-template-columns: 1fr !important;
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .mjg-hero {
+        min-height: auto;
+      }
+
+      .mjg-hero h1 {
+        font-size: clamp(52px, 11vw, 86px);
+      }
+    }
+
+    /* Mobile */
+    @media (max-width: 680px) {
+      .mjg-container {
+        padding: 0 18px;
+      }
+
+      .mjg-hero {
+        min-height: auto;
+        padding: 58px 0 48px;
+      }
+
+      .mjg-logo {
+        width: 150px;
+        margin-bottom: 34px;
+      }
+
+      .mjg-eyebrow {
+        width: auto;
+        max-width: 100%;
+        padding: 9px 14px;
+        font-size: 10px;
+        letter-spacing: 1.3px;
+      }
+
+      .mjg-hero h1 {
+        font-size: clamp(58px, 17vw, 86px);
+        line-height: 0.93;
+        letter-spacing: -0.065em;
+      }
+
+      .mjg-hero p {
+        font-size: 17px;
+      }
+
+      .mjg-card-grid,
+      .mjg-dashboard-grid {
+        grid-template-columns: 1fr !important;
+        gap: 18px;
+      }
+
+      .mjg-card {
+        padding: 24px;
+      }
+
+      .mjg-step {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .mjg-button-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .mjg-btn {
+        width: 100%;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .mjg-dark-box {
+        border-radius: 22px;
+      }
+
+      .mjg-section-header {
+        margin-bottom: 32px;
+      }
+    }
+
+    /* Small Mobile */
+    @media (max-width: 420px) {
+      .mjg-container {
+        padding: 0 16px;
+      }
+
+      .mjg-hero h1 {
+        font-size: clamp(50px, 18vw, 72px);
+      }
+
+      .mjg-section-header h2,
+      .mjg-dark-box h2,
+      .mjg-final-cta h2 {
+        font-size: clamp(34px, 12vw, 48px);
+      }
+
+      .mjg-card,
+      .mjg-step,
+      .mjg-dashboard-card {
+        padding: 22px;
+      }
+    }
+  </style>
+
+  <div class="mjg-container">
+    
+    <section class="mjg-hero">
+      <div>
+        <img
+          class="mjg-logo"
+          src="https://michaeljgauthier.com/mjg-logos/mjg_black_white.png"
+          alt="Michael J. Gauthier"
+        />
+
+        <span class="mjg-eyebrow">The Stewardship Blueprint</span>
+
+        <h1>You Were Created <span>For More</span></h1>
+
+        <p>
+          A private guided experience for aligning faith, family, <br>finances, future, and legacy.
+        </p>
+
+        <div class="mjg-button-row">
+          <a class="mjg-btn mjg-btn-primary" href="https://my.michaeljgauthier.com" target="_blank" rel="noopener">
+            Start Your Journey
+          </a>
+          <a class="mjg-btn mjg-btn-secondary" href="https://my.michaeljgauthier.com/login" target="_blank" rel="noopener">
+            Register Your Account
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="mjg-container">
+    
+    <section class="mjg-hero">
+      <div>
+        <img
+          class="mjg-logo"
+          src="https://michaeljgauthier.com/mjg-logos/mjg_black_white.png"
+          alt="Michael J. Gauthier"
+        />
+
+        <span class="mjg-eyebrow">The Stewardship Blueprint</span>
+
+        <h1>You Were Created <span>For More</span></h1>
+
+        <p>
+          A private guided experience for aligning faith, family, <br>finances, future, and legacy.
+        </p>
+
+        <div class="mjg-button-row">
+          <a class="mjg-btn mjg-btn-primary" href="https://my.michaeljgauthier.com" target="_blank" rel="noopener">
+            Start Your Journey
+          </a>
+          <a class="mjg-btn mjg-btn-secondary" href="https://my.michaeljgauthier.com/login" target="_blank" rel="noopener">
+            Register Your Account
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="mjg-section">
+    <div class="mjg-container">
+      <div class="mjg-section-header">
+        <h2>A Blueprint for What Matters Most</h2>
+        <p>
+          The Stewardship Blueprint helps individuals and families reflect on the areas of life that should not be managed separately: faith, family, finances, future, and legacy.
+        </p>
+      </div>
+
+      <div class="mjg-card-grid">
+        <div class="mjg-card">
+          <div class="mjg-card-number">01</div>
+          <h3>Faith</h3>
+          <p>Reflect on the beliefs and values that shape how you define stewardship and success.</p>
+        </div>
+
+        <div class="mjg-card">
+          <div class="mjg-card-number">02</div>
+          <h3>Family</h3>
+          <p>Consider the people you are called to love, lead, protect, support, and serve.</p>
+        </div>
+
+        <div class="mjg-card">
+          <div class="mjg-card-number">03</div>
+          <h3>Finances</h3>
+          <p>Organize the resources, responsibilities, and decisions that affect your financial life.</p>
+        </div>
+
+        <div class="mjg-card">
+          <div class="mjg-card-number">04</div>
+          <h3>Future</h3>
+          <p>Think intentionally about the next season of life and what needs to be prepared.</p>
+        </div>
+
+        <div class="mjg-card">
+          <div class="mjg-card-number">05</div>
+          <h3>Legacy</h3>
+          <p>Explore the impact, generosity, wisdom, and values you want to pass on to others.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mjg-section">
+    <div class="mjg-container">
+      <div class="mjg-section-header">
+        <h2>How It Works</h2>
+        <p>
+          The experience is designed to help users move from reflection to clarity through a simple guided process.
+        </p>
+      </div>
+
+      <div class="mjg-steps">
+        <div class="mjg-step">
+          <div class="mjg-step-badge">1</div>
+          <div>
+            <h3>Sign In or Request Access</h3>
+            <p>Enter the private MJG WebApp through a secure, guided experience.</p>
+          </div>
+        </div>
+
+        <div class="mjg-step">
+          <div class="mjg-step-badge">2</div>
+          <div>
+            <h3>Complete Guided Reflections</h3>
+            <p>Answer thoughtful prompts around faith, family, finances, future, giving, and legacy.</p>
+          </div>
+        </div>
+
+        <div class="mjg-step">
+          <div class="mjg-step-badge">3</div>
+          <div>
+            <h3>Organize Key Information</h3>
+            <p>Complete forms, review resources, and prepare for a meaningful stewardship conversation.</p>
+          </div>
+        </div>
+
+        <div class="mjg-step">
+          <div class="mjg-step-badge">4</div>
+          <div>
+            <h3>Get Help From Steward</h3>
+            <p>Steward, the MJG AI Agent, helps users understand the process and know what to do next.</p>
+          </div>
+        </div>
+
+        <div class="mjg-step">
+          <div class="mjg-step-badge">5</div>
+          <div>
+            <h3>Meet With the MJG Team</h3>
+            <p>Come prepared for a deeper conversation with clarity, context, and direction.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mjg-dark-section">
+    <div class="mjg-container">
+      <div class="mjg-dark-box">
+        <span class="mjg-eyebrow">Meet Steward</span>
+        <h2>Your Private AI Guide</h2>
+
+        <p>
+          Steward is the MJG AI Agent designed to help users navigate the private webapp, understand forms, prepare for meetings, and identify next steps.
+        </p>
+
+        <p>
+          Steward does not provide financial, legal, tax, investment, insurance, or estate planning advice. Sensitive questions should be routed to Michael or the MJG team.
+        </p>
+
+        <div class="mjg-dashboard-grid">
+          <div class="mjg-dashboard-card">
+            <h3>Guided Forms</h3>
+            <p>Steward helps users understand what information is being requested and why it matters.</p>
+          </div>
+
+          <div class="mjg-dashboard-card">
+            <h3>Next Steps</h3>
+            <p>Users can get direction on what to complete, review, or prepare next.</p>
+          </div>
+
+          <div class="mjg-dashboard-card">
+            <h3>Meeting Prep</h3>
+            <p>Steward helps users come prepared for a meaningful stewardship conversation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mjg-section">
+    <div class="mjg-container">
+      <div class="mjg-section-header">
+        <h2>Your Private Stewardship Dashboard</h2>
+        <p>
+          Everything is organized in one private place so users can move at their own pace, track progress, and prepare for the conversations that matter.
+        </p>
+      </div>
+
+      <div class="mjg-card-grid">
+        <div class="mjg-card">
+          <h3>Progress Tracking</h3>
+          <p>See what has been completed and what still needs attention.</p>
+        </div>
+
+        <div class="mjg-card">
+          <h3>Documents</h3>
+          <p>Access key resources, PDFs, forms, and private stewardship materials.</p>
+        </div>
+
+        <div class="mjg-card">
+          <h3>Booking Links</h3>
+          <p>Schedule next-step conversations when the right sections are complete.</p>
+        </div>
+
+        <div class="mjg-card">
+          <h3>Experience Pages</h3>
+          <p>Access private guided content based on role, need, or stewardship journey.</p>
+        </div>
+
+        <div class="mjg-card">
+          <h3>AI Guidance</h3>
+          <p>Ask Steward for help navigating the process and preparing thoughtful questions.</p>
+        </div>
+      </div>
+
+      <div class="mjg-quote">
+        <p>
+          Stewardship is not only about managing money. It is about aligning your resources with your purpose.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mjg-final-cta">
+    <div class="mjg-container">
+      <h2>Begin Your Stewardship Journey</h2>
+      <p>
+        Take the next step toward a more intentional life. Reflect on what matters most, organize your priorities, and prepare for a meaningful stewardship conversation.
+      </p>
+
+      <div class="mjg-button-row">
+        <a class="mjg-btn mjg-btn-primary" href="https://my.michaeljgauthier.com" target="_blank" rel="noopener">
+          Begin Your Stewardship Journey
+        </a>
+        <a class="mjg-btn mjg-btn-secondary" href="https://my.michaeljgauthier.com/login" target="_blank" rel="noopener">
+          Sign In
+        </a>
+      </div>
+    </div>
+  </section>
+</section>

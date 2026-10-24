@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif} a{color:var(--ink,#1c1917)} a:hover{color:#b88a4a}</style>
+</helmet>
+<footer style="border-top:1px solid var(--border,#e1dbd0);background:var(--bg,#fbfaf7);font-family:Geist,Arial,sans-serif;color:var(--ink,#1c1917);">
+  <div style="max-width:1160px;margin:0 auto;padding:40px 32px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;">
+    <div>
+      <a href="home.dc.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink,#1c1917);">
+        <img src="{{ logoSrc }}" alt="Michael J. Gauthier" style="height:28px;width:auto;display:block;">
+        <span style="font-family:Fraunces,Georgia,serif;font-style:italic;font-size:14px;">Michael <span style="color:#b88a4a;">J.</span> Gauthier</span>
+      </a>
+      <p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:var(--muted-fg,#6d6660);max-width:280px;">The Stewardship Blueprint — a whole-life framework for stewarding what God has entrusted to you.</p>
+    </div>
+    <sc-for list="{{ cols }}" as="col" hint-placeholder-count="3">
+      <div>
+        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">{{ col.title }}</p>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;">
+          <sc-for list="{{ col.links }}" as="l" hint-placeholder-count="5">
+            <a href="{{ l.href }}" style="text-decoration:none;color:var(--muted-fg,#6d6660);" style-hover="color:#b88a4a;">{{ l.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="border-top:1px solid var(--border,#e1dbd0);">
+    <div style="max-width:1160px;margin:0 auto;padding:18px 32px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted-fg,#6d6660);">
+      <span>© 2026 Stewardship Blueprint LLC · Michael J. Gauthier</span>
+      <span style="display:flex;gap:18px;"><a href="#" style="text-decoration:none;color:var(--muted-fg,#6d6660);">Privacy</a><a href="#" style="text-decoration:none;color:var(--muted-fg,#6d6660);">Terms</a><a href="#" style="text-decoration:none;color:var(--muted-fg,#6d6660);">SMS Terms</a><a href="#" style="text-decoration:none;color:var(--muted-fg,#6d6660);">Legal & Trust</a></span>
+    </div>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:280}}">
+class Component extends DCLogic {
+  state = { theme: (typeof window !== "undefined" && window.localStorage.getItem("mjg-mock-theme")) || "light" };
+  componentDidMount() { this._t = (e) => this.setState({ theme: e.detail }); window.addEventListener("mjg-theme", this._t); }
+  componentWillUnmount() { window.removeEventListener("mjg-theme", this._t); }
+  renderVals() {
+    const cols = [
+      { title: "The Blueprint", links: [["The Framework", "stewardship-blueprint.dc.html"], ["Personal Blueprint", "personal-blueprint.dc.html"], ["Assessments", "assessments.dc.html"], ["Created for More Check-In", "created-for-more-check-in.dc.html"], ["Steward", "steward.dc.html"]] },
+      { title: "Learn & Grow", links: [["The Life You’re Building", "the-life-youre-building.dc.html"], ["Studies & Experiences", "studies.dc.html"], ["Insights & Resources", "resources.dc.html"], ["For Churches & Groups", "churches.dc.html"], ["Lead a Group", "lead-a-group.dc.html"]] },
+      { title: "Connect", links: [["About Michael", "about.dc.html"], ["Mission & Vision", "mission.dc.html"], ["Contact", "contact.dc.html"], ["Join the Journey", "join.dc.html"], ["Prices & Plans", "https://michaeljgauthier.com/steward/pricing"]] },
+    ].map(c => ({ title: c.title, links: c.links.map(([label, href]) => ({ label, href })) }));
+    return { cols, logoSrc: this.state.theme === "dark" ? "docs/mjg-logos/mjg_white.png" : "docs/mjg-logos/mjg_black_white.png" };
+  }
+}
+</script>
+</body>
+</html>

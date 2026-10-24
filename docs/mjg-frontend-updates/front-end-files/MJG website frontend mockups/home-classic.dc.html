@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="Home — Classic option" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+
+<sc-if value="{{ awakenOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeAwaken }}" style="position:fixed;inset:0;z-index:10000;background:rgba(20,18,17,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;">
+    <div onClick="{{ stop }}" role="dialog" aria-modal="true" aria-label="What Kind of Life Are You Actually Building?" style="position:relative;width:100%;max-width:680px;max-height:calc(100vh - 48px);box-sizing:border-box;overflow-y:auto;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);border:1px solid var(--border,#e1dbd0);border-radius:16px;box-shadow:0 30px 90px rgba(0,0,0,.4);padding:clamp(24px,5vw,40px);font-family:Geist,Arial,sans-serif;">
+      <button onClick="{{ closeAwaken }}" aria-label="Close" style="position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:9999px;border:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);color:var(--ink,#1c1917);cursor:pointer;display:flex;align-items:center;justify-content:center;" style-hover="background:var(--hover,#e9e4d8);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6 18 18M18 6 6 18"></path></svg></button>
+      <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ 01 · Awaken</span>
+      <h2 style="margin:20px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(30px,4vw,40px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance;">What Kind of Life Are You Actually <em style="font-style:normal;color:#b88a4a;">Building?</em></h2>
+      <p style="margin:18px 0 0;font-size:18px;line-height:1.7;font-weight:500;">Most people don’t intentionally drift. Life simply gets full.</p>
+      <p style="margin:14px 0 0;font-size:16.5px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">We work hard, care for people, pursue opportunities, and manage countless responsibilities. But somewhere along the way, we can stop asking whether the life we’re building reflects what matters most.</p>
+      <p style="margin:14px 0 0;font-size:16.5px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Your life is taking shape every day—through your calendar, relationships, habits, health, decisions, and use of resources. The question isn’t whether you are building. It’s whether you are building on purpose.</p>
+      <p style="margin:14px 0 0;font-size:16.5px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The Stewardship Blueprint is a whole-life framework that helps you stop drifting, steward what God has entrusted to you, and build a life that matters.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border,#e1dbd0);">
+        <a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Take the Free Check-In</a>
+        <a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Explore the Blueprint →</a>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<!-- 01 AWAKEN -->
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 72px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ The Stewardship Blueprint</span>
+    <h1 style="margin:24px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">What Kind of Life Are You Actually <em style="font-style:normal;color:#b88a4a;">Building?</em></h1>
+    <p style="margin:22px 0 0;font-size:18px;line-height:1.7;color:var(--ink,#1c1917);max-width:600px;font-weight:500;">Most people don’t intentionally drift. Life simply gets full.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">We work hard, care for people, pursue opportunities, and manage countless responsibilities. But somewhere along the way, we can stop asking whether the life we’re building reflects what matters most.</p>
+    
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:600px;text-wrap:pretty;">The Stewardship Blueprint is a whole-life framework that helps you stop drifting, steward what God has entrusted to you, and build a life that matters.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;">
+      <a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Take the Free Check-In</a>
+      <a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Explore the Blueprint →</a>
+    </div>
+  </div>
+  <div>
+    <div style="position:relative;width:100%;aspect-ratio:4/3;border-radius:16px;overflow:hidden;border:1px solid var(--border,#e1dbd0);box-shadow:0 24px 80px rgba(12,20,25,.08);background:#141211;">
+      <image-slot id="home-hero-video-poster" shape="rect" placeholder="Filmpool brand film poster (verify Vimeo 1237401025) — click-to-play, no sound autoplay"></image-slot>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+        <span style="display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:9999px;background:#b88a4a;color:var(--card,#fff);box-shadow:0 6px 28px rgba(184,138,74,.45);"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></span>
+      </div>
+    </div>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:14px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note · Hero media</span><br>Hero split-screen. Static poster + click-to-play. DO NOT default to a full Steward product demo. Confirm which supplied Vimeo link is the brand film before publishing. On mobile the primary CTA stays visible before the video.</div></sc-if>
+    <button onClick="{{ openAwaken }}" aria-label="Read the full section" style="display:inline-flex;align-items:center;gap:8px;margin:16px 0 0;padding:0;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#b88a4a;" style-hover="opacity:.8;"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;border:1px solid #b88a4a;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>Read more</button>
+  </div>
+</section>
+
+<!-- 02 SEE THE FRAMEWORK -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">02 · See the Framework</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">A Life That Matters Is Built on Purpose.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">We make plans for careers, finances, vacations, and major decisions. Yet many of us have never created a thoughtful blueprint for the life those plans are meant to serve.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The Stewardship Blueprint connects the parts of life that should never be managed in isolation: faith and identity; mission and values; family, fitness, fun, and finances; guardrails; keystone habits; energy; and legacy.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">It is not a formula for perfection. It is a practical structure for living with purpose in the season you are in.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+        <a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore the Framework →</a>
+      </div>
+    </div>
+    <div>
+      <dc-import name="FrameworkTemple" hint-size="100%,560px"></dc-import>
+      <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:14px auto 0;max-width:520px;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note · Framework art</span><br>Interactive stand-in (hover = preview, click = pin, links to each layer on /stewardship-blueprint). Swap the fills for crops of the actual <code>SB Framework Image.png</code> when layered vectors arrive; keep text labels for a11y. Legacy caption must read “What your life multiplies through others now.”</div></sc-if>
+    </div>
+  </div>
+</section>
+
+<!-- 03 FIRST STEP -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div style="order:2;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">03 · First Step</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">Awareness Is Where Stewardship Begins.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Before you can build differently, you need to see clearly where you are today.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The Created for More Check-In is a free, 28-question reflection across seven connected layers of the Blueprint. In about fifteen minutes, it helps you notice where your life is aligned, where you may be drifting, and what deserves attention next.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">This is not a grade. It is a starting point for honest reflection and one faithful next step.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+      <a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Begin My Free Check-In</a>
+      <a href="assessments.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Explore Other Assessments</a>
+    </div>
+  </div>
+  <div style="order:1;">
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);padding:24px;box-shadow:0 18px 50px rgba(12,20,25,.05);">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Created for More Check-In</span><span style="font-size:12px;color:var(--muted-fg,#6d6660);">Question 12 of 28</span></div>
+      <div style="margin-top:12px;height:4px;border-radius:9999px;background:var(--muted,#f4f1ea);overflow:hidden;"><div style="width:43%;height:100%;background:#b88a4a;"></div></div>
+      <p style="margin:20px 0 0;font-family:Fraunces,Georgia,serif;font-size:19px;line-height:1.35;">My calendar reflects the people and priorities I say matter most.</p>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px;">
+        <div style="border:1px solid var(--border,#e1dbd0);border-radius:8px;padding:12px 4px;text-align:center;font-size:13px;color:var(--muted-fg,#6d6660);">1</div>
+        <div style="border:1px solid var(--border,#e1dbd0);border-radius:8px;padding:12px 4px;text-align:center;font-size:13px;color:var(--muted-fg,#6d6660);">2</div>
+        <div style="border:1px solid var(--ink,#1c1917);background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);border-radius:8px;padding:12px 4px;text-align:center;font-size:13px;font-weight:600;">3</div>
+        <div style="border:1px solid var(--border,#e1dbd0);border-radius:8px;padding:12px 4px;text-align:center;font-size:13px;color:var(--muted-fg,#6d6660);">4</div>
+        <div style="border:1px solid var(--border,#e1dbd0);border-radius:8px;padding:12px 4px;text-align:center;font-size:13px;color:var(--muted-fg,#6d6660);">5</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted-fg,#6d6660);margin-top:6px;"><span>Rarely true</span><span>Consistently true</span></div>
+      <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border,#e1dbd0);">
+        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-fg,#6d6660);">Seven layers</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="font-size:12px;padding:4px 10px;border-radius:9999px;background:var(--muted,#f4f1ea);">Faith & Identity</span><span style="font-size:12px;padding:4px 10px;border-radius:9999px;background:var(--muted,#f4f1ea);">Mission & Values</span><span style="font-size:12px;padding:4px 10px;border-radius:9999px;background:rgba(184,138,74,.15);color:var(--gold-text,#8a6630);font-weight:600;">Four Pillars</span><span style="font-size:12px;padding:4px 10px;border-radius:9999px;background:var(--muted,#f4f1ea);">Guardrails</span><span style="font-size:12px;padding:4px 10px;border-radius:9999px;background:var(--muted,#f4f1ea);">Keystone Habits</span><span style="font-size:12px;padding:4px 10px;border-radius:9999px;background:var(--muted,#f4f1ea);">Energy</span><span style="font-size:12px;padding:4px 10px;border-radius:9999px;background:var(--muted,#f4f1ea);">Legacy</span></div>
+      </div>
+    </div>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:14px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Swap for a real screenshot or anonymized illustration of the current assessment interface and example results. Do not imply result functions not currently deployed.</div></sc-if>
+  </div>
+</section>
+
+<!-- 04 WAYS TO ENGAGE -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">04 · Ways to Engage</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;max-width:760px;text-wrap:pretty;">There Is More Than One Way to Begin.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:680px;text-wrap:pretty;">You can start with quiet reflection, a good book, meaningful conversation, a group experience, or a more detailed personal plan. Each path is connected to the same framework.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:36px;">
+      <a href="assessments.dc.html" style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;text-decoration:none;color:var(--ink,#1c1917);display:flex;flex-direction:column;" style-hover="border-color:#b88a4a;">
+        <div style="width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;"><image-slot id="home-engage-learn" shape="rect" placeholder="Assessment / results imagery"></image-slot></div>
+        <p style="margin:18px 0 0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Learn & Reflect</p>
+        <p style="margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">Assessments, insights, and tools that help you notice what matters.</p>
+      </a>
+      <a href="the-life-youre-building.dc.html" style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;text-decoration:none;color:var(--ink,#1c1917);display:flex;flex-direction:column;" style-hover="border-color:#b88a4a;">
+        <div style="width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;"><image-slot id="home-engage-read" shape="rect" placeholder="Approved book cover"></image-slot></div>
+        <p style="margin:18px 0 0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Read & Discover</p>
+        <p style="margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">The Life You’re Building and practical resources that explain the framework.</p>
+      </a>
+      <a href="studies.dc.html" style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;text-decoration:none;color:var(--ink,#1c1917);display:flex;flex-direction:column;" style-hover="border-color:#b88a4a;">
+        <div style="width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;"><image-slot id="home-engage-grow" shape="rect" placeholder="Study guide cover"></image-slot></div>
+        <p style="margin:18px 0 0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Grow Together</p>
+        <p style="margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">Small-group studies and church experiences that turn insight into honest conversation and action.</p>
+      </a>
+      <a href="personal-blueprint.dc.html" style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;text-decoration:none;color:var(--ink,#1c1917);display:flex;flex-direction:column;" style-hover="border-color:#b88a4a;">
+        <div style="width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;"><image-slot id="home-engage-build" shape="rect" placeholder="Sample Personal Blueprint cover"></image-slot></div>
+        <p style="margin:18px 0 0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Build Your Blueprint</p>
+        <p style="margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">A personal plan rooted in your mission, values, relationships, commitments, and current season.</p>
+      </a>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;">
+      <a href="start.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Find My Starting Point</a>
+      <a href="learn-and-grow.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--card,#fff);">Explore Learning & Resources</a>
+    </div>
+  </div>
+</section>
+
+<!-- 05 PERSONAL BLUEPRINT -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">05 · Personal Blueprint</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">Your Life Deserves More Than Good Intentions.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Imagine having one place to return to when decisions become difficult, the calendar gets crowded, or the season changes.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Your Personal Stewardship Blueprint brings together your identity, mission, values, pillars, boundaries, habits, energy, accountability, and living legacy. It helps you remember what matters, protect it, and choose the next step.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">It is a living guide—not a document you finish and put away.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+      <a href="personal-blueprint.dc.html#sample" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">See a Sample Blueprint</a>
+      <a href="personal-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Explore How to Build Yours</a>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px;align-items:start;">
+    <div style="aspect-ratio:8.5/11;border-radius:10px;overflow:hidden;box-shadow:0 18px 48px rgba(20,20,20,.12);background:#141211;position:relative;">
+      <image-slot id="home-blueprint-cover" shape="rect" placeholder="Sample Blueprint cover (generic 13-page sample)"></image-slot>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="aspect-ratio:8.5/11;border-radius:10px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="home-blueprint-northstar" shape="rect" placeholder="North Star page"></image-slot></div>
+      <div style="aspect-ratio:8.5/11;border-radius:10px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="home-blueprint-interior" shape="rect" placeholder="Interior preview"></image-slot></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 MEET STEWARD -->
+<section style="background:#141211;color:#f4f1ea;">
+  <div style="max-width:1160px;margin:0 auto;padding:80px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d8bd86;">06 · Meet Steward</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">Meet Steward, Your Personal Stewardship Guide.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">Creating a plan matters. Living it is where change happens.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">Steward helps you reflect, organize your thinking, develop your Personal Stewardship Blueprint, and revisit it as life unfolds. When priorities compete, decisions feel complicated, or habits start slipping, Steward helps you connect your next choice with the life you are building.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">You remain in control. Steward can suggest and clarify; you decide what belongs in your Blueprint.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+        <a href="steward.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Meet Steward</a>
+        <a href="steward.dc.html#demo" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid rgba(255,255,255,.18);color:#f4f1ea;font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:rgba(255,255,255,.06);color:#f4f1ea;">See How It Works</a>
+      </div>
+    </div>
+    <div>
+      <div style="border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.04);padding:22px;display:flex;flex-direction:column;gap:14px;">
+        <div style="align-self:flex-end;max-width:85%;border-radius:12px 12px 2px 12px;background:#b88a4a;color:var(--card,#fff);padding:12px 16px;font-size:14.5px;line-height:1.55;">My work calendar keeps crowding out family. Help me think through what needs to change.</div>
+        <div style="align-self:flex-start;max-width:90%;border-radius:12px 12px 12px 2px;background:rgba(255,255,255,.07);padding:12px 16px;font-size:14.5px;line-height:1.55;color:#f4f1ea;">Your Blueprint names “present with Kristi and the kids on weeknights” as a priority. Three late meetings landed there this week. Would a guardrail help — a hard stop at 5:30 on Tuesdays and Thursdays?</div>
+        <div style="align-self:flex-start;border:1px dashed rgba(216,189,134,.5);border-radius:10px;padding:12px 14px;font-size:13px;color:#cfc7ba;background:rgba(216,189,134,.06);"><span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#d8bd86;">Proposed guardrail</span><br>“No meetings after 5:30 on Tue/Thu — family dinner is protected.”<div style="display:flex;gap:8px;margin-top:10px;"><span style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;background:#f4f1ea;color:#141211;">Add to my Blueprint</span><span style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.2);">Edit</span><span style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.2);">Not now</span></div></div>
+      </div>
+      <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:14px 0 0;border:1px dashed #d8bd86;border-radius:8px;padding:10px 14px;background:rgba(216,189,134,.08);font-size:12.5px;line-height:1.55;color:#cfc7ba;"><span style="font-weight:700;color:#d8bd86;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Short click-to-play demo cut from the existing Steward animation (steward-hero-autoplay). Silent preview only if it does not distract; no multi-screen scroll-trap. No “AI coach” / “AI life planner” in large type — AI disclosure lives on /steward and legal/help.</div></sc-if>
+    </div>
+  </div>
+</section>
+
+<!-- 07 GROW TOGETHER -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div style="order:2;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">07 · Grow Together</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">Some of the Most Important Growth Happens Together.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">A good conversation can help you recognize what you could not see alone. Trusted relationships can help you follow through on what you already know matters.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The Stewardship Blueprint offers six-week studies, group discussions, and church experiences that combine Scripture, reflection, practical action, and encouragement. Whether you’re joining a group or leading one, there is a place to begin.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+      <a href="studies.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore Studies & Experiences</a>
+      <a href="churches.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">For Churches & Group Leaders</a>
+    </div>
+  </div>
+  <div style="order:1;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div style="grid-column:span 2;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--border,#e1dbd0);"><image-slot id="home-group-photo" shape="rect" placeholder="Approved study / ministry gathering photo (or omit)"></image-slot></div>
+    <div style="aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="home-participant-guide" shape="rect" placeholder="Participant Guide cover"></image-slot></div>
+    <div style="aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:1px solid var(--border,#e1dbd0);background:var(--card,#fff);"><image-slot id="home-leader-guide" shape="rect" placeholder="Leader & Campaign Guide cover"></image-slot></div>
+  </div>
+</section>
+
+<!-- 08 THE BOOK -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">08 · The Book</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(30px,3.6vw,42px);line-height:1.1;letter-spacing:-.015em;">The Life You’re Building</h2>
+      <p style="margin:10px 0 0;font-family:Fraunces,Georgia,serif;font-style:italic;font-size:20px;line-height:1.4;color:var(--muted-fg,#6d6660);">How to Stop Drifting and Design a Life That Matters.</p>
+      <p style="margin:18px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">A life can look successful from a distance and still feel misaligned up close. Through personal stories, biblical insight, and practical reflection, The Life You’re Building invites you to examine the life taking shape and begin building with greater purpose.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The goal is not simply to finish another book. It is to live differently because of what you discover.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+        <a href="the-life-youre-building.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore the Book</a>
+        <a href="https://michaeljgauthier.com/book-waitlist" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Join the Book Waitlist</a>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;">
+      <div style="width:min(300px,80%);aspect-ratio:2/3;border-radius:6px 14px 14px 6px;overflow:hidden;box-shadow:-10px 24px 60px rgba(20,20,20,.22);background:#141211;"><image-slot id="home-book-cover" shape="rect" placeholder="Approved retail book cover (single final concept)"></image-slot></div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 MICHAEL -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:48px;align-items:end;">
+  <div style="display:flex;justify-content:center;align-items:flex-end;">
+    <img src="public/media/mike-gauthier-profile-photo.png" alt="Michael J. Gauthier" style="width:min(300px,100%);height:auto;display:block;">
+  </div>
+  <div style="padding-bottom:72px;grid-column:span 1;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">09 · Michael</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">A Question That Changed How I Look at Life.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Early in my career, I was pursuing the markers of success our culture often celebrates. After the birth of our first child, a question began reshaping my priorities: <em style="font-family:Fraunces,Georgia,serif;color:var(--ink,#1c1917);">If everything I am chasing works, will it actually matter?</em></p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">That question led me to think differently about my faith, family, work, health, money, and the purposes God had entrusted to me.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">I created the Stewardship Blueprint because I believe meaningful lives are not built accidentally—and I am still learning to live it myself.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;margin-top:24px;font-size:15px;font-weight:600;">
+      <a href="about.dc.html" style="color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Read My Story →</a>
+      <a href="mission.dc.html" style="color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Our Mission →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 10 STAY CONNECTED -->
+<section id="join" style="border-top:1px solid var(--border,#e1dbd0);background:#141211;color:#f4f1ea;">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px 80px;text-align:center;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d8bd86;">10 · Stay Connected</p>
+    <h2 style="margin:12px auto 0;max-width:680px;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;">Keep Building a Life That <em style="font-style:normal;color:#d8bd86;">Matters.</em></h2>
+    <p style="margin:16px auto 0;max-width:600px;font-size:17px;line-height:1.7;color:#cfc7ba;">A meaningful life is built through repeated choices, not one moment of inspiration.</p>
+    <p style="margin:10px auto 0;max-width:600px;font-size:15px;line-height:1.7;color:#9d948a;">Join the Stewardship Blueprint journey for occasional reflections, practical tools, book news, studies, and new opportunities to grow.</p>
+    <form onSubmit="{{ noop }}" style="margin:32px auto 0;max-width:520px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(255,255,255,.03);padding:24px;text-align:left;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+        <input placeholder="First name" aria-label="First name" style="width:100%;box-sizing:border-box;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);padding:12px 16px;font-size:15px;color:#f4f1ea;font-family:Geist,Arial,sans-serif;">
+        <input placeholder="Email address" type="email" aria-label="Email address" style="width:100%;box-sizing:border-box;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);padding:12px 16px;font-size:15px;color:#f4f1ea;font-family:Geist,Arial,sans-serif;">
+      </div>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:13px;line-height:1.5;color:#cfc7ba;"><input type="checkbox" style="margin-top:3px;accent-color:#b88a4a;">I agree to receive Stewardship Blueprint email updates and understand I can unsubscribe at any time.</label>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:8px;font-size:13px;line-height:1.5;color:#9d948a;"><input type="checkbox" style="margin-top:3px;accent-color:#b88a4a;">Optional: also text me occasional SMS reminders (separate consent; phone collected on the next step).</label>
+      <a href="join.dc.html" style="margin-top:16px;display:flex;align-items:center;justify-content:center;height:48px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Join the Journey →</a>
+      <p style="margin:14px 0 0;text-align:center;font-size:12px;line-height:1.6;color:#9d948a;">Your information will only be used to send you updates about The Stewardship Blueprint. No spam, ever. Unsubscribe at any time.</p>
+    </form>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:18px auto 0;max-width:520px;text-align:left;border:1px dashed #d8bd86;border-radius:8px;padding:10px 14px;background:rgba(216,189,134,.08);font-size:12.5px;line-height:1.55;color:#cfc7ba;"><span style="font-weight:700;color:#d8bd86;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Replaces the current “Join the Journey” modal. First name + email only; phone must NOT be required. Email consent and SMS consent are separate fields. Posts to /api/public/join-journey with source tracking.</div></sc-if>
+  </div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  state = { awakenOpen: false };
+  componentDidMount() { this._k = (e) => { if (e.key === "Escape") this.setState({ awakenOpen: false }); }; document.addEventListener("keydown", this._k); }
+  componentWillUnmount() { document.removeEventListener("keydown", this._k); }
+  renderVals() {
+    return { notes: this.props.showDevNotes ?? true, noop: (e) => e.preventDefault(),
+      awakenOpen: this.state.awakenOpen, openAwaken: () => this.setState({ awakenOpen: true }), closeAwaken: () => this.setState({ awakenOpen: false }), stop: (e) => e.stopPropagation() };
+  }
+}
+</script>
+</body>
+</html>

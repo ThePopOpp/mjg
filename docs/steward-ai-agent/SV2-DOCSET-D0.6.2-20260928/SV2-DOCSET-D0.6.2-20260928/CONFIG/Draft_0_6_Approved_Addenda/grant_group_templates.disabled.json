@@ -1,0 +1,11 @@
+{
+  "status": "disabled_example",
+  "grant_types": [
+    "free",
+    "full_included",
+    "premium_period",
+    "no_scheduled_expiry"
+  ],
+  "requires_authorized_admin": true,
+  "no_card_grant_never_bills": true
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="The Stewardship Blueprint" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="blueprint" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 48px;text-align:center;">
+  <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ The Framework</span>
+  <h1 style="margin:24px auto 0;max-width:900px;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">One Framework. Your Whole <em style="font-style:normal;color:#b88a4a;">Life.</em></h1>
+  <p style="margin:20px auto 0;max-width:680px;font-size:18px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">You are building a life, whether you have designed it or not. The Stewardship Blueprint helps you see the entire structure and bring your daily choices into alignment with what matters most.</p>
+  <p style="margin:14px auto 0;max-width:680px;font-size:18px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">It begins with an important belief: our lives are not merely ours to use. They are entrusted to us to steward faithfully.</p>
+  <div style="display:flex;justify-content:center;margin-top:30px;"><a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Take the Free Check-In</a></div>
+  <div style="margin:48px auto 0;max-width:620px;"><dc-import name="FrameworkTemple" hint-size="100%,560px"></dc-import></div>
+</section>
+
+<!-- THE BUILDING -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">The Building</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;max-width:760px;">See How the Layers Work Together.</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:36px;">
+      <sc-for list="{{ layers }}" as="l" hint-placeholder-count="7">
+        <div id="{{ l.id }}" style="scroll-margin-top:80px;border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><span style="font-family:Fraunces,Georgia,serif;font-size:13px;color:var(--muted-fg,#6d6660);">{{ l.num }}</span><div style="height:64px;width:96px;border-radius:8px;overflow:hidden;"><image-slot id="{{ l.slot }}" shape="rect" placeholder="Layer crop"></image-slot></div></div>
+          <div>
+            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">{{ l.layer }}</p>
+            <h3 style="margin:6px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:22px;line-height:1.25;">{{ l.title }}</h3>
+            <p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">{{ l.body }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;">
+      <a href="assessments.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">See the Assessments</a>
+      <a href="studies.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--card,#fff);">Explore Studies</a>
+    </div>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:24px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>One separate crop/highlight per layer if original vector files are available (request layered SVG/AI/EPS from Filmpool). Accessible text labels required.</div></sc-if>
+  </div>
+</section>
+
+<!-- HOW TO USE IT -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div>
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">How to Use It</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">Your Blueprint Changes With Your Season.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The Stewardship Blueprint is not a demand for perfect balance. Some seasons require more attention to family, others to health, resources, service, or rest. The point is to notice what is truly entrusted to you and avoid leaving important areas unattended indefinitely.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Begin by examining what is true now. Then choose one important next step. As your season changes, return to the framework and refine the decisions you are making.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+      <a href="start.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Start Your Journey</a>
+      <a href="personal-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Build Your Personal Blueprint</a>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:18px;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg,#6d6660);">Now</p><p style="margin:8px 0 0;font-family:Fraunces,Georgia,serif;font-size:18px;line-height:1.3;">Examine what is true</p></div>
+    <div style="border:1px solid #b88a4a;border-radius:12px;background:rgba(184,138,74,.06);padding:18px;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#b88a4a;">Next</p><p style="margin:8px 0 0;font-family:Fraunces,Georgia,serif;font-size:18px;line-height:1.3;">Choose one important step</p></div>
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:18px;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-fg,#6d6660);">New season</p><p style="margin:8px 0 0;font-family:Fraunces,Georgia,serif;font-size:18px;line-height:1.3;">Return and refine</p></div>
+  </div>
+</section>
+
+<!-- FAITH & WELCOME -->
+<section style="background:#141211;color:#f4f1ea;">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;text-align:center;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d8bd86;">Faith & Welcome</p>
+    <h2 style="margin:12px auto 0;max-width:720px;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;">Rooted in Faith. Open to Honest Questions.</h2>
+    <p style="margin:16px auto 0;max-width:640px;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">The framework reflects a Christian understanding of life as a gift entrusted by God. You do not need to have everything figured out—or every belief settled—to begin reflecting on the kind of life you are building.</p>
+    <p style="margin:14px auto 0;max-width:640px;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">We will be clear about the convictions that shape this work and respectful of where each visitor is beginning.</p>
+    <div style="display:flex;justify-content:center;margin-top:28px;"><a href="mission.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid rgba(255,255,255,.18);color:#f4f1ea;font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:rgba(255,255,255,.06);color:#f4f1ea;">About the Mission →</a></div>
+  </div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const layers = [
+      { num: "01", layer: "Bedrock", title: "Faith & Identity", body: "Your identity is deeper than what you accomplish, own, or produce. Faith is not just one room in the house; it shapes the entire structure." },
+      { num: "02", layer: "Foundation", title: "Mission, Values, Calling & Purpose", body: "What matters most to you? What does faithful living look like in this season? Foundation translates conviction into direction." },
+      { num: "03", layer: "Four Pillars", title: "Family, Fitness, Fun & Finances", body: "Relationships, health, joy, and financial resources are connected. Strengthening one while neglecting the others eventually affects the whole life." },
+      { num: "04", layer: "Guardrails", title: "Boundaries That Protect", body: "Pre-decided limits protect your priorities, integrity, relationships, and freedom before pressure creates regret." },
+      { num: "05", layer: "Keystone Habits", title: "Rhythms That Strengthen", body: "Small, repeatable actions shape the life you live more than occasional bursts of motivation." },
+      { num: "06", layer: "Energy", title: "Capacity to Live It", body: "Physical, emotional, mental, and spiritual energy must be received, invested, renewed, and protected." },
+      { num: "07", layer: "Legacy", title: "What You Multiply While Living", body: "Your legacy takes shape in the people you influence, equip, serve, and encourage now. Generosity grows when others learn to practice and pass it on. Estate arrangements may support continuity but do not define Legacy Giving." },
+    ].map((l, i) => ({ ...l, slot: "sb-layer-" + (i + 1), id: "layer-" + (i + 1) }));
+    return { layers, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

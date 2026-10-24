@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="About Michael" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="about" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:end;">
+  <div style="padding-bottom:64px;">
+    <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ About Michael</span>
+    <h1 style="margin:24px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;">I’m Still Building, <em style="font-style:normal;color:#b88a4a;">Too.</em></h1>
+    <p style="margin:20px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:580px;text-wrap:pretty;">I’m Michael J. Gauthier. I’m a husband, father, follower of Jesus, financial planner, business leader, and someone who is still learning to live what matters most.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);max-width:580px;text-wrap:pretty;">The Stewardship Blueprint is not a theory I developed from a distance. It grew out of my own questions, successes, misplaced scoreboards, relationships, faith journey, and ongoing desire to steward the life God has entrusted to me.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;"><a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore the Framework</a></div>
+  </div>
+  <div style="display:flex;justify-content:center;align-items:flex-end;"><img src="public/media/mike-gauthier-profile-photo.png" alt="Michael J. Gauthier" style="width:min(360px,100%);height:auto;display:block;"></div>
+</section>
+
+<!-- THE QUESTION -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">The Question</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">If Everything I’m Chasing Works, Will It Actually Matter?</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Early in my career, I was ambitious. I worked hard and measured success through production, growth, titles, and recognition. None of those pursuits were inherently wrong. But they were incomplete.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">When Kristi and I welcomed our first child, Colton, I started thinking about a different kind of success. He would not just need provision. He would watch what I valued, how I treated his mother, where I spent my time, and what I celebrated.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Later, trusted friends invited our family into a small-group Bible study. My faith began to move from a compartment of life toward the foundation of how I understood marriage, work, finances, service, and purpose.</p>
+    </div>
+    <div>
+      <div style="aspect-ratio:4/5;max-width:420px;margin:0 auto;border-radius:16px;overflow:hidden;border:1px solid var(--border,#e1dbd0);"><image-slot id="about-family" shape="rect" placeholder="Optional family image (with permission) or brief story video w/ transcript"></image-slot></div>
+      <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:14px auto 0;max-width:420px;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Existing asset available: public/media/Gauthier-Family-840x1020-1.png (confirm permission). Optional brief personal story video with subtitle transcript; do not force autoplay.</div></sc-if>
+    </div>
+  </div>
+</section>
+
+<!-- THE JOURNEY -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+  <div style="order:2;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">The Journey</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;text-wrap:pretty;">From Planning Money to Examining the Whole Life.</h2>
+    <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">I founded Strategic Income Group in 2013 after leaving a large Wall Street firm. Financial planning taught me important lessons about discipline, responsibility, and wise use of resources.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">It also revealed a deeper question: <em style="font-family:Fraunces,Georgia,serif;color:var(--ink,#1c1917);">What is the money for?</em> Many people have detailed financial plans without a clear picture of the life those resources are meant to serve.</p>
+    <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">That observation, together with my personal faith and family journey, helped shape the Stewardship Blueprint. It is an invitation to look beyond one scoreboard and steward the whole life.</p>
+    <a href="mission.dc.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:15px;font-weight:600;color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Read My Mission →</a>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:20px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Keep SIG background factual and concise; do not route the site into an investment-advisory sales funnel.</div></sc-if>
+  </div>
+  <div style="order:1;display:grid;gap:12px;">
+    <div style="display:grid;grid-template-columns:72px 1fr;gap:16px;align-items:baseline;border-bottom:1px solid var(--border,#e1dbd0);padding-bottom:14px;"><span style="font-family:Fraunces,Georgia,serif;font-size:22px;color:#b88a4a;">2013</span><p style="margin:0;font-size:15px;line-height:1.6;">Left a large Wall Street firm; founded Strategic Income Group.</p></div>
+    <div style="display:grid;grid-template-columns:72px 1fr;gap:16px;align-items:baseline;border-bottom:1px solid var(--border,#e1dbd0);padding-bottom:14px;"><span style="font-family:Fraunces,Georgia,serif;font-size:22px;color:#b88a4a;">Then</span><p style="margin:0;font-size:15px;line-height:1.6;">Financial planning raised the deeper question: what is the money for?</p></div>
+    <div style="display:grid;grid-template-columns:72px 1fr;gap:16px;align-items:baseline;padding-bottom:14px;"><span style="font-family:Fraunces,Georgia,serif;font-size:22px;color:#b88a4a;">Now</span><p style="margin:0;font-size:15px;line-height:1.6;">The Stewardship Blueprint — an invitation to steward the whole life.</p></div>
+  </div>
+</section>
+
+<!-- INVITATION -->
+<section style="background:#141211;color:#f4f1ea;">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;text-align:center;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d8bd86;">Invitation</p>
+    <h2 style="margin:12px auto 0;max-width:720px;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;">Come Build With Me.</h2>
+    <p style="margin:16px auto 0;max-width:640px;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">I do not believe you need a perfect life to begin living on purpose. You only need the courage to stop, look honestly at what is true, and choose your next faithful step.</p>
+    <p style="margin:14px auto 0;max-width:640px;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">My hope is that the Stewardship Blueprint becomes useful to people of many ages and seasons—and that they will eventually help others begin as well.</p>
+    <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:28px;">
+      <a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Take the Free Check-In</a>
+      <a href="join.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid rgba(255,255,255,.18);color:#f4f1ea;font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:rgba(255,255,255,.06);color:#f4f1ea;">Join the Journey</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() { return { notes: this.props.showDevNotes ?? true }; }
+}
+</script>
+</body>
+</html>

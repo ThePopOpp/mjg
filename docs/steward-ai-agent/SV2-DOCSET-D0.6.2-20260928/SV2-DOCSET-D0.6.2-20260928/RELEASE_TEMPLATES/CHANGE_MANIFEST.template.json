@@ -1,0 +1,51 @@
+{
+  "schema_version": "steward-change-manifest.design.v1",
+  "status": "DRAFT_NOT_AUTHORIZED",
+  "change_id": null,
+  "base_product_version": null,
+  "target_product_version": null,
+  "base_package_sha256": null,
+  "target_package_sha256": null,
+  "classification": null,
+  "allowed_classifications": [
+    "CONTENT_PROMPT",
+    "CONFIGURATION",
+    "APPLICATION_SCHEMA",
+    "PROVIDER_SAFETY_RIGHTS"
+  ],
+  "owner_direction_refs": [],
+  "affected_requirement_ids": [],
+  "changed_files": [],
+  "agent_prompt_versions": {},
+  "canon_serving_manifest_ref": null,
+  "rights_manifest_ref": null,
+  "required_code_commit": null,
+  "schema_compatibility": {
+    "from": null,
+    "to": null,
+    "migrations": [],
+    "reversible": null,
+    "forward_repair_plan": null
+  },
+  "tool_dependencies": [],
+  "feature_flags": [],
+  "offer_benefit_versions": [],
+  "participant_permission_changes": [],
+  "required_tests": [],
+  "actual_test_evidence": [],
+  "required_reviews": [],
+  "actual_approvals": [],
+  "rollout": {
+    "environment": "STAGING_SYNTHETIC_ONLY",
+    "initial_audience": null,
+    "expansion_conditions": [],
+    "stop_conditions": []
+  },
+  "rollback": {
+    "approved_target": null,
+    "data_compatibility_evidence": null,
+    "preserve_deletion_revocation_and_canceled_billing": true
+  },
+  "production_authorized": false,
+  "notes": "Uploadable content is not implemented code. Empty required fields or unsupported dependencies block promotion."
+}

@@ -1,0 +1,18 @@
+{
+  "scope": "All prior 170 case IDs retained; only D02-001 definition amended for correction and prior failure provenance.",
+  "unchanged_prior_definition_count": 169,
+  "changed_prior_definitions": [
+    "D02-001"
+  ],
+  "new_definitions": [
+    "D04-001",
+    "D04-002",
+    "D04-003",
+    "D04-004",
+    "D04-005"
+  ],
+  "preserved_V2_case_count": 86,
+  "current_case_count": 175,
+  "current_candidate_execution": "NOT RUN",
+  "prior_D02_001_conversation": "FAIL_OWNER_REPORTED_DRAFT_0_3"
+}

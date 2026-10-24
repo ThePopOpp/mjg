@@ -1,0 +1,987 @@
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 1
+MICHAEL J. GAUTHIER
+THE STEWARDSHIP
+BLUEPRINT
+WEBSITE ARCHITECTURE & FULL PAGE COPY
+Review Edition 1 • 21 October 2026
+For Jeremy / MJG website development
+Brand: framework first. Awaken before products. Personal agency before technology. Legacy multiplied through people now.
+
+-- 1 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 2
+Editorial and deployment notes
+This document is a proposed public-facing copy package, not a claim that all pages, programs, or features are live.
+Each page is divided into visitor-facing copy, calls to action, image/video placement, and implementation notes.
+Statuses should be verified at publication.
+PRIMARY PUBLIC JOURNEY: Awaken → See the Framework → Reflect & Engage → Build Your Personal Blueprint → Live &
+Multiply.
+BRAND HIERARCHY: Stewardship Blueprint is the framework; The Life You’re Building is the flagship book; studies and
+assessments support learning; Steward is the Personal Stewardship Guide; ForgedLife supports group/accountability
+where applicable.
+AI DISCLOSURE: Never lead with “AI” or market the platform as an AI life coach. Say clearly on Steward’s dedicated
+page that it is a digital guide powered by AI and that the participant controls decisions and approvals.
+LEGACY STANDARD: Living multiplication through people governs copy. Legacy Giving means modeling, teaching, and
+equipping others to practice and pass on generosity now. Estate planning is supporting continuity.
+RELEASE DISCIPLINE: Keep the working existing Check-In and men’s group pathways. Mark upcoming assessments,
+products, and group editions honestly.
+VIDEO VERIFICATION: Filmpool URLs are supplied, but the media titles, durations, and contents could not be
+independently confirmed from the private Vimeo links. Jeremy should identify their exact role before assigning
+homepage placement.
+PUBLICATION: Review all legal/financial/privacy/feature claims with the actual implemented experience and counsel
+as appropriate.
+Final main navigation
+1. The Blueprint
+2. Start Here
+3. Learn & Grow
+4. Steward
+5. For Churches
+6. About
+Persistent utility navigation: logo → Home; primary CTA → /created-for-more-check-in; sign-in → appropriate participant
+workspace (verify current /login purpose); footer → Contact, Join, Privacy, Terms, Support.
+Editorial recommendation: Insights & Resources
+Keep editorial content, but do not build a high-frequency blog. Curate 6–8 durable foundation articles for launch and
+publish roughly one strong original article per month as capacity allows. Social media, short clips, email, and church
+partnerships direct visitors to articles, study pages, and the Check-In.
+Host the library at /resources under Learn & Grow; do not bury it inside a book marketing page. Use topical tags
+aligned to framework layers and connect every article to one reasonable next step. Preserve the existing “The Watch
+and the Wrong Scoreboard” URL.
+A practical starting editorial queue: The Watch and the Wrong Scoreboard (existing); Busyness Can Disguise Drift;
+What Is Whole-Life Stewardship?; The Four Pillars; Guardrails Before Regret; Energy Is an Entrusted Resource; A Life of
+Generosity Begins Now; What a Personal Blueprint Is For.
+
+-- 2 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 3
+Measure meaningful actions rather than raw article volume: Check-In starts/completions, visits to deeper framework
+pages, qualified group/facilitator inquiries, book waitlist growth, Steward engagement, and voluntary return visits.
+Page and route inventory
+Public page Suggested route Status
+HOME / EXISTING — REPLACE COPY &
+STRUCTURE
+THE STEWARDSHIP BLUEPRINT /stewardship-blueprint NEW
+YOUR PERSONAL STEWARDSHIP
+BLUEPRINT
+/personal-blueprint NEW
+START YOUR JOURNEY /start NEW
+ASSESSMENTS & CHECK-INS /assessments NEW
+CREATED FOR MORE CHECK-IN /created-for-more-check-in EXISTING — KEEP 28-QUESTION
+TOOL
+LEARN & GROW /learn-and-grow NEW
+THE LIFE YOU’RE BUILDING —
+BOOK
+/the-life-youre-building NEW PUBLIC LANDING PAGE
+STUDIES & EXPERIENCES /studies NEW
+INSIGHTS & RESOURCES /resources EXISTING — RETITLE & CURATE
+STEWARD — PERSONAL GUIDE /steward NEW
+FOR CHURCHES & GROUPS /churches NEW
+LEAD A GROUP /lead-a-group NEW
+ABOUT MICHAEL /about EXISTING — REWRITE
+MISSION & VISION /mission EXISTING — UPDATE
+CONTACT /contact EXISTING — UPDATE
+JOIN THE JOURNEY /join NEW (ALSO USE INLINE FORM
+COMPONENT)
+Additional working routes to preserve: /book-waitlist, /6-week-challenge, /6-week-challenge/videos, /register, /login, /resources/the-watch-
+and-the-wrong-scoreboard, privacy/legal paths and all existing session-specific links. New proposed routes are drafts; do not assume they
+resolve today.
+Video and imagery inventory
+Filmpool Vimeo 1
+https://vimeo.com/1237401025/c37d5b82d1?share=copy&fl=sv&fe=ci
+Supplied by Mike; verify exact title, content, duration, captions, embed rights. Preferred homepage hero if it is the mission/framework brand
+film.
+Filmpool Vimeo 2
+https://vimeo.com/1237334903/875275e082?share=copy&fl=sv&fe=ci
+Supplied by Mike; verify exact title and intended role. Potential secondary homepage/social/church video depending on footage.
+Six-week video library
+https://michaeljgauthier.com/6-week-challenge/videos
+Existing page listing Invitation, Homework, Week 1, Week 2, Week 3, Week 4, Week 5, Week 6, Closing. Week 3 and Week 6 showed Coming
+Soon during review; verify ahead of launch.
+
+-- 3 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 4
+Steward demo A
+https://michaeljgauthier.com/steward-homepage-autoplay
+Existing private preview supplied by Jeremy; use a shortened excerpt lower on Home / longer on Steward page if approved.
+Steward demo B
+https://michaeljgauthier.com/steward-homepage-scroll
+Existing private preview supplied by Jeremy; avoid full multi-screen interaction on homepage.
+Brand framework artwork
+/mnt/data/SB Framework Image.png
+Actual supplied illustration; request layered SVG/AI/EPS or appropriate editable assets from Filmpool for future highlighting.
+Book cover concepts
+/mnt/data/the_life_youre_building_cover_clean_retail.png ;
+/mnt/data/the_life_youre_building_cover_bestseller_style.png
+Select final approved book cover before publication; do not show multiple variations publicly.
+Current site issues to resolve before public switch
+Old Home still says the book is being written “chapter by chapter,” and defines legacy as what is left behind; update to
+current book and living-legacy framework.
+Current /login presents an internal 7-day pilot management workspace. Ensure public Participant/Facilitator sign-in
+routes to the appropriate dashboard rather than admin messaging.
+The Homepage “Join the Journey” modal requires a phone number although a general email list need not. Simplify to
+first name/email and separate consent for SMS.
+The existing /created-for-more-check-in is 28 questions across seven layers. Do not mix its scores with earlier five-
+category assessment versions without a documented versioning policy.
+Six-week video library labels Week 3 and Week 6 Coming Soon in the public view; confirm release state before broader
+rollout.
+Separate Stewardship Blueprint LLC brand and support from SIG services. Confirm correct mailing address ZIP and
+approved disclosures before go-live.
+For new URLs, establish permanent redirects from obsolete public routes only after active campaigns, QR codes, login
+flows, links, and email automations are tested.
+
+-- 4 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 5
+PAGE 01 / EXISTING — REPLACE COPY & STRUCTURE
+HOME
+Route: /
+Purpose: Awaken interest, show the framework, introduce the connected experience, and move visitors to one first action.
+01 • AWAKEN
+What Kind of Life Are You Actually Building?
+Most people don’t intentionally drift. Life simply gets full.
+We work hard, care for people, pursue opportunities, and manage countless responsibilities. But somewhere along
+the way, we can stop asking whether the life we’re building reflects what matters most.
+Your life is taking shape every day—through your calendar, relationships, habits, health, decisions, and use of
+resources. The question isn’t whether you are building. It’s whether you are building on purpose.
+The Stewardship Blueprint is a whole-life framework that helps you stop drifting, steward what God has entrusted to
+you, and build a life that matters.
+CALLS TO ACTION: Take the Free Check-In → /created-for-more-check-in • Explore the Blueprint → /stewardship-blueprint
+IMAGE / VIDEO: Media: Hero split-screen. Left text; right an approved Filmpool mission/framework video with a static poster and click-to-
+play. DO NOT default to a full Steward product demo. Confirm which supplied Vimeo link is the brand film before publishing.
+JEREMY / REVIEW NOTE: Above fold: one primary CTA and one secondary. No sound autoplay; on mobile the first CTA should remain visible
+before a long video.
+02 • SEE THE FRAMEWORK
+A Life That Matters Is Built on Purpose.
+We make plans for careers, finances, vacations, and major decisions. Yet many of us have never created a thoughtful
+blueprint for the life those plans are meant to serve.
+The Stewardship Blueprint connects the parts of life that should never be managed in isolation: faith and identity;
+mission and values; family, fitness, fun, and finances; guardrails; keystone habits; energy; and legacy.
+It is not a formula for perfection. It is a practical structure for living with purpose in the season you are in.
+CALLS TO ACTION: Explore the Framework → /stewardship-blueprint
+IMAGE / VIDEO: Media: Actual SB Framework Image.png in large format, not stock architecture. Initial static image with clear supporting
+labels; make sections interactive as a second-phase enhancement.
+JEREMY / REVIEW NOTE: For Legacy captions use “What your life multiplies through others now,” not inheritance-first language.
+03 • FIRST STEP
+Awareness Is Where Stewardship Begins.
+Before you can build differently, you need to see clearly where you are today.
+The Created for More Check-In is a free, 28-question reflection across seven connected layers of the Blueprint. In
+about fifteen minutes, it helps you notice where your life is aligned, where you may be drifting, and what deserves
+attention next.
+This is not a grade. It is a starting point for honest reflection and one faithful next step.
+CALLS TO ACTION: Begin My Free Check-In → /created-for-more-check-in • Explore Other Assessments → /assessments
+IMAGE / VIDEO: Media: Real screenshot or anonymized illustration of the current assessment interface and example results. Do not imply
+result functions not currently deployed.
+04 • WAYS TO ENGAGE
+
+-- 5 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 6
+There Is More Than One Way to Begin.
+You can start with quiet reflection, a good book, meaningful conversation, a group experience, or a more detailed
+personal plan. Each path is connected to the same framework.
+LEARN & REFLECT — Assessments, insights, and tools that help you notice what matters.
+READ & DISCOVER — The Life You’re Building and practical resources that explain the framework.
+GROW TOGETHER — Small-group studies and church experiences that turn insight into honest conversation and
+action.
+BUILD YOUR BLUEPRINT — A personal plan rooted in your mission, values, relationships, commitments, and current
+season.
+CALLS TO ACTION: Find My Starting Point → /start • Explore Learning & Resources → /learn-and-grow
+IMAGE / VIDEO: Media: Four concise branded cards; genuine study guide/book/assessment images, not generic AI imagery.
+05 • PERSONAL BLUEPRINT
+Your Life Deserves More Than Good Intentions.
+Imagine having one place to return to when decisions become difficult, the calendar gets crowded, or the season
+changes.
+Your Personal Stewardship Blueprint brings together your identity, mission, values, pillars, boundaries, habits, energy,
+accountability, and living legacy. It helps you remember what matters, protect it, and choose the next step.
+It is a living guide—not a document you finish and put away.
+CALLS TO ACTION: See a Sample Blueprint → /personal-blueprint • Explore How to Build Yours → /personal-blueprint
+IMAGE / VIDEO: Media: Approved generic 13-page sample; show cover, North Star, and 1–2 interior previews. Never use a real participant’s
+confidential information.
+06 • MEET STEWARD
+Meet Steward, Your Personal Stewardship Guide.
+Creating a plan matters. Living it is where change happens.
+Steward helps you reflect, organize your thinking, develop your Personal Stewardship Blueprint, and revisit it as life
+unfolds. When priorities compete, decisions feel complicated, or habits start slipping, Steward helps you connect
+your next choice with the life you are building.
+You remain in control. Steward can suggest and clarify; you decide what belongs in your Blueprint.
+CALLS TO ACTION: Meet Steward → /steward • See How It Works → /steward#demo
+IMAGE / VIDEO: Media: Short click-to-play demo made from Jeremy’s existing Steward animation. Use the shorter autoplay concept as silent
+preview only if it does not distract. Do not make visitors scroll through multiple screens before reading other sections.
+JEREMY / REVIEW NOTE: No “AI coach” or “AI life planner” in large type. Transparent AI disclosure belongs on /steward and legal/help.
+07 • GROW TOGETHER
+Some of the Most Important Growth Happens Together.
+A good conversation can help you recognize what you could not see alone. Trusted relationships can help you follow
+through on what you already know matters.
+The Stewardship Blueprint offers six-week studies, group discussions, and church experiences that combine
+Scripture, reflection, practical action, and encouragement. Whether you’re joining a group or leading one, there is a
+place to begin.
+CALLS TO ACTION: Explore Studies & Experiences → /studies • For Churches & Group Leaders → /churches
+IMAGE / VIDEO: Media: Authentic photo from an approved study or ministry gathering plus actual Participant and Leader Guide cover
+artwork. If no approved photo exists, use the guide imagery only.
+08 • THE BOOK
+
+-- 6 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 7
+The Life You’re Building
+How to Stop Drifting and Design a Life That Matters.
+A life can look successful from a distance and still feel misaligned up close. Through personal stories, biblical insight,
+and practical reflection, The Life You’re Building invites you to examine the life taking shape and begin building with
+greater purpose.
+The goal is not simply to finish another book. It is to live differently because of what you discover.
+CALLS TO ACTION: Explore the Book → /the-life-youre-building • Join the Book Waitlist → /book-waitlist
+IMAGE / VIDEO: Media: Actual approved retail book cover. Both supplied concepts are prototypes; Mike/Jeremy choose the final art before
+deployment.
+09 • MICHAEL
+A Question That Changed How I Look at Life.
+Early in my career, I was pursuing the markers of success our culture often celebrates. After the birth of our first child,
+a question began reshaping my priorities: If everything I am chasing works, will it actually matter?
+That question led me to think differently about my faith, family, work, health, money, and the purposes God had
+entrusted to me.
+I created the Stewardship Blueprint because I believe meaningful lives are not built accidentally—and I am still
+learning to live it myself.
+CALLS TO ACTION: Read My Story → /about • Our Mission → /mission
+IMAGE / VIDEO: Media: Current approved portrait or candid photo of Mike, not a generic business headshot. Optional second photo of Mike
+engaging with a group.
+10 • STAY CONNECTED
+Keep Building a Life That Matters.
+A meaningful life is built through repeated choices, not one moment of inspiration.
+Join the Stewardship Blueprint journey for occasional reflections, practical tools, book news, studies, and new
+opportunities to grow.
+CALLS TO ACTION: Join the Journey → /join
+IMAGE / VIDEO: Media: Simple first-name and email signup inline; no video. Keep the form friction-light and distinguish email consent from
+optional SMS.
+
+-- 7 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 8
+PAGE 02 / NEW
+THE STEWARDSHIP BLUEPRINT
+Route: /stewardship-blueprint
+Purpose: Explain the actual framework, faith foundation, architectural layers, and connection to further resources.
+HERO
+One Framework. Your Whole Life.
+You are building a life, whether you have designed it or not. The Stewardship Blueprint helps you see the entire
+structure and bring your daily choices into alignment with what matters most.
+It begins with an important belief: our lives are not merely ours to use. They are entrusted to us to steward faithfully.
+CALLS TO ACTION: Take the Free Check-In → /created-for-more-check-in
+IMAGE / VIDEO: Media: Full original architectural Blueprint as hero or immediately below text.
+THE BUILDING
+See How the Layers Work Together.
+BEDROCK — FAITH & IDENTITY. Your identity is deeper than what you accomplish, own, or produce. Faith is not just
+one room in the house; it shapes the entire structure.
+FOUNDATION — MISSION, VALUES, CALLING & PURPOSE. What matters most to you? What does faithful living look
+like in this season? Foundation translates conviction into direction.
+FOUR PILLARS — FAMILY, FITNESS, FUN & FINANCES. Relationships, health, joy, and financial resources are
+connected. Strengthening one while neglecting the others eventually affects the whole life.
+GUARDRAILS — BOUNDARIES THAT PROTECT. Pre-decided limits protect your priorities, integrity, relationships, and
+freedom before pressure creates regret.
+KEYSTONE HABITS — RHYTHMS THAT STRENGTHEN. Small, repeatable actions shape the life you live more than
+occasional bursts of motivation.
+ENERGY — CAPACITY TO LIVE IT. Physical, emotional, mental, and spiritual energy must be received, invested,
+renewed, and protected.
+LEGACY — WHAT YOU MULTIPLY WHILE LIVING. Your legacy takes shape in the people you influence, equip, serve,
+and encourage now. Generosity grows when others learn to practice and pass it on. Estate arrangements may support
+continuity but do not define Legacy Giving.
+CALLS TO ACTION: See the Assessments → /assessments • Explore Studies → /studies
+IMAGE / VIDEO: Media: One separate crop/highlight for each layer if original vector files are available. Accessible text labels required.
+HOW TO USE IT
+Your Blueprint Changes With Your Season.
+The Stewardship Blueprint is not a demand for perfect balance. Some seasons require more attention to family, others
+to health, resources, service, or rest. The point is to notice what is truly entrusted to you and avoid leaving important
+areas unattended indefinitely.
+Begin by examining what is true now. Then choose one important next step. As your season changes, return to the
+framework and refine the decisions you are making.
+CALLS TO ACTION: Start Your Journey → /start • Build Your Personal Blueprint → /personal-blueprint
+IMAGE / VIDEO: Media: Minimal calendar, real personal Blueprint sample, or no image; let the branded illustration carry this page.
+FAITH & WELCOME
+
+-- 8 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 9
+Rooted in Faith. Open to Honest Questions.
+The framework reflects a Christian understanding of life as a gift entrusted by God. You do not need to have everything
+figured out—or every belief settled—to begin reflecting on the kind of life you are building.
+We will be clear about the convictions that shape this work and respectful of where each visitor is beginning.
+CALLS TO ACTION: About the Mission → /mission
+
+-- 9 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 10
+PAGE 03 / NEW
+YOUR PERSONAL STEWARDSHIP BLUEPRINT
+Route: /personal-blueprint
+Purpose: Show tangible outcome; sample thirteen-page deliverable; connected pathway from reflection to living guide.
+HERO
+Make the Life You’re Building Visible.
+You may have financial plans, calendars, work goals, and lists of things to accomplish. But do they point toward one
+clear picture of the life you want to build?
+A Personal Stewardship Blueprint captures the commitments, priorities, relationships, and rhythms that matter in this
+season so you can use them to guide real decisions.
+CALLS TO ACTION: See a Sample Blueprint → /personal-blueprint#sample • Explore How to Begin → /start
+IMAGE / VIDEO: Media: A generic sample Personal Blueprint cover and North Star overview, not Mike’s private details.
+WHAT IT INCLUDES
+A Living Guide, Not Just Another Document.
+Your Blueprint can bring together your faith and identity; your mission, values, and purpose; the person you are
+becoming; Family, Fitness, Fun, and Finances; financial direction; guardrails; drift signals; accountability; keystone
+habits; energy; and the legacy your life is multiplying through others.
+The standard Personal Blueprint structure includes a cover and twelve supporting pages. Each section helps answer a
+practical question: What should I remember, protect, decide, practice, or revisit?
+It should be personal enough to recognize yourself and usable enough to open on a difficult Tuesday.
+CALLS TO ACTION: Explore the Framework → /stewardship-blueprint
+IMAGE / VIDEO: Media: Page-turn gallery using 3–5 sanitized sample pages from the thirteen-page template.
+BUILDING PROCESS
+Notice. Clarify. Build. Live. Revisit.
+START WITH AWARENESS — Take the Created for More Check-In or reflect on a current area of drift.
+CLARIFY WHAT MATTERS — Identify the convictions, people, responsibilities, and priorities that need to guide this
+season.
+BUILD THE PLAN — Capture meaningful statements, boundaries, habits, and next steps rather than generic
+aspirations.
+PUT IT INTO LIFE — Let your calendar, conversations, and decisions reflect what you have written.
+REVISIT & REFINE — Your identity and enduring mission may remain steady while your calling, roles, and
+commitments change.
+CALLS TO ACTION: Begin with the Free Check-In → /created-for-more-check-in • Meet Steward → /steward
+CHOOSING A PATH
+Start Simply. Go Deeper When You’re Ready.
+You do not need to purchase a complete program to begin examining your life. The free Check-In creates a practical
+starting point.
+Deeper Blueprint-building options and ongoing Steward guidance may be available based on the current offering.
+Show only currently functioning access levels and pricing on the live page; clearly mark anything not yet launched.
+CALLS TO ACTION: View Current Blueprint Options → /steward • Start Here → /start
+
+-- 10 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 11
+JEREMY / REVIEW NOTE: No guarantee of a free downloadable thirteen-page Blueprint unless Jeremy confirms it is available. Paid price is
+changeable; authoritative terms at checkout.
+
+-- 11 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 12
+PAGE 04 / NEW
+START YOUR JOURNEY
+Route: /start
+Purpose: Offer easy decision path for people entering through social, church, book, or personal curiosity.
+HERO
+Start Where You Actually Are.
+You do not need to know exactly what is wrong—or have a detailed life plan—to take a meaningful first step.
+Some people begin because they sense drift. Others are changing seasons, joining a group, reading a book, or ready to
+build a personal plan. Wherever you’re starting, choose the next step that fits.
+CALLS TO ACTION: Take the Free Check-In → /created-for-more-check-in
+CHOOSE A PATH
+Find the Next Step That Fits.
+I WANT TO SEE WHERE I AM — Take the Created for More Check-In and identify an area deserving attention.
+I WANT TO UNDERSTAND THE FRAMEWORK — Explore how faith, purpose, the four pillars, habits, energy, and living
+legacy fit together.
+I WANT TO LEARN ON MY OWN — Explore reflections, the upcoming book, and practical resources.
+I WANT TO GROW WITH OTHERS — Find a six-week study or church/group experience.
+I AM READY TO BUILD A PERSONAL PLAN — See what goes into a Personal Blueprint and how Steward can guide the
+process.
+CALLS TO ACTION: Check-In → /created-for-more-check-in • The Framework → /stewardship-blueprint • Learn & Grow → /learn-and-grow •
+Studies → /studies • Personal Blueprint → /personal-blueprint
+IMAGE / VIDEO: Media: Five clean cards or simple guided selection. Avoid creating a complicated intake questionnaire just to route visitors.
+REASSURANCE
+You Only Need One Faithful Next Step.
+The goal is not to fix everything today. Begin with what is true, choose what matters most, and take a step you can
+actually live.
+CALLS TO ACTION: Begin the Check-In → /created-for-more-check-in
+
+-- 12 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 13
+PAGE 05 / NEW
+ASSESSMENTS & CHECK-INS
+Route: /assessments
+Purpose: Central assessment library and sequencing; distinguish active from planned.
+HERO
+Clarity Begins with Honest Reflection.
+You cannot steward what you refuse to examine. Our assessments help you pause, notice what is working, and see
+what may need greater attention.
+Each tool focuses on a different part of the Stewardship Blueprint. Begin with the broad view, then explore a specific
+area when it is useful.
+CALLS TO ACTION: Begin Created for More → /created-for-more-check-in
+ASSESSMENT 1
+Created for More Check-In
+A free, approximately fifteen-minute, 28-question reflection across seven Blueprint layers. It helps you see current
+alignment and drift and choose a next step.
+CALLS TO ACTION: Take the Check-In → /created-for-more-check-in
+IMAGE / VIDEO: Media: real interface screenshot with seven-layer labels. Status: live.
+ASSESSMENT 2
+The Energy Audit
+Energy fuels the life you are building. The Energy Audit examines your physical, emotional, mental, and spiritual
+capacity, helping you identify a drain to reduce and a rhythm of renewal to protect.
+Use this as a deeper follow-up when energy, pace, recovery, or presence becomes your focus.
+CALLS TO ACTION: Explore Energy Audit → /assessments/energy-audit (only when launched)
+IMAGE / VIDEO: Media: approved Energy Audit front cover. Status must be checked before button is enabled.
+ASSESSMENT 3
+Values Assessment
+Values guide the decisions that ultimately shape a life. This upcoming experience will help you identify what you want
+to stand for and where daily choices may be disconnected from those convictions.
+CALLS TO ACTION: Notify Me When Available → /join
+IMAGE / VIDEO: Media: tasteful text card marked Upcoming. Do not suggest a live assessment until ready.
+WHAT HAPPENS NEXT
+From a Score to an Action.
+Your score is a reflection tool, not a measure of your worth or spiritual maturity. After each assessment, pause over
+what surprised you, choose an area to explore, and take one small action.
+When you use Steward or participate in a study, your approved reflections should be reusable with your permission
+where the system supports it—so you do not have to keep starting over.
+
+-- 13 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 14
+PAGE 06 / EXISTING — KEEP 28-QUESTION TOOL
+CREATED FOR MORE CHECK-IN
+Route: /created-for-more-check-in
+Purpose: Keep functional assessment; update supporting introduction, results, and adjacent CTAs without changing scores silently.
+TOP COPY
+Created for More Check-In
+What kind of life are you actually building?
+Most people do not set out to drift. Responsibilities grow, the calendar fills, and the important can become crowded
+out by the urgent.
+This free Check-In invites you to pause for about fifteen minutes and reflect honestly across seven layers of the
+Stewardship Blueprint. You will notice where your life feels aligned, where drift may be emerging, and what deserves
+attention in this season.
+It is not a test you pass or fail. The value is in the honesty—and the next step you choose.
+CALLS TO ACTION: Begin the Check-In → keep current embedded questionnaire
+IMAGE / VIDEO: Media: No distracting video inside scoring tool; optional branded framework thumbnail above opening.
+JEREMY / REVIEW NOTE: Preserve current question copy/ordering, client-side scoring, saved results, and all active deep links until any score-
+version change is explicitly approved.
+AFTER RESULTS
+Your Score Is a Starting Point.
+Look at the area that needs your attention, but do not ignore the areas worth protecting.
+What surprised you? What matters most in this season? What small and realistic step could you take this week?
+You can explore the related Blueprint layer, continue with a study, or begin creating a more personal plan.
+CALLS TO ACTION: Explore the Framework → /stewardship-blueprint • Build a Personal Blueprint → /personal-blueprint • Explore Related
+Resources → /resources
+IMAGE / VIDEO: Media: Actual scoring and category chart as implemented; no fictional result screenshots.
+PRIVACY & POSITION
+Your Reflection Belongs to You.
+The Check-In is intended to support personal reflection and planning. Tell participants plainly what is saved, what is
+optional, who can access it, and how to review or delete their information.
+CALLS TO ACTION: Privacy Policy → existing privacy URL
+JEREMY / REVIEW NOTE: Do not claim automatic sync to Steward until tested. The live Check-In has 28 questions across 7 layers; an older
+PDF uses 25 questions / 5 categories, so maintain version distinction.
+
+-- 14 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 15
+PAGE 07 / NEW
+LEARN & GROW
+Route: /learn-and-grow
+Purpose: Hub for book, studies, articles, videos, practical resources.
+HERO
+Learning That Leads to Living.
+Information alone rarely changes a life. What matters is what you notice, discuss, decide, and put into practice.
+Explore books, small-group studies, videos, and practical insights that help you understand and live the Stewardship
+Blueprint.
+CALLS TO ACTION: Explore Studies → /studies • Read Insights & Resources → /resources
+FEATURED LEARNING
+Choose How You Like to Learn.
+THE LIFE YOU’RE BUILDING — A story-driven invitation to move from drift to design.
+STUDIES & GROUP EXPERIENCES — Guided conversation, Scripture, reflection, and practical follow-through.
+INSIGHTS & RESOURCES — Brief and in-depth reflections, videos, worksheets, and tools organized around the layers
+of the Blueprint.
+CALLS TO ACTION: Explore the Book → /the-life-youre-building • Find a Study → /studies • Explore Insights → /resources
+IMAGE / VIDEO: Media: 3 large cards using book mockup, study guide cover, and authentic article art.
+FEATURED NEXT STEP
+From Learning to Action.
+Whatever you choose to read or watch, end with one question: What changes because of what I have learned?
+Start the free Check-In if you have not yet examined the life you are currently building.
+CALLS TO ACTION: Take the Free Check-In → /created-for-more-check-in
+
+-- 15 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 16
+PAGE 08 / NEW PUBLIC LANDING PAGE
+THE LIFE YOU’RE BUILDING — BOOK
+Route: /the-life-youre-building
+Purpose: Explain the book, author, reader transformation, release status, and companion resources.
+HERO
+The Life You’re Building
+How to Stop Drifting and Design a Life That Matters
+What if you are working hard, achieving meaningful goals, and doing what responsible people do—but you have not
+stopped to ask whether you are building the right life?
+This book invites you to look more closely at the life taking shape and discover what faithful, intentional stewardship
+can look like across every area of life.
+CALLS TO ACTION: Join the Book Waitlist → /book-waitlist
+IMAGE / VIDEO: Media: approved final book cover prominently on desktop and mobile, with no “bestseller” language unless earned.
+INSIDE THE BOOK
+A Journey from Drift to Design.
+The Life You’re Building begins with a wake-up call, introduces the Stewardship Blueprint, and helps readers evaluate
+relationships, health, joy, and finances; establish guardrails and habits; renew energy; rethink financial resources; and
+consider what their lives are multiplying through other people.
+Each chapter combines story, Christian faith, questions, and practical next steps. The book is written for ordinary
+people with full calendars—not only financial professionals or seasoned church leaders.
+CALLS TO ACTION: Explore the Framework → /stewardship-blueprint
+IMAGE / VIDEO: Media: mockup of representative interior spread when finalized, or simple numbered parts graphic.
+AUTHOR NOTE
+Why I Wrote It.
+For a long time I measured progress through achievement and ambition. The birth of my first child prompted a different
+question: If everything I am chasing works, will it actually matter?
+The answer did not arrive in a day. It became a long journey of learning to see faith, relationships, purpose, money,
+time, and influence as connected responsibilities.
+I wrote this book to share the framework that continues to shape the life I am building.
+
+-- 16 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 17
+CALLS TO ACTION: Read My Story → /about
+IMAGE / VIDEO: Media: authentic author portrait or short author invitation video if approved.
+GO DEEPER
+Keep Building Beyond the Last Page.
+The book introduces the framework. The assessments help you see your current reality. Group experiences bring the
+conversation to life. Your Personal Blueprint and Steward help you make the work personal and ongoing.
+Each element is useful in its own right. Choose the next step that fits your season.
+CALLS TO ACTION: Explore Studies → /studies • Build My Blueprint → /personal-blueprint • Join the Waitlist → /book-waitlist
+JEREMY / REVIEW NOTE: The book is not claimed published. Current waitlist includes format preferences; keep /book-waitlist working.
+
+-- 17 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 18
+PAGE 09 / NEW
+STUDIES & EXPERIENCES
+Route: /studies
+Purpose: A gender-neutral catalog of learning experiences; specific men’s track distinct.
+HERO
+Grow Through Conversation and Action.
+You can learn a great deal on your own. But trusted community creates space to ask better questions, tell the truth,
+and follow through.
+Our studies and experiences combine biblical teaching, guided reflection, practical commitments, and
+encouragement. Some are designed for specific audiences; others are for anyone ready to examine the life they are
+building.
+CALLS TO ACTION: Explore the Six-Week Challenge → /6-week-challenge
+CURRENT EXPERIENCE
+The Life You’re Building — Six-Week Men’s Challenge
+Six sessions to wake up to drift, see the framework, evaluate the four pillars, install guardrails, strengthen daily
+rhythms, and assemble a Personal Blueprint.
+This edition is built for men participating with a leader or small group. It includes participant materials, short teaching
+videos, personal reflection, and group conversation.
+CALLS TO ACTION: Open the Challenge → /6-week-challenge • Watch the Video Library → /6-week-challenge/videos
+IMAGE / VIDEO: Media: actual Participant Guide and Leader & Campaign Guide covers; short invitation video if functioning.
+ADDITIONAL EXPERIENCES
+More Ways to Grow.
+FULLY ENGAGED — A focused exploration of physical, emotional, mental, and spiritual energy stewardship. Mark as
+upcoming until final release and online registration are ready.
+GROUP EDITIONS FOR DIFFERENT AUDIENCES — As they are developed, studies can be adapted for general groups,
+women, couples, families, young adults, and leadership settings. Do not imply these editions are already published.
+GUARDRAILS, HABITS, FINANCES & LEGACY — Future deeper resources can grow from the same master framework
+without changing the structure of the website.
+CALLS TO ACTION: Join for New Study Updates → /join
+IMAGE / VIDEO: Media: preview study covers where rights/permissions cleared, with accurate Coming Soon treatment.
+INVITE A GROUP
+Want to Lead One?
+You do not need to be a professional teacher to host a meaningful conversation. Good facilitators create safety, ask
+thoughtful questions, and help participants leave with a practical next step.
+We provide structured materials and guidance to help leaders prepare.
+CALLS TO ACTION: Explore Leading a Group → /lead-a-group • For Churches → /churches
+
+-- 18 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 19
+PAGE 10 / EXISTING — RETITLE & CURATE
+INSIGHTS & RESOURCES
+Route: /resources
+Purpose: Evergreen authored articles, teachings, video clips, downloadable reflection tools; no content treadmill.
+HERO
+Insights for the Life You’re Building.
+Sometimes one honest question can change the way you see an entire season. Explore reflections, teaching, and
+practical tools for a life rooted in faith, built on purpose, and lived with generosity.
+These resources are meant to be used—not just collected. Each one offers a question or next step you can apply in
+real life.
+CALLS TO ACTION: Take the Free Check-In → /created-for-more-check-in
+BROWSE
+Explore by Blueprint Area.
+AWAKEN & PURPOSE — The wrong scoreboard, drifting without noticing, and what your life is really building.
+FAITH & IDENTITY — Life beyond roles and performance; faith at the center of decisions.
+FAMILY — Presence, relationships, mentorship, and investing in others.
+FITNESS & ENERGY — Health, recovery, attention, and fully engaged living.
+FUN & JOY — Purposeful experiences, Sabbath, adventure, and celebration.
+FINANCES — Money as tool, margin, generosity, freedom, and stewardship.
+GUARDRAILS & HABITS — Pre-decided boundaries and rhythms that protect what matters.
+LEGACY & GENEROSITY — Modeling and equipping others to practice and pass on generosity while living.
+IMAGE / VIDEO: Media: topic labels and a consistent thumbnail system.
+FEATURED INSIGHT
+The Watch and the Wrong Scoreboard
+Why did an expensive watch and a professional title seem like arrival—and what happened when the achievement
+failed to deliver the meaning I expected?
+This personal reflection explores ambition, identity, priorities, and the danger of becoming excellent at building the
+wrong life.
+CALLS TO ACTION: Read the Article → /resources/the-watch-and-the-wrong-scoreboard
+IMAGE / VIDEO: Media: original Montblanc watch images already supplied by Mike; preserve existing post and enhance internal links.
+
+-- 19 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 20
+PAGE 11 / NEW
+STEWARD — PERSONAL GUIDE
+Route: /steward
+Purpose: Explain Steward without letting AI dominate the message; realistic demo, personal control, optional deeper access.
+HERO
+Meet Steward, Your Personal Stewardship Guide.
+Your life is too important to navigate only when something goes wrong.
+Steward is a personal guide built around the Stewardship Blueprint. It helps you make space to think, clarify priorities,
+develop your personal plan, and return to the decisions that matter when life gets busy.
+Your thoughts, convictions, and choices lead. Steward helps organize them into a clearer path forward.
+CALLS TO ACTION: See How Steward Works → /steward#demo • Explore Your Personal Blueprint → /personal-blueprint
+IMAGE / VIDEO: Media: screenshot of sample guide conversation + sample Blueprint; no anthropomorphic avatar required.
+WHAT IT HELPS WITH
+Clarity You Can Return To.
+REFLECT — Think through the real questions behind your current season.
+BUILD — Work through your Personal Stewardship Blueprint one meaningful section at a time.
+DECIDE — Examine choices against your mission, values, commitments, and guardrails.
+REVISIT — Return to your Blueprint when you need renewed clarity or a change in direction.
+FOLLOW THROUGH — Use reminders, check-ins, and reviews where enabled by your current account and
+permissions.
+CALLS TO ACTION: Start with the Free Check-In → /created-for-more-check-in
+JEREMY / REVIEW NOTE: Descriptions of proactive reminders and recurring check-ins must match deployed version/entitlements; do not
+claim upcoming premium features are live.
+DEMO
+See a Realistic Conversation.
+Imagine saying: “My work calendar keeps crowding out family. Help me think through what needs to change.”
+Steward helps clarify the real tension, reconnect it to the person’s stated priorities, and propose a short action or draft
+statement for their approval.
+The participant reviews the suggestion, chooses what to use, and decides whether to add it to the Personal Blueprint.
+CALLS TO ACTION: Explore the Personal Blueprint → /personal-blueprint
+IMAGE / VIDEO: Media: Jeremy’s existing demo, edited to 20–35 seconds with readable captions. If long, offer extended demonstration
+separately. Source link pending verification: supplied Vimeo IDs 1237401025 and 1237334903 are Filmpool assets of unconfirmed titles; do
+not mislabel.
+YOUR CONTROL
+Your Life. Your Decisions. Your Blueprint.
+Steward offers structured reflection and suggestions. It does not replace trusted relationships, spiritual guidance, or
+qualified professional advice. You remain responsible for your decisions and approve changes saved to your personal
+plan.
+Steward is an interactive digital guide powered by AI. This technology supports the experience; it is not the purpose of
+the experience. The Stewardship Blueprint remains the foundation.
+
+-- 20 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 21
+CALLS TO ACTION: Read Privacy & Trust Details → existing Legal & Trust / Privacy
+JEREMY / REVIEW NOTE: Explain AI plainly, without hiding it; do not position as human or licensed counselor/financial advisor. Validate data
+handling before claiming privacy specifics.
+ACCESS
+Begin at the Level That Fits.
+The free Check-In is a meaningful way to start. Options for a deeper Personal Blueprint and Steward access may be
+available according to the current offering.
+Review exactly what is included and the current price before you begin. Your ability to reflect, learn, and join a group
+should not depend on purchasing premium access.
+CALLS TO ACTION: Take the Free Check-In → /created-for-more-check-in • View Current Access Options → live checkout/registration route
+once verified
+JEREMY / REVIEW NOTE: Do not freeze early pricing in editorial copy. Current proposed offering was $299 Full Build + 12 months and $199
+annual renewal, but changes require current confirmation.
+
+-- 21 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 22
+PAGE 12 / NEW
+FOR CHURCHES & GROUPS
+Route: /churches
+Purpose: Pastors/ministry leaders understand opportunity, available curricula, readiness, and partnership process.
+HERO
+Help People Build Lives of Faithful Stewardship.
+Churches help people form the faith, relationships, practices, and character that shape daily life. The Stewardship
+Blueprint offers a practical framework for connecting that formation to the realities people face all week long.
+Our studies and resources help participants examine their lives, identify drift, build wise boundaries, renew rhythms,
+and take meaningful next steps in community.
+CALLS TO ACTION: Explore Current Studies → /studies • Ask About a Church Experience → /contact?topic=church
+IMAGE / VIDEO: Media: authentic approved group photo; optional short Filmpool framework invitation video.
+WHAT GROUPS EXPLORE
+Whole-Life Stewardship, Not Simply a Money Study.
+Faith and identity; mission and values; relationships; health and joy; finances as one entrusted tool; boundaries and
+habits; energy; and the legacy being multiplied through people now.
+Participants are invited to move from hearing information to reflecting honestly, talking with trusted people, and
+practicing what they learn.
+CALLS TO ACTION: Explore the Framework → /stewardship-blueprint
+EXPERIENCE OPTIONS
+Choose a Setting That Fits Your Community.
+SMALL GROUP STUDIES — Guided discussion and weekly action supported by Participant and Leader Guides.
+MEN’S MINISTRY EXPERIENCE — The existing six-week men’s challenge, with videos and practical group materials.
+LEADERSHIP OR CHURCH-WIDE PATHWAYS — Potential expansions to plan with ministry leaders based on
+availability and readiness.
+PERSONAL REFLECTION — The free Check-In can support an individual starting point before or alongside a group.
+CALLS TO ACTION: Lead a Group → /lead-a-group • Explore the Six-Week Challenge → /6-week-challenge
+JEREMY / REVIEW NOTE: Do not advertise unbuilt women’s/couples tracks or a complete church-wide campaign as currently available.
+WHAT LEADERS RECEIVE
+Support That Simplifies Facilitation.
+Where available, leaders can access session outlines, participant materials, short teaching videos, discussion
+questions, and group setup guidance.
+The leader’s role is to foster honest conversation and help people choose real next steps—not to have all the answers.
+CALLS TO ACTION: Explore Leader Resources → /lead-a-group • Contact Our Team → /contact?topic=church
+NEXT STEP
+Let’s Talk About Your Community.
+Tell us a little about your church or group, the audience you hope to serve, and the timing you are considering. We can
+discuss which current resources fit and which ideas belong to a future season.
+CALLS TO ACTION: Church/Group Inquiry → /contact?topic=church
+
+-- 22 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 23
+PAGE 13 / NEW
+LEAD A GROUP
+Route: /lead-a-group
+Purpose: Facilitator entry, training expectations, practical FAQ, links to actual materials and setup.
+HERO
+You Don’t Have to Be the Expert in the Room.
+Great group conversations often begin with one person willing to create space for honesty, Scripture, reflection, and
+practical action.
+Leading a Stewardship Blueprint study is not about giving six polished speeches. It is about serving people well and
+helping them move from insight to one meaningful next step.
+CALLS TO ACTION: Explore the Current Challenge → /6-week-challenge • Register as Facilitator → /register
+IMAGE / VIDEO: Media: cover of approved leader guide and optional invitation teaching video.
+WHAT LEADERS DO
+Create Space. Ask Good Questions. Encourage Action.
+Prepare with the participant materials, welcome the group, maintain confidentiality, guide discussion rather than
+dominate it, and invite each person to choose a manageable commitment.
+Good leaders listen carefully, respect the right to pass, avoid acting as another person’s therapist or professional
+advisor, and know when to involve appropriate church or professional support.
+CALLS TO ACTION: View Facilitator FAQ → /lead-a-group#faq
+SIMPLE PATH
+How to Start a Group.
+1. Choose the study and audience. The current men’s challenge has established materials.
+2. Select the group schedule and location.
+3. Register or sign in using the appropriate facilitator access.
+4. Invite participants and distribute available materials.
+5. Confirm all video links and session dates, then lead with humility and clarity.
+6. Encourage each participant to name a practical next step and revisit it.
+CALLS TO ACTION: Create an Account → /register • Open the Video Library → /6-week-challenge/videos
+JEREMY / REVIEW NOTE: The current /register page supports Participant and Facilitator roles; live permission and dashboards should be
+verified.
+FREQUENT QUESTIONS
+Questions New Facilitators Ask.
+DO I NEED TO BE A TRAINED TEACHER? No. Read the guide, prepare faithfully, and focus on helpful facilitation rather
+than performance.
+HOW LONG IS THE STUDY? The current Life You’re Building men’s experience uses six sessions. Confirm the actual
+session schedule with your group.
+WHAT IF SOMEONE DOES NOT WANT TO SHARE? Respect their choice. The right to pass is part of healthy group
+culture.
+WHAT IF A CONVERSATION GOES OFF TOPIC? Follow the person and the purpose; bring the conversation gently back
+to the question or next step when needed.
+
+-- 23 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 24
+CAN A CHURCH CUSTOMIZE THE EXPERIENCE? Ask about currently supported options before assuming custom
+content or white-label functionality.
+WHAT IF SOMEONE NEEDS DEEPER CARE? Follow your church safeguarding policies and connect them to
+appropriate pastoral or professional support.
+CALLS TO ACTION: Contact Us About Leading → /contact?topic=facilitator
+
+-- 24 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 25
+PAGE 14 / EXISTING — REWRITE
+ABOUT MICHAEL
+Route: /about
+Purpose: Personal story first; credible vocational context second; distinct from company marketing.
+HERO
+I’m Still Building, Too.
+I’m Michael J. Gauthier. I’m a husband, father, follower of Jesus, financial planner, business leader, and someone who
+is still learning to live what matters most.
+The Stewardship Blueprint is not a theory I developed from a distance. It grew out of my own questions, successes,
+misplaced scoreboards, relationships, faith journey, and ongoing desire to steward the life God has entrusted to me.
+CALLS TO ACTION: Explore the Framework → /stewardship-blueprint
+IMAGE / VIDEO: Media: authentic portrait, optional family image with permission.
+THE QUESTION
+If Everything I’m Chasing Works, Will It Actually Matter?
+Early in my career, I was ambitious. I worked hard and measured success through production, growth, titles, and
+recognition. None of those pursuits were inherently wrong. But they were incomplete.
+When Kristi and I welcomed our first child, Colton, I started thinking about a different kind of success. He would not
+just need provision. He would watch what I valued, how I treated his mother, where I spent my time, and what I
+celebrated.
+Later, trusted friends invited our family into a small-group Bible study. My faith began to move from a compartment of
+life toward the foundation of how I understood marriage, work, finances, service, and purpose.
+IMAGE / VIDEO: Media: optional brief personal story video with subtitle transcript; do not force autoplay.
+THE JOURNEY
+From Planning Money to Examining the Whole Life.
+I founded Strategic Income Group in 2013 after leaving a large Wall Street firm. Financial planning taught me important
+lessons about discipline, responsibility, and wise use of resources.
+It also revealed a deeper question: What is the money for? Many people have detailed financial plans without a clear
+picture of the life those resources are meant to serve.
+That observation, together with my personal faith and family journey, helped shape the Stewardship Blueprint. It is an
+invitation to look beyond one scoreboard and steward the whole life.
+CALLS TO ACTION: Read My Mission → /mission
+JEREMY / REVIEW NOTE: Keep SIG background factual and concise; do not route the site into an investment-advisory sales funnel.
+INVITATION
+Come Build With Me.
+I do not believe you need a perfect life to begin living on purpose. You only need the courage to stop, look honestly at
+what is true, and choose your next faithful step.
+My hope is that the Stewardship Blueprint becomes useful to people of many ages and seasons—and that they will
+eventually help others begin as well.
+CALLS TO ACTION: Take the Free Check-In → /created-for-more-check-in • Join the Journey → /join
+
+-- 25 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 26
+PAGE 15 / EXISTING — UPDATE
+MISSION & VISION
+Route: /mission
+Purpose: Explain motivation/faith/impact; living multiplication and source of truth for future platform.
+HERO
+Using God-Given Resources for God-Given Purposes.
+My mission is to encourage and inspire people to use their God-given resources for God-given purposes.
+Those resources include far more than money. They include time, relationships, health, talents, attention,
+opportunity, energy, influence, and everything else we have been entrusted to steward.
+CALLS TO ACTION: Explore the Stewardship Blueprint → /stewardship-blueprint
+WHY IT EXISTS
+A Better Way to Measure a Meaningful Life.
+Our culture offers visible scoreboards: income, career growth, possessions, recognition, influence, and busyness.
+Some of those things may be good, but none is big enough to tell us what our lives are for.
+The Stewardship Blueprint exists to help people move from drift toward faithful living by connecting belief to daily
+choices and long-term direction.
+OUR CONVICTIONS
+What Guides This Work.
+FAITH IS THE BEDROCK — Identity is received from God, not earned through performance.
+PURPOSE GIVES DIRECTION — Mission and values help the important govern the urgent.
+WHOLE-LIFE STEWARDSHIP MATTERS — Relationships, health, joy, money, and energy influence one another.
+PRACTICAL ACTION MATTERS — Insight should result in habits, guardrails, decisions, and honest conversations.
+COMMUNITY STRENGTHENS FAITHFULNESS — We grow through relationships, accountability, and service.
+LEGACY BEGINS WHILE WE LIVE — Impact multiplies as we teach, encourage, equip, and help others live generously
+and pass it on.
+CALLS TO ACTION: Start Your Journey → /start
+OUR VISION
+Impact Worth Multiplying.
+I hope the Stewardship Blueprint encourages tens of thousands of people to live more intentionally and multiply
+generosity and faithful influence through their families, churches, communities, workplaces, and relationships.
+The goal is not to measure a person’s worth by a score, gift amount, follower count, or platform adoption. It is to
+encourage faithful action and let impact grow through people.
+CALLS TO ACTION: Learn With Others → /studies • Join the Journey → /join
+JEREMY / REVIEW NOTE: Aspirational reach goals can be mentioned in About or an impact report, not stated as outcomes already achieved.
+WELCOME
+Faith-Rooted, People-Welcoming.
+This work is explicitly shaped by Christian faith, and we will not hide that foundation. At the same time, honest
+reflection and thoughtful next steps are available to people at different points in their spiritual journey.
+No one has to pretend to have all the answers to begin.
+
+-- 26 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 27
+PAGE 16 / EXISTING — UPDATE
+CONTACT
+Route: /contact
+Purpose: Separate general SB contact and SIG financial advisory contact; route inquiries appropriately.
+HERO
+Let’s Connect.
+Have a question about the Stewardship Blueprint, an assessment, a study, a church experience, or your account?
+Send us a note and help us understand what you need.
+We want to make it easy to find the right next step.
+CALLS TO ACTION: Send a Message → form on /contact
+INQUIRY ROUTING
+What Can We Help With?
+GENERAL QUESTION — The framework, book, articles, or available resources.
+CHURCH OR GROUP — A study, facilitator question, or potential partnership.
+STEWARD & ACCOUNT — Access, billing, privacy, or troubleshooting.
+SPEAKING & MEDIA — Invitations and interview inquiries.
+IMAGE / VIDEO: Media: no necessary image; clean, trustworthy support form.
+CONTACT FORM
+Tell Us What You Need.
+Form labels: First name (required); Email (required); Topic (required); Message (required); Organization or Church
+(optional).
+Optional checkbox: “I would also like to receive Stewardship Blueprint resources and updates.” Keep marketing opt-in
+separate from the required contact request.
+Confirmation: “Thanks for reaching out. We received your message and will follow up through the appropriate contact
+channel.”
+JEREMY / REVIEW NOTE: Use support@michaeljgauthier.com and privacy@michaeljgauthier.com as established. Do not expose SIG planner
+email as the default SB contact. Confirm current mailing address ZIP before publishing; source documents and live site conflict (85224 vs
+85284). Do not promise a 24–48h response SLA unless actually staffed.
+BOUNDARIES
+A Clear Separation.
+The Stewardship Blueprint is an educational and personal development experience. It is separate from Strategic
+Income Group’s investment advisory services. Inquiries through this site should not be treated as a request for
+investment advice.
+If you need professional financial, legal, medical, or other specialized help, consult an appropriately qualified
+professional.
+
+-- 27 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 28
+PAGE 17 / NEW (ALSO USE INLINE FORM COMPONENT)
+JOIN THE JOURNEY
+Route: /join
+Purpose: Email sign-up, content preference and transparent consent; one simple clear CTA.
+HERO
+Keep Building a Life That Matters.
+You do not need another crowded inbox. You need useful reminders to slow down, reflect, and act on what matters.
+Join the Stewardship Blueprint journey for occasional insights, practical tools, book news, and study opportunities.
+CALLS TO ACTION: Join the Journey → inline signup form
+IMAGE / VIDEO: Media: slim branded image or none. Keep form in first screen.
+WHAT YOU’LL RECEIVE
+Thoughtful Resources, Not Constant Noise.
+Reflections on faith, identity, family, health, joy, finances, habits, energy, and legacy.
+Useful assessments, guides, and practical next steps.
+Book updates and opportunities to participate in current or future studies and group experiences.
+SIGNUP
+Stay Connected.
+Fields: First name (required); Email address (required). Optional: “I’m especially interested in: assessments;
+books/resources; groups/churches; Steward.”
+Consent: “I agree to receive Stewardship Blueprint email updates and understand I can unsubscribe at any time.” Link
+to privacy information.
+Success state: “Welcome to the journey. As you get started, consider taking the free Created for More Check-In.”
+CALLS TO ACTION: Take the Free Check-In → /created-for-more-check-in
+JEREMY / REVIEW NOTE: Do not require phone for this marketing signup. Track distinct consent and source; do not silently enroll church
+study participants in unrelated marketing without proper permissions.
+
+-- 28 of 29 --
+
+STEWARDSHIP BLUEPRINT | MJG WEBSITE CONTENT | REVIEW DRAFT
+STEWARDSHIP BLUEPRINT • INTERNAL WORKING COPY • OCTOBER 2026 | PAGE 29
+Jeremy implementation and QA checklist
+Messaging and asset controls
+• Keep Stewardship Blueprint as master name and framework; avoid “AI” hero copy, “AI life coach,” and competing
+master brands.
+• Use approved actual Filmpool videos and specific supplied image assets. Obtain captions/transcripts and verify
+licensing/embed settings.
+• Use current Legacy/Legacy Giving standard, including in old PDF downloads, intros, captions, and assessment
+text when version changes are approved.
+• Have Mike choose a single approved book-cover concept.
+Routing, accounts, and experience
+• Preserve /created-for-more-check-in, /6-week-challenge, /6-week-challenge/videos, /book-waitlist and their
+campaign/deep links.
+• Distinguish /login internal pilot/admin screens from participant/facilitator/product workspace access and correct
+after-auth destination.
+• Check that registration and group schedules and all nine video-library cards function before Compass rollout.
+• Mark unbuilt Values Assessment and non-live study editions Upcoming; do not promise premium functionality not
+deployed.
+• Confirm form success states, email verification, unsubscribe, re-engagement, consent, billing, and privacy
+handling.
+Accessibility, mobile and editorial publishing
+• Choose readable image alt text, contrast, captions, keyboard-accessible controls, and mobile-first typography.
+• No mandatory sound autoplay or scroll-trapping full-screen demo on Home.
+• Give each public page one clear primary CTA and logical secondary links; avoid repeated popups.
+• For articles: author and publish dates, original insight, one practical next step, and contextual internal links.
+• Confirm metadata, canonical URLs, 301 redirects, analytics goals, event tracking, and indexability of public
+pages.
+Approval sequence
+1. Approve Home layout and language. 2. Approve Framework and Personal Blueprint. 3. Approve Start Here and
+Assessments. 4. Approve Learn & Grow pages and article strategy. 5. Approve Steward page and pricing/claims. 6.
+Approve Churches/Facilitators. 7. Approve About/Mission/Contact/Join. 8. Complete legal, link and video release QA.
+
+-- 29 of 29 --
+

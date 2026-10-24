@@ -1,0 +1,614 @@
+{
+  "package_id": "SV2-DOCSET-D0.4-20260926",
+  "status": "DISABLED_DESIGN_EXAMPLES",
+  "features": [
+    {
+      "feature_id": "P01",
+      "name": "Adaptive Steward Check-Ins",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P02",
+      "name": "Steward, Check Me",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P03",
+      "name": "Decision Mode",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P04",
+      "name": "Quarterly Blueprint Reset",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P05",
+      "name": "Accountability Partner Mode",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P06",
+      "name": "Family/Spouse Conversation Mode",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P07",
+      "name": "My Stewardship Year in Review",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P08",
+      "name": "Vision Casting / My Next Season",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P09",
+      "name": "Blueprint Version History / My Blueprint Journey",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P10",
+      "name": "Life Story / Steward Journal",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P11",
+      "name": "Remember When Moments",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P12",
+      "name": "Accomplishment & Progress Memory",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P13",
+      "name": "Visual Steward Experience",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P14",
+      "name": "Multi-Channel Communication",
+      "target_scope": "SPLIT",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "P15",
+      "name": "Inner Circle / Membership Benefits",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S01",
+      "name": "Current Life Season record",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S02",
+      "name": "Blueprint-area seasons / postures",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S03",
+      "name": "Season right-sizing: overload and underreach",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S04",
+      "name": "Capacity Zones",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S05",
+      "name": "Evidence of Alignment",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S06",
+      "name": "For the Right Season memory",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S07",
+      "name": "Transition Mode",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S08",
+      "name": "Season completion and transition signals",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S09",
+      "name": "Season Timeline",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S10",
+      "name": "Energy-aware season design and Restore posture",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S11",
+      "name": "Loving recognition before bold challenge",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "S12",
+      "name": "Season-aware Decision Mode",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X01",
+      "name": "Direct entry / registration",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X02",
+      "name": "Progressive Blueprint and nine-function ownership",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X03",
+      "name": "Helpful chat upgrade / resume",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X04",
+      "name": "Participant referral / advocacy",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X05",
+      "name": "Configurable commercial / grants",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X06",
+      "name": "Optional church affiliation / acquisition",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X07",
+      "name": "Attention and shared promotion budget",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X08",
+      "name": "Experiments",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X09",
+      "name": "Protect Mode",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X10",
+      "name": "Re-engagement",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X11",
+      "name": "Relationship context / avoid repeated questions",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X12",
+      "name": "Inner Circle / configurable groups",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "X13",
+      "name": "Controlled releases / import and rollback",
+      "target_scope": "INITIAL_FULL_BUILD",
+      "production_enabled": false,
+      "requires": {
+        "actual_release": true,
+        "valid_entitlement": true,
+        "purpose_permission": true,
+        "rights_scope": true
+      },
+      "status": "DESIGN_EXAMPLE_NOT_IMPLEMENTED"
+    },
+    {
+      "feature_id": "ORG_EVENTS",
+      "name": "Church events/resource feed",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "separate_owner_scope": true,
+        "qualified_review": true
+      },
+      "status": "DEFERRED"
+    },
+    {
+      "feature_id": "ORG_MESSAGES",
+      "name": "Church-admin broadcasts/notifications",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "separate_owner_scope": true,
+        "qualified_review": true
+      },
+      "status": "DEFERRED"
+    },
+    {
+      "feature_id": "ORG_DASHBOARD",
+      "name": "Church-integrated dashboard",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "separate_owner_scope": true,
+        "qualified_review": true
+      },
+      "status": "DEFERRED"
+    },
+    {
+      "feature_id": "PUSH",
+      "name": "Push notifications",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "separate_owner_scope": true,
+        "qualified_review": true
+      },
+      "status": "DEFERRED"
+    },
+    {
+      "feature_id": "SMS",
+      "name": "SMS reminders",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "separate_owner_scope": true,
+        "qualified_review": true
+      },
+      "status": "DEFERRED"
+    },
+    {
+      "feature_id": "FORGEDLIFE_SYNC",
+      "name": "Deep ForgedLife exchange",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "separate_owner_scope": true,
+        "qualified_review": true
+      },
+      "status": "DEFERRED"
+    },
+    {
+      "feature_id": "PARTNER_PORTAL",
+      "name": "Recipient/partner access",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "separate_owner_scope": true,
+        "qualified_review": true
+      },
+      "status": "DEFERRED"
+    },
+    {
+      "feature_id": "PHOTO_JOURNAL",
+      "name": "Participant photo/life-story archive",
+      "target_scope": "DEFERRED",
+      "production_enabled": false,
+      "requires": {
+        "separate_owner_scope": true,
+        "qualified_review": true
+      },
+      "status": "DEFERRED"
+    }
+  ]
+}

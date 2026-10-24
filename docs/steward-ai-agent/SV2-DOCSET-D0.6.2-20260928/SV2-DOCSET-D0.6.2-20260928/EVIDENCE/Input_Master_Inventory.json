@@ -1,0 +1,90 @@
+{
+  "received_files": [
+    {
+      "filename": "00_Control_Register.md",
+      "bytes": 128942,
+      "sha256": "e65de202813b1336e89d309d856b90698b3048a36e60898ae067ce4358dce800",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/00_Control_Register.md"
+    },
+    {
+      "filename": "02_Framework_Blueprint_Assessments.md",
+      "bytes": 135444,
+      "sha256": "818f9e8a0e2de2952ef1291c7995c586ba8b9254ff4993d64dd2a8dcee7f2148",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/02_Framework_Blueprint_Assessments.md"
+    },
+    {
+      "filename": "03_Conversation_Sensitive_Safety.md",
+      "bytes": 66106,
+      "sha256": "61c3cb01abe14932a58dddf1ab75b146a6730fa27037e5e4477d36a2f219fe16",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/03_Conversation_Sensitive_Safety.md"
+    },
+    {
+      "filename": "04_Product_Journey_New_Features.md",
+      "bytes": 159371,
+      "sha256": "867ebd74efe6ac798760e9000e36a55672423ffd2854811dbb805db163bcb076",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/04_Product_Journey_New_Features.md"
+    },
+    {
+      "filename": "05_Data_Privacy_Security.md",
+      "bytes": 360254,
+      "sha256": "e45d1e8139ac3cab1d62951b52f84132364c45f2c71403a3d84d42fe02093e44",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/05_Data_Privacy_Security.md"
+    },
+    {
+      "filename": "06_Safety_Support_Release.md",
+      "bytes": 256547,
+      "sha256": "4c3981826af70d543e4dedfe88356ce2ea72a195de54bfb918d84a9006ff1333",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/06_Safety_Support_Release.md"
+    },
+    {
+      "filename": "07_Commerce_Scripture_Rights.md",
+      "bytes": 406478,
+      "sha256": "fd65ef4a533a59c928f4d618455571dd57d8a8cff3143b4826d8f734c4e4149f",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/07_Commerce_Scripture_Rights.md"
+    },
+    {
+      "filename": "08_Engineering_Experience_Operations.md",
+      "bytes": 206487,
+      "sha256": "c4e1f97f92b78fef15de3f76580c0dd3680a142887577961acc86a745fa8f1f4",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/08_Engineering_Experience_Operations.md"
+    },
+    {
+      "filename": "09_Test_Suite_Quality_Control.md",
+      "bytes": 235988,
+      "sha256": "abdf63be82c90740b7d292414e401cba163497214eb23e460f4619ce84d43fe5",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/09_Test_Suite_Quality_Control.md"
+    },
+    {
+      "filename": "10_Teaching_Reference_Library.md",
+      "bytes": 612648,
+      "sha256": "dd5d2e8d916e55d61db2c2fe54f3e7335f1d38bb6fd3fc365bfd7de70baaedf4",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/10_Teaching_Reference_Library.md"
+    },
+    {
+      "filename": "11_Change_Impact_Decisions.md",
+      "bytes": 119706,
+      "sha256": "0978abdbe6af4c35f3268fae11b926966582cfd1d51c10361c4744f2d61c3dcc",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/11_Change_Impact_Decisions.md"
+    },
+    {
+      "filename": "Statement-of-Faith.txt",
+      "bytes": 2633,
+      "sha256": "b587d8af30ad22d695e48d78608cc6cbbf05d928cd3c6527c58ca305ac9e4e87",
+      "matched_supplied_attachment": true,
+      "archive_path": "ARCHIVE/Draft_0_3_Inputs/Statement-of-Faith.txt"
+    }
+  ],
+  "scope": "Twelve supplied Draft 0.3 masters match complete preserved prior package.",
+  "previous_package_sha256": "c2ee1439331f222c9691bd3b1c993db977b0fc0feff4893567cacce321ac1a95"
+}

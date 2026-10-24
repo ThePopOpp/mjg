@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f6f3;color:#1b1a17;font-family:'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}a:hover{opacity:.7}
+@keyframes sw-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes sw-dot{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-4px);opacity:1}}
+@keyframes sw-pulse{0%{box-shadow:0 0 0 0 var(--pulse)}100%{box-shadow:0 0 0 18px rgba(0,0,0,0)}}
+@keyframes sw-caret{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes sw-orb{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.08) rotate(180deg)}}
+@keyframes sw-sheen{from{background-position:200% 0}to{background-position:-200% 0}}
+</style>
+</helmet>
+<div style="{{ rootStyle }}">
+  <header style="flex:none;position:sticky;top:0;z-index:5;background:var(--header);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)">
+    <div style="max-width:1280px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <a href="#" style="display:flex;align-items:center;gap:12px">
+        <img src="{{ logoSrc }}" alt="MJG" style="height:34px;width:auto;display:block">
+        <span style="font-family:'Instrument Serif',serif;font-style:italic;font-size:17px">Michael J. Gauthier</span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:26px;font-size:14px;font-weight:500">
+        <a href="#">Home</a><a href="#">About</a><a href="#">Mission</a>
+        <a href="#" style="display:inline-flex;align-items:center;gap:4px">Resources <span style="font-size:10px">▾</span></a>
+        <a href="#">Contact</a>
+        <a href="#" style="display:inline-flex;align-items:center;gap:4px">Account <span style="font-size:10px">▾</span></a>
+        <button onClick="{{ toggleTheme }}" aria-label="Toggle theme" style="width:36px;height:36px;border:1px solid var(--line2);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:var(--surface);color:var(--ink);cursor:pointer;padding:0">
+          <sc-if value="{{ dark }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></sc-if>
+          <sc-if value="{{ light }}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <div style="flex:1;min-height:0;max-width:1280px;width:100%;margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);box-sizing:border-box">
+    <aside style="border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:18px;min-height:0">
+      <button onClick="{{ newChat }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.06)" style-hover="background:var(--soft)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>New conversation
+      </button>
+      <div style="display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);padding:0 10px 6px">Recent</div>
+        <sc-for list="{{ threads }}" as="t" hint-placeholder-count="4">
+          <button style="{{ t.style }}" style-hover="background:var(--soft)">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-align:left">{{ t.title }}</span>
+            <span style="font-size:11px;color:var(--muted2)">{{ t.when }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="flex:1"></div>
+      <div style="padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:flex;gap:10px;align-items:center">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">MG</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:600">Michael</div><div style="font-size:12px;color:var(--muted2)">Premium · Steward</div></div>
+      </div>
+    </aside>
+
+    <section style="display:flex;flex-direction:column;min-height:0;position:relative">
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 28px;border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="{{ orbStyle }}"></div>
+          <div><div style="font-size:14px;font-weight:600;line-height:1.1">Steward AI</div><div style="font-size:12px;color:var(--muted2)">{{ statusText }}</div></div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <span style="font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--muted)">Blueprint context on</span>
+        </div>
+      </div>
+
+      <div ref="{{ scrollRef }}" style="flex:1;min-height:0;overflow:auto;padding:28px 28px 8px">
+        <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px">
+          <sc-if value="{{ empty }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:40px 0 12px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;animation:sw-in .5s ease both">
+              <div style="font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Steward AI</div>
+              <h1 style="margin:0;font-size:38px;font-weight:600;letter-spacing:-.02em;line-height:1.1">Good afternoon, Michael.<br><span style="font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;color:var(--muted)">Where should we begin?</span></h1>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+                <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="4">
+                  <button onClick="{{ s.pick }}" style="padding:9px 14px;border-radius:999px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer;transition:all .18s" style-hover="background:var(--ink);color:var(--surface);border-color:var(--ink);transform:translateY(-1px)">{{ s.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-for list="{{ messages }}" as="m" hint-placeholder-count="0">
+            <div style="{{ m.rowStyle }}">
+              <sc-if value="{{ m.isAi }}" hint-placeholder-val="{{ false }}">
+                <div style="width:28px;height:28px;border-radius:8px;flex:none;background:var(--ink);display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50%;background:var(--surface)"></div></div>
+              </sc-if>
+              <div style="{{ m.bubbleStyle }}">
+                <sc-if value="{{ m.voice }}" hint-placeholder-val="{{ false }}"><div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.65;margin-bottom:6px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>Voice</div></sc-if>
+                <div style="white-space:pre-wrap">{{ m.text }}</div>
+                <sc-if value="{{ m.streaming }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:2px;height:14px;background:currentColor;margin-left:2px;vertical-align:-2px;animation:sw-caret .8s steps(1) infinite"></span></sc-if>
+                <sc-if value="{{ m.actions }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:4px;margin-top:10px;opacity:.7">
+                    <button style="border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;border-radius:6px;display:flex" style-hover="background:var(--soft)" aria-label="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg></button>
+                    <button style="border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;border-radius:6px;display:flex" style-hover="background:var(--soft)" aria-label="Regenerate"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg></button>
+                    <button style="border:none;background:transparent;color:inherit;cursor:pointer;padding:4px;border-radius:6px;display:flex" style-hover="background:var(--soft)" aria-label="Good"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 7a2 2 0 0 1-1.9 1.4H7V10l4.2-6.6A2 2 0 0 1 15 5.9z"></path></svg></button>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ thinking }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:12px;align-items:flex-start;animation:sw-in .3s ease both">
+              <div style="width:28px;height:28px;border-radius:8px;flex:none;background:var(--ink);display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;border-radius:50%;background:var(--surface);animation:sw-orb 1.6s ease-in-out infinite"></div></div>
+              <div style="padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:flex;gap:5px;align-items:center;height:18px">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--ink);animation:sw-dot 1.2s ease-in-out infinite"></span>
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--ink);animation:sw-dot 1.2s ease-in-out .15s infinite"></span>
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--ink);animation:sw-dot 1.2s ease-in-out .3s infinite"></span>
+              </div>
+            </div>
+          </sc-if>
+          <div style="height:12px"></div>
+        </div>
+      </div>
+
+      <div style="flex:none;padding:8px 28px 22px;background:linear-gradient(to bottom,transparent,var(--bg) 30%)">
+        <div style="max-width:760px;margin:0 auto">
+          <div style="{{ composerStyle }}">
+            <sc-if value="{{ listening }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:14px;padding:6px 6px 6px 10px;min-height:48px">
+                <div style="display:flex;align-items:center;gap:3px;height:36px;flex:1">
+                  <sc-for list="{{ bars }}" as="b" hint-placeholder-count="0">
+                    <span style="{{ b.style }}"></span>
+                  </sc-for>
+                </div>
+                <div style="font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums">{{ listenLabel }}</div>
+                <button onClick="{{ cancelVoice }}" aria-label="Cancel" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:var(--soft)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+                <button onClick="{{ stopVoice }}" aria-label="Send voice" style="width:36px;height:36px;border-radius:50%;border:none;background:var(--ink);color:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;animation:sw-pulse 1.4s ease-out infinite"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg></button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ notListening }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:flex-end;gap:8px;padding:6px 6px 6px 14px">
+                <textarea ref="{{ inputRef }}" value="{{ draft }}" onChange="{{ onDraft }}" onKeyDown="{{ onKey }}" onFocus="{{ onFocus }}" onBlur="{{ onBlur }}" rows="1" placeholder="Ask Steward anything about your Blueprint…" style="flex:1;resize:none;border:none;outline:none;background:transparent;color:var(--ink);font:inherit;font-size:15px;line-height:1.5;padding:9px 0;max-height:160px;min-height:24px"></textarea>
+                <button onClick="{{ startVoice }}" aria-label="Voice" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;transition:all .18s" style-hover="background:var(--soft);transform:scale(1.06)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+                <button onClick="{{ send }}" aria-label="Send" style="{{ sendStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></button>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px;color:var(--muted2);padding:0 4px">
+            <span>Steward can make mistakes. Confirm anything that touches money or commitments.</span>
+            <span><kbd style="font:inherit;border:1px solid var(--line2);border-radius:4px;padding:0 5px">⏎</kbd> send · <kbd style="font:inherit;border:1px solid var(--line2);border-radius:4px;padding:0 5px">⇧⏎</kbd> newline</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light'|'dark'&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  state = { dark: false, draft: '', messages: [], thinking: false, listening: false, bars: Array(28).fill(0.15), listenSec: 0, focus: false, active: 0 };
+  scrollRef = React.createRef(); inputRef = React.createRef();
+  replies = [
+    'Here\u2019s what I\u2019m seeing in your Blueprint: your time plan has 6 commitments but your calendar only protects 3 of them. Want me to draft protected blocks for the other three, or trim the list first?',
+    'Based on the stewardship goals you set in March, this fits \u2014 as long as it comes out of the discretionary line, not the giving line. I\u2019d suggest capping it at $240/mo. Shall I update page 9?',
+    'Good question. Your Calling page names three roles: father, builder, mentor. Your last four weeks skewed heavily to builder. A small rebalance \u2014 one mentoring hour on Thursdays \u2014 would bring it back in range.'
+  ];
+  componentDidMount() {
+    const t = localStorage.getItem('mjg-theme');
+    const d = t ? t === 'dark' : (this.props.defaultTheme ?? 'light') === 'dark';
+    if (d !== this.state.dark) this.setState({ dark: d });
+  }
+  componentDidUpdate() { const el = this.scrollRef.current; if (el) el.scrollTop = el.scrollHeight; }
+  componentWillUnmount() { clearInterval(this.vi); clearInterval(this.si); clearTimeout(this.tt); }
+  send(text, voice) {
+    const t = (text ?? this.state.draft).trim(); if (!t || this.state.thinking) return;
+    this.setState(s => ({ draft: '', thinking: true, messages: [...s.messages, { id: Date.now(), role: 'user', text: t, voice }] }));
+    const r = this.inputRef.current; if (r) r.style.height = 'auto';
+    const reply = this.replies[this.state.messages.length / 2 % this.replies.length | 0];
+    this.tt = setTimeout(() => {
+      const id = Date.now() + 1; let i = 0;
+      this.setState(s => ({ thinking: false, messages: [...s.messages, { id, role: 'ai', text: '', streaming: true }] }));
+      this.si = setInterval(() => {
+        i += 2 + Math.floor(Math.random() * 3);
+        const done = i >= reply.length;
+        this.setState(s => ({ messages: s.messages.map(m => m.id === id ? { ...m, text: reply.slice(0, i), streaming: !done } : m) }));
+        if (done) clearInterval(this.si);
+      }, 24);
+    }, 900 + Math.random() * 500);
+  }
+  startVoice() {
+    this.setState({ listening: true, listenSec: 0 });
+    let tick = 0;
+    this.vi = setInterval(() => {
+      tick++;
+      this.setState(s => ({ listenSec: Math.floor(tick / 12), bars: s.bars.map((_, k) => { const p = Math.sin(tick * .5 + k * .6) * .5 + .5; return .12 + Math.random() * .25 + p * .6 * (Math.random() > .3 ? 1 : .3); }) }));
+    }, 85);
+  }
+  endVoice(sendIt) {
+    clearInterval(this.vi);
+    this.setState({ listening: false });
+    if (sendIt) this.send('Can I afford to add a $300 a month coaching program this fall without touching our giving?', true);
+  }
+  renderVals() {
+    const { dark, draft, messages, thinking, listening, bars, listenSec, focus, active } = this.state;
+    const T = dark ? { bg: '#121110', surface: '#1b1a17', ink: '#f3f1ec', muted: '#a9a497', muted2: '#7f7a6e', line: '#2c2a26', line2: '#3a3733', soft: '#242220', header: 'rgba(18,17,16,.9)', pulse: 'rgba(243,241,236,.35)', shadow: 'rgba(0,0,0,.6)' }
+                   : { bg: '#f7f6f3', surface: '#fff', ink: '#1b1a17', muted: '#5c584f', muted2: '#8a8577', line: '#e7e4dd', line2: '#d9d5cc', soft: '#f1efe9', header: 'rgba(247,246,243,.92)', pulse: 'rgba(27,26,23,.3)', shadow: 'rgba(27,26,23,.25)' };
+    const rootStyle = `height:100vh;display:flex;flex-direction:column;background:${T.bg};color:${T.ink};transition:background .25s,color .25s;--bg:${T.bg};--surface:${T.surface};--ink:${T.ink};--muted:${T.muted};--muted2:${T.muted2};--line:${T.line};--line2:${T.line2};--soft:${T.soft};--header:${T.header};--pulse:${T.pulse};`;
+    const hasDraft = draft.trim().length > 0;
+    const composerStyle = `border-radius:16px;border:1.5px solid ${listening || focus ? T.ink : T.line2};background:${T.surface};transition:border-color .2s,box-shadow .25s,transform .25s;` +
+      (listening || focus ? `box-shadow:0 18px 40px -18px ${T.shadow};transform:translateY(-2px);` : 'box-shadow:0 1px 2px rgba(0,0,0,.05);');
+    const sendStyle = `width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;transition:all .2s;` +
+      (hasDraft ? `background:${T.ink};color:${T.surface};transform:scale(1);` : `background:${T.soft};color:${T.muted2};transform:scale(.92);cursor:default;`);
+    const msgs = messages.map(m => {
+      const ai = m.role === 'ai';
+      return { ...m, isAi: ai, actions: ai && !m.streaming,
+        rowStyle: `display:flex;gap:12px;align-items:flex-start;animation:sw-in .35s ease both;` + (ai ? '' : 'justify-content:flex-end;'),
+        bubbleStyle: ai ? `max-width:100%;font-size:15px;line-height:1.6;padding:2px 0;color:${T.ink}`
+                        : `max-width:78%;font-size:15px;line-height:1.55;padding:11px 15px;border-radius:16px 16px 4px 16px;background:${T.ink};color:${T.surface};` };
+    });
+    const threadsRaw = ['Fall budget: coaching program', 'Protecting Thursday mentoring', 'Giving plan review Q4', 'Calling page rewrite'];
+    const whens = ['Now', '2d', '1w', '3w'];
+    const threads = threadsRaw.map((title, i) => ({ title, when: whens[i], style: `display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:8px;border:none;background:${i === active ? T.soft : 'transparent'};color:${T.ink};font:inherit;font-size:13.5px;cursor:pointer;transition:background .15s` }));
+    const suggestions = ['Review my giving plan', 'Am I over-committed this month?', 'Draft protected time blocks', 'Summarise my Blueprint'].map(label => ({ label, pick: () => this.send(label) }));
+    const pad = n => String(n).padStart(2, '0');
+    const statusText = listening ? 'Listening…' : thinking ? 'Thinking…' : messages.some(m => m.streaming) ? 'Responding…' : 'Online · grounded in your Blueprint';
+    const busy = listening || thinking || messages.some(m => m.streaming);
+    const orbStyle = `width:10px;height:10px;border-radius:50%;background:${busy ? T.ink : '#2f9e55'};transition:background .3s;` + (busy ? `animation:sw-pulse 1.4s ease-out infinite;` : '');
+    return {
+      rootStyle, composerStyle, sendStyle, dark, light: !dark, draft, thinking, listening, notListening: !listening, empty: messages.length === 0 && !thinking,
+      messages: msgs, threads, suggestions, statusText, orbStyle, scrollRef: this.scrollRef, inputRef: this.inputRef,
+      logoSrc: dark ? 'https://michaeljgauthier.com/mjg-logos/mjg_white.png' : 'https://michaeljgauthier.com/mjg-logos/mjg_black_white.png',
+      bars: bars.map(h => ({ style: `flex:1;max-width:4px;min-width:2px;border-radius:2px;background:${T.ink};height:${Math.round(h * 100)}%;transition:height .09s ease;opacity:${.45 + h * .55}` })),
+      listenLabel: `0:${pad(listenSec)}`,
+      toggleTheme: () => this.setState(s => { localStorage.setItem('mjg-theme', s.dark ? 'light' : 'dark'); return { dark: !s.dark }; }),
+      newChat: () => { clearInterval(this.si); clearTimeout(this.tt); this.setState({ messages: [], thinking: false, draft: '' }); },
+      onDraft: e => { const el = e.target; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 160) + 'px'; this.setState({ draft: el.value }); },
+      onKey: e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } },
+      onFocus: () => this.setState({ focus: true }), onBlur: () => this.setState({ focus: false }),
+      send: () => this.send(), startVoice: () => this.startVoice(), stopVoice: () => this.endVoice(true), cancelVoice: () => this.endVoice(false)
+    };
+  }
+}
+</script>
+</body>
+</html>

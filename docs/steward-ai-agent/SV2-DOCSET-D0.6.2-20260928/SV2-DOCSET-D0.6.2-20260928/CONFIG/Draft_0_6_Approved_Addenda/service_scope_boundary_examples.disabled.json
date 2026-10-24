@@ -1,0 +1,19 @@
+{
+  "status": "DISABLED_EXAMPLE_NOT_RUNTIME_CONFIG",
+  "package": "SV2-DOCSET-D0.6-20260928",
+  "examples": [
+    {
+      "scenario": "prior_full_owner_no_premium_serial_redevelopment",
+      "expected": "explain retained content and bounded Free help; do not offer serial Full redevelopment as Free; offer one bounded current-access alternative"
+    },
+    {
+      "scenario": "prior_full_owner_isolated_mission_question",
+      "expected": "answer or draft limited wording within Free where appropriate; do not turn every isolated question into Premium-only"
+    },
+    {
+      "scenario": "active_premium_on_demand_refinement",
+      "expected": "guided Full refinement may proceed within confirmed Premium/Living scope, subject to approval and persistence controls"
+    }
+  ],
+  "no_quotas_selected": true
+}

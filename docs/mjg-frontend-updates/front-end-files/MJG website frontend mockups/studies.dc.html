@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="Studies & Experiences" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="learn" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 56px;text-align:center;">
+  <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ Studies & Experiences</span>
+  <h1 style="margin:24px auto 0;max-width:900px;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">Grow Through Conversation and <em style="font-style:normal;color:#b88a4a;">Action.</em></h1>
+  <p style="margin:20px auto 0;max-width:680px;font-size:18px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">You can learn a great deal on your own. But trusted community creates space to ask better questions, tell the truth, and follow through.</p>
+  <p style="margin:14px auto 0;max-width:680px;font-size:18px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Our studies and experiences combine biblical teaching, guided reflection, practical commitments, and encouragement. Some are designed for specific audiences; others are for anyone ready to examine the life they are building.</p>
+  <div style="display:flex;justify-content:center;margin-top:30px;"><a href="https://michaeljgauthier.com/6-week-challenge" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore the Six-Week Challenge</a></div>
+</section>
+
+<!-- CURRENT EXPERIENCE -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Current Experience</p>
+    <div style="margin-top:20px;border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);overflow:hidden;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));">
+      <div style="padding:36px;">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:9999px;background:rgba(47,125,91,.14);color:#2f7d5b;">LIVE · MEN’S EDITION</span>
+        <h2 style="margin:16px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(26px,3vw,34px);line-height:1.15;">The Life You’re Building — Six-Week Men’s Challenge</h2>
+        <p style="margin:14px 0 0;font-size:16px;line-height:1.7;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Six sessions to wake up to drift, see the framework, evaluate the four pillars, install guardrails, strengthen daily rhythms, and assemble a Personal Blueprint.</p>
+        <p style="margin:12px 0 0;font-size:16px;line-height:1.7;color:var(--muted-fg,#6d6660);text-wrap:pretty;">This edition is built for men participating with a leader or small group. It includes participant materials, short teaching videos, personal reflection, and group conversation.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px;">
+          <sc-for list="{{ weeks }}" as="w" hint-placeholder-count="6">
+            <div style="border:1px solid var(--border,#e1dbd0);border-radius:8px;padding:10px 12px;"><p style="margin:0;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#b88a4a;">Week {{ w.n }}</p><p style="margin:4px 0 0;font-size:13px;line-height:1.4;">{{ w.t }}</p></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;">
+          <a href="https://michaeljgauthier.com/6-week-challenge" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Open the Challenge</a>
+          <a href="https://michaeljgauthier.com/6-week-challenge/videos" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">▶ Watch the Video Library</a>
+        </div>
+      </div>
+      <div style="background:#141211;padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:center;">
+        <div style="aspect-ratio:3/4;border-radius:8px;overflow:hidden;box-shadow:0 18px 48px rgba(0,0,0,.5);"><image-slot id="studies-participant-guide" shape="rect" placeholder="Participant Guide cover"></image-slot></div>
+        <div style="aspect-ratio:3/4;border-radius:8px;overflow:hidden;box-shadow:0 18px 48px rgba(0,0,0,.5);"><image-slot id="studies-leader-guide" shape="rect" placeholder="Leader & Campaign Guide cover"></image-slot></div>
+        <div style="grid-column:span 2;aspect-ratio:16/9;border-radius:8px;overflow:hidden;position:relative;"><img src="public/6-week-challenge/mike-intro.png" alt="Invitation video" style="width:100%;height:100%;object-fit:cover;display:block;"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><span style="width:56px;height:56px;border-radius:9999px;background:#b88a4a;color:var(--card,#fff);display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></span></div></div>
+      </div>
+    </div>
+    <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:18px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Week titles are illustrative — pull from the existing 6-week-challenge data. Video library labels Week 3 and Week 6 “Coming Soon” in the public view; confirm release state before broader rollout. Preserve /6-week-challenge and /6-week-challenge/videos deep links.</div></sc-if>
+  </div>
+</section>
+
+<!-- ADDITIONAL EXPERIENCES -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Additional Experiences</p>
+  <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">More Ways to Grow.</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:36px;">
+    <div style="border:1px dashed #d8c9a6;border-radius:12px;background:var(--card,#fff);padding:24px;display:flex;flex-direction:column;">
+      <div style="aspect-ratio:16/9;border-radius:8px;overflow:hidden;margin-bottom:18px;"><image-slot id="studies-fully-engaged" shape="rect" placeholder="Fully Engaged cover (if rights cleared)"></image-slot></div>
+      <span style="align-self:flex-start;font-size:11px;font-weight:700;padding:4px 10px;border-radius:9999px;background:rgba(181,130,30,.16);color:var(--gold-text,#8a6630);">UPCOMING</span>
+      <h3 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:22px;line-height:1.25;">Fully Engaged</h3>
+      <p style="margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">A focused exploration of physical, emotional, mental, and spiritual energy stewardship.</p>
+    </div>
+    <div style="border:1px dashed #d8c9a6;border-radius:12px;background:var(--card,#fff);padding:24px;display:flex;flex-direction:column;">
+      <span style="align-self:flex-start;font-size:11px;font-weight:700;padding:4px 10px;border-radius:9999px;background:rgba(181,130,30,.16);color:var(--gold-text,#8a6630);">IN DEVELOPMENT</span>
+      <h3 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:22px;line-height:1.25;">Group Editions for Different Audiences</h3>
+      <p style="margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">As they are developed, studies can be adapted for general groups, women, couples, families, young adults, and leadership settings.</p>
+    </div>
+    <div style="border:1px dashed #d8c9a6;border-radius:12px;background:var(--card,#fff);padding:24px;display:flex;flex-direction:column;">
+      <span style="align-self:flex-start;font-size:11px;font-weight:700;padding:4px 10px;border-radius:9999px;background:var(--muted,#f4f1ea);color:var(--muted-fg,#6d6660);">FUTURE</span>
+      <h3 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:22px;line-height:1.25;">Guardrails, Habits, Finances & Legacy</h3>
+      <p style="margin:8px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);">Future deeper resources can grow from the same master framework without changing the structure of the website.</p>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;"><a href="join.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Join for New Study Updates</a></div>
+  <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="margin:24px 0 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Do not imply group editions are already published. Mark Fully Engaged upcoming until final release and online registration are ready.</div></sc-if>
+</section>
+
+<!-- INVITE A GROUP -->
+<section style="background:#141211;color:#f4f1ea;">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;text-align:center;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d8bd86;">Invite a Group</p>
+    <h2 style="margin:12px auto 0;max-width:720px;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;">Want to Lead One?</h2>
+    <p style="margin:16px auto 0;max-width:640px;font-size:17px;line-height:1.75;color:#cfc7ba;text-wrap:pretty;">You do not need to be a professional teacher to host a meaningful conversation. Good facilitators create safety, ask thoughtful questions, and help participants leave with a practical next step.</p>
+    <p style="margin:14px auto 0;max-width:640px;font-size:17px;line-height:1.75;color:#cfc7ba;">We provide structured materials and guidance to help leaders prepare.</p>
+    <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:28px;">
+      <a href="lead-a-group.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:#b88a4a;color:var(--card,#fff);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:#a67c42;color:var(--card,#fff);">Explore Leading a Group</a>
+      <a href="churches.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid rgba(255,255,255,.18);color:#f4f1ea;font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:rgba(255,255,255,.06);color:#f4f1ea;">For Churches</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const weeks = ["Wake up to drift", "See the framework", "Evaluate the four pillars", "Install guardrails", "Strengthen daily rhythms", "Assemble a Personal Blueprint"].map((t, i) => ({ n: i + 1, t }));
+    return { weeks, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

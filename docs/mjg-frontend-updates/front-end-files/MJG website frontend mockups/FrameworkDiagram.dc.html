@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif}
+@keyframes sbGlow{0%,100%{box-shadow:0 0 0 0 rgba(184,138,74,.0),0 6px 24px rgba(184,138,74,.25)}50%{box-shadow:0 0 0 4px rgba(184,138,74,.12),0 10px 32px rgba(184,138,74,.4)}}
+@keyframes sbShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes sbPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.35);opacity:.5}}
+@keyframes sbRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+</style>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea}</style>
+</helmet>
+<div style="font-family:Geist,Arial,sans-serif;color:var(--ink,#1c1917);width:100%;max-width:560px;margin:0 auto;" onMouseLeave="{{ clearHover }}">
+  <div style="display:grid;grid-template-columns:40px minmax(0,1fr) 40px;grid-auto-rows:auto;gap:6px;align-items:stretch;">
+
+    <!-- ROOF · LEGACY -->
+    <button onMouseEnter="{{ roof.enter }}" onClick="{{ roof.click }}" aria-label="Legacy layer" style="grid-column:1 / -1;position:relative;height:124px;margin:0 -10px;padding:0;border:none;background:none;cursor:pointer;font-family:inherit;text-align:center;opacity:{{ roof.opacity }};transform:{{ roof.transform }};transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s;transition-delay:{{ roof.delay }};">
+      <div style="position:absolute;inset:0;clip-path:polygon(50% 0,100% 100%,0 100%);background:{{ roof.bg }};transition:background .25s;"></div>
+      <div style="position:absolute;inset:3px 6px 0 6px;clip-path:polygon(50% 0,100% 100%,0 100%);background:{{ roof.inner }};transition:background .25s;"></div>
+      <span style="position:absolute;left:50%;top:-7px;transform:translateX(-50%);width:14px;height:14px;border-radius:9999px;background:#b88a4a;box-shadow:0 0 0 4px rgba(184,138,74,.18);animation:sbPulse 2.6s ease-in-out infinite;"></span>
+      <div style="position:absolute;left:0;right:0;bottom:16px;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#d8bd86;">Legacy</span>
+        <span style="font-size:12.5px;color:#e7e1d3;opacity:.85;">What your life multiplies through others now</span>
+      </div>
+    </button>
+
+    <!-- ENERGY -->
+    <button onMouseEnter="{{ energy.enter }}" onClick="{{ energy.click }}" style="grid-column:2;position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:12px;height:50px;padding:0 16px;border-radius:8px;border:1px solid {{ energy.border }};background:{{ energy.bg }};cursor:pointer;font-family:inherit;text-align:left;box-shadow:{{ energy.shadow }};animation:{{ energy.anim }};opacity:{{ energy.opacity }};transform:{{ energy.transform }};transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s,border-color .2s,box-shadow .25s;transition-delay:{{ energy.delay }};">
+      <span style="position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,transparent,#b88a4a,#d8bd86,#b88a4a,transparent);background-size:200% 100%;animation:sbShimmer 2.4s linear infinite;opacity:{{ energy.barOpacity }};transition:opacity .25s;"></span>
+      <span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink,#1c1917);white-space:nowrap;">Energy</span>
+      <span style="font-size:12.5px;color:var(--muted-fg,#6d6660);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;">Capacity to live it</span>
+    </button>
+
+    <!-- GUARDRAIL LEFT (spans habits + pillars) -->
+    <button onMouseEnter="{{ rail.enter }}" onClick="{{ rail.click }}" aria-label="Guardrails" style="grid-column:1;grid-row:3 / span 2;position:relative;border-radius:8px;border:1px solid {{ rail.border }};background:{{ rail.bg }};cursor:pointer;padding:0;font-family:inherit;box-shadow:{{ rail.shadow }};animation:{{ rail.anim }};opacity:{{ rail.opacity }};transform:{{ rail.transform }};transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s,border-color .2s,box-shadow .25s;transition-delay:{{ rail.delay }};">
+      <span style="position:absolute;inset:8px 0;background-image:repeating-linear-gradient(180deg,transparent 0 10px,rgba(184,138,74,.22) 10px 12px);background-size:100% 100%;mask:linear-gradient(90deg,transparent 0 14px,#000 14px 16px,transparent 16px calc(100% - 16px),#000 calc(100% - 16px) calc(100% - 14px),transparent calc(100% - 14px));-webkit-mask:linear-gradient(90deg,transparent 0 14px,#000 14px 16px,transparent 16px calc(100% - 16px),#000 calc(100% - 16px) calc(100% - 14px),transparent calc(100% - 14px));pointer-events:none;"></span>
+      <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;transform:rotate(180deg);font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:{{ rail.text }};">Guardrails</span>
+    </button>
+
+    <!-- KEYSTONE HABITS -->
+    <button onMouseEnter="{{ habits.enter }}" onClick="{{ habits.click }}" style="grid-column:2;grid-row:3;display:flex;justify-content:space-between;align-items:center;gap:12px;height:50px;padding:0 16px;border-radius:8px;border:1px solid {{ habits.border }};background:{{ habits.bg }};cursor:pointer;font-family:inherit;text-align:left;box-shadow:{{ habits.shadow }};animation:{{ habits.anim }};opacity:{{ habits.opacity }};transform:{{ habits.transform }};transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s,border-color .2s,box-shadow .25s;transition-delay:{{ habits.delay }};">
+      <span style="display:flex;align-items:center;gap:10px;"><span style="display:flex;gap:3px;"><span style="width:6px;height:6px;border-radius:2px;background:#b88a4a;transform:rotate(45deg);"></span><span style="width:6px;height:6px;border-radius:2px;background:#b88a4a;transform:rotate(45deg);opacity:.7;"></span><span style="width:6px;height:6px;border-radius:2px;background:#b88a4a;transform:rotate(45deg);opacity:.4;"></span></span><span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink,#1c1917);white-space:nowrap;">Keystone Habits</span></span>
+      <span style="font-size:12.5px;color:var(--muted-fg,#6d6660);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;">Rhythms that strengthen</span>
+    </button>
+
+    <!-- GUARDRAIL RIGHT -->
+    <button onMouseEnter="{{ rail.enter }}" onClick="{{ rail.click }}" aria-label="Guardrails" style="grid-column:3;grid-row:3 / span 2;position:relative;border-radius:8px;border:1px solid {{ rail.border }};background:{{ rail.bg }};cursor:pointer;padding:0;font-family:inherit;box-shadow:{{ rail.shadow }};animation:{{ rail.anim }};opacity:{{ rail.opacity }};transform:{{ rail.transform }};transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s,border-color .2s,box-shadow .25s;transition-delay:{{ rail.delay }};">
+      <span style="position:absolute;inset:8px 0;background-image:repeating-linear-gradient(180deg,transparent 0 10px,rgba(184,138,74,.22) 10px 12px);mask:linear-gradient(90deg,transparent 0 14px,#000 14px 16px,transparent 16px calc(100% - 16px),#000 calc(100% - 16px) calc(100% - 14px),transparent calc(100% - 14px));-webkit-mask:linear-gradient(90deg,transparent 0 14px,#000 14px 16px,transparent 16px calc(100% - 16px),#000 calc(100% - 16px) calc(100% - 14px),transparent calc(100% - 14px));pointer-events:none;"></span>
+      <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:{{ rail.text }};">Guardrails</span>
+    </button>
+
+    <!-- FOUR PILLARS -->
+    <div style="grid-column:2;grid-row:4;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;">
+      <sc-for list="{{ pillars }}" as="p" hint-placeholder-count="4">
+        <button onMouseEnter="{{ p.enter }}" onClick="{{ p.click }}" style="position:relative;height:88px;border-radius:8px;border:1px solid {{ p.border }};background:{{ p.bg }};cursor:pointer;font-family:inherit;padding:0;box-shadow:{{ p.shadow }};animation:{{ p.anim }};opacity:{{ p.opacity }};transform:{{ p.transform }};transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s,border-color .2s,box-shadow .25s,background .2s;transition-delay:{{ p.delay }};">
+          <span style="position:absolute;left:10px;right:10px;top:8px;height:2px;border-radius:2px;background:rgba(184,138,74,.45);"></span>
+          <span style="position:absolute;left:10px;right:10px;bottom:8px;height:2px;border-radius:2px;background:rgba(184,138,74,.45);"></span>
+          <span style="display:block;font-family:Fraunces,Georgia,serif;font-size:16px;font-weight:600;color:var(--ink,#1c1917);">{{ p.label }}</span>
+          <span style="display:block;margin-top:3px;font-size:10.5px;color:var(--muted-fg,#6d6660);letter-spacing:.04em;">{{ p.sub }}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <!-- FOUNDATION -->
+    <button onMouseEnter="{{ foundation.enter }}" onClick="{{ foundation.click }}" style="grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;gap:12px;height:56px;padding:0 18px;border-radius:8px;border:1px solid {{ foundation.border }};background:{{ foundation.bg }};cursor:pointer;font-family:inherit;text-align:left;box-shadow:{{ foundation.shadow }};animation:{{ foundation.anim }};opacity:{{ foundation.opacity }};transform:{{ foundation.transform }};transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s,border-color .2s,box-shadow .25s;transition-delay:{{ foundation.delay }};">
+      <span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink,#1c1917);white-space:nowrap;">Foundation</span>
+      <span style="font-size:12.5px;color:var(--muted-fg,#6d6660);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;">Mission · Values · Calling · Purpose</span>
+    </button>
+
+    <!-- BEDROCK (2× foundation) -->
+    <button onMouseEnter="{{ bedrock.enter }}" onClick="{{ bedrock.click }}" style="grid-column:1 / -1;position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:12px;height:112px;padding:0 18px;border-radius:8px;border:1px solid {{ bedrock.border }};background:#141211;color:#f4f1ea;cursor:pointer;font-family:inherit;text-align:left;box-shadow:{{ bedrock.shadow }};animation:{{ bedrock.anim }};opacity:{{ bedrock.opacity }};transform:{{ bedrock.transform }};transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s,border-color .2s,box-shadow .25s;transition-delay:{{ bedrock.delay }};">
+      <span style="position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);pointer-events:none;"></span>
+      <span style="position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#b88a4a,transparent);opacity:{{ bedrock.lineOpacity }};transition:opacity .25s;"></span>
+      <span style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#d8bd86;">Bedrock</span><span style="font-family:Fraunces,Georgia,serif;font-size:22px;line-height:1.1;color:#f4f1ea;">Faith & Identity</span></span>
+      <span style="font-size:12.5px;color:#cfc7ba;max-width:200px;text-align:right;line-height:1.45;">Not one room in the house — it shapes the entire structure.</span>
+    </button>
+  </div>
+
+  <!-- DETAIL -->
+  <div style="margin-top:14px;border:1px solid var(--border,#e1dbd0);border-left:3px solid #b88a4a;border-radius:10px;background:var(--card,#fff);padding:14px 16px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start;min-height:72px;">
+    <div style="min-width:0;">
+      <p style="margin:0;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">{{ detail.eyebrow }}</p>
+      <p style="margin:4px 0 0;font-family:Fraunces,Georgia,serif;font-size:17px;line-height:1.25;">{{ detail.title }}</p>
+      <p style="margin:6px 0 0;font-size:13.5px;line-height:1.55;color:var(--muted-fg,#6d6660);">{{ detail.body }}</p>
+    </div>
+    <a href="{{ detail.href }}" style="flex:none;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#b88a4a;text-decoration:none;white-space:nowrap;margin-top:2px;" style-hover="text-decoration:underline;">{{ detail.cta }} →</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:600,&quot;height&quot;:640},&quot;linkBase&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;stewardship-blueprint.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { hover: null, pinned: null, ready: false };
+  componentDidMount() { this._t = setTimeout(() => this.setState({ ready: true }), 40); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const base = this.props.linkBase ?? "stewardship-blueprint.dc.html";
+    const L = {
+      legacy: { eyebrow: "Roof · Layer 07", title: "Legacy — What You Multiply While Living", body: "Your legacy takes shape in the people you influence, equip, serve, and encourage now. Generosity grows when others learn to practice and pass it on." },
+      energy: { eyebrow: "Layer 06", title: "Energy — Capacity to Live It", body: "Physical, emotional, mental, and spiritual energy must be received, invested, renewed, and protected." },
+      habits: { eyebrow: "Layer 05", title: "Keystone Habits — Rhythms That Strengthen", body: "Small, repeatable actions shape the life you live more than occasional bursts of motivation." },
+      rail: { eyebrow: "Layer 04 · Both sides", title: "Guardrails — Boundaries That Protect", body: "Pre-decided limits protect your priorities, integrity, relationships, and freedom before pressure creates regret." },
+      pillars: { eyebrow: "Layer 03", title: "Four Pillars — Family, Fitness, Fun & Finances", body: "Relationships, health, joy, and financial resources are connected. Strengthening one while neglecting the others eventually affects the whole life." },
+      foundation: { eyebrow: "Layer 02", title: "Foundation — Mission, Values, Calling & Purpose", body: "What matters most to you? What does faithful living look like in this season? Foundation translates conviction into direction." },
+      bedrock: { eyebrow: "Layer 01", title: "Bedrock — Faith & Identity", body: "Your identity is deeper than what you accomplish, own, or produce. Faith is not just one room in the house; it shapes the entire structure." },
+    };
+    const active = this.state.hover || this.state.pinned;
+    const anyHover = !!this.state.hover;
+    const GOLD = "#b88a4a";
+    const mk = (key, i, opts = {}) => {
+      const on = active === key, pinned = this.state.pinned === key;
+      const dim = anyHover && !on;
+      return {
+        enter: () => this.setState({ hover: key }),
+        click: () => this.setState(s => ({ pinned: s.pinned === key ? null : key })),
+        border: on ? GOLD : (opts.dark ? "rgba(216,189,134,.35)" : "var(--border,#e1dbd0)"),
+        bg: opts.pillar ? (on ? "rgba(184,138,74,.16)" : "rgba(184,138,74,.07)") : (on ? "var(--hover,#fffdf8)" : "var(--card,#fff)"),
+        shadow: on ? "0 10px 28px rgba(184,138,74,.22)" : "0 1px 2px rgba(20,20,20,.04)",
+        anim: pinned ? "sbGlow 2.2s ease-in-out infinite" : "none",
+        opacity: !this.state.ready ? 0 : (dim ? .55 : 1),
+        transform: !this.state.ready ? "translateY(14px)" : (on ? "translateY(-3px)" : "none"),
+        delay: this.state.ready ? "0s" : (i * 70) + "ms",
+        text: on ? GOLD : "var(--muted-fg,#6d6660)",
+      };
+    };
+    const roof = { ...mk("legacy", 6), bg: active === "legacy" ? GOLD : "#2a2622", inner: active === "legacy" ? "#1c1917" : "#141211" };
+    const energy = { ...mk("energy", 5), barOpacity: active === "energy" ? 1 : .35 };
+    const bedrock = { ...mk("bedrock", 0, { dark: true }), lineOpacity: active === "bedrock" ? 1 : .45 };
+    const P = [["Family", "Relationships"], ["Fitness", "Health"], ["Fun", "Experiences"], ["Finances", "Resources"]];
+    const pillars = P.map(([label, sub], i) => ({ label, sub, ...mk("pillars", 2, { pillar: true }), delay: this.state.ready ? "0s" : (140 + i * 40) + "ms" }));
+    const d = L[active] || { eyebrow: "The Stewardship Blueprint", title: "Seven connected layers. One whole life.", body: "Hover any layer to see what it holds; click to pin it. Every part of the structure depends on the ones beneath it." };
+    const slug = { legacy: 7, energy: 6, habits: 5, rail: 4, pillars: 3, foundation: 2, bedrock: 1 };
+    return {
+      roof, energy, habits: mk("habits", 4), rail: mk("rail", 3), pillars, foundation: mk("foundation", 1), bedrock,
+      detail: { ...d, href: active ? base + "#layer-" + slug[active] : base, cta: active ? "Explore this layer" : "See the full framework" },
+      clearHover: () => this.setState({ hover: null }),
+    };
+  }
+}
+</script>
+</body>
+</html>

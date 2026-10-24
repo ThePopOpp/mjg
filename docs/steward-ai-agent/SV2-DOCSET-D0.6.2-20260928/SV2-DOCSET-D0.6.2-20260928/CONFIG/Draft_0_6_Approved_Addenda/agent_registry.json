@@ -1,0 +1,15 @@
+{
+  "status": "disabled_example",
+  "functions": [
+    "S00",
+    "AG01",
+    "AG02",
+    "AG03",
+    "AG04",
+    "AG05",
+    "AG06",
+    "AG07",
+    "AG08",
+    "AG09"
+  ]
+}

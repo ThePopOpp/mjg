@@ -1,0 +1,300 @@
+[
+  {
+    "source_key": "SR4",
+    "registered_original_filename": "Steward_Source_Register_and_Review_Queue_v4_APPROVED_SOURCE_CONTROL (1).docx",
+    "registered_original_sha256": "1c104a88df4b71a55b6a0e2aa811ab8fc17fc77e989e079b63f3f31d2a5d219b",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "CTX3",
+    "registered_original_filename": "00_STEWARD_CONTEXT_AND_DECISIONS_v3_APPROVED_CURRENT_CONTEXT (1).docx",
+    "registered_original_sha256": "2f80a3ab43143cce364acb5dcb84d354bc485d1b28149295e5a89c245405c028",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "INSTR4",
+    "registered_original_filename": "Steward_AI_Project_Instructions_v4_Compact.txt",
+    "registered_original_sha256": "2538296bd7f9a7855b729dd5c02d1ff07f9b0e4e240dae2440f3a313b7779144",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "T4",
+    "registered_original_filename": "Personal_Stewardship_Blueprint_Template_v4_APPROVED_GOVERNING_STANDARD (1).docx",
+    "registered_original_sha256": "35d7c53ce165a881d0b0c410fcafd4d52783d3a57c4f4d9f205c3053f42ede1c",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "LG",
+    "registered_original_filename": "04_SB_Legacy_and_Legacy_Giving_Standard_v1.docx",
+    "registered_original_sha256": "27c39fd5b37fd0a8ac5ff67562ad03da09c07b2f092d3960092ac700ee7b6457",
+    "actual_available_filename": "04_SB_Legacy_and_Legacy_Giving_Standard_v1(1).docx",
+    "packaged_native_path": "REFERENCE/Available_Native_Originals/04_SB_Legacy_and_Legacy_Giving_Standard_v1(1).docx",
+    "status": "HASH_MATCHING_NATIVE_INCLUDED",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "CFM4",
+    "registered_original_filename": "Created_for_More_Check-In_v4_Printable (1).docx",
+    "registered_original_sha256": "43e1495c26345dd709c08a6ad4b3fecf45416bad825a74cd08bcd7bf85d536ae",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "EA",
+    "registered_original_filename": "The Energy Audit Check In(2).docx",
+    "registered_original_sha256": "838b2ddccf8644cfce5306670bef01801eb775c9d430791d3752f3c5868bfee9",
+    "actual_available_filename": "The Energy Audit Check In(2).docx",
+    "packaged_native_path": "REFERENCE/Available_Native_Originals/The Energy Audit Check In(2).docx",
+    "status": "HASH_MATCHING_NATIVE_INCLUDED",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "OI4",
+    "registered_original_filename": "Steward_Operating_Instructions_v0_4_APPROVED_WORKING_TEST_BASELINE.docx",
+    "registered_original_sha256": "d4cc4c3fb2803d1d827ee0dd2f0775fefacb0bda3110f6241b3bee6daeaded23",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "SC3",
+    "registered_original_filename": "Steward_Sensitive_Conversations_and_Safety_Standards_v0_3_WORKING_TEST_BASELINE.txt",
+    "registered_original_sha256": "5c3ecbb090df21180f87fcb9ec7fc9cfe756713efea78860508299a44f2a1056",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "PJ",
+    "registered_original_filename": "Steward_Product_Journey_and_Progression_Standard_v0_1_APPROVED_GOVERNING_STANDARD.docx",
+    "registered_original_sha256": "c34a5a14abe82fc65f29e3134ac4a3ec3b1852afb8ceac139d5a24bb9d253c4a",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "ARCH",
+    "registered_original_filename": "P1-01_Production_Data_Architecture_v1_APPROVED_PRODUCTION_DATA_ARCHITECTURE.docx",
+    "registered_original_sha256": "cc5d1004181a347814a69608388878c4fe12809d7b3127021dd851afe9f587dd",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "PRIV",
+    "registered_original_filename": "P1-02_P1-03_Privacy_Security_Consent_v0_1_APPROVED_STANDARD.docx",
+    "registered_original_sha256": "0ff1a3a6267bb9a87b301d8069fa9bd5157b20b149201a6669e7104ac2177c45",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "SAF",
+    "registered_original_filename": "P1-07_P1-08_P1-10_Safety_Support_Release_v0_1_APPROVED_STANDARD.docx",
+    "registered_original_sha256": "221e5210b7428e09799b481d0aa6d28dac78698fb5c273ac869d70101259c043",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "COM",
+    "registered_original_filename": "P1-04_P1-05_P1-06_Commerce_Entitlements_v0_1_APPROVED_STANDARD.docx",
+    "registered_original_sha256": "250c75590d229cb1e3311966b8789055867ceb6162f5bd46df989dbb40089d6b",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "RIGHTS",
+    "registered_original_filename": "P1-09_Scripture_Publication_Rights_v0_1_APPROVED_STANDARD.docx",
+    "registered_original_sha256": "d31ac4e39f638467bc62f756184b367929dd58b20047402ee85ece69fa808657",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "UX",
+    "registered_original_filename": "Steward_MJG_Digital_Experience_Implementation_Brief_v1_UPDATED.docx",
+    "registered_original_sha256": "f9ced8e12a4851b2e803e22e9794646fa6ce75a2237f5a20d5c0f80354f17ce1",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "ADMIN",
+    "registered_original_filename": "Steward_Admin_and_Observability_Implementation_Brief_v1.docx",
+    "registered_original_sha256": "01f7cf9a199c5fa2afcc7f6be40971655b1545339bbfe19f7506037a80b60124",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "KICKOFF",
+    "registered_original_filename": "Jeremy_Phase_1_Build_Kickoff_v1.docx",
+    "registered_original_sha256": "a14e8eb5365b767894c02a850040ef4cc8b3bf92ab1b4cd72ca4550661af3960",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "CFM-WEB",
+    "registered_original_filename": "CFM_Website_Handoff_original.md",
+    "registered_original_sha256": "06b6cd5c4610be98b7513f69da48656cba0de1054ef11eeee9026b1f76db4565",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "TS2",
+    "registered_original_filename": "Steward_Sensitive_Conversation_Test_Suite_v0_2_WORKING_TEST_BASELINE.txt",
+    "registered_original_sha256": "6802ff0db4d4ebaf4901dd74483b72790eb899e3094301b34002e80e7f9555d7",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "TS-HIST",
+    "registered_original_filename": "02_Steward_Test_Scenarios_v2_original.txt",
+    "registered_original_sha256": "de0b42a40a4f7482e16dbc70c41c34b54a17a82bb2692dd88cbf875fb7391de3",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "BOOK",
+    "registered_original_filename": "TLYB Book First Edit(1).docx",
+    "registered_original_sha256": "b8213cf707113ea1fc890200437f1a3d67de0481020df76e793dfa67d71c51f1",
+    "actual_available_filename": "TLYB Book First Edit(1).docx",
+    "packaged_native_path": "REFERENCE/Available_Native_Originals/TLYB Book First Edit(1).docx",
+    "status": "HASH_MATCHING_NATIVE_INCLUDED",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "STUDY5",
+    "registered_original_filename": "v.5 The_Life_Youre_Building_6_Week_Mens_Study_Participant_Guide(3).docx",
+    "registered_original_sha256": "0dbc894ac45f7dd56dada94d16ccbd63b101efca9b317ac25b35bc2f3daf553b",
+    "actual_available_filename": "v.5 The_Life_Youre_Building_6_Week_Mens_Study_Participant_Guide(3).docx",
+    "packaged_native_path": "REFERENCE/Available_Native_Originals/v.5 The_Life_Youre_Building_6_Week_Mens_Study_Participant_Guide(3).docx",
+    "status": "HASH_MATCHING_NATIVE_INCLUDED",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "FE",
+    "registered_original_filename": "Fully_Engaged_Updated_Participant_Guide(1).docx",
+    "registered_original_sha256": "3fde95229c7794c4aa843fb5e014e270a8e9c5a8cb3a4ea2a72271af6b7bef47",
+    "actual_available_filename": "Fully_Engaged_Updated_Participant_Guide(1).docx",
+    "packaged_native_path": "REFERENCE/Available_Native_Originals/Fully_Engaged_Updated_Participant_Guide(1).docx",
+    "status": "HASH_MATCHING_NATIVE_INCLUDED",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "BRAND",
+    "registered_original_filename": "Stewardship_Blueprint_Master_Branding_Document.docx",
+    "registered_original_sha256": "69669e0aaf635ad894bf72f1679a1c9bad3af339fb9795c74d6079964ac046c7",
+    "actual_available_filename": "Stewardship_Blueprint_Master_Branding_Document.docx",
+    "packaged_native_path": "REFERENCE/Available_Native_Originals/Stewardship_Blueprint_Master_Branding_Document.docx",
+    "status": "HASH_MATCHING_NATIVE_INCLUDED",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "PD-PREMIUM",
+    "registered_original_filename": "Steward_Premium_Product_Direction_Update_v0_1.txt",
+    "registered_original_sha256": "ba33c96dce124383f77c23fcc4112594973bdd083dfafc723e64a72356ba5f24",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "CN-PREMIUM",
+    "registered_original_filename": "Steward_Change_Notice_CN_PREMIUM_001_v0_1.txt",
+    "registered_original_sha256": "116a41e84a41621aa87a6e1273afa637398212bb212eab8b658eb028ac9b6ba2",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "PD-SEASON",
+    "registered_original_filename": "Steward_Season_Transition_Capacity_Product_Direction_Update_v0_1.docx",
+    "registered_original_sha256": "167f4360dfe51b903fe2d0ecafd2e0723a0addb802cd43673b612a18034bd8d9",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "CN-SEASON",
+    "registered_original_filename": "Steward_Change_Notice_CN_SEASON_001_v0_1.docx",
+    "registered_original_sha256": "6d65576bbd0d236a58745482428e4ef8489649ef4ce871e52a6573a489a9e17f",
+    "actual_available_filename": null,
+    "packaged_native_path": null,
+    "status": "NATIVE_NOT_PROVIDED_HERE",
+    "source_body_available": true,
+    "native_page_visual_audit_performed": false
+  },
+  {
+    "source_key": "SF",
+    "registered_original_filename": "Statement-of-Faith.txt",
+    "packaged_native_path": "PROJECT_SOURCES/Statement-of-Faith.txt",
+    "status": "EXACT_SUPPLIED_SOURCE_INCLUDED",
+    "sha256": "b587d8af30ad22d695e48d78608cc6cbbf05d928cd3c6527c58ca305ac9e4e87",
+    "source_body_available": true
+  }
+]

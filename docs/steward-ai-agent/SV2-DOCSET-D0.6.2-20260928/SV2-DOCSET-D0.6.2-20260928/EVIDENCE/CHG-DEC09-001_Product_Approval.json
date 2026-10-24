@@ -1,0 +1,18 @@
+{
+  "change_id": "CHG-DEC09-001",
+  "owner": "Michael J. Gauthier",
+  "approved_on": "2026-09-26",
+  "recorded_timezone": "America/Phoenix",
+  "scope": "PRODUCT_TERMS_AND_DOCUMENTATION_INCORPORATION",
+  "status": "APPROVED_PRODUCT_TERMS",
+  "owner_instruction_ref": "CHANGE_RECORDS/CHG-DEC09-001_Owner_Approval.md",
+  "approved_proposal_sha256": "b3db6d2cc15ad5612c27ae971674a22e637c7de4dfc544eeaeb8ffeb7e53c6cf",
+  "current_requirement": "07 M11; 11 OD-20/AMD-04/DEC-09",
+  "exact_candidate_acceptance": null,
+  "participant_recurring_consent": null,
+  "qualified_clearance": null,
+  "application_test_evidence": [],
+  "production_authorized": false,
+  "live_billing_authorized": false,
+  "interactive_test_condition": "After owner confirms installation; Mike plays fictional participant"
+}

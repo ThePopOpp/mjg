@@ -1,0 +1,19 @@
+{
+  "package_id": "SV2-DOCSET-D0.6.2-20260928",
+  "active_source_count": 12,
+  "active_sources": [
+    "PROJECT_SOURCES/00_Control_Register.md",
+    "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+    "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+    "PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+    "PROJECT_SOURCES/05_Data_Privacy_Security.md",
+    "PROJECT_SOURCES/06_Safety_Support_Release.md",
+    "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+    "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+    "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+    "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+    "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+    "PROJECT_SOURCES/Statement-of-Faith.txt"
+  ],
+  "numbered_01_present": false
+}

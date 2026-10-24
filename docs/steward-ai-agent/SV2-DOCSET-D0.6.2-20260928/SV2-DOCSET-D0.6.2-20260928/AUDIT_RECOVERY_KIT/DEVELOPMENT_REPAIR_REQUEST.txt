@@ -1,0 +1,17 @@
+Use the supplied restoration kit to finish the already-authorized CHG-B02-FREE-SCOPE-EVIDENCE-001 package repair. Do not reopen product scope, pricing, doctrine, or numerical allowances.
+
+The complete original Draft 0.4 ZIP is now available in RESTORATION_INPUTS. Its SHA-256 is c8c4ac2d4d9997bccc4d01fe4d9ad4c4e60942213b63cab0490ae31464642688. This is historical restoration material, not a replacement of the current active requirements. The kit also includes the exact uploaded consolidated Batch 01/02 reviews; they are not missing full test transcripts.
+
+Keep Draft 0.6 untouched as history. Create one distinct repaired package from its current requirements, using the original D0.4 archive for detailed companions. Account for every baseline companion restored, updated, intentionally archived, superseded, or unavailable. Preserve original evidence bytes; retain summaries only as indexes. Do not recreate unprovided transcripts.
+
+Repair the two duplicated live clause IDs: keep the existing Batch 01 D23 and E14; assign unique IDs to the added Batch 02 clauses and update all their references. Synchronize the live master00/master11, DEC-12, compact instructions, prompt references, installation/startup documents, coverage and manifests. Distinguish current metadata from unchanged historical/source version names.
+
+Build payload manifests without self-referential or mutual manifest hashes. Exclude manifest files from their own payload maps and state the exclusions. Finalize all payloads, generate matching text/JSON payload lists, create the ZIP, then publish the whole-ZIP hash EXTERNALLY after the ZIP is finalized. Do not insert a whole-ZIP hash inside the same ZIP. Validate the final extracted archive, every listed payload hash, the complete path inventory, unique current clause IDs, source preservation and LF/CRLF instruction lengths.
+
+Restore the actual detailed D0.4 feature/agent/offer/benefit/lifecycle/grant/promotion configurations and release/test/validation templates before applying approved later changes. Do not substitute category lists or the current count-only validator for the detailed originals. Keep these as disabled design examples, not runtime-ready or independently approved new configuration. Produce full feature-to-requirement/test coverage using the retained catalogue, with each scope and execution status explicit. Correct the compact coverage row that cites B02-03 as promotion evidence; that run tested capture.
+
+Use the supplied supplemental acceptance run cards as reusable manual test inputs, not production instructions, new policy, or executed evidence. Keep their reviewer rubrics out of participant prompts. Record actual installed candidate identity on execution. Do not run both sides or award passes without transcripts.
+
+Remove any wording implying that owner permission to hand unexecuted scripts to Jeremy closes mandatory high-priority fictional acceptance. Such a handoff can remain a technical-review candidate; approved V1.0 engineering acceptance and real-participant release remain distinct gates.
+
+Return one complete repaired ZIP plus concise factual check results and an explicit remaining-evidence list. No automatic installation, new participant test, V1.0 promotion, live processing or billing. Preserve Draft 0.6 and all historical results unchanged.

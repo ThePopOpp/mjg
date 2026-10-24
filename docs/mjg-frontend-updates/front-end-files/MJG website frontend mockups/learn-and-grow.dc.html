@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="Learn & Grow" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="learn" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 56px;text-align:center;">
+  <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ Learn & Grow</span>
+  <h1 style="margin:24px auto 0;max-width:900px;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;">Learning That Leads to <em style="font-style:normal;color:#b88a4a;">Living.</em></h1>
+  <p style="margin:20px auto 0;max-width:680px;font-size:18px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Information alone rarely changes a life. What matters is what you notice, discuss, decide, and put into practice.</p>
+  <p style="margin:14px auto 0;max-width:680px;font-size:18px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Explore books, small-group studies, videos, and practical insights that help you understand and live the Stewardship Blueprint.</p>
+  <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:30px;">
+    <a href="studies.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore Studies</a>
+    <a href="resources.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--muted,#f4f1ea);">Read Insights & Resources</a>
+  </div>
+</section>
+
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Featured Learning</p>
+    <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Choose How You Like to Learn.</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:36px;">
+      <a href="the-life-youre-building.dc.html" style="border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);overflow:hidden;text-decoration:none;color:var(--ink,#1c1917);display:flex;flex-direction:column;" style-hover="border-color:#b88a4a;">
+        <div style="aspect-ratio:16/10;background:#141211;display:flex;align-items:center;justify-content:center;padding:24px;"><div style="width:120px;aspect-ratio:2/3;border-radius:3px 8px 8px 3px;overflow:hidden;box-shadow:-6px 12px 30px rgba(0,0,0,.4);"><image-slot id="lg-book" shape="rect" placeholder="Book cover"></image-slot></div></div>
+        <div style="padding:24px;display:flex;flex-direction:column;flex:1;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">The Book</p><h3 style="margin:8px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:24px;line-height:1.2;">The Life You’re Building</h3><p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);flex:1;">A story-driven invitation to move from drift to design.</p><span style="margin-top:16px;font-size:14px;font-weight:600;color:#b88a4a;">Explore the Book →</span></div>
+      </a>
+      <a href="studies.dc.html" style="border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);overflow:hidden;text-decoration:none;color:var(--ink,#1c1917);display:flex;flex-direction:column;" style-hover="border-color:#b88a4a;">
+        <div style="aspect-ratio:16/10;overflow:hidden;"><image-slot id="lg-study" shape="rect" placeholder="Study guide cover"></image-slot></div>
+        <div style="padding:24px;display:flex;flex-direction:column;flex:1;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Together</p><h3 style="margin:8px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:24px;line-height:1.2;">Studies & Group Experiences</h3><p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);flex:1;">Guided conversation, Scripture, reflection, and practical follow-through.</p><span style="margin-top:16px;font-size:14px;font-weight:600;color:#b88a4a;">Find a Study →</span></div>
+      </a>
+      <a href="resources.dc.html" style="border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);overflow:hidden;text-decoration:none;color:var(--ink,#1c1917);display:flex;flex-direction:column;" style-hover="border-color:#b88a4a;">
+        <div style="aspect-ratio:16/10;overflow:hidden;"><img src="public/media/The-Watch-the-Title-and-the-Wrong-Scoreboard-Featured-Image-v.2.png" alt="The Watch and the Wrong Scoreboard" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+        <div style="padding:24px;display:flex;flex-direction:column;flex:1;"><p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Articles & Tools</p><h3 style="margin:8px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:24px;line-height:1.2;">Insights & Resources</h3><p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:var(--muted-fg,#6d6660);flex:1;">Brief and in-depth reflections, videos, worksheets, and tools organized around the layers of the Blueprint.</p><span style="margin-top:16px;font-size:14px;font-weight:600;color:#b88a4a;">Explore Insights →</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section style="max-width:1160px;margin:0 auto;padding:80px 32px;text-align:center;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Featured Next Step</p>
+  <h2 style="margin:12px auto 0;max-width:720px;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;">From Learning to Action.</h2>
+  <p style="margin:16px auto 0;max-width:600px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Whatever you choose to read or watch, end with one question: <em style="font-family:Fraunces,Georgia,serif;color:var(--ink,#1c1917);">What changes because of what I have learned?</em></p>
+  <p style="margin:14px auto 0;max-width:600px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);">Start the free Check-In if you have not yet examined the life you are currently building.</p>
+  <div style="display:flex;justify-content:center;margin-top:28px;"><a href="created-for-more-check-in.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Take the Free Check-In</a></div>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+</body>
+</html>

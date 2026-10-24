@@ -1,0 +1,6 @@
+{
+  "package_id": "SV2-DOCSET-D0.6.2-20260928",
+  "check_scope": "current front sections before preserved source modules; headings with explicit clause/test IDs and dash delimiters",
+  "duplicate_current_clause_ids": {},
+  "status": "PASS"
+}

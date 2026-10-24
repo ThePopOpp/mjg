@@ -1,0 +1,70 @@
+{
+  "package_id": "SV2-DOCSET-D0.5.1-20260928",
+  "items": [
+    {
+      "path": "ARCHIVE/Preinstallation_Reviewed_Draft_0_5/SV2-DOCSET-D0.5-20260928.zip",
+      "sha256": "631b1f769f211e6d35edb5529c554cda51a27fcfecb2ec89a10f6409bf38b38e",
+      "bytes": 856434
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/05_Data_Privacy_Security.md",
+      "sha256": "9597014ab33e20b583fbf5465b49768c4827e35361fab10fb4c8e9658f4f09a5",
+      "bytes": 361235
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+      "sha256": "33066af1dedca983c96e0bd7e87b2f680a89b98105345ce76cb70ded0f2128fc",
+      "bytes": 406521
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+      "sha256": "364b35c961b1bbc5597c5d8770e4915259240740eea34a83cf164c1b8e5588e5",
+      "bytes": 66924
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "sha256": "4dc71033b3586d733f9ccf38a26c7e794cf11cce24a56f11fe822715d8b6bfab",
+      "bytes": 135487
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "sha256": "e20769c0bde213cd6ba4af57037457bba597ca1acedfdd4bdc3f5e8885836174",
+      "bytes": 612691
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/00_Control_Register.md",
+      "sha256": "a34ebb8ace578d9ca47ce5d32a69cb6811602f1a94edff8a64a8f6c99b441cfa",
+      "bytes": 128249
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+      "sha256": "72e4665779df9ea06d1ab674a7f290328b2be818b03ea6c58828d23c163b3049",
+      "bytes": 247487
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/06_Safety_Support_Release.md",
+      "sha256": "47f0264639d1e75bc0a4e43d9bb0fee8af0502f297e359720ecbf40935243186",
+      "bytes": 256590
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "sha256": "678307424d6775860cfc26eefaa6c3016077a3d4d5df705baff523a4ac2a6b53",
+      "bytes": 208174
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/Statement-of-Faith.txt",
+      "sha256": "b587d8af30ad22d695e48d78608cc6cbbf05d928cd3c6527c58ca305ac9e4e87",
+      "bytes": 2633
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "sha256": "68b1c6f24420809f2442b337ab2f90fb95e9cd995928887fe6d043c7cf41218f",
+      "bytes": 123735
+    },
+    {
+      "path": "ARCHIVE/Draft_0_4_Inputs/PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+      "sha256": "bda7ac01800385ca9024ed83041b1ad6541e10210445a7afd1b86d37ca20ba9e",
+      "bytes": 160195
+    }
+  ]
+}

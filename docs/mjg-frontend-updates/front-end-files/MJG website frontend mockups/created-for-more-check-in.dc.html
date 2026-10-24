@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div data-screen-label="Created for More Check-In" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<dc-import name="SiteNav" active="blueprint" style="position:sticky;top:0;z-index:50;" hint-size="100%,60px"></dc-import>
+<main style="flex:1;">
+
+<section style="max-width:1160px;margin:0 auto;padding:64px 32px 40px;text-align:center;">
+  <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ Free · About 15 Minutes</span>
+  <h1 style="margin:24px auto 0;max-width:900px;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(40px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;">Created for More <em style="font-style:normal;color:#b88a4a;white-space:nowrap;">Check-In</em></h1>
+  <p style="margin:16px auto 0;max-width:680px;font-family:Fraunces,Georgia,serif;font-style:italic;font-size:22px;line-height:1.4;color:var(--ink,#1c1917);">What kind of life are you actually building?</p>
+  <p style="margin:18px auto 0;max-width:680px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Most people do not set out to drift. Responsibilities grow, the calendar fills, and the important can become crowded out by the urgent.</p>
+  <p style="margin:14px auto 0;max-width:680px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">This free Check-In invites you to pause for about fifteen minutes and reflect honestly across seven layers of the Stewardship Blueprint. You will notice where your life feels aligned, where drift may be emerging, and what deserves attention in this season.</p>
+  <p style="margin:14px auto 0;max-width:680px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">It is not a test you pass or fail. The value is in the honesty—and the next step you choose.</p>
+</section>
+
+<!-- Embedded questionnaire (existing component) -->
+<section style="max-width:1160px;margin:0 auto;padding:0 32px 72px;">
+  <div style="max-width:760px;margin:0 auto;border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);padding:32px;box-shadow:0 18px 50px rgba(12,20,25,.05);">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;"><span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Layer 3 of 7 · Four Pillars</span><span style="font-size:12px;color:var(--muted-fg,#6d6660);">Question 12 of 28</span></div>
+    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
+      <div style="height:4px;border-radius:9999px;background:#b88a4a;"></div><div style="height:4px;border-radius:9999px;background:#b88a4a;"></div><div style="height:4px;border-radius:9999px;background:#b88a4a;opacity:.5;"></div><div style="height:4px;border-radius:9999px;background:var(--muted,#f4f1ea);"></div><div style="height:4px;border-radius:9999px;background:var(--muted,#f4f1ea);"></div><div style="height:4px;border-radius:9999px;background:var(--muted,#f4f1ea);"></div><div style="height:4px;border-radius:9999px;background:var(--muted,#f4f1ea);"></div>
+    </div>
+    <p style="margin:28px 0 0;font-family:Fraunces,Georgia,serif;font-size:24px;line-height:1.35;">My calendar reflects the people and priorities I say matter most.</p>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:24px;">
+      <button style="border:1px solid var(--border,#e1dbd0);border-radius:10px;background:var(--card,#fff);padding:16px 4px;font-size:15px;color:var(--muted-fg,#6d6660);cursor:pointer;font-family:inherit;" style-hover="border-color:#b88a4a;">1</button>
+      <button style="border:1px solid var(--border,#e1dbd0);border-radius:10px;background:var(--card,#fff);padding:16px 4px;font-size:15px;color:var(--muted-fg,#6d6660);cursor:pointer;font-family:inherit;" style-hover="border-color:#b88a4a;">2</button>
+      <button style="border:1px solid var(--ink,#1c1917);border-radius:10px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);padding:16px 4px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">3</button>
+      <button style="border:1px solid var(--border,#e1dbd0);border-radius:10px;background:var(--card,#fff);padding:16px 4px;font-size:15px;color:var(--muted-fg,#6d6660);cursor:pointer;font-family:inherit;" style-hover="border-color:#b88a4a;">4</button>
+      <button style="border:1px solid var(--border,#e1dbd0);border-radius:10px;background:var(--card,#fff);padding:16px 4px;font-size:15px;color:var(--muted-fg,#6d6660);cursor:pointer;font-family:inherit;" style-hover="border-color:#b88a4a;">5</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted-fg,#6d6660);margin-top:8px;"><span>Rarely true</span><span>Consistently true</span></div>
+    <div style="display:flex;justify-content:space-between;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border,#e1dbd0);">
+      <a href="#" style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:14px;text-decoration:none;">← Back</a>
+      <a href="#" style="display:inline-flex;align-items:center;height:44px;padding:0 22px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:14px;text-decoration:none;">Next question →</a>
+    </div>
+  </div>
+  <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="max-width:760px;margin:16px auto 0;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note · KEEP EXISTING TOOL</span><br>Wireframe only. Keep the current embedded questionnaire (<code>components/check-in/created-for-more-assessment.tsx</code>): preserve question copy/ordering, client-side scoring, saved results, and all active deep links until any score-version change is explicitly approved. No distracting video inside the scoring tool. Live tool = 28 questions / 7 layers; the older PDF = 25 questions / 5 categories — maintain version distinction, never mix scores.</div></sc-if>
+</section>
+
+<!-- AFTER RESULTS -->
+<section style="border-top:1px solid var(--border,#e1dbd0);border-bottom:1px solid var(--border,#e1dbd0);background:var(--muted,#f4f1ea);">
+  <div style="max-width:1160px;margin:0 auto;padding:72px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;align-items:center;">
+    <div>
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">After Results</p>
+      <h2 style="margin:12px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;letter-spacing:-.01em;">Your Score Is a Starting Point.</h2>
+      <p style="margin:16px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">Look at the area that needs your attention, but do not ignore the areas worth protecting.</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">What surprised you? What matters most in this season? What small and realistic step could you take this week?</p>
+      <p style="margin:14px 0 0;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">You can explore the related Blueprint layer, continue with a study, or begin creating a more personal plan.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;">
+        <a href="stewardship-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;background:var(--ink,#1c1917);color:var(--bg,#fbfaf7);font-weight:600;font-size:15px;text-decoration:none;" style-hover="opacity:.9;color:var(--bg,#fbfaf7);">Explore the Framework</a>
+        <a href="personal-blueprint.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--card,#fff);">Build a Personal Blueprint</a>
+        <a href="resources.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:6px;border:1px solid var(--border,#e1dbd0);color:var(--ink,#1c1917);font-weight:600;font-size:15px;text-decoration:none;" style-hover="background:var(--card,#fff);">Explore Related Resources</a>
+      </div>
+    </div>
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:16px;background:var(--card,#fff);padding:24px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-fg,#6d6660);">Example results · seven layers</p>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px;">
+        <sc-for list="{{ results }}" as="r" hint-placeholder-count="7">
+          <div style="display:grid;grid-template-columns:140px 1fr 36px;gap:12px;align-items:center;font-size:13.5px;">
+            <span style="color:var(--ink,#1c1917);">{{ r.label }}</span>
+            <div style="height:8px;border-radius:9999px;background:var(--muted,#f4f1ea);overflow:hidden;"><div style="height:100%;background:{{ r.color }};width:{{ r.width }};"></div></div>
+            <span style="text-align:right;font-variant-numeric:tabular-nums;color:var(--muted-fg,#6d6660);">{{ r.score }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:18px;border:1px solid var(--border,#e1dbd0);border-left:3px solid #b88a4a;border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><strong style="color:var(--ink,#1c1917);">Deserves attention:</strong> Energy. <strong style="color:var(--ink,#1c1917);">Worth protecting:</strong> Faith & Identity.</div>
+      <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><p style="margin:14px 0 0;font-size:12px;color:var(--gold-text,#8a6630);">Dev note: render the actual scoring/category chart as implemented (check-in-results-dashboard.tsx); no fictional result screenshots.</p></sc-if>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section style="max-width:1160px;margin:0 auto;padding:72px 32px;text-align:center;">
+  <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Privacy & Position</p>
+  <h2 style="margin:12px auto 0;max-width:720px;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.15;">Your Reflection Belongs to You.</h2>
+  <p style="margin:16px auto 0;max-width:640px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);text-wrap:pretty;">The Check-In is intended to support personal reflection and planning. We tell you plainly what is saved, what is optional, who can access it, and how to review or delete your information.</p>
+  <div style="display:flex;justify-content:center;margin-top:24px;"><a href="#" style="font-size:15px;font-weight:600;color:#b88a4a;text-decoration:none;" style-hover="text-decoration:underline;">Privacy Policy →</a></div>
+  <sc-if value="{{ notes }}" hint-placeholder-val="{{ true }}"><div style="max-width:640px;margin:20px auto 0;text-align:left;border:1px dashed #b5821e;border-radius:8px;padding:10px 14px;background:rgba(181,130,30,.06);font-size:12.5px;line-height:1.55;color:var(--muted-fg,#6d6660);"><span style="font-weight:700;color:#b5821e;letter-spacing:.1em;text-transform:uppercase;font-size:10px;">Dev note</span><br>Link to existing privacy URL. Do not claim automatic sync to Steward until tested.</div></sc-if>
+</section>
+
+</main>
+<dc-import name="SiteFooter" hint-size="100%,280px"></dc-import>
+<dc-import name="StewardFab" style="position:fixed;right:0;bottom:0;z-index:9990;" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDevNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Handoff&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const results = [["Faith & Identity", 4.5], ["Mission & Values", 3.8], ["Four Pillars", 3.2], ["Guardrails", 2.9], ["Keystone Habits", 3.4], ["Energy", 2.3], ["Legacy", 3.6]].map(([label, s]) => ({
+      label, score: s.toFixed(1), width: (s / 5 * 100) + "%", color: s < 2.5 ? "#b5821e" : s >= 4 ? "#2f7d5b" : "#b88a4a",
+    }));
+    return { results, notes: this.props.showDevNotes ?? true };
+  }
+}
+</script>
+</body>
+</html>

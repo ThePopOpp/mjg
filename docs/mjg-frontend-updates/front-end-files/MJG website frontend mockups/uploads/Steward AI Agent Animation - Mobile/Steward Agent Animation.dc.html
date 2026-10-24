@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; height: 100%; background: #141211; }
+    a { color: #b88a4a; } a:hover { color: #d4a862; }
+  </style>
+  <script>window.OM_SCENES = '[{"name":"Opening","dur":1,"desc":"Steward welcome screen settles while the camera pushes toward the three ways to help"},{"name":"Listen","dur":11,"desc":"Listen First is chosen, a voice note is recorded with the 3D waveform, and Steward answers"},{"name":"Think","dur":12,"desc":"Help Me Think is chosen, a question is typed and sent, and Steward answers"},{"name":"Step","dur":11,"desc":"Help Me Take a Step is chosen, Steward proposes Guardrails wording and it is added to the Blueprint"},{"name":"Close","dur":2,"desc":"Camera pulls back to the full app and the loop resets"}]';</script>
+  <script>window.OM_PLAYBACK = '{"mode":"loop"}';</script>
+  <script>window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "theme": "dark",
+    "layout": "desktop",
+    "particles": true,
+    "tilt": true,
+    "motionEditor": true
+  }/*EDITMODE-END*/;</script>
+  <script type="module">import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'; window.THREE = THREE; window.dispatchEvent(new Event('three-ready'));</script>
+  <script src="./steward-three.js"></script>
+</helmet>
+<div data-screen-label="Steward Agent Animation" style="position: relative; width: 100%; height: 100vh; background: #141211;">
+  <x-import component-from-global-scope="StewardAnimation" from="./animations-v3.jsx ./tweaks-panel.jsx ./steward-scene.jsx" hint-size="100%,100%" style="position:absolute;inset:0;"></x-import>
+</div>
+</x-dc>
+</body>
+</html>

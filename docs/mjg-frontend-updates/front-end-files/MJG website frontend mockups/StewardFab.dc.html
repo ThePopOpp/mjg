@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:transparent;font-family:Geist,Arial,sans-serif} @keyframes fabIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="position:fixed;right:20px;bottom:20px;z-index:9990;display:flex;flex-direction:column;align-items:flex-end;gap:12px;font-family:Geist,Arial,sans-serif;">
+  <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-label="Steward" style="width:320px;max-width:calc(100vw - 40px);background:{{ c.bg }};border:1px solid {{ c.border }};border-radius:16px;box-shadow:{{ c.shadow }};overflow:hidden;transform-origin:bottom right;animation:fabIn .16s ease-out;">
+      <div style="padding:16px 17.6px 13.6px;">
+        <p style="margin:0;font-size:16px;font-weight:700;color:{{ c.text }};">Steward</p>
+        <p style="margin:3px 0 0;font-size:13px;line-height:1.45;color:{{ c.muted }};">A personal guide for designing and living a life that matters.</p>
+      </div>
+      <sc-for list="{{ links }}" as="l" hint-placeholder-count="4">
+        <a href="{{ l.href }}" onClick="{{ close }}" style="display:flex;align-items:center;gap:12.8px;padding:12.8px 17.6px;border-top:1px solid {{ c.border }};color:{{ c.text }};text-decoration:none;transition:background .15s;" style-hover="background:{{ c.hover }};">
+          <span style="display:flex;flex:none;color:{{ c.gold }};"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ l.d1 }}"></path><path d="{{ l.d2 }}"></path></svg></span>
+          <span style="display:flex;flex-direction:column;min-width:0;flex:1;"><span style="font-size:14px;font-weight:500;">{{ l.label }}</span><span style="font-size:12px;color:{{ c.muted }};margin-top:1.6px;">{{ l.note }}</span></span>
+          <span style="display:flex;flex:none;color:{{ c.muted }};opacity:.6;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></span>
+        </a>
+      </sc-for>
+    </div>
+  </sc-if>
+  <div style="display:flex;align-items:center;gap:9.6px;">
+    <sc-if value="{{ showPill }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ toggle }}" aria-expanded="{{ open }}" style="display:inline-flex;align-items:center;gap:6.4px;padding:11.2px 18.4px;background:{{ c.bg }};color:{{ c.text }};border:1px solid {{ c.border }};border-radius:999px;box-shadow:{{ c.shadow }};font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;transition:transform .15s;" style-hover="transform:translateY(-1px);">Need help? <b style="font-weight:600;color:{{ c.gold }};">Ask Steward</b></button>
+    </sc-if>
+    <button onClick="{{ toggle }}" aria-expanded="{{ open }}" aria-label="{{ btnLabel }}" style="display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;flex:none;background:{{ c.ink }};color:{{ c.onInk }};border:none;border-radius:50%;box-shadow:{{ c.shadow }};cursor:pointer;transition:transform .15s;" style-hover="transform:scale(1.05);">
+      <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6 18 18M18 6 6 18"></path></svg></sc-if>
+      <sc-if value="{{ closed }}" hint-placeholder-val="{{ true }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.9 8.9 0 0 1-3.8-.9L3 20.5l1.6-4.9A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4Z"></path></svg></sc-if>
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:480}}">
+class Component extends DCLogic {
+  state = { open: false, width: typeof window !== "undefined" ? window.innerWidth : 1280, theme: (typeof window !== "undefined" && window.localStorage.getItem("mjg-mock-theme")) || "light" };
+  componentDidMount() {
+    this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener("resize", this._r);
+    this._t = (e) => this.setState({ theme: e.detail }); window.addEventListener("mjg-theme", this._t);
+    this._k = (e) => { if (e.key === "Escape") this.setState({ open: false }); }; document.addEventListener("keydown", this._k);
+  }
+  componentWillUnmount() { window.removeEventListener("resize", this._r); window.removeEventListener("mjg-theme", this._t); document.removeEventListener("keydown", this._k); }
+  renderVals() {
+    const dark = this.state.theme === "dark";
+    const c = dark
+      ? { bg: "#17150f", text: "#f4f1ea", muted: "#a9a497", border: "rgba(255,255,255,.11)", gold: "#d8bd86", ink: "#f4f1ea", onInk: "#17150f", hover: "rgba(255,255,255,.07)", shadow: "0 18px 44px -14px rgba(0,0,0,.75)" }
+      : { bg: "#ffffff", text: "#111110", muted: "#6b665c", border: "#e8e6e0", gold: "#b88a4a", ink: "#111110", onInk: "#ffffff", hover: "rgba(17,17,17,.05)", shadow: "0 18px 44px -14px rgba(17,16,14,.3)" };
+    const links = [
+      { label: "Talk to Steward", note: "Open the chat and start where you are", href: "https://michaeljgauthier.com/steward", d1: "M7.5 3.5 8.6 6.4 11.5 7.5 8.6 8.6 7.5 11.5 6.4 8.6 3.5 7.5 6.4 6.4Z", d2: "M16 13l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z" },
+      { label: "Plans and pricing", note: "Free, the Full Build, and Premium", href: "https://michaeljgauthier.com/steward/pricing", d1: "M3 7a2 2 0 0 1 2-2h5.2a2 2 0 0 1 1.4.6l8 8a2 2 0 0 1 0 2.8l-5.2 5.2a2 2 0 0 1-2.8 0l-8-8A2 2 0 0 1 3 12.2Z", d2: "M7.5 8.3a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z" },
+      { label: "Contact us", note: "Questions, speaking, partnership", href: "contact.dc.html", d1: "M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z", d2: "m3.5 7 8.5 6 8.5-6" },
+      { label: "Create an account", note: "Start free — no card needed", href: "https://michaeljgauthier.com/register", d1: "M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 3.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z", d2: "M18 8.5v5M20.5 11h-5" },
+    ];
+    return {
+      c, links, open: this.state.open, closed: !this.state.open, showPill: this.state.width > 560,
+      btnLabel: this.state.open ? "Close the Steward menu" : "Open the Steward menu",
+      toggle: () => this.setState(s => ({ open: !s.open })), close: () => this.setState({ open: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{
+  "record_id": "D02-001-D03-OWNER-REPORT-001",
+  "test_id": "D02-001",
+  "reported_candidate": "SV2-DOCSET-D0.3-20260926",
+  "evidence_kind": "OWNER_SUPPLIED_REPORT_OF_EXECUTED_CONVERSATIONAL_TEST",
+  "conversation_result": "FAIL",
+  "recorded_on": "2026-09-26",
+  "recorded_timezone": "America/Phoenix",
+  "reported_run_timestamp": null,
+  "full_transcript_supplied": false,
+  "verbatim_exchanges": null,
+  "prior_instruction_version": null,
+  "prior_model_identity": null,
+  "prior_candidate_digest_at_execution": null,
+  "known_candidate_reference_sha256": "c2ee1439331f222c9691bd3b1c993db977b0fc0feff4893567cacce321ac1a95",
+  "candidate_digest_note": "Known preserved Draft 0.3 artifact; no execution-time digest was supplied. C1 is available as the requested correction baseline, not proven as the prior executed prompt.",
+  "owner_report_text": "D02-001’s conversational registration/acknowledgment handling failed against Draft 0.3. Steward twice claimed simulated account creation without the required preceding steps. After acknowledging its first error, it received only the fictional name Jordan and email jordan@example.com, then invented completed email verification and service/privacy acknowledgment and issued another account-created receipt. Adult status was already declared in the fixture. The proposed starting note was never approved or saved. Real application authentication, grants, and persistence remain NOT RUN.",
+  "report_text_treatment": "Owner narrative, with email markdown normalized to plain text; not a reconstructed transcript.",
+  "observations": [
+    {
+      "reported": "First premature simulated account-creation claim",
+      "exact_exchange": null
+    },
+    {
+      "reported": "After acknowledging the first error, Steward received only Jordan and jordan@example.com and again invented verification, service/privacy acknowledgment and an account-created receipt",
+      "exact_exchange": null
+    }
+  ],
+  "fixture_adult_status": "ALREADY_DECLARED",
+  "proposed_starting_note": {
+    "wording": null,
+    "participant_approved": false,
+    "saved": false
+  },
+  "real_application_results": {
+    "authentication": "NOT RUN",
+    "grants": "NOT RUN",
+    "persistence": "NOT RUN"
+  },
+  "real_application_failure_established": false,
+  "defect_id": "DEF-D02-001-001",
+  "correction_id": "CHG-D02-001-001",
+  "draft04_retest": "NOT RUN",
+  "independent_review": null
+}

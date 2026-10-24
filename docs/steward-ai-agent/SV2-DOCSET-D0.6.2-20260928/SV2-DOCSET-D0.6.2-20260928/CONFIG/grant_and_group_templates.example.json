@@ -1,0 +1,77 @@
+{
+  "status": "DISABLED_DESIGN_EXAMPLES",
+  "owner_configurable": {
+    "discount_percent_range": [
+      0,
+      100
+    ],
+    "fixed_discounts": true,
+    "custom_offers": true,
+    "fixed_or_duration_access": true,
+    "explicit_no_expiry_admin_grant": true,
+    "models_can_grant": false
+  },
+  "groups": [
+    {
+      "key": "internal_testers",
+      "production_enabled": false
+    },
+    {
+      "key": "pilot_cohort",
+      "production_enabled": false
+    },
+    {
+      "key": "early_access",
+      "production_enabled": false
+    },
+    {
+      "key": "mikes_inner_circle",
+      "production_enabled": false
+    }
+  ],
+  "templates": [
+    {
+      "key": "compass_participant_reference",
+      "benefits": [
+        "full_acquisition",
+        "build_window",
+        "premium"
+      ],
+      "premium_days": 60,
+      "activation": "confirmed_post_study",
+      "card_required": false,
+      "auto_paid_conversion": false,
+      "production_enabled": false
+    },
+    {
+      "key": "compass_leader_reference",
+      "benefits": [
+        "full_if_needed",
+        "premium"
+      ],
+      "premium_calendar_months": 12,
+      "card_required": false,
+      "auto_paid_conversion": false,
+      "production_enabled": false
+    },
+    {
+      "key": "owner_nonexpiring_example",
+      "benefits": [
+        "CHOOSE_EXPLICIT_COMPONENTS"
+      ],
+      "expiry_kind": "NONE",
+      "expires_at": null,
+      "requires_authorized_deliberate_selection": true,
+      "card_required": false,
+      "auto_paid_conversion": false,
+      "production_enabled": false
+    }
+  ],
+  "rules": {
+    "affiliation_is_sponsorship": false,
+    "group_is_consent": false,
+    "group_is_entitlement": false,
+    "price_or_grant_changes_require_audit": true
+  },
+  "package_id": "SV2-DOCSET-D0.4-20260926"
+}

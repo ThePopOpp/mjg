@@ -1,0 +1,1 @@
+Complete original Draft 0.4 ZIP supplied in the recovery kit and used as the mechanical restoration source for detailed companions. SHA-256: c8c4ac2d4d9997bccc4d01fe4d9ad4c4e60942213b63cab0490ae31464642688.

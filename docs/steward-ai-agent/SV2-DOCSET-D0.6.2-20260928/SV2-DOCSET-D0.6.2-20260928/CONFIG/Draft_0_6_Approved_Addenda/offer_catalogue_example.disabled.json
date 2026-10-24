@@ -1,0 +1,12 @@
+{
+  "status": "disabled_example",
+  "prices": "reference only",
+  "offers": {
+    "full_blueprint_build": 14900,
+    "build_plus_first_year_recurring_v1": 29900,
+    "steward_premium_annual": 19900,
+    "steward_premium_monthly": 1900
+  },
+  "currency": "USD",
+  "notes": "No live billing; CHG-DEC09 terms preserved."
+}

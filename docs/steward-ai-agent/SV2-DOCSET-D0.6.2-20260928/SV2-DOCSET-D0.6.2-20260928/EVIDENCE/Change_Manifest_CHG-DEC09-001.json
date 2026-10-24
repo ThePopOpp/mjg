@@ -1,0 +1,503 @@
+{
+  "schema_version": "steward-document-change.v1",
+  "change_id": "CHG-DEC09-001",
+  "status": "OWNER_APPROVED_PRODUCT_TERMS_IN_DOCUMENT_CANDIDATE",
+  "base_package_id": "SV2-DOCSET-D0.2-20260926",
+  "target_package_id": "SV2-DOCSET-D0.3-20260926",
+  "base_package_sha256": "9c5c4f7972afa5b509aa806c7c3acc122cdafc70c2f2e924e3c4df32ea8f36fa",
+  "owner_direction_refs": [
+    "OD-10",
+    "OD-20",
+    "AMD-04",
+    "DEC-09"
+  ],
+  "product_approval_ref": "EVIDENCE/CHG-DEC09-001_Product_Approval.json",
+  "exact_candidate_acceptance": null,
+  "substantive_master_fronts": [
+    "00",
+    "04",
+    "05",
+    "07",
+    "08",
+    "09",
+    "11"
+  ],
+  "metadata_only_master_fronts": [
+    "02",
+    "03",
+    "06",
+    "10"
+  ],
+  "historical_source_module_changes": [],
+  "statement_of_faith_changed": false,
+  "offer_version_ids": [
+    "build_plus_first_year_recurring_v1"
+  ],
+  "benefit_template_version_ids": [
+    "dec09_initial_bundle_benefits_v1"
+  ],
+  "lifecycle_policy_version_ids": [
+    "dec09_lifecycle_v1"
+  ],
+  "new_test_definitions": [
+    "DEC09-T01",
+    "DEC09-T02",
+    "DEC09-T03",
+    "DEC09-T04",
+    "DEC09-T05",
+    "DEC09-T06",
+    "DEC09-T07",
+    "DEC09-T08",
+    "DEC09-T09",
+    "DEC09-T10",
+    "DEC09-T11",
+    "DEC09-T12"
+  ],
+  "amended_prior_test_definitions": [
+    "D02-001",
+    "D02-015"
+  ],
+  "behavior_application_execution": "NOT RUN",
+  "actual_application_code_commit": null,
+  "live_provider_configuration": null,
+  "qualified_clearance": null,
+  "production_authorized": false,
+  "live_billing_authorized": false,
+  "installation_confirmed": false,
+  "changed_files": [
+    {
+      "path": "AGENT_PROMPTS/00_Common_Candidate_Instructions.md",
+      "operation": "UPDATE",
+      "base_sha256": "d0e14f4265fda39f9efc002ebb0e4e4713ce7dbc16678eff0b842d122ef4d610",
+      "candidate_sha256": "c6bfc61a9d5ae3062e41a594aa12e3249489f5b78993cb1b078a09cd0227cfe6",
+      "candidate_bytes": 2232
+    },
+    {
+      "path": "AGENT_PROMPTS/AG01_orchestrator.md",
+      "operation": "UPDATE",
+      "base_sha256": "adbdf15631a6d6e6cfcf425233ca54cffbb48aafee26437fb1ad15b51279ef81",
+      "candidate_sha256": "0f10ed115256da12ed0d4f5ef06a0893bea99372bcaf51bea7620a946cf64dc6",
+      "candidate_bytes": 2618
+    },
+    {
+      "path": "AGENT_PROMPTS/AG02_blueprint_architect.md",
+      "operation": "UPDATE",
+      "base_sha256": "d188bdd17bd9de77e740469d1070a3e761d5ebe15cf9c14a7d4d53a4eb043338",
+      "candidate_sha256": "c5ac161f83d0713e184a8bdecdc18e13a264488b97957faeb5bc5dc172e3a1e0",
+      "candidate_bytes": 2748
+    },
+    {
+      "path": "AGENT_PROMPTS/S00_Participant_Steward.md",
+      "operation": "UPDATE",
+      "base_sha256": "2e91ff7c0d92ee3d1a4effc8f5af9030d20d3dad83d67d14014acad380c64c8c",
+      "candidate_sha256": "52ec018bf670e7544c6f8acc19818cdcad7967498e1a2e6d3eb07ff3b860eb97",
+      "candidate_bytes": 2081
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/00_Control_Register.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "96a6b69df570705a05270cd81ae0897ff3ebe747a4ebe4869d70465a080f845c",
+      "candidate_bytes": 127748
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/02_Framework_Blueprint_Assessments.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "2425da9c6c713c89f4bdcba51d47e1df312abe43350af6e5410b611087328514",
+      "candidate_bytes": 135325
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/03_Conversation_Sensitive_Safety.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "29f059e3fa811b1c3713df04d34659ad20884d2f1595d0513624741a67ce3708",
+      "candidate_bytes": 65987
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/04_Product_Journey_New_Features.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "497fe716d344e35d30ced8fafae7aa03393b79a43cd7adf4692c0f906b1e7e82",
+      "candidate_bytes": 156729
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/05_Data_Privacy_Security.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "b7b989b1b3976e8bb6650156e6a2732caad3b789cc1380f52fa444c8efbc6fef",
+      "candidate_bytes": 359171
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/06_Safety_Support_Release.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "6633600f4a94da8b1db5a366becfdc84a9dc17ea015969e0058960246672b721",
+      "candidate_bytes": 256428
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/07_Commerce_Scripture_Rights.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "2ada208db1450ca42ef4fc17091f86931d5585e22ce21910a7968025664e3113",
+      "candidate_bytes": 396863
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/08_Engineering_Experience_Operations.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "6755e4695c3812fcdd3df8c6cec6385793d5757b4c4bd6ddc84f904e53130cb7",
+      "candidate_bytes": 201866
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/09_Test_Suite_Quality_Control.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "430b1cf6520c3577cadef858375836a767ae505cc060e552be6a01eb8df39ad4",
+      "candidate_bytes": 220975
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/10_Teaching_Reference_Library.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "baa016939ca425061a6db434d9e4b77fd2e50722a3693c477a905a7c3ef12990",
+      "candidate_bytes": 612529
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/11_Change_Impact_Decisions.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "4bc4c401f887d1fd7c1146e0a102f597bd4bc07becd1d46cd0db1f794c718b0b",
+      "candidate_bytes": 114336
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Inputs/Statement-of-Faith.txt",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "b587d8af30ad22d695e48d78608cc6cbbf05d928cd3c6527c58ca305ac9e4e87",
+      "candidate_bytes": 2633
+    },
+    {
+      "path": "ARCHIVE/Draft_0_2_Previous_Candidate.zip",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "9c5c4f7972afa5b509aa806c7c3acc122cdafc70c2f2e924e3c4df32ea8f36fa",
+      "candidate_bytes": 7116220
+    },
+    {
+      "path": "CHANGE_RECORDS/CHG-DEC09-001_Documentation_Diff.patch",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "f6820569fbe2d99a5bc22f0a6793dcb764d10e45deef1e472b82f5c2b47eaae0",
+      "candidate_bytes": 181903
+    },
+    {
+      "path": "CHANGE_RECORDS/CHG-DEC09-001_Owner_Approval.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "cf66dd5eedef4a3320af6acfc7f8bd9dd2a9ae50d6fe535b6660dfc94bc0e870",
+      "candidate_bytes": 2566
+    },
+    {
+      "path": "CONFIG/README.md",
+      "operation": "UPDATE",
+      "base_sha256": "1cf81d3550461826f6cd51b49d182fc44a84113e1076840e96385934bfda7cd7",
+      "candidate_sha256": "8a5db0a0fdacd28fa2393fb04f99863453571dd22386670ec98734e8aa4b51b9",
+      "candidate_bytes": 913
+    },
+    {
+      "path": "CONFIG/agent_registry.example.json",
+      "operation": "UPDATE",
+      "base_sha256": "812c50463be3e6f92f3042af5825903527dac2a994a8c1c447abbd67d0a4f035",
+      "candidate_sha256": "4c9e991aedadd5dbb33c156e86246a29a770e0e783768f2248cbbe102de39425",
+      "candidate_bytes": 19077
+    },
+    {
+      "path": "CONFIG/dec09_benefits.example.json",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "bd8a8d9d922419e1d664ea60cd9c4bd184e258e6d562ba68543ba25b631e8281",
+      "candidate_bytes": 1297
+    },
+    {
+      "path": "CONFIG/dec09_lifecycle_policies.example.json",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "cb1ff299a28174ad3b3bd18a72dcd53ad05ebab65af0c4b830d55dcb72d441ab",
+      "candidate_bytes": 2897
+    },
+    {
+      "path": "CONFIG/feature_catalogue.example.json",
+      "operation": "UPDATE",
+      "base_sha256": "2f03e38d5604b1cf21a7ba2e156ff547f002f83ec629575d04c47b07d6f8e81f",
+      "candidate_sha256": "c8e7a0edb04566fe269dcb83e110ea17b5254596eaed993caf6783edf6e15b79",
+      "candidate_bytes": 17387
+    },
+    {
+      "path": "CONFIG/grant_and_group_templates.example.json",
+      "operation": "UPDATE",
+      "base_sha256": "766c1a260a8e98928f8a5bceb5b0cfa6ddfd9e2acc84886615cee92b2b6c3062",
+      "candidate_sha256": "a9cd707f783c926ba58da88de491ce1a3259d96d1fc46fdf21236d30852ba61d",
+      "candidate_bytes": 1798
+    },
+    {
+      "path": "CONFIG/offer_catalogue.example.json",
+      "operation": "UPDATE",
+      "base_sha256": "450a4ce7552adf645bbd4e49394a4d60c8fad84596158e0c47f8099e4e2bc089",
+      "candidate_sha256": "fe3cfc587edda29488e7f5b3ef14d0cdafe2dbddfc3fbb0736b1aef51668f886",
+      "candidate_bytes": 4582
+    },
+    {
+      "path": "CONFIG/promotion_attention.example.json",
+      "operation": "UPDATE",
+      "base_sha256": "21d428c87066a0acb1a59180881f8b239d837c01a9b00f39f991e0d5dc952ca1",
+      "candidate_sha256": "556b861a2c092c77400f958ada0809f6771ada119112365dc87121b22c89a3aa",
+      "candidate_bytes": 794
+    },
+    {
+      "path": "CONTINUE_IN_NEW_PROJECT.txt",
+      "operation": "UPDATE",
+      "base_sha256": "9169dbbc6c386fe9d07e3c042702200544b60770013c1532c97aa7ba71063c95",
+      "candidate_sha256": "584faa8ea3e8fbe232ca2eddd881ddbb424b5d869fc85644c8fb8b3ec7ff7bab",
+      "candidate_bytes": 1583
+    },
+    {
+      "path": "EVIDENCE/CHG-DEC09-001_Product_Approval.json",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "93a2c71bd688fce67c9445c02d4d4bbdaaab735b5aacb06e0895047f21c1cccf",
+      "candidate_bytes": 792
+    },
+    {
+      "path": "EVIDENCE/Decision_Status_Register.json",
+      "operation": "UPDATE",
+      "base_sha256": "9d39246abef90127c06c34296efbd3e05474a348f7deab45d00790b37e6f89e4",
+      "candidate_sha256": "3dd8d1fb3e5826843a68f33f25e939498a80b81d3fde7d64a7343313bc4eec3c",
+      "candidate_bytes": 7560
+    },
+    {
+      "path": "EVIDENCE/Documentation_QA.json",
+      "operation": "UPDATE",
+      "base_sha256": "cd1045c208984bb1ceb5c85152f21a54f1330cb75c36e28cb157201a5fbf5c2e",
+      "candidate_sha256": "367b70be4bf15ef56e80c134be01a5d5f9d340bbefef544d196749a5ada01cbf",
+      "candidate_bytes": 3769
+    },
+    {
+      "path": "EVIDENCE/Input_Master_Inventory.json",
+      "operation": "UPDATE",
+      "base_sha256": "2353fabf438b68896eaa9027f91ccdb4dcc4c58193aa3d47c8ee4db2e04140e9",
+      "candidate_sha256": "aa992d537832fc386264951acd8a94feb74ff437d4a8b1c0064e7d122e518884",
+      "candidate_bytes": 3792
+    },
+    {
+      "path": "EVIDENCE/Original_Test_Catalogue_Preservation.json",
+      "operation": "UPDATE",
+      "base_sha256": "ea58c30bd9aa25d02575ce88f2d18f2335905c0d2bf9c25fc0792d8a2b83d6aa",
+      "candidate_sha256": "aedf05a2fc37a7eeb0f7a6f904973fe8f0f379741c10eb893f04353de27fd6a5",
+      "candidate_bytes": 481
+    },
+    {
+      "path": "EVIDENCE/Owner_Direction_Register.json",
+      "operation": "UPDATE",
+      "base_sha256": "e85234374b5b59ead652f9ba4c2cf151fac744071faf69559cbcb05883790447",
+      "candidate_sha256": "fb6d2c89724e54276a5645df2d8ae08718ae4217507360b7cbcc38a178ed2695",
+      "candidate_bytes": 13676
+    },
+    {
+      "path": "EVIDENCE/Previous_Candidate_Preservation.json",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "dae0f403855dcd435c9389e31d0dc2039ed75b69002c841f85b528e42de6185b",
+      "candidate_bytes": 463
+    },
+    {
+      "path": "EVIDENCE/Scoped_Amendments.json",
+      "operation": "UPDATE",
+      "base_sha256": "5d4a76f0b67138912480489e01285f27ce51e6da3fd527fa4f1018872421f4e2",
+      "candidate_sha256": "f9b0bd6a77ec7355772f0779bc196d637d710f5d79240adfdc7e56d6ff0d3236",
+      "candidate_bytes": 6664
+    },
+    {
+      "path": "EVIDENCE/Source_Block_Carryforward_Ledger.csv",
+      "operation": "UPDATE",
+      "base_sha256": "c6409d31d2f3142357e7622a354b07687cba290efe611dda937d8696802de4f4",
+      "candidate_sha256": "87e3dea9eb2bd55b03d61721b711a3a5031d247fc46b2b16bf6101bfd0e7ccc2",
+      "candidate_bytes": 1415459
+    },
+    {
+      "path": "EVIDENCE/Source_Module_Preservation.json",
+      "operation": "UPDATE",
+      "base_sha256": "34498b27ea9bb0ba47c899ad0fbc1fbfc52172c212f2da8c687e1586c5fcff43",
+      "candidate_sha256": "75d4013666515ccd2c2ed0967582f66d433fbe6da8d72cbf0af8c314b14976d3",
+      "candidate_bytes": 12446
+    },
+    {
+      "path": "EVIDENCE/Test_Catalogue.json",
+      "operation": "UPDATE",
+      "base_sha256": "38c63d061c738bf43f1afa69a077961d16182fc6b2e546276bd75ba76c16641b",
+      "candidate_sha256": "b3a6a9a4584df0e1ab7ed952af375da52cf27733fe432a9dbd90a424044f83b0",
+      "candidate_bytes": 89798
+    },
+    {
+      "path": "EVIDENCE/Validator_Smoke_Checks.json",
+      "operation": "UPDATE",
+      "base_sha256": "ebe2cdaf808624a2bbd84c5a570014e198476af1fcdfc9bfd59b51d2aab1b6bc",
+      "candidate_sha256": "7623d636bcc9c01e0a3188fd7652a2b05ee0816ee3c4ef9be3e07385527b8ba4",
+      "candidate_bytes": 1777
+    },
+    {
+      "path": "OWNER_REVIEW.md",
+      "operation": "UPDATE",
+      "base_sha256": "60c9e5b0cdb9042a5a0262663bf3e81cfe21f12e969945e1cb09e8635820c4f4",
+      "candidate_sha256": "e0e3a3749721f6f5ed6666061bab48b4cbb1ff3654014ffce24b84961e3230b2",
+      "candidate_bytes": 6555
+    },
+    {
+      "path": "PROJECT_INSTRUCTIONS.txt",
+      "operation": "UPDATE",
+      "base_sha256": "94a45444e0743666fbbe9cfd73f70930e75ebcf7c483253a93027a1f1e1259bd",
+      "candidate_sha256": "c882b3bfce027a3eb030466ab615560f78afd13281b317c9f7cc0fd7b2bac378",
+      "candidate_bytes": 9179
+    },
+    {
+      "path": "PROJECT_SOURCES/00_Control_Register.md",
+      "operation": "UPDATE",
+      "base_sha256": "96a6b69df570705a05270cd81ae0897ff3ebe747a4ebe4869d70465a080f845c",
+      "candidate_sha256": "e65de202813b1336e89d309d856b90698b3048a36e60898ae067ce4358dce800",
+      "candidate_bytes": 128942
+    },
+    {
+      "path": "PROJECT_SOURCES/02_Framework_Blueprint_Assessments.md",
+      "operation": "UPDATE",
+      "base_sha256": "2425da9c6c713c89f4bdcba51d47e1df312abe43350af6e5410b611087328514",
+      "candidate_sha256": "818f9e8a0e2de2952ef1291c7995c586ba8b9254ff4993d64dd2a8dcee7f2148",
+      "candidate_bytes": 135444
+    },
+    {
+      "path": "PROJECT_SOURCES/03_Conversation_Sensitive_Safety.md",
+      "operation": "UPDATE",
+      "base_sha256": "29f059e3fa811b1c3713df04d34659ad20884d2f1595d0513624741a67ce3708",
+      "candidate_sha256": "61c3cb01abe14932a58dddf1ab75b146a6730fa27037e5e4477d36a2f219fe16",
+      "candidate_bytes": 66106
+    },
+    {
+      "path": "PROJECT_SOURCES/04_Product_Journey_New_Features.md",
+      "operation": "UPDATE",
+      "base_sha256": "497fe716d344e35d30ced8fafae7aa03393b79a43cd7adf4692c0f906b1e7e82",
+      "candidate_sha256": "867ebd74efe6ac798760e9000e36a55672423ffd2854811dbb805db163bcb076",
+      "candidate_bytes": 159371
+    },
+    {
+      "path": "PROJECT_SOURCES/05_Data_Privacy_Security.md",
+      "operation": "UPDATE",
+      "base_sha256": "b7b989b1b3976e8bb6650156e6a2732caad3b789cc1380f52fa444c8efbc6fef",
+      "candidate_sha256": "e45d1e8139ac3cab1d62951b52f84132364c45f2c71403a3d84d42fe02093e44",
+      "candidate_bytes": 360254
+    },
+    {
+      "path": "PROJECT_SOURCES/06_Safety_Support_Release.md",
+      "operation": "UPDATE",
+      "base_sha256": "6633600f4a94da8b1db5a366becfdc84a9dc17ea015969e0058960246672b721",
+      "candidate_sha256": "4c3981826af70d543e4dedfe88356ce2ea72a195de54bfb918d84a9006ff1333",
+      "candidate_bytes": 256547
+    },
+    {
+      "path": "PROJECT_SOURCES/07_Commerce_Scripture_Rights.md",
+      "operation": "UPDATE",
+      "base_sha256": "2ada208db1450ca42ef4fc17091f86931d5585e22ce21910a7968025664e3113",
+      "candidate_sha256": "fd65ef4a533a59c928f4d618455571dd57d8a8cff3143b4826d8f734c4e4149f",
+      "candidate_bytes": 406478
+    },
+    {
+      "path": "PROJECT_SOURCES/08_Engineering_Experience_Operations.md",
+      "operation": "UPDATE",
+      "base_sha256": "6755e4695c3812fcdd3df8c6cec6385793d5757b4c4bd6ddc84f904e53130cb7",
+      "candidate_sha256": "c4e1f97f92b78fef15de3f76580c0dd3680a142887577961acc86a745fa8f1f4",
+      "candidate_bytes": 206487
+    },
+    {
+      "path": "PROJECT_SOURCES/09_Test_Suite_Quality_Control.md",
+      "operation": "UPDATE",
+      "base_sha256": "430b1cf6520c3577cadef858375836a767ae505cc060e552be6a01eb8df39ad4",
+      "candidate_sha256": "abdf63be82c90740b7d292414e401cba163497214eb23e460f4619ce84d43fe5",
+      "candidate_bytes": 235988
+    },
+    {
+      "path": "PROJECT_SOURCES/10_Teaching_Reference_Library.md",
+      "operation": "UPDATE",
+      "base_sha256": "baa016939ca425061a6db434d9e4b77fd2e50722a3693c477a905a7c3ef12990",
+      "candidate_sha256": "dd5d2e8d916e55d61db2c2fe54f3e7335f1d38bb6fd3fc365bfd7de70baaedf4",
+      "candidate_bytes": 612648
+    },
+    {
+      "path": "PROJECT_SOURCES/11_Change_Impact_Decisions.md",
+      "operation": "UPDATE",
+      "base_sha256": "4bc4c401f887d1fd7c1146e0a102f597bd4bc07becd1d46cd0db1f794c718b0b",
+      "candidate_sha256": "0978abdbe6af4c35f3268fae11b926966582cfd1d51c10361c4744f2d61c3dcc",
+      "candidate_bytes": 119706
+    },
+    {
+      "path": "REFERENCE/DEC09/Steward_DEC09_Recurring_Offer_Proposal_Draft_0_1.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "b3db6d2cc15ad5612c27ae971674a22e637c7de4dfc544eeaeb8ffeb7e53c6cf",
+      "candidate_bytes": 27697
+    },
+    {
+      "path": "RELEASE_NOTES.md",
+      "operation": "UPDATE",
+      "base_sha256": "6ee563ad312742e7fbf06c2e528cf6a3cb83307b2f4ea2337a7cb9a8e9f26fbc",
+      "candidate_sha256": "457a862d7ba8a6f2837a2915efdca0133448f3bf1d72413d81d11ced9bc23e39",
+      "candidate_bytes": 2457
+    },
+    {
+      "path": "SOURCE_COMPLETENESS.md",
+      "operation": "UPDATE",
+      "base_sha256": "1c4dd40f10cd837c01c2b1ea31ba2a51046c3166ac8f50a00489b9c66040c1c7",
+      "candidate_sha256": "50b6b0aa26d48b776a3278d5dfee617ccb1a3b5801a04686bdf32b06be0afc29",
+      "candidate_bytes": 1578
+    },
+    {
+      "path": "START_HERE.md",
+      "operation": "UPDATE",
+      "base_sha256": "94cf4a3ce3bcfbf45a871994c9888e1ff8ad4ef7f195eb4142935362f0c2c11d",
+      "candidate_sha256": "512645dffeaeb2c1d8af6b0924b5f9075ba7e207a414f5c9dc06ed1b9dbcf02e",
+      "candidate_bytes": 3306
+    },
+    {
+      "path": "TESTING/D02-001_Interactive_Run_Guide.md",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "0a74313c4cb18d7b758bf341068c9bbd8cc45ad2e11a0bafe1b003205ca3724e",
+      "candidate_bytes": 3260
+    },
+    {
+      "path": "TESTING/D02-001_Run_State.json",
+      "operation": "ADD",
+      "base_sha256": null,
+      "candidate_sha256": "4dc19bff2b18b45710ab03ea3892edce4e54be0cfa17935c8843f97335a8972b",
+      "candidate_bytes": 596
+    },
+    {
+      "path": "TOOLS/README.md",
+      "operation": "UPDATE",
+      "base_sha256": "a788642e8c9f45c0cf70d9ef4ceffc413dde35948edffb7b735bffe5e2db6533",
+      "candidate_sha256": "187c330f05e0f14d25b5e7b9bce631e360c4151c9c9fd6e59f86fe8a64ec4206",
+      "candidate_bytes": 1078
+    },
+    {
+      "path": "TOOLS/validate_package.py",
+      "operation": "UPDATE",
+      "base_sha256": "20cc0b5fa7e4eb434ae758a257a6e4a038aa3bbd73fe258fad65df9f7827be9a",
+      "candidate_sha256": "f4d8cbbc3f7fa782167de69b8c293d0bf3ecd0a129392e52185f3f71f5e0174c",
+      "candidate_bytes": 14280
+    }
+  ],
+  "deleted_files": [],
+  "hash_output_exclusions": [
+    "EVIDENCE/Change_Manifest_CHG-DEC09-001.json",
+    "PACKAGE_MANIFEST.json",
+    "SHA256SUMS.txt"
+  ],
+  "inventory_note": "This manifest hashes changed payload except recursive hash-output metadata. PACKAGE_MANIFEST.json inventories all payload, including this file; SHA256SUMS.txt covers all final files except itself."
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>html.dark{--bg:#141211;--card:#1f1c19;--muted:#1a1816;--hover:#2c2825;--border:#2c2825;--ink:#f4f1ea;--muted-fg:#a9a497;--gold-text:#d8bd86} html.dark body{background:#141211;color:#f4f1ea} body{margin:0;background:#fbfaf7;color:#1c1917;font-family:Geist,Arial,sans-serif;-webkit-font-smoothing:antialiased} a{color:#1c1917} a:hover{color:#b88a4a}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--bg,#fbfaf7);color:var(--ink,#1c1917);font-family:Geist,Arial,sans-serif;">
+<div style="max-width:1160px;margin:0 auto;padding:56px 32px 96px;">
+
+  <div style="display:flex;align-items:center;gap:12px;">
+    <img src="docs/mjg-logos/mjg_black_white.png" alt="MJG" style="height:32px;width:auto;">
+    <span style="font-family:Fraunces,Georgia,serif;font-style:italic;font-size:15px;">Michael <span style="color:#b88a4a;">J.</span> Gauthier</span>
+  </div>
+  <span style="display:inline-flex;margin-top:28px;align-items:center;gap:8px;border:1px solid rgba(184,138,74,.4);border-radius:9999px;padding:6px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#b88a4a;">✦ Frontend UI Mockups · Handoff for Claude Code</span>
+  <h1 style="margin:20px 0 0;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(36px,4.6vw,54px);line-height:1.05;letter-spacing:-.02em;">The Stewardship Blueprint <em style="font-style:normal;color:#b88a4a;">website</em></h1>
+  <p style="margin:16px 0 0;max-width:720px;font-size:17px;line-height:1.75;color:var(--muted-fg,#6d6660);">Seventeen public pages built from <em>MJG_Stewardship_Blueprint_Website_Full_Copy_v1</em> (Review Edition 1, 21 Oct 2026), styled to the current Next.js frontend in <code>ThePopOpp/mjg</code>. Every page below is a clickable mockup; the shared nav and footer are real components. Dashed amber “Dev note” boxes carry Jeremy’s implementation notes and can be hidden with the <strong>showDevNotes</strong> tweak on each page.</p>
+
+  <!-- ASSUMPTIONS -->
+  <section style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Design context used</p>
+      <ul style="margin:12px 0 0;padding-left:18px;font-size:14px;line-height:1.7;color:var(--muted-fg,#6d6660);">
+        <li><code>app/globals.css</code> tokens → cream <code>#fbfaf7</code>, ink <code>#1c1917</code>, muted <code>#f4f1ea</code>, border <code>#e1dbd0</code>, muted text <code>#6d6660</code></li>
+        <li>Gold accent <code>#b88a4a</code> (hover <code>#a67c42</code>), dark sections <code>#141211</code> with light gold <code>#d8bd86</code> — from <code>site-shell.tsx</code> / <code>join-the-journey.tsx</code></li>
+        <li>Type: Fraunces (serif headlines, last word in gold) + Geist (UI/body), per <code>SiteHero</code></li>
+        <li>Chrome: 1160px content box, 2rem gutters, 60px sticky nav, <code>rounded-md</code> buttons (h-12)</li>
+        <li>Logos from <code>public/mjg-logos</code>; photos from <code>public/media</code></li>
+      </ul>
+    </div>
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Assumptions</p>
+      <ul style="margin:12px 0 0;padding-left:18px;font-size:14px;line-height:1.7;color:var(--muted-fg,#6d6660);">
+        <li>Light theme only shown; dark mode follows existing <code>.dark</code> tokens</li>
+        <li><code>docs/mjg_design_system</code> (Playfair/Figtree) is an older spec — the live React app (Fraunces/Geist) wins</li>
+        <li>Image slots mark where approved assets go (framework art, book cover, guide covers, Filmpool video); none are invented</li>
+        <li>Blueprint page list, week titles, book parts and example scores are illustrative — read from product constants</li>
+        <li>Nav is the doc’s six-item structure with dropdowns; “Take the Free Check-In” is the persistent CTA</li>
+      </ul>
+    </div>
+    <div style="border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);padding:24px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b88a4a;">Build pattern (Next.js)</p>
+      <ul style="margin:12px 0 0;padding-left:18px;font-size:14px;line-height:1.7;color:var(--muted-fg,#6d6660);">
+        <li>Wrap each route in <code>SiteShell</code>; replace <code>publicNavItems()</code> with the new six-item nav + children</li>
+        <li>Hero = existing <code>SiteHero</code> (centered or <code>align="left"</code> with media column)</li>
+        <li>Alternate plain / <code>bg-muted/30 border-y</code> / <code>bg-[#141211]</code> sections as shown</li>
+        <li>Join form: first name + email only, separate email/SMS consent → <code>/api/public/join-journey</code></li>
+        <li>Keep <code>/created-for-more-check-in</code>, <code>/6-week-challenge(/videos)</code>, <code>/book-waitlist</code>, <code>/register</code>, <code>/login</code> untouched</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ROUTE MAP -->
+  <section style="margin-top:56px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Page & route inventory</p>
+    <h2 style="margin:10px 0 0;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:32px;line-height:1.15;">Seventeen pages. Click any to open the mockup.</h2>
+    <div style="margin-top:28px;border:1px solid var(--border,#e1dbd0);border-radius:12px;background:var(--card,#fff);overflow:hidden;">
+      <sc-for list="{{ pages }}" as="p" hint-placeholder-count="17">
+        <a href="{{ p.file }}" style="display:grid;grid-template-columns:36px minmax(0,1.4fr) minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--muted,#f4f1ea);text-decoration:none;color:var(--ink,#1c1917);" style-hover="background:var(--bg,#fbfaf7);">
+          <span style="font-family:Fraunces,Georgia,serif;font-size:14px;color:var(--muted-fg,#6d6660);">{{ p.n }}</span>
+          <span style="font-weight:600;font-size:15px;">{{ p.title }}</span>
+          <code style="font-size:12.5px;color:var(--muted-fg,#6d6660);">{{ p.route }}</code>
+          <span style="font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:9999px;background:{{ p.bg }};color:{{ p.fg }};white-space:nowrap;">{{ p.status }}</span>
+        </a>
+      </sc-for>
+    </div>
+    <p style="margin:14px 0 0;font-size:13px;color:var(--muted-fg,#6d6660);">Shared components: <a href="SiteNav.dc.html" style="color:#b88a4a;text-decoration:none;">SiteNav</a> (dropdowns, mobile menu, <code>active</code> prop) · <a href="SiteFooter.dc.html" style="color:#b88a4a;text-decoration:none;">SiteFooter</a>. Source copy: <code>content/copy.txt</code>.</p>
+  </section>
+
+  <!-- JOURNEY -->
+  <section style="margin-top:56px;border-radius:16px;background:#141211;color:#f4f1ea;padding:36px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d8bd86;">Primary public journey</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;align-items:center;">
+      <span style="border:1px solid rgba(255,255,255,.18);border-radius:9999px;padding:10px 18px;font-family:Fraunces,Georgia,serif;font-size:17px;">Awaken</span><span style="color:#d8bd86;">→</span>
+      <span style="border:1px solid rgba(255,255,255,.18);border-radius:9999px;padding:10px 18px;font-family:Fraunces,Georgia,serif;font-size:17px;">See the Framework</span><span style="color:#d8bd86;">→</span>
+      <span style="border:1px solid rgba(255,255,255,.18);border-radius:9999px;padding:10px 18px;font-family:Fraunces,Georgia,serif;font-size:17px;">Reflect & Engage</span><span style="color:#d8bd86;">→</span>
+      <span style="border:1px solid rgba(255,255,255,.18);border-radius:9999px;padding:10px 18px;font-family:Fraunces,Georgia,serif;font-size:17px;">Build Your Personal Blueprint</span><span style="color:#d8bd86;">→</span>
+      <span style="border:1px solid rgba(255,255,255,.18);border-radius:9999px;padding:10px 18px;font-family:Fraunces,Georgia,serif;font-size:17px;">Live & Multiply</span>
+    </div>
+    <p style="margin:18px 0 0;font-size:14px;line-height:1.7;color:#cfc7ba;max-width:760px;">Brand hierarchy: Stewardship Blueprint is the framework; <em>The Life You’re Building</em> is the flagship book; studies and assessments support learning; Steward is the Personal Stewardship Guide. Never lead with “AI” — the disclosure lives on /steward and legal pages. Legacy = what your life multiplies through others now.</p>
+  </section>
+
+  <!-- NEXT STEPS -->
+  <section style="margin-top:56px;">
+    <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#b88a4a;">Next steps</p>
+    <ul style="margin:12px 0 0;padding-left:18px;font-size:15px;line-height:1.8;color:var(--muted-fg,#6d6660);max-width:760px;">
+      <li>Drop approved assets into the image slots (framework art, final book cover, guide covers, Filmpool poster) — they persist in this project</li>
+      <li>Confirm Steward pricing/access and Energy Audit status before those CTAs go live</li>
+      <li>Want a dark-mode pass, mobile frames, or a second layout direction for Home? Ask and I’ll add it as a new turn</li>
+    </ul>
+  </section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const S = { NEW: ["rgba(181,130,30,.16)", "#8a6630"], KEEP: ["rgba(47,125,91,.14)", "#2f7d5b"], UPDATE: ["#f4f1ea", "#6d6660"] };
+    const rows = [
+      ["Home (Steward video hero + framework)", "/", "home.dc.html", "Replace copy & structure", "UPDATE"],
+      ["Home — Classic option (brand film hero)", "/", "home-classic.dc.html", "Alternate", "NEW"],
+      ["The Stewardship Blueprint", "/stewardship-blueprint", "stewardship-blueprint.dc.html", "New", "NEW"],
+      ["See the Framework — Temple infographic", "/ (section 02 option)", "framework-temple.dc.html", "Alternate", "NEW"],
+      ["Your Personal Stewardship Blueprint", "/personal-blueprint", "personal-blueprint.dc.html", "New", "NEW"],
+      ["Start Your Journey", "/start", "start.dc.html", "New", "NEW"],
+      ["Assessments & Check-Ins", "/assessments", "assessments.dc.html", "New", "NEW"],
+      ["Created for More Check-In", "/created-for-more-check-in", "created-for-more-check-in.dc.html", "Keep 28-question tool", "KEEP"],
+      ["Learn & Grow", "/learn-and-grow", "learn-and-grow.dc.html", "New", "NEW"],
+      ["The Life You’re Building — Book", "/the-life-youre-building", "the-life-youre-building.dc.html", "New landing page", "NEW"],
+      ["Studies & Experiences", "/studies", "studies.dc.html", "New", "NEW"],
+      ["Insights & Resources", "/resources", "resources.dc.html", "Retitle & curate", "UPDATE"],
+      ["Steward — Personal Guide", "/steward", "steward.dc.html", "New", "NEW"],
+      ["For Churches & Groups", "/churches", "churches.dc.html", "New", "NEW"],
+      ["Lead a Group", "/lead-a-group", "lead-a-group.dc.html", "New", "NEW"],
+      ["About Michael", "/about", "about.dc.html", "Rewrite", "UPDATE"],
+      ["Mission & Vision", "/mission", "mission.dc.html", "Update", "UPDATE"],
+      ["Contact", "/contact", "contact.dc.html", "Update", "UPDATE"],
+      ["Join the Journey", "/join", "join.dc.html", "New + inline form", "NEW"],
+    ];
+    const pages = rows.map(([title, route, file, status, k], i) => ({ n: String(i + 1).padStart(2, "0"), title, route, file, status, bg: S[k][0], fg: S[k][1] }));
+    return { pages };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "package_id": "SV2-DOCSET-D0.4-20260926",
+  "status": "DESIGN_EXAMPLE_PRODUCT_TERMS_APPROVED",
+  "owner_approval_ref": "CHG-DEC09-001",
+  "template_version_id": "dec09_initial_bundle_benefits_v1",
+  "production_enabled": false,
+  "full_acquisition": {
+    "included": true,
+    "source_specific_qualification": true,
+    "repeat_acquisition_on_renewal": false
+  },
+  "initial_build": {
+    "calendar_days": 30,
+    "start": "CONFIRMED_EXPLICIT_ACTIVATION"
+  },
+  "initial_premium": {
+    "calendar_months": 12,
+    "start": "SAME_CONFIRMED_ACTIVATION",
+    "initial_build_inside_term": true
+  },
+  "active_premium": {
+    "continue_building_same_full": true,
+    "complete_unexplored_full_areas": true,
+    "refine_existing_blueprint": true,
+    "after_initial_build_window": true,
+    "additional_initial_full_fee": false,
+    "new_initial_build_grant": false,
+    "participant_approval_required_for_content": true,
+    "usage_allowance": null
+  },
+  "renewal_grant": {
+    "source": "CONFIRMED_QUALIFYING_INVOICE",
+    "interval": "ACTUAL_RECONCILED_INVOICE_PERIOD",
+    "idempotent_business_effect": true
+  },
+  "paid_expiry": {
+    "retain_legitimate_created_blueprint": true,
+    "secure_eligible_view_export": true,
+    "free_access": true,
+    "automatic_content_deletion": false
+  }
+}

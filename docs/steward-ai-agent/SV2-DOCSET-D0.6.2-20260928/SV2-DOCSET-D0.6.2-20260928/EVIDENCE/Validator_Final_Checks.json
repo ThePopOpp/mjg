@@ -1,0 +1,11 @@
+{
+  "package_id": "SV2-DOCSET-D0.6.2-20260928",
+  "validator_adapted_to_current_package_format": true,
+  "validator_clean_extracted_package_status": "PASS",
+  "validator_clean_zip_status": "PASS",
+  "corrupted_payload_negative_control_status": "PASS",
+  "corrupted_payload_exit_code": 1,
+  "corrupted_payload_expected_result": "validator rejects disposable copy after README.md is modified without manifest update",
+  "corrupted_payload_stdout": "",
+  "corrupted_payload_stderr": "VALIDATION FAILED: package manifest mismatch README.md\n"
+}
