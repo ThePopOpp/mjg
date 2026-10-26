@@ -11,6 +11,7 @@ import {
   CircleUserRound,
   ClipboardList,
   CreditCard,
+  Plug,
   Download,
   FileText,
   FileBarChart,
@@ -85,6 +86,8 @@ export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/steward", label: "Steward", icon: Sparkles, permission: PERMISSIONS.MANAGE_SETTINGS },
   // Commerce: coupons today, products/orders later. Super-Admin only.
   { kind: "item", href: "/dashboard/stripe", label: "Stripe", icon: CreditCard, permission: PERMISSIONS.MANAGE_STRIPE },
+  // The Claude connector (MCP): on/off, connections, agent tokens, approvals. Super-Admin only.
+  { kind: "item", href: "/dashboard/claude", label: "Claude & Agents", icon: Plug, permission: PERMISSIONS.MANAGE_CONNECTOR },
   { kind: "item", href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
   {

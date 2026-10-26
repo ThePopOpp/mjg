@@ -81,7 +81,8 @@ function revalidateWebsitePage(slug: string): void {
 
 export async function logWebsiteAudit(input: {
   actorId?: string | null;
-  actorType?: "user" | "shepherd";
+  /** "mcp" = through the Claude connector (migration 202610260120). */
+  actorType?: "user" | "shepherd" | "mcp";
   action: string;
   resourceType?: string;
   resourceId?: string | null;

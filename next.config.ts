@@ -112,6 +112,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     const beforeFiles = [];
 
+    // The MJG MCP (Claude connector) is served at /mcp — e.g.
+    // https://mcp.michaeljgauthier.com/mcp — by app/api/mcp. First, so no host
+    // rule below can capture it.
+    beforeFiles.push({ source: "/mcp", destination: "/api/mcp" });
+
     // /eve/v1/* must reach the agent rather than 404 against a route that does
     // not exist in this app.
     if (agentUrl) {

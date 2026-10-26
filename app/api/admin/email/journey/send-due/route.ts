@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sendDueJourneyEmails } from "@/lib/email/templates";
 import { requireUserManager } from "@/lib/user-management/auth";
+import { cronSecretMatches, presentedSecret } from "@/lib/auth/cron-secret";
 
 export const dynamic = "force-dynamic";
 
@@ -14,14 +15,10 @@ export const dynamic = "force-dynamic";
  */
 async function handle(request: Request) {
   const body = await request.json().catch(() => ({}));
-  const secret = process.env.EXPERIENCE_CRON_SECRET;
-  const presented =
-    request.headers.get("x-cron-secret") ||
-    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim() ||
-    (typeof body.secret === "string" ? body.secret : "");
+  const cronOk = cronSecretMatches(presentedSecret(request, body));
 
   let actorId: string | null = null;
-  if (secret && presented && presented === secret) {
+  if (cronOk) {
     actorId = null; // system-initiated on schedule
   } else {
     const actor = await requireUserManager(request, body.actionToken);

@@ -31,7 +31,16 @@ export async function resolve(specifier, context, next) {
       }
     }
   }
-  return next(specifier, context);
+  try {
+    return await next(specifier, context);
+  } catch (error) {
+    // Bare subpath imports such as "next/server" resolve in the bundler but
+    // need the file extension under plain Node ESM.
+    if (error?.code === "ERR_MODULE_NOT_FOUND" && /^[@a-z][^:]*\\/[^.]+$/i.test(specifier)) {
+      return next(specifier + ".js", context);
+    }
+    throw error;
+  }
 }
 `;
 

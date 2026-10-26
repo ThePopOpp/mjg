@@ -1,0 +1,39 @@
+# Claude Code on GitHub: when an issue (or a comment) from the repo's owner,
+# members or collaborators mentions @claude, Claude Code works on it and opens
+# a pull request. Issues filed from the MJG connector with hand_to_claude=true
+# include the mention (lib/tools/deploy.ts). Nothing merges or deploys by
+# itself — a person reviews and merges the PR, then deploys.
+#
+# Needs a repo secret: ANTHROPIC_API_KEY (Settings → Secrets and variables →
+# Actions), or swap in claude_code_oauth_token for a Claude subscription token.
+name: Claude Code
+
+on:
+  issues:
+    types: [opened, assigned]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  claude:
+    if: |
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association || github.event.issue.author_association) && (
+        (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude'))) ||
+        (github.event_name != 'issues' && contains(github.event.comment.body, '@claude'))
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}

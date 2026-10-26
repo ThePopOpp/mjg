@@ -18,6 +18,9 @@ export const PERMISSIONS = {
   // Super-Admin-only (same pattern as MANAGE_CMS): the Stripe section — coupons
   // now, products, orders and reporting as it grows.
   MANAGE_STRIPE: "manage_stripe",
+  // Super-Admin-only (same pattern as MANAGE_CMS): the Claude connector (MCP) —
+  // its on/off switch, connections, agent tokens and approvals.
+  MANAGE_CONNECTOR: "manage_connector",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

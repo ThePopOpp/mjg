@@ -69,6 +69,9 @@ export const PROTECTED_ROUTES = [
   // The Steward member app (and everything under it). Its known pages are real
   // routes, but without this a CMS page could claim an unused /steward/* path.
   "/steward",
+  // The Claude connector (MCP endpoint and its OAuth sign-in).
+  "/mcp",
+  "/oauth",
   // The marketing-site rebuild: preview copies of the redesigned pages, and the
   // new code-built pages (content edited through lib/marketing/content).
   "/site-preview",

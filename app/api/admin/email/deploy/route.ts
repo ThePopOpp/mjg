@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getRecipientsForAudience, sendTemplateEmail } from "@/lib/email/templates";
+import { sendTemplateEmail } from "@/lib/email/templates";
+import { resolveEmailAudience } from "@/lib/email/audience";
 import { requireUserManager } from "@/lib/user-management/auth";
 
 export async function POST(request: Request) {
@@ -16,7 +17,8 @@ export async function POST(request: Request) {
 
     const recipients =
       mode === "audience"
-        ? await getRecipientsForAudience(body.audience === "participants" ? "participants" : "profiles", Number(body.limit ?? 25))
+        ? // Leaves out anyone who opted out of email (CAN-SPAM); same rule as the Claude connector.
+          (await resolveEmailAudience(body.audience === "participants" ? "participants" : "profiles", Number(body.limit ?? 25))).recipients
         : [
             {
               email: String(body.testEmail ?? "").trim(),

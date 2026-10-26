@@ -171,6 +171,20 @@ async function getAuthenticatedUser(request?: Request, actionToken?: string | nu
   throw new Error("Authentication required.");
 }
 
+/**
+ * A profile's effective role (owner emails count as Super Admin) when it is
+ * active, or null. For callers that already know the profile id — the MCP
+ * token check (lib/mcp/auth.ts) re-runs this on every request, so a demoted or
+ * deactivated person loses access immediately even with a valid token.
+ */
+export async function getActiveProfileRole(profileId: string) {
+  const admin = createSupabaseAdminClient();
+  const { data: profile, error } = await admin.from("profiles").select("id,role,status,email").eq("id", profileId).maybeSingle();
+  if (error) throw error;
+  if (!profile || profile.status !== "active") return null;
+  return { profile, role: normalizeResolvedRole(profile, profile.email) };
+}
+
 function normalizeResolvedRole(profile: { email?: string | null; role?: string | null } | null, authEmail?: string | null) {
   const userEmail = (authEmail ?? "").trim().toLowerCase();
   const profileEmail = (profile?.email ?? "").trim().toLowerCase();

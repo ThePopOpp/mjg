@@ -17,13 +17,15 @@ export type ContentSource = "manual" | "shepherd" | "mcp" | "restore";
 export type Actor = { id: string | null; source: ContentSource };
 
 export class ContentError extends Error {
-  constructor(
-    message: string,
-    readonly issues: ValidationIssue[] = [],
-    readonly code: "not_found" | "invalid" | "conflict" = "invalid",
-  ) {
+  // Plain fields rather than constructor parameter properties, so the module
+  // also loads under node --experimental-strip-types (the unit tests).
+  readonly issues: ValidationIssue[];
+  readonly code: "not_found" | "invalid" | "conflict";
+  constructor(message: string, issues: ValidationIssue[] = [], code: "not_found" | "invalid" | "conflict" = "invalid") {
     super(message);
     this.name = "ContentError";
+    this.issues = issues;
+    this.code = code;
   }
 }
 
@@ -60,6 +62,10 @@ async function getRow(scopeKey: string, sectionKey: string): Promise<EntryRow | 
     .maybeSingle();
   if (error) throw error;
   return (data as EntryRow | null) ?? null;
+}
+
+function auditActorType(source: ContentSource): "user" | "shepherd" | "mcp" {
+  return source === "shepherd" ? "shepherd" : source === "mcp" ? "mcp" : "user";
 }
 
 function revalidateScope(scopeKey: string) {
@@ -163,7 +169,7 @@ async function writeDraft(
 
   await logWebsiteAudit({
     actorId: actor.id,
-    actorType: actor.source === "shepherd" ? "shepherd" : "user",
+    actorType: auditActorType(actor.source),
     action: "content.draft",
     resourceType: "content_entry",
     summary,
@@ -292,7 +298,7 @@ export async function publish(input: { scope: string; sections?: string[]; note?
 
   await logWebsiteAudit({
     actorId: input.actor.id,
-    actorType: input.actor.source === "shepherd" ? "shepherd" : "user",
+    actorType: auditActorType(input.actor.source),
     action: "content.publish",
     resourceType: "content_entry",
     summary: `Published ${published.join(", ")} on ${scope.label}`,
