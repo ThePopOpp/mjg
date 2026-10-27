@@ -57,14 +57,13 @@ export async function MeetStewardPage() {
       </Band>
 
       {/* Demo */}
+      {/* Stacked like the homepage hero: intro centred, then the video full width. */}
       <Band id="demo">
-        <Split>
-          <div>
-            <SectionIntro eyebrow={demo.eyebrow} title={demo.title} body={demo.body} />
-            <TextLink cta={demo.link} className="mt-6" />
-          </div>
-          <LoopingVideo video={demo.video} label={demo.videoLabel} />
-        </Split>
+        <div className="text-center">
+          <SectionIntro center eyebrow={demo.eyebrow} title={demo.title} body={demo.body} className="[&_p]:text-pretty" />
+          <TextLink cta={demo.link} className="mt-6" />
+        </div>
+        <LoopingVideo video={demo.video} label={demo.videoLabel} className="mx-auto mt-12 max-w-[1160px] text-left" />
       </Band>
 
       {/* Your Control + plain AI disclosure */}

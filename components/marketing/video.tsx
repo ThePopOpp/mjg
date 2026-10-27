@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Play } from "lucide-react";
 import type { MediaValue, VideoFileValue } from "@/lib/marketing/content/kit";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,16 @@ export function LoopingVideo({ video, label, className }: { video: VideoFileValu
     };
   }, []);
 
+  // React sets `muted` as a property but never writes the attribute, and some
+  // browsers (iOS Safari especially) judge autoplay by the attribute — so a
+  // silent loop could sit on its poster. Set both, then ask it to play.
+  const startMuted = useCallback((el: HTMLVideoElement | null) => {
+    if (!el) return;
+    el.muted = true;
+    el.setAttribute("muted", "");
+    el.play().catch(() => {});
+  }, []);
+
   const src = mobile && video.mobileSrc ? video.mobileSrc : video.src;
   const poster = video.poster ?? "";
   const mobilePoster = video.mobilePoster ?? poster;
@@ -57,6 +67,7 @@ export function LoopingVideo({ video, label, className }: { video: VideoFileValu
       {mobile !== null && !reduced && src ? (
         <video
           key={src}
+          ref={startMuted}
           src={src}
           autoPlay
           muted

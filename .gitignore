@@ -17,6 +17,8 @@ tsconfig.tsbuildinfo
 *.mp4
 *.mov
 docs/assets/video/**/*.mp4
+# ...except the small, compressed clips the site actually serves (~3 MB total).
+!public/marketing/video/*.mp4
 
 # Legal package archives — the extracted markdown is the source of truth
 docs/legal/*.zip
