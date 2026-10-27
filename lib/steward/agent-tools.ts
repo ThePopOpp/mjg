@@ -3,13 +3,15 @@ import { BLUEPRINT_PAGES, FREE_PAGES } from "@/lib/steward/blueprint";
 import { fieldsForSection } from "@/lib/steward/blueprint-fields";
 import { DEFINITION_STATE_LABEL } from "@/lib/steward/state";
 import { getBlueprint, proposeWording } from "@/lib/steward/blueprint-service";
+import { assessmentDetail, assessmentSnapshot } from "@/lib/steward/assessments";
 
 // THE ONLY THINGS STEWARD CAN DO.
 //
 // This is the whole write surface of the member-facing agent. It is small on
 // purpose, and the exclusions matter more than the inclusions:
 //
-//   Steward can READ a member's Blueprint and PROPOSE wording for one field.
+//   Steward can READ a member's Blueprint and their own Check-In results, and
+//   PROPOSE wording for one field.
 //
 //   Steward CANNOT approve its own proposal. There is no approve tool here, at
 //   any price, because approval is the participant's act — the UI calls
@@ -221,6 +223,10 @@ export const AGENT_TOOLS = {
     profileId: string,
     args: { page: string; field: string; wording: string; needs_clarity?: boolean },
   ) => proposeBlueprintWording(profileId, args),
+  // Read-only. Scores for the per-turn context; statement ratings and their own
+  // reflections only when the conversation turns to them.
+  "assessments.snapshot": (profileId: string) => assessmentSnapshot(profileId),
+  "assessments.detail": (profileId: string) => assessmentDetail(profileId),
 } as const;
 
 export type AgentToolName = keyof typeof AGENT_TOOLS;
