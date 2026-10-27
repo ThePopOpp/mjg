@@ -346,22 +346,46 @@ export async function saveFacilitatorProfile(profileId: string, input: Facilitat
 
 // ── Launch gate ──────────────────────────────────────────────────────────────────
 
-export async function getFinderSettings(): Promise<{ mode: FinderMode; opensLabel: string | null }> {
+/**
+ * "2027-01-05" → "January 5". The year is added only when the month and day
+ * alone would be ambiguous: a past year, or more than eleven months ahead.
+ */
+export function formatOpensOn(opensOn: string): string {
+  const [y, m, d] = opensOn.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const now = new Date();
+  const ahead = (date.getTime() - now.getTime()) / 86_400_000;
+  const withYear = y < now.getUTCFullYear() || ahead > 335;
+  return date.toLocaleDateString("en-US", { month: "long", day: "numeric", ...(withYear ? { year: "numeric" } : {}), timeZone: "UTC" });
+}
+
+export async function getFinderSettings(): Promise<{ mode: FinderMode; opensOn: string | null; opensLabel: string | null }> {
   try {
     const supabase = createSupabaseAdminClient();
-    const { data } = await supabase.from("group_finder_settings").select("mode,opens_label").eq("id", 1).maybeSingle();
-    return { mode: (data?.mode as FinderMode) ?? "hidden", opensLabel: data?.opens_label ?? null };
+    const { data } = await supabase.from("group_finder_settings").select("mode,opens_on,opens_label").eq("id", 1).maybeSingle();
+    const opensOn = (data?.opens_on as string | null) ?? null;
+    return {
+      mode: (data?.mode as FinderMode) ?? "hidden",
+      opensOn,
+      // The label is what visitors read; it comes from the date. The old free-text
+      // label is only a fallback for a row saved before the date existed.
+      opensLabel: opensOn ? formatOpensOn(opensOn) : (data?.opens_label as string | null) ?? null,
+    };
   } catch {
-    return { mode: "hidden", opensLabel: null };
+    return { mode: "hidden", opensOn: null, opensLabel: null };
   }
 }
 
-export async function setFinderSettings(actorId: string, mode: FinderMode, opensLabel: string | null) {
+export async function setFinderSettings(actorId: string, mode: FinderMode, opensOn: string | null) {
   if (!["hidden", "preview", "open"].includes(mode)) throw new Error("Invalid mode.");
+  const date = str(opensOn);
+  if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`)))) {
+    throw new Error("Pick the date requests open.");
+  }
   const supabase = createSupabaseAdminClient();
   const { error } = await supabase
     .from("group_finder_settings")
-    .upsert({ id: 1, mode, opens_label: str(opensLabel), updated_by: actorId, updated_at: new Date().toISOString() });
+    .upsert({ id: 1, mode, opens_on: date, opens_label: null, updated_by: actorId, updated_at: new Date().toISOString() });
   if (error) throw error;
   return getFinderSettings();
 }

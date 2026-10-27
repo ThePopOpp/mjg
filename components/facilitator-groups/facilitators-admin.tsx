@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { Download, ExternalLink, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
@@ -36,7 +36,7 @@ export function FacilitatorsAdmin({
   isSuperAdmin, finder, groups, facilitators, pendingInvites, prefillCount,
 }: {
   isSuperAdmin: boolean;
-  finder: { mode: FinderMode; opensLabel: string | null };
+  finder: { mode: FinderMode; opensOn: string | null; opensLabel: string | null };
   groups: AdminGroup[];
   facilitators: FacilitatorRow[];
   pendingInvites: Array<{ email: string; status: string; scheduledFor: string | null; sentAt: string | null }>;
@@ -47,12 +47,12 @@ export function FacilitatorsAdmin({
 
   // Launch switch
   const [mode, setMode] = useState(finder.mode);
-  const [opensLabel, setOpensLabel] = useState(finder.opensLabel ?? "");
+  const [opensOn, setOpensOn] = useState(finder.opensOn ?? "");
   const [modeMsg, setModeMsg] = useState<string | null>(null);
   async function saveMode(next: FinderMode) {
     setModeMsg(null);
     try {
-      const { settings } = await groupApi<{ settings: { mode: FinderMode } }>("/api/admin/group-finder", "POST", { mode: next, opensLabel }, actionToken);
+      const { settings } = await groupApi<{ settings: { mode: FinderMode } }>("/api/admin/group-finder", "POST", { mode: next, opensOn: opensOn || null }, actionToken);
       setMode(settings.mode);
       setModeMsg("Saved.");
     } catch (e) {
@@ -170,7 +170,11 @@ export function FacilitatorsAdmin({
           <div className="flex flex-wrap items-end gap-2">
             <div className="space-y-1.5">
               <Label>When requests open (shown to visitors)</Label>
-              <Input value={opensLabel} onChange={(e) => setOpensLabel(e.target.value)} placeholder="January 5" className="w-56" disabled={!isSuperAdmin} />
+              {isSuperAdmin ? (
+                <DatePicker value={opensOn} onChange={setOpensOn} placeholder="Pick a date" className="w-56" />
+              ) : (
+                <p className="h-10 py-2 text-sm">{finder.opensLabel ?? "Not set"}</p>
+              )}
             </div>
             {isSuperAdmin ? <Button variant="outline" onClick={() => saveMode(mode)}>Save</Button> : null}
             <a href="/groups" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 pb-2 text-sm text-primary hover:underline">Open Find a Group <ExternalLink className="h-3.5 w-3.5" /></a>

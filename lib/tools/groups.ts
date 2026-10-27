@@ -111,14 +111,14 @@ const finderSet: ToolDef = {
   domain: "people",
   inputSchema: {
     type: "object",
-    properties: { mode: { type: "string", enum: ["hidden", "preview", "open"] }, opens_label: { type: "string", description: "Shown to visitors, e.g. 'January 5'." } },
+    properties: { mode: { type: "string", enum: ["hidden", "preview", "open"] }, opens_on: { type: "string", description: "The date requests open, YYYY-MM-DD. Shown to visitors as e.g. 'January 5'." } },
     required: ["mode"],
   },
   risk: "high",
   minRole: "super_admin",
   summarize: (a: { mode: string }) => `Set Find a Group to ${a.mode}`,
-  preview: async (a: { mode: string; opens_label?: string }) => ({ current: await getFinderSettings(), next: { mode: a.mode, opensLabel: a.opens_label ?? null } }),
-  run: async (a: { mode: FinderMode; opens_label?: string }, ctx) => setFinderSettings(ctx.actorId, a.mode, a.opens_label ?? null),
+  preview: async (a: { mode: string; opens_on?: string }) => ({ current: await getFinderSettings(), next: { mode: a.mode, opensOn: a.opens_on ?? null } }),
+  run: async (a: { mode: FinderMode; opens_on?: string }, ctx) => setFinderSettings(ctx.actorId, a.mode, a.opens_on ?? null),
 };
 
 const facilitatorImport: ToolDef = {

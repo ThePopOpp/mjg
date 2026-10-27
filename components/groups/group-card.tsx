@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CalendarDays, Globe, MapPin, Users } from "lucide-react";
-import { AUDIENCES, FORMATS, scheduleLabel, type PublicGroup } from "@/lib/facilitator-groups/shared";
+import { FORMATS, scheduleLabel, type PublicGroup } from "@/lib/facilitator-groups/shared";
 import { cn } from "@/lib/utils";
 
 export function spotsText(g: Pick<PublicGroup, "spotsLeft" | "capacity">) {
@@ -37,10 +37,12 @@ export function GroupCard({ group, selected, onHover }: { group: PublicGroup; se
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold-deep dark:text-gold-light">
-            {AUDIENCES[group.audience] ?? "Group"}{group.startDate ? ` · Starts ${startLabel(group.startDate)}` : ""}
-          </p>
-          <h3 className="mt-1.5 text-pretty font-display text-xl leading-snug text-foreground group-hover:text-gold-deep dark:group-hover:text-gold-light">{group.title}</h3>
+          {group.startDate ? (
+            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-gold-deep dark:text-gold-light">
+              Starts {startLabel(group.startDate)}
+            </p>
+          ) : null}
+          <h3 className="text-pretty font-display text-xl leading-snug text-foreground group-hover:text-gold-deep dark:group-hover:text-gold-light">{group.title}</h3>
         </div>
         <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold", full ? "bg-muted text-muted-foreground" : "bg-gold/15 text-gold-deep dark:text-gold-light")}>
           {spotsText(group)}

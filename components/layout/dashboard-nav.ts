@@ -50,6 +50,7 @@ export const dashboardNav: NavEntry[] = [
   {
     kind: "group", label: "Community", icon: Users, items: [
       { href: "/dashboard/participants", label: "Participants", icon: UsersRound, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
+      { href: "/dashboard/facilitators", label: "Facilitators & Groups", icon: MapPinned, permission: PERMISSIONS.MANAGE_USERS },
       { href: "/dashboard/contacts", label: "Contacts", icon: UserCircle, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
       { href: "/dashboard/waves", label: "Waves", icon: Waves, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
       { href: "/dashboard/check-in-results", label: "Check-In Results", icon: CheckSquare, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
@@ -79,7 +80,6 @@ export const dashboardNav: NavEntry[] = [
     kind: "group", label: "Experiences", icon: Sparkles, items: [
       { href: "/dashboard/experiences", label: "All Experiences", icon: Sparkles, permission: PERMISSIONS.MANAGE_EXPERIENCES },
       { href: "/dashboard/experiences/automation", label: "Email Automation", icon: MailCheck, permission: PERMISSIONS.MANAGE_EXPERIENCES },
-      { href: "/dashboard/facilitators", label: "Facilitators & Groups", icon: MapPinned, permission: PERMISSIONS.MANAGE_USERS },
     ],
   },
   { kind: "item", href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
