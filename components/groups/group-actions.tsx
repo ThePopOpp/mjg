@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, MessageSquareText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { buttonClass } from "@/components/marketing/primitives";
 import { STATUS_LABELS, type FinderMode, type ReservationStatus } from "@/lib/facilitator-groups/shared";
 
@@ -205,9 +206,20 @@ export function GroupActions({
 
             <label className={LABEL}>
               How many spots?
-              <select value={partySize} onChange={(e) => setPartySize(Number(e.target.value))} className={FIELD}>
-                {[1, 2, 3, 4].map((n) => <option key={n} value={n} disabled={!full && n > Math.max(1, spotsLeft)}>{n === 1 ? "Just me" : `${n} people`}</option>)}
-              </select>
+              {/* The site's Select, not a native <select>: the browser's own list ignores the theme and
+                  paints its highlight in system blue. */}
+              <Select value={String(partySize)} onValueChange={(v) => setPartySize(Number(v))} disabled={!open || busy}>
+                <SelectTrigger className="mt-1.5 h-10 bg-background font-normal shadow-none focus:border-gold focus:ring-1 focus:ring-gold focus:ring-offset-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4].map((n) => (
+                    <SelectItem key={n} value={String(n)} disabled={!full && n > Math.max(1, spotsLeft)}>
+                      {n === 1 ? "Just me" : `${n} people`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <span className="mt-1 block text-xs font-normal text-muted-foreground">Coming with your spouse or a friend? Save a spot for them too.</span>
             </label>
             <label className={LABEL}>
