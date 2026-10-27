@@ -35,6 +35,7 @@ import {
   UsersRound,
   UserCircle,
   Waves,
+  MapPinned,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PERMISSIONS, type Permission } from "@/lib/rbac/permissions";
@@ -78,6 +79,7 @@ export const dashboardNav: NavEntry[] = [
     kind: "group", label: "Experiences", icon: Sparkles, items: [
       { href: "/dashboard/experiences", label: "All Experiences", icon: Sparkles, permission: PERMISSIONS.MANAGE_EXPERIENCES },
       { href: "/dashboard/experiences/automation", label: "Email Automation", icon: MailCheck, permission: PERMISSIONS.MANAGE_EXPERIENCES },
+      { href: "/dashboard/facilitators", label: "Facilitators & Groups", icon: MapPinned, permission: PERMISSIONS.MANAGE_USERS },
     ],
   },
   { kind: "item", href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
@@ -111,6 +113,7 @@ export const dashboardNav: NavEntry[] = [
 export const facilitatorNav: NavEntry[] = [
   { kind: "item", href: "/dashboard", label: "Dashboard", icon: Home },
   { kind: "item", href: "/dashboard/team", label: "My Team", icon: UsersRound },
+  { kind: "item", href: "/dashboard/facilitator-listing", label: "Facilitator Listing", icon: MapPinned },
   { kind: "item", href: "/dashboard/my-experiences", label: "Experiences", icon: Sparkles },
   { kind: "item", href: "/dashboard/downloads", label: "Downloads", icon: Download },
   { kind: "item", href: "/dashboard/resources", label: "Resources", icon: Newspaper },
@@ -124,6 +127,7 @@ export const facilitatorNav: NavEntry[] = [
 export const participantNav: NavEntry[] = [
   { kind: "item", href: "/dashboard", label: "Dashboard", icon: Home },
   { kind: "item", href: "/dashboard/team", label: "My Team", icon: UsersRound },
+  { kind: "item", href: "/groups", label: "Find a Group", icon: MapPinned },
   { kind: "item", href: "/dashboard/downloads", label: "Downloads", icon: Download },
   { kind: "item", href: "/dashboard/resources", label: "Resources", icon: Newspaper },
   { kind: "item", href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },

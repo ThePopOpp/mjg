@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { safeNextPath } from "@/lib/auth/safe-next";
 import { Eye, EyeOff, Mail, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,7 @@ import { createClient } from "@/lib/supabase/browser";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") || "/dashboard";
+  const nextPath = safeNextPath(searchParams.get("next"));
   const message = searchParams.get("message");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

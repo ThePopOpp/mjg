@@ -44,6 +44,14 @@ export default async function SixWeekChallengeHubPage() {
         cta={{ href: "/created-for-more-check-in", label: "Start your Check-In" }}
       />
       <div className={`${SITE_CONTENT_BOX} pb-14`}>
+      <Section id="find-a-group" eyebrow="Join a Group" title="Find a group near you">
+        <p>
+          The challenge is built to be walked with other men. Browse the groups forming near you &mdash; see the day, time,
+          area, and how many spots are left &mdash; and save your spot in one that fits your schedule.
+        </p>
+        <CTA href="/groups">Find a group</CTA>
+      </Section>
+
       <Section id="dates" eyebrow="Start Here" title="Protect the six weeks">
         <p>
           The challenge is six weekly sessions. The men who get the most out of it do one simple thing first: they put

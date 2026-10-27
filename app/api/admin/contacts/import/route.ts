@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireParticipantManager } from "@/lib/user-management/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { normalizeHeader, parseCSV } from "@/lib/csv";
 
 // Maps CSV header variants → DB column name
 const COLUMN_MAP: Record<string, string> = {
@@ -24,36 +25,6 @@ const COLUMN_MAP: Record<string, string> = {
   "zip code": "zip_code", zip: "zip_code", postal: "zip_code", "postal code": "zip_code",
   "profile photo": "profile_photo_url", photo: "profile_photo_url", "photo url": "profile_photo_url", avatar: "profile_photo_url",
 };
-
-function normalizeHeader(h: string) {
-  return h.trim().toLowerCase().replace(/[_-]/g, " ");
-}
-
-function parseCSV(text: string): { headers: string[]; rows: string[][] } {
-  const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter(Boolean);
-  if (!lines.length) return { headers: [], rows: [] };
-
-  function splitLine(line: string) {
-    const result: string[] = [];
-    let cur = "";
-    let inQuote = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') {
-        if (inQuote && line[i + 1] === '"') { cur += '"'; i++; }
-        else inQuote = !inQuote;
-      } else if (ch === "," && !inQuote) {
-        result.push(cur.trim()); cur = "";
-      } else { cur += ch; }
-    }
-    result.push(cur.trim());
-    return result;
-  }
-
-  const headers = splitLine(lines[0]);
-  const rows = lines.slice(1).map(splitLine);
-  return { headers, rows };
-}
 
 export async function POST(request: Request) {
   try {

@@ -6,16 +6,20 @@ import { RegisterForm } from "@/components/auth/register-form";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { canAccessPortal } from "@/lib/rbac/roles";
+import { safeNextPath } from "@/lib/auth/safe-next";
 
 export const metadata = {
   title: "Create your account | Michael J. Gauthier",
   description: "Register as a Participant or a Facilitator to join the 6-Week Challenge.",
 };
 
-export default async function RegisterPage() {
+export default async function RegisterPage({ searchParams }: { searchParams?: Promise<{ next?: string }> }) {
   const profile = await getCurrentProfile();
+  const { next: rawNext } = (await searchParams) ?? {};
+  // e.g. /groups/<slug> — after registering, people come back to the group they were looking at.
+  const next = rawNext ? safeNextPath(rawNext) : null;
   if (profile?.status === "active" && canAccessPortal(profile.role)) {
-    redirect("/dashboard");
+    redirect(next ?? "/dashboard");
   }
 
   return (
@@ -36,11 +40,11 @@ export default async function RegisterPage() {
         </p>
         <p className="mt-3 text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-[#c9aa70] hover:underline">Sign in</Link>
+          <Link href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"} className="font-semibold text-[#c9aa70] hover:underline">Sign in</Link>
         </p>
       </div>
 
-      <RegisterForm />
+      <RegisterForm next={next} />
     </main>
   );
 }

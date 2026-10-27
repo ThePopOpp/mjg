@@ -6,27 +6,11 @@ import { LoginForm } from "@/components/auth/login-form";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getCurrentProfile, isActiveDashboardProfile } from "@/lib/auth/server";
 import { ROLES } from "@/lib/rbac/roles";
+import { safeNextPath } from "@/lib/auth/safe-next";
 
 export const metadata = {
   title: "Login | MJG Dashboard",
 };
-
-/**
- * Where an already-signed-in visitor is sent.
- *
- * LoginForm already honours ?next=, but this server-side guard used to ignore
- * it and send everyone to /dashboard — so following a link like
- * /login?next=/steward/pricing while signed in silently dropped the
- * destination. Only same-origin paths are accepted: a value starting "//" or
- * containing a backslash can address another host and would turn this into an
- * open redirect.
- */
-function safeNextPath(raw: string | undefined): string {
-  if (!raw) return "/dashboard";
-  if (!raw.startsWith("/")) return "/dashboard";
-  if (raw.startsWith("//") || raw.includes("\\")) return "/dashboard";
-  return raw;
-}
 
 export default async function LoginPage({
   searchParams,

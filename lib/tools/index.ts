@@ -6,6 +6,7 @@ import { CORE_TOOLS } from "./core";
 import { DEPLOY_TOOLS } from "./deploy";
 import { DEV_TOOLS } from "./dev";
 import { EMAIL_TOOLS } from "./email";
+import { GROUP_TOOLS } from "./groups";
 import { LEGAL_TOOLS } from "./legal";
 import { OPS_TOOLS } from "./ops";
 import { SHEPHERD_TOOLS } from "./shepherd-adapter";
@@ -32,6 +33,8 @@ export const TOOLS: ToolDef[] = [
   ...OPS_TOOLS,
   // P4 · customers & orders
   ...COMMERCE_TOOLS,
+  // Find a Group (facilitator listings, rosters, launch switch, facilitator import)
+  ...GROUP_TOOLS,
   // P5 · agent layer (task queue for Paperclip / Hermes / OpenClaw)
   ...AGENT_LAYER_TOOLS,
   // P6 · building & shipping (GitHub issues/PRs, Coolify deploys)

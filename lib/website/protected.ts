@@ -85,6 +85,9 @@ export const PROTECTED_ROUTES = [
   "/lead-a-group",
   "/personal-blueprint",
   "/join",
+  // Find a Group (facilitator listings).
+  "/groups",
+  "/facilitators",
 ] as const;
 
 /** Slugs that must never be taken by a CMS page (the homepage is code-owned). */

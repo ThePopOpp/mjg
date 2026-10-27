@@ -52,7 +52,7 @@ const CARDS: {
   },
 ];
 
-export function RegisterForm() {
+export function RegisterForm({ next = null }: { next?: string | null } = {}) {
   const [choice, setChoice] = useState<Choice | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -86,6 +86,18 @@ export function RegisterForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error ?? "Registration failed.");
+      // Came from a group listing (or another ?next=): sign them straight in and take them back.
+      if (next) {
+        const signIn = await fetch("/api/auth/sign-in", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: form.email, password: form.password }),
+        }).catch(() => null);
+        if (signIn?.ok) {
+          window.location.assign(next);
+          return;
+        }
+      }
       setDone({ email: data.email, needsChallengeAccess: Boolean(data.needsChallengeAccess) });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Registration failed.");
@@ -111,7 +123,9 @@ export function RegisterForm() {
             </p>
           ) : null}
           <Button asChild className="mt-1 w-full">
-            <Link href="/login">Sign in</Link>
+            <Link href={`/login?next=${encodeURIComponent(next ?? (done.needsChallengeAccess ? "/dashboard/facilitator-listing" : "/groups"))}`}>
+              {next ? "Sign in and continue" : done.needsChallengeAccess ? "Sign in and set up your group" : "Sign in and find a group"}
+            </Link>
           </Button>
         </CardContent>
       </Card>
@@ -258,7 +272,7 @@ export function RegisterForm() {
 
           <p className="text-center text-xs text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-[#c9aa70] hover:underline">Sign in</Link>
+            <Link href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"} className="font-semibold text-[#c9aa70] hover:underline">Sign in</Link>
           </p>
         </form>
       </CardContent>

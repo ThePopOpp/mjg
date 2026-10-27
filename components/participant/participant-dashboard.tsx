@@ -14,6 +14,7 @@ import { EnergyAuditDetail } from "@/components/energy-audit/energy-audit-detail
 import { TOTAL_MAX } from "@/lib/energy-audit/energy-audit";
 import { getBookWaitlistForEmail, formatLabels } from "@/lib/book-waitlist/repository";
 import type { DashboardProfile } from "@/lib/auth/server";
+import { MyGroupCard } from "./my-group-card";
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -52,6 +53,8 @@ export async function ParticipantDashboard({ profile }: { profile: DashboardProf
         title={`Welcome${myName ? `, ${myName}` : ""}`}
         description="Your group, your conversations, and your next steps at a glance."
       />
+
+      <MyGroupCard profileId={profile.id} />
 
       {/* Your Created for More Check-In — take it, and see your results */}
       <div className="space-y-4 border-t pt-6">

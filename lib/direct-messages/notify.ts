@@ -2,12 +2,12 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendSmtpEmail } from "@/lib/email/smtp";
 import { sendSms } from "@/lib/twilio/sms";
 import { brandEmailButton, brandEmailHeader } from "@/lib/brand/assets";
-import { publicSiteUrl } from "@/lib/public-site/static-pages";
+import { appUrl, publicSiteUrl } from "@/lib/public-site/static-pages";
 import { getDmPrefs } from "@/lib/direct-messages/preferences";
 import { sendPushToUser } from "@/lib/push/web-push";
 
 const DEBOUNCE_MS = 5 * 60 * 1000; // don't re-alert the same recipient within 5 min
-const MESSAGES_URL = "https://my.michaeljgauthier.com/dashboard/direct-messages";
+const MESSAGES_URL = `${appUrl()}/dashboard/direct-messages`;
 
 function esc(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

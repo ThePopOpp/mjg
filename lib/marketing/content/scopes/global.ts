@@ -78,6 +78,7 @@ const nav = defineSection<NavContent>({
         href: "/churches",
         links: [
           link("churches", "For Churches & Groups", "/churches"),
+          link("find-group", "Find a Group", "/groups"),
           link("lead", "Lead a Group", "/lead-a-group"),
           link("challenge", "Six-Week Challenge", "/6-week-challenge"),
         ],
@@ -155,6 +156,7 @@ const footer = defineSection<FooterContent>({
           link("studies", "Studies & Experiences", "/studies"),
           link("resources", "Insights & Resources", "/resources"),
           link("churches", "For Churches & Groups", "/churches"),
+          link("find-group", "Find a Group", "/groups"),
           link("lead", "Lead a Group", "/lead-a-group"),
         ],
       },
