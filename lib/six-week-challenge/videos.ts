@@ -1,6 +1,6 @@
-// The 6-Week Challenge video set. Content is fixed; the actual video + thumbnail URLs are
-// filled in once Michael provides the recordings (see the memory note). Until then each page
-// renders a branded "coming soon" placeholder, so every email/library URL already resolves.
+// The 6-Week Challenge video set — the code fallback for the challenge_videos table (which
+// the Media Studio edits). Videos are on Vimeo; a video without a link renders a branded
+// "coming soon" placeholder, so every email/library URL already resolves.
 
 export type ChallengeVideo = {
   slug: string;
@@ -12,6 +12,7 @@ export type ChallengeVideo = {
   // Videos are hosted off the VPS and played through our own branded facade so the page
   // never looks like the host. Provide ONE source:
   //   youtubeId — 11-char id from a YouTube watch URL (youtu.be/<ID> or watch?v=<ID>)
+  //   vimeo     — put the Vimeo page link (vimeo.com/<id>) in videoUrl; the player embeds it
   //   driveId   — Google Drive file id (drive.google.com/file/d/<ID>/view); file must be
   //               shared "Anyone with the link". Player order of preference: youtube → drive → url.
   youtubeId: string | null;
@@ -37,18 +38,17 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     slug: "invitation",
     order: 0,
     badge: "Invitation",
-    title: "The Invitation",
+    title: "An Invitation",
     subtitle: "What The Life You're Building is — and who it's for.",
     description:
-      "A short invitation to the 6-Week Challenge. Share this with any man you're inviting into the group — it makes the ask easy and helps him say yes.",
+      "What kind of life are you actually building? Michael Gauthier invites you into The Life You’re Building Men’s Challenge, a six-week Stewardship Blueprint experience for men who are ready to stop drifting and start building on purpose. You don’t need a polished story or all the answers. Bring a guide, a pen, and a willingness to be real.",
     youtubeId: null,
-    driveId: "1p9eEwKjA8tQ408-35cwtB2qyCgrNe-CU",
-    embedDirect: true,
-    videoUrl: null,
+    embedDirect: false,
+    videoUrl: "https://vimeo.com/1239686215",
     posterEyebrow: null,
     posterTitle: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/invitation.svg",
-    thumbnailDark: "/6-week-challenge/thumbnails/invitation.svg",
+    thumbnailUrl: "/6-week-challenge/thumbnails/v2/invitation.jpg",
+    thumbnailDark: "/6-week-challenge/thumbnails/v2/invitation.jpg",
     durationLabel: null,
   },
   {
@@ -58,11 +58,10 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "Your First Assignment",
     subtitle: "Do the pre-work before Week 1 begins.",
     description:
-      "Before the first session, watch this short homework video and take the Created for More Check-In. It sets up everything Week 1 builds on.",
+      "The work between sessions is where real growth begins. Complete your check-in, fill out your guide, share what you're learning with another man, and take the next step by bringing it to your group.",
     youtubeId: null,
-    driveId: "1dlwMGJ2ZTIThMv04GZstd5wD-G9MrIMB",
-    embedDirect: true,
-    videoUrl: null,
+    embedDirect: false,
+    videoUrl: "https://vimeo.com/1239920175",
     thumbnailUrl: "/6-week-challenge/thumbnails/homework.svg",
     thumbnailDark: "/6-week-challenge/thumbnails/homework.svg",
     durationLabel: null,
@@ -74,13 +73,12 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "Wake Up",
     subtitle: "Name your current reality and notice the drift.",
     description:
-      "Week 1 isn't about shame or a dramatic overhaul — it's about awareness. We slow down and tell the truth about the life we're actually building.",
+      "Drift is subtle, and busyness can disguise it. This week, Michael helps you see the structure your life already has and the scoreboard you’ve been playing on. Take the Created for More Check-In, name where you’re drifting, and choose one man to walk with you through the next six weeks.",
     youtubeId: null,
-    driveId: "1yG2gVCiibEUrwZqxli-S250vsI_4qdaF",
-    embedDirect: true,
-    videoUrl: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/week1.svg",
-    thumbnailDark: "/6-week-challenge/thumbnails/week1.svg",
+    embedDirect: false,
+    videoUrl: "https://vimeo.com/1239685393",
+    thumbnailUrl: "/6-week-challenge/thumbnails/v2/week-1.jpg",
+    thumbnailDark: "/6-week-challenge/thumbnails/v2/week-1.jpg",
     durationLabel: null,
   },
   {
@@ -90,13 +88,12 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "See the Blueprint",
     subtitle: "Clarify bedrock, identity, values, mission, and daily purpose.",
     description:
-      "A blueprint shows where the walls go, but not why the house is being built. Week 2 gets clear on what your life is rooted in and built toward.",
+      "Identity before strategy. This week goes down to your bedrock (faith and identity) and the foundation built on it: your mission, values, life verse, and daily purpose. Bring a rough first draft to your group. A messy, true mission beats a polished one you never live by.",
     youtubeId: null,
-    driveId: "1h8VIR-xPMke-NQrC1rey9ExxVci__r-B",
-    embedDirect: true,
-    videoUrl: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/week2.svg",
-    thumbnailDark: "/6-week-challenge/thumbnails/week2.svg",
+    embedDirect: false,
+    videoUrl: "https://vimeo.com/1239689416",
+    thumbnailUrl: "/6-week-challenge/thumbnails/v2/week-2.jpg",
+    thumbnailDark: "/6-week-challenge/thumbnails/v2/week-2.jpg",
     durationLabel: null,
   },
   {
@@ -106,11 +103,12 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "Evaluate the Pillars",
     subtitle: "Assess family, fitness, fun, and finances; choose one focus.",
     description:
-      "The four visible pillars carry the weight of everyday life. Week 3 assesses each honestly and chooses the one focus pillar for the next 90 days.",
+      "Family, Fitness, Fun, and Finances are the four pillars that carry everyday life. The goal isn’t perfect balance but faithful stewardship. Score each pillar, choose one Focus Pillar for the next 90 days, and give the other three one faithful touch each week. Focus one. Steward all four.",
     youtubeId: null,
-    videoUrl: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/week3.svg",
-    thumbnailDark: "/6-week-challenge/thumbnails/week3.svg",
+    embedDirect: false,
+    videoUrl: "https://vimeo.com/1239698700",
+    thumbnailUrl: "/6-week-challenge/thumbnails/v2/week-3.jpg",
+    thumbnailDark: "/6-week-challenge/thumbnails/v2/week-3.jpg",
     durationLabel: null,
   },
   {
@@ -120,11 +118,12 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "Install the Guardrails",
     subtitle: "Build one specific boundary that protects what matters.",
     description:
-      "A guardrail is a decision made before the moment of pressure — not after regret. Week 4 builds one boundary specific enough to actually keep.",
+      "A guardrail is a decision made before the moment of pressure. It protects what you don’t want to lose. This week, draft one specific guardrail for your Focus Pillar, scan the other pillars for danger zones, and tell one trusted man who can ask how it’s going.",
     youtubeId: null,
-    videoUrl: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/week4.svg",
-    thumbnailDark: "/6-week-challenge/thumbnails/week4.svg",
+    embedDirect: false,
+    videoUrl: "https://vimeo.com/1239702336",
+    thumbnailUrl: "/6-week-challenge/thumbnails/v2/week-4.jpg",
+    thumbnailDark: "/6-week-challenge/thumbnails/v2/week-4.jpg",
     durationLabel: null,
   },
   {
@@ -134,11 +133,12 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "Strengthen the Structure",
     subtitle: "Choose one keystone rhythm and one renewal rhythm.",
     description:
-      "Change is sustained by rhythm, not intensity. Week 5 focuses on keystone rhythms and the energy needed to steward what matters without running empty.",
+      "You are shaped less by inspiration than by rhythm. Michael walks through keystone habits and how to steward your physical, emotional, mental, and spiritual energy. Design one habit, protect one rhythm of renewal, and run it for seven days.",
     youtubeId: null,
-    videoUrl: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/week5.svg",
-    thumbnailDark: "/6-week-challenge/thumbnails/week5.svg",
+    embedDirect: false,
+    videoUrl: "https://vimeo.com/1239699941",
+    thumbnailUrl: "/6-week-challenge/thumbnails/v2/week-5.jpg",
+    thumbnailDark: "/6-week-challenge/thumbnails/v2/week-5.jpg",
     durationLabel: null,
   },
   {
@@ -148,11 +148,12 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "Design My Life",
     subtitle: "Assemble your Personal Blueprint and retake the Check-In.",
     description:
-      "Week 6 brings the whole structure together into one Personal Blueprint, retakes the Created for More Check-In, and names the next 30-day commitment.",
+      "This is where it all comes together. Complete your Personal Blueprint, explore the final layer of legacy, and retake the Check-In to see how far you’ve come. Then commit to a 30-day focus with a four-pillar rhythm and the man who will help you keep it.",
     youtubeId: null,
+    embedDirect: false,
     videoUrl: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/week6.svg",
-    thumbnailDark: "/6-week-challenge/thumbnails/week6.svg",
+    thumbnailUrl: "/6-week-challenge/thumbnails/v2/week-6.jpg",
+    thumbnailDark: "/6-week-challenge/thumbnails/v2/week-6.jpg",
     durationLabel: null,
   },
   {
@@ -162,11 +163,12 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "What's Next",
     subtitle: "Keep building — and help another man begin.",
     description:
-      "A closing word after Week 6: how to keep the Blueprint from sitting in a drawer, protect your 30-day commitment, and multiply what you built.",
+      "You finished, but a blueprint was never meant to sit in a drawer. Michael shares three next steps: keep the accountability alive, carry the framework into daily life with the ForgedLife app, and invite the next man to walk through the challenge with you. Keep building.",
     youtubeId: null,
-    videoUrl: null,
-    thumbnailUrl: "/6-week-challenge/thumbnails/whats-next.svg",
-    thumbnailDark: "/6-week-challenge/thumbnails/whats-next.svg",
+    embedDirect: false,
+    videoUrl: "https://vimeo.com/1239704415",
+    thumbnailUrl: "/6-week-challenge/thumbnails/v2/closing.jpg",
+    thumbnailDark: "/6-week-challenge/thumbnails/v2/closing.jpg",
     durationLabel: null,
   },
 ];

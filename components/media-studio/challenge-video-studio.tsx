@@ -37,7 +37,7 @@ function slugify(s: string) {
   return s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
 }
 
-// Turn a pasted Drive/YouTube/mp4 link into the stored fields.
+// Turn a pasted Vimeo/Drive/YouTube/mp4 link (Vimeo links are kept whole in videoUrl) into the stored fields.
 function parseVideoLink(link: string): { youtubeId: string | null; driveId: string | null; videoUrl: string | null } {
   const s = link.trim();
   if (!s) return { youtubeId: null, driveId: null, videoUrl: null };
@@ -299,8 +299,8 @@ export function ChallengeVideoStudio({
               </div>
 
               {/* Video link */}
-              <Field label="Video link" hint="Google Drive or YouTube share link, or a direct .mp4 URL">
-                <Input value={form.videoLink} onChange={(e) => setForm({ ...form, videoLink: e.target.value })} placeholder="https://drive.google.com/file/d/…/view" />
+              <Field label="Video link" hint="Vimeo, Google Drive or YouTube link, or a direct .mp4 URL">
+                <Input value={form.videoLink} onChange={(e) => setForm({ ...form, videoLink: e.target.value })} placeholder="https://vimeo.com/…" />
               </Field>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={form.embedDirect} onChange={(e) => setForm({ ...form, embedDirect: e.target.checked })} className="h-4 w-4 rounded border-border" />

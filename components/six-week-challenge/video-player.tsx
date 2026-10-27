@@ -3,10 +3,19 @@
 import { useState } from "react";
 import { Play } from "lucide-react";
 
+// A Vimeo page link (vimeo.com/<id>, or vimeo.com/<id>/<hash> for unlisted videos) → its
+// embeddable player URL. Vimeo links live in videoUrl; anything else there is a direct file.
+export function vimeoEmbedUrl(url: string | null | undefined): string | null {
+  const m = url?.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([a-f0-9]+))?/i);
+  if (!m) return null;
+  const hash = m[2] ?? url?.match(/[?&]h=([a-f0-9]+)/i)?.[1];
+  return `https://player.vimeo.com/video/${m[1]}?${hash ? `h=${hash}&` : ""}title=0&byline=0&portrait=0&dnt=1&color=C9A46E`;
+}
+
 // Pre-composed 16:9 transparent cut-out — Mike is already scaled/positioned in the frame.
 const MIKE_PHOTO = "/6-week-challenge/mike-intro.png";
 
-// A branded video player. Videos are hosted off-site (YouTube/Drive) to save VPS space,
+// A branded video player. Videos are hosted off-site (Vimeo/YouTube/Drive) to save VPS space,
 // but the page never shows the host's chrome up front: we render our own poster + play
 // button and only load the embed after a click (a "facade").
 export function ChallengeVideoPlayer({
@@ -34,15 +43,16 @@ export function ChallengeVideoPlayer({
 }) {
   const [playing, setPlaying] = useState(false);
   const hasVideo = Boolean(youtubeId || driveId || videoUrl);
+  const vimeoSrc = vimeoEmbedUrl(videoUrl);
 
   // Direct embed: skip our facade and show the host's player from the start, so it plays
   // on a single click (their play button is the only one). Loses the branded poster.
-  if (embedDirect && (driveId || youtubeId)) {
+  if (embedDirect && (driveId || youtubeId || vimeoSrc)) {
     return (
       <div className="relative aspect-video overflow-hidden rounded-xl border border-black/10 bg-black shadow-sm dark:border-white/10">
         <iframe
           className="absolute inset-0 h-full w-full"
-          src={driveId ? `https://drive.google.com/file/d/${driveId}/preview` : `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1&playsinline=1`}
+          src={driveId ? `https://drive.google.com/file/d/${driveId}/preview` : youtubeId ? `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1&playsinline=1` : vimeoSrc!}
           title={title}
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowFullScreen
@@ -72,6 +82,14 @@ export function ChallengeVideoPlayer({
           src={`https://drive.google.com/file/d/${driveId}/preview`}
           title={title}
           allow="autoplay; fullscreen"
+          allowFullScreen
+        />
+      ) : playing && vimeoSrc ? (
+        <iframe
+          className="absolute inset-0 h-full w-full"
+          src={`${vimeoSrc}&autoplay=1`}
+          title={title}
+          allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
         />
       ) : playing && videoUrl ? (
