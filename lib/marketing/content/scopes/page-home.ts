@@ -101,7 +101,7 @@ const framework = defineSection<Framework>({
     f.cta("frameworkCta", "Framework link"),
   ],
   defaults: {
-    eyebrow: "02 · See the Framework",
+    eyebrow: "See the Framework",
     title: "A Life That Matters Is Built on Purpose.",
     layerCta: "Explore this layer",
     frameworkCta: { label: "Explore the Framework →", href: "/stewardship-blueprint" },
@@ -151,7 +151,7 @@ const firstStep = defineSection<FirstStep>({
     },
   ],
   defaults: {
-    eyebrow: "03 · First Step",
+    eyebrow: "First Step",
     title: "Awareness Is Where Stewardship Begins.",
     body: "Before you can build differently, you need to see clearly where you are today.\n\nThe Created for More Check-In is a free, 28-question reflection across seven connected layers of the Blueprint. In about fifteen minutes, it helps you notice where your life is aligned, where you may be drifting, and what deserves attention next.\n\nThis is not a grade. It is a starting point for honest reflection and one faithful next step.",
     primaryCta: { label: "Begin My Free Check-In", href: "/created-for-more-check-in" },
@@ -191,7 +191,7 @@ const engage = defineSection<Engage>({
     f.cta("secondaryCta", "Secondary button"),
   ],
   defaults: {
-    eyebrow: "04 · Ways to Engage",
+    eyebrow: "Ways to Engage",
     title: "There Is More Than One Way to Begin.",
     body: "You can start with quiet reflection, a good book, meaningful conversation, a group experience, or a more detailed personal plan. Each path is connected to the same framework.",
     cards: [
@@ -256,7 +256,7 @@ const blueprint = defineSection<Blueprint>({
     f.media("interior", "Bottom-right image"),
   ],
   defaults: {
-    eyebrow: "05 · Personal Blueprint",
+    eyebrow: "Personal Blueprint",
     title: "Your Life Deserves More Than Good Intentions.",
     body: "Imagine having one place to return to when decisions become difficult, the calendar gets crowded, or the season changes.\n\nYour Personal Stewardship Blueprint brings together your identity, mission, values, pillars, boundaries, habits, energy, accountability, and living legacy. It helps you remember what matters, protect it, and choose the next step.\n\nIt is a living guide—not a document you finish and put away.",
     primaryCta: { label: "See a Sample Blueprint", href: "/personal-blueprint#sample" },
@@ -312,7 +312,7 @@ const steward = defineSection<StewardBand>({
   label: "06 · Meet Steward",
   fields: [f.eyebrow(), f.title(), f.lead(), f.body(), f.cta("primaryCta", "Primary button"), f.cta("secondaryCta", "Secondary button"), ...chatFields],
   defaults: {
-    eyebrow: "06 · Meet Steward",
+    eyebrow: "Meet Steward",
     title: "Meet Steward, Your Personal Stewardship Guide.",
     lead: "Creating a plan matters. Living it is where change happens.",
     body: "Steward helps you reflect, organize your thinking, develop your Personal Stewardship Blueprint, and revisit it as life unfolds. When priorities compete, decisions feel complicated, or habits start slipping, Steward helps you connect your next choice with the life you are building.\n\nYou remain in control. Steward can suggest and clarify; you decide what belongs in your Blueprint.",
@@ -354,7 +354,7 @@ const grow = defineSection<Grow>({
     f.media("thirdPhoto", "Third photo"),
   ],
   defaults: {
-    eyebrow: "07 · Grow Together",
+    eyebrow: "Grow Together",
     title: "Some of the Most Important Growth Happens Together.",
     body: "A good conversation can help you recognize what you could not see alone. Trusted relationships can help you follow through on what you already know matters.\n\nThe Stewardship Blueprint offers six-week studies, group discussions, and church experiences that combine Scripture, reflection, practical action, and encouragement. Whether you’re joining a group or leading one, there is a place to begin.",
     primaryCta: { label: "Explore Studies & Experiences", href: "/studies" },
@@ -383,7 +383,7 @@ const book = defineSection<Book>({
     { key: "model", label: "3D book (.glb)", kind: "url", help: "A .glb file; leave empty to show only the image." },
   ],
   defaults: {
-    eyebrow: "08 · The Book",
+    eyebrow: "The Book",
     title: "The Life You’re Building",
     subtitle: "How to Stop Drifting and Design a Life That Matters.",
     body: "A life can look successful from a distance and still feel misaligned up close. Through personal stories, biblical insight, and practical reflection, The Life You’re Building invites you to examine the life taking shape and begin building with greater purpose.\n\nThe goal is not simply to finish another book. It is to live differently because of what you discover.",
@@ -409,7 +409,7 @@ const michael = defineSection<Michael>({
     f.list("links", "Links", [f.text("label", "Label", 60), { key: "href", label: "Link", kind: "url" }], 4, "Link"),
   ],
   defaults: {
-    eyebrow: "09 · Michael",
+    eyebrow: "Michael Gauthier",
     title: "A Question That Changed How I Look at Life.",
     body: "Early in my career, I was pursuing the markers of success our culture often celebrates. After the birth of our first child, a question began reshaping my priorities: *If everything I am chasing works, will it actually matter?*\n\nThat question led me to think differently about my faith, family, work, health, money, and the purposes God had entrusted to me.\n\nI created the Stewardship Blueprint because I believe meaningful lives are not built accidentally—and I am still learning to live it myself.",
     photo: photo("/marketing/brand/michael-gauthier.webp", "Michael J. Gauthier"),
@@ -429,7 +429,7 @@ const join = defineSection<Join>({
   label: "10 · Stay Connected",
   fields: [f.eyebrow(), f.title(), f.lead(), f.body()],
   defaults: {
-    eyebrow: "10 · Stay Connected",
+    eyebrow: "Stay Connected",
     title: "Keep Building a Life That Matters.",
     lead: "A meaningful life is built through repeated choices, not one moment of inspiration.",
     body: "Join the Stewardship Blueprint journey for occasional reflections, practical tools, book news, studies, and new opportunities to grow.",

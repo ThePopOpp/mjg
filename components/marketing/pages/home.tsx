@@ -38,49 +38,36 @@ export async function HomePage() {
 
   return (
     <>
-      {/* 00 · Hero — Steward */}
+      {/* 00 · Hero — Awaken (The Stewardship Blueprint) */}
       <section className="border-b">
         <div className={`${CONTAINER} pb-14 pt-14 text-center md:pb-20 md:pt-20`}>
-          <Eyebrow pill>{hero.eyebrow}</Eyebrow>
-          <Heading title={hero.title} level={1} className="mt-6" />
-          {hero.subtitle ? <p className="mt-4 font-display text-[clamp(1.15rem,2vw,1.4rem)] italic text-muted-foreground">{keepTogether(hero.subtitle)}</p> : null}
-          <Prose text={hero.body} className="mx-auto mt-5 max-w-[44.5rem] text-pretty text-[17px] leading-8 text-muted-foreground" />
+          <Eyebrow pill>{awaken.eyebrow}</Eyebrow>
+          <Heading title={awaken.title} level={1} accent className="mx-auto mt-6 max-w-[16ch]" />
+          {awaken.lead ? <p className="mx-auto mt-6 max-w-[40rem] text-pretty text-lg font-medium leading-relaxed">{keepTogether(awaken.lead)}</p> : null}
+          <Prose text={awaken.body} className="mx-auto mt-4 max-w-[40rem] text-[17px] leading-8 text-muted-foreground" />
           <Actions center>
-            <ButtonLink cta={hero.secondaryCta} variant="outline" />
-            <ButtonLink cta={hero.primaryCta} variant="gold" />
+            <ButtonLink cta={awaken.primaryCta} />
+            <ButtonLink cta={awaken.secondaryCta} variant="outline" />
           </Actions>
-          <LoopingVideo video={hero.video} label={hero.videoLabel} className="mx-auto mt-12 max-w-[1160px] text-left" />
+          <ClickToPlay
+            embed={awaken.film}
+            poster={awaken.filmPoster}
+            label={awaken.filmLabel}
+            ratio="16/9"
+            className="mx-auto mt-12 max-w-[1040px] text-left"
+          />
+          {awaken.moreBody ? (
+            <ReadMoreDialog
+              label={awaken.readMoreLabel}
+              eyebrow={awaken.eyebrow}
+              title={awaken.title}
+              body={awaken.moreBody}
+              primaryCta={awaken.primaryCta}
+              secondaryCta={awaken.secondaryCta}
+            />
+          ) : null}
         </div>
       </section>
-
-      {/* 01 · Awaken */}
-      <Band>
-        <Split>
-          <div>
-            <Eyebrow pill>{awaken.eyebrow}</Eyebrow>
-            <Heading title={awaken.title} level={2} accent className="mt-5 text-[clamp(2rem,4.2vw,3rem)] font-semibold leading-[1.08]" />
-            {awaken.lead ? <p className="mt-5 text-lg font-medium leading-relaxed">{awaken.lead}</p> : null}
-            <Prose text={awaken.body} className="mt-4 text-base leading-7 text-muted-foreground" />
-            <Actions>
-              <ButtonLink cta={awaken.primaryCta} />
-              <ButtonLink cta={awaken.secondaryCta} variant="outline" />
-            </Actions>
-          </div>
-          <div>
-            <ClickToPlay embed={awaken.film} poster={awaken.filmPoster} label={awaken.filmLabel} ratio="16/9" />
-            {awaken.moreBody ? (
-              <ReadMoreDialog
-                label={awaken.readMoreLabel}
-                eyebrow={awaken.eyebrow}
-                title={awaken.title}
-                body={awaken.moreBody}
-                primaryCta={awaken.primaryCta}
-                secondaryCta={awaken.secondaryCta}
-              />
-            ) : null}
-          </div>
-        </Split>
-      </Band>
 
       {/* 02 · See the Framework */}
       <Band tone="muted" id="framework">
@@ -106,6 +93,21 @@ export async function HomePage() {
           <CheckInDemo demo={firstStep.demo} href={firstStep.primaryCta.href} />
         </Split>
       </Band>
+
+      {/* 03b · Meet Steward AI — the former hero, with its looping demo */}
+      <section className="border-b">
+        <div className={`${CONTAINER} py-16 text-center md:py-20`}>
+          <Eyebrow pill>{hero.eyebrow}</Eyebrow>
+          <Heading title={hero.title} level={2} accent className="mt-6 text-[clamp(2.4rem,5.2vw,3.75rem)] font-semibold leading-[1.05]" />
+          {hero.subtitle ? <p className="mt-4 font-display text-[clamp(1.15rem,2vw,1.4rem)] italic text-muted-foreground">{keepTogether(hero.subtitle)}</p> : null}
+          <Prose text={hero.body} className="mx-auto mt-5 max-w-[44.5rem] text-pretty text-[17px] leading-8 text-muted-foreground" />
+          <Actions center>
+            <ButtonLink cta={hero.secondaryCta} variant="outline" />
+            <ButtonLink cta={hero.primaryCta} variant="gold" />
+          </Actions>
+          <LoopingVideo video={hero.video} label={hero.videoLabel} className="mx-auto mt-12 max-w-[1160px] text-left" />
+        </div>
+      </section>
 
       {/* 04 · Ways to Engage */}
       <Band tone="muted">
