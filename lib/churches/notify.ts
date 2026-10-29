@@ -5,11 +5,13 @@ import { checkSmsConsent } from "@/lib/sms/outbound";
 import { toE164 } from "@/lib/sms/contacts";
 import { BRAND_KIT, brandEmailHeader } from "@/lib/brand/assets";
 import { appUrl } from "@/lib/public-site/static-pages";
+import { createPersonalNotification } from "@/lib/notifications/personal";
 
-// Church notifications. Church admin applications go to the Super Admins: an MJG-branded email
-// with Approve / Reject links (every active Super Admin) and a text to Mike when his profile has
-// a phone. The links carry a single-use token and open a signed-in approval screen — nothing is
-// approved from the link alone.
+// Church notifications. Church admin applications go to Mike: an MJG-branded email with
+// Approve / Reject links, a text when his profile has a phone, and a dashboard notification
+// only he sees (Churches → Applications). The email/text links carry a single-use token and
+// open a signed-in approval screen — nothing is approved from the link alone. The dashboard
+// notification carries no token.
 
 export const MIKE_EMAIL = "mike@strategicincomegroup.com";
 
@@ -52,17 +54,16 @@ export type ApplicationNotice = {
 
 export type NotifyResult = { emailed: string[]; texted: string | null; smsSkipped: string | null; errors: string[] };
 
-export async function notifySuperAdminsOfChurchAdminApplication(notice: ApplicationNotice, token: string): Promise<NotifyResult> {
+export async function notifySuperAdminsOfChurchAdminApplication(notice: ApplicationNotice, token: string, applicationId?: string): Promise<NotifyResult> {
   const result: NotifyResult = { emailed: [], texted: null, smsSkipped: null, errors: [] };
   const supabase = createSupabaseAdminClient();
   const { data: admins } = await supabase
     .from("profiles")
-    .select("email,phone,first_name")
+    .select("id,email,phone,first_name")
     .eq("role", "super_admin")
     .eq("status", "active");
   const people = admins ?? [];
-  const emails = Array.from(new Set(people.map((p: any) => String(p.email ?? "").toLowerCase()).filter(Boolean)));
-  if (!emails.includes(MIKE_EMAIL)) emails.push(MIKE_EMAIL);
+  const emails = [MIKE_EMAIL];
 
   const expires = new Date(notice.expiresAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Phoenix" });
   const ink = BRAND_KIT.colors.ink.hex;
@@ -88,6 +89,18 @@ export async function notifySuperAdminsOfChurchAdminApplication(notice: Applicat
   else if (sent) result.errors.push(`email: ${sent.reason ?? "not sent"}`);
 
   const mike = people.find((p: any) => String(p.email ?? "").toLowerCase() === MIKE_EMAIL);
+  if (mike?.id) {
+    await createPersonalNotification({
+      userId: mike.id,
+      type: "church_admin_application",
+      title: `Church admin application — ${notice.applicantName}`,
+      message: `${notice.applicantName} wants to be a church admin for ${notice.churchName}${notice.isNewChurch ? " (a new church)" : ""}. Review and approve or reject it in Churches → Applications.`,
+      href: "/dashboard/churches",
+      metadata: applicationId ? { applicationId } : {},
+    });
+  } else {
+    result.errors.push("dashboard: Mike's account isn't an active Super Admin");
+  }
   const phone = toE164(mike?.phone ?? "");
   if (!phone) {
     result.smsSkipped = "Mike's profile has no phone number";

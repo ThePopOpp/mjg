@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { ReviewFab } from "@/components/cms/review/review-fab";
+import { PersonalNotifications } from "@/components/layout/personal-notifications";
 import { createAdminActionToken } from "@/lib/auth/action-token";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { ROLES, canAccessPortal } from "@/lib/rbac/roles";
@@ -26,6 +27,7 @@ export default async function DashboardLayout({
   const isSuperAdmin = profile.role === ROLES.SUPER_ADMIN;
   return (
     <DashboardShell actionToken={createAdminActionToken(profile)} profile={profile}>
+      <PersonalNotifications />
       {children}
       {isSuperAdmin && (
         <ReviewFab me={{ email: (profile.email ?? "").toLowerCase(), name: [profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.email }} />

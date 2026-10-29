@@ -448,11 +448,13 @@ const notificationsList: ToolDef = {
   inputSchema: { type: "object", properties: { unread_only: { type: "boolean" }, limit: { type: "integer", minimum: 1, maximum: 100 } } },
   risk: "read",
   minRole: "super_admin",
-  run: async (a: { unread_only?: boolean; limit?: number }) => {
+  run: async (a: { unread_only?: boolean; limit?: number }, ctx) => {
     let query = createSupabaseAdminClient()
       .from("notifications")
       .select("id, type, title, message, status, read_at, created_at, metadata")
       .eq("destination", "dashboard")
+      // Shared notifications, plus your own personal ones — never someone else's.
+      .or(`user_id.is.null,user_id.eq.${ctx.actorId}`)
       .order("read_at", { ascending: true, nullsFirst: true })
       .order("created_at", { ascending: false })
       .limit(a.limit ?? 30);
@@ -471,9 +473,14 @@ const notificationsMarkRead: ToolDef = {
   inputSchema: { type: "object", properties: { ids: { type: "array", items: { type: "string" } }, all: { type: "boolean" } } },
   risk: "write",
   minRole: "super_admin",
-  run: async (a: { ids?: string[]; all?: boolean }) => {
+  run: async (a: { ids?: string[]; all?: boolean }, ctx) => {
     if (!a.all && !a.ids?.length) throw new Error("Give ids, or all: true.");
-    let query = createSupabaseAdminClient().from("notifications").update({ read_at: new Date().toISOString() }).is("read_at", null).eq("destination", "dashboard");
+    let query = createSupabaseAdminClient()
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .is("read_at", null)
+      .eq("destination", "dashboard")
+      .or(`user_id.is.null,user_id.eq.${ctx.actorId}`);
     if (!a.all) query = query.in("id", a.ids ?? []);
     const { error } = await query;
     if (error) throw error;

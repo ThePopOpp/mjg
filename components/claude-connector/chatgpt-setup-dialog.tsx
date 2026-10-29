@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Maximize2, Minimize2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 // What it takes to connect ChatGPT to MJG — the same steps as docs/mcp/chatgpt-setup.md,
 // shown beside the ChatGPT switch in Settings → Claude & Agents → AI clients.
 
 export function ChatgptSetupDialog({ connectorUrl, enabled }: { connectorUrl: string; enabled: boolean }) {
   const [copied, setCopied] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
   const origin = connectorUrl.replace(/\/mcp$/, "");
   const copy = (value: string) => {
     navigator.clipboard?.writeText(value);
@@ -17,9 +19,9 @@ export function ChatgptSetupDialog({ connectorUrl, enabled }: { connectorUrl: st
     setTimeout(() => setCopied(null), 1500);
   };
   const CopyRow = ({ label, value }: { label: string; value: string }) => (
-    <div className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-1.5 font-mono text-[12.5px]">
-      <span className="shrink-0 font-sans text-xs text-muted-foreground">{label}</span>
-      <span className="min-w-0 flex-1 truncate">{value}</span>
+    <div className="flex min-w-0 items-start gap-3 rounded-md border bg-muted/40 px-3 py-2 font-mono text-[12.5px]">
+      <span className="w-28 shrink-0 pt-0.5 font-sans text-xs text-muted-foreground">{label}</span>
+      <span className="min-w-0 flex-1 pt-0.5 [overflow-wrap:anywhere]">{value}</span>
       <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => copy(value)} aria-label={`Copy ${label}`}>
         {copied === value ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
       </Button>
@@ -27,22 +29,48 @@ export function ChatgptSetupDialog({ connectorUrl, enabled }: { connectorUrl: st
   );
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={(open) => !open && setExpanded(false)}>
       <DialogTrigger asChild>
         <Button type="button" size="sm" variant="outline">
           Setup steps
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Connecting ChatGPT to MJG</DialogTitle>
-          <DialogDescription>
-            ChatGPT uses the same connector, tools, rules and activity log as Claude. It's {enabled ? "switched on" : "switched off"} — while it's off,
-            ChatGPT can sign in but every call is refused.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent
+        className={cn(
+          // Own header controls replace the default corner close button (last child).
+          "flex max-w-none flex-col gap-0 overflow-hidden p-0 transition-[width,height] [&>button:last-child]:hidden",
+          expanded ? "h-[94vh] w-[96vw]" : "h-[min(88vh,52rem)] w-[min(94vw,60rem)]",
+        )}
+      >
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b px-6 py-4">
+          <div className="min-w-0">
+            <DialogTitle className="text-lg">Connecting ChatGPT to MJG</DialogTitle>
+            <DialogDescription className="mt-1 text-pretty">
+              ChatGPT uses the same connector, tools, rules and activity log as Claude. It's {enabled ? "switched on" : "switched off"} — while it's off,
+              ChatGPT can sign in but every call is refused.
+            </DialogDescription>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setExpanded((v) => !v)}
+              aria-label={expanded ? "Restore size" : "Expand"}
+              title={expanded ? "Restore size" : "Expand"}
+            >
+              {expanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            </Button>
+            <DialogClose asChild>
+              <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Close" title="Close">
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogClose>
+          </div>
+        </div>
 
-        <div className="space-y-5 text-sm">
+        <div className="brand-scroll min-h-0 min-w-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden px-6 py-5 text-sm">
           <section className="rounded-lg border border-[#b88a4a]/60 bg-[#b88a4a]/10 p-4">
             <h3 className="font-semibold">1 · Decide on the ChatGPT plan</h3>
             <p className="mt-1 text-muted-foreground">
@@ -105,6 +133,14 @@ export function ChatgptSetupDialog({ connectorUrl, enabled }: { connectorUrl: st
               republishing — so publish once the tool list is settled.
             </p>
           </section>
+        </div>
+
+        <div className="flex shrink-0 justify-end border-t px-6 py-3">
+          <DialogClose asChild>
+            <Button type="button" variant="outline" size="sm">
+              Close
+            </Button>
+          </DialogClose>
         </div>
       </DialogContent>
     </Dialog>

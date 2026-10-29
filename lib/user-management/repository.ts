@@ -88,7 +88,7 @@ export async function getUserManagementData() {
         .order("created_at", { ascending: false })
         .limit(100),
       supabase.from("form_submissions").select("*").is("deleted_at", null).order("created_at", { ascending: false }).limit(100),
-      supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("notifications").select("*").is("user_id", null).order("created_at", { ascending: false }).limit(100),
       supabase
         .from("participants")
         .select("id,first_name,last_name,email,phone,participant_type,wave,check_in_status,journey_status,created_at")

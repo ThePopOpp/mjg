@@ -23,7 +23,7 @@ export async function getPilotDashboardData() {
       supabase.from("survey_responses").select("*, participants(first_name,last_name,email,wave,source,participant_type)").order("created_at", { ascending: false }).limit(100),
       supabase.from("email_journey_events").select("*, participants(first_name,last_name,email)").order("scheduled_at", { ascending: true }).limit(80),
       supabase.from("tags").select("id,name,category,participant_tags(participant_id)").is("deleted_at", null).order("name"),
-      supabase.from("notifications").select("*, participants(first_name,last_name,email)").order("created_at", { ascending: false }).limit(20),
+      supabase.from("notifications").select("*, participants(first_name,last_name,email)").is("user_id", null).order("created_at", { ascending: false }).limit(20),
       supabase.from("inner_circle_responses").select("*, participants(first_name,last_name,email)").order("created_at", { ascending: false }).limit(30),
     ]);
 

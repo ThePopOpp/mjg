@@ -9,6 +9,7 @@ import {
   type ChurchActor,
 } from "./repository";
 import { notifyChurchAdminDecision, notifySuperAdminsOfChurchAdminApplication } from "./notify";
+import { resolvePersonalNotifications } from "@/lib/notifications/personal";
 
 // Church admin applications. Anyone signed in may apply; only a Super Admin approves — from the
 // dashboard, or through the single-use, expiring link texted/emailed to Mike (we keep only the
@@ -122,6 +123,7 @@ export async function applyForChurchAdmin(actor: ChurchActor, input: ChurchAdmin
       expiresAt,
     },
     token,
+    app.id,
   ).catch((e) => ({ emailed: [], texted: null, smsSkipped: null, errors: [e instanceof Error ? e.message : String(e)] }));
   await supabase.from("church_admin_applications").update({ notified: { ...notified, at: new Date().toISOString() } }).eq("id", app.id);
   return { ...app, notified };
@@ -212,6 +214,7 @@ export async function decideChurchAdminApplication(
     }
   }
 
+  await resolvePersonalNotifications("church_admin_application", "applicationId", app.id);
   await notifyChurchAdminDecision(app.email, { name: app.name, churchName, approved: input.decision === "approve", note }).catch((e) =>
     console.error("[churches] decision email failed", e instanceof Error ? e.message : e),
   );
