@@ -11,11 +11,13 @@ export default async function SmsComposePage() {
       .from("sms_templates")
       .select("id, name, body")
       .eq("status", "active")
+      .is("deleted_at", null)
       .order("name"),
     supabase
       .from("participants")
       .select("id, first_name, last_name, phone, sms_opt_in")
       .eq("sms_opt_in", true)
+      .is("deleted_at", null)
       .not("phone", "is", null)
       .order("first_name"),
   ]);

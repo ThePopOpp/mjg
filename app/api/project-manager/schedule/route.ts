@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
       .from("project_schedule_items")
       .select("*")
       .eq("board_id", boardId)
+      .is("deleted_at", null)
       .order("start_date", { ascending: true })
       .order("sort_order", { ascending: true });
     if (error) throw error;

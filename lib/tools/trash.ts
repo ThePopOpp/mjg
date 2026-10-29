@@ -74,4 +74,98 @@ const contactsDelete = trashDeleteTool({
   domain: "crm",
 });
 
-export const TRASH_TOOLS: ToolDef[] = [trashList, restore, contactsDelete];
+const participantsArchive = trashDeleteTool({
+  entity: "participant",
+  name: "participants_archive",
+  title: "Archive a participant",
+  description: "Archives a pilot participant (id from search_participants): they disappear from lists, reports and every send (journeys, experiences, broadcasts). Their history is kept.",
+  domain: "people",
+});
+
+const tagsDelete = trashDeleteTool({
+  entity: "tag",
+  name: "tags_delete",
+  title: "Delete a tag",
+  description: "Deletes a participant tag (id from list_tags); it stops showing on everyone tagged with it.",
+  domain: "people",
+});
+
+const groupDelete = trashDeleteTool({
+  entity: "facilitator_group",
+  name: "group_delete",
+  title: "Delete a group listing",
+  description: "Deletes a Find a Group listing (id from groups_list) — it disappears from the site and the dashboard. To just take it down, use group_set_status closed or archived.",
+  domain: "people",
+});
+
+const socialPostDelete = trashDeleteTool({
+  entity: "social_post",
+  name: "social_post_delete",
+  title: "Delete a social post",
+  description: "Deletes a social post (id from list_social_posts); a scheduled one won't publish. Doesn't remove anything already posted on the platform.",
+  domain: "social",
+});
+
+const socialTemplateDelete = trashDeleteTool({
+  entity: "social_template",
+  name: "social_template_delete",
+  title: "Delete a social template",
+  description: "Deletes a social post template (id from list_social_templates). Automations using it stop finding it — check list_social_templates' automations first.",
+  domain: "social",
+});
+
+const mediaDelete = trashDeleteTool({
+  entity: "media_asset",
+  name: "media_delete",
+  title: "Delete a media asset",
+  description: "Deletes a Media Studio asset (id from list_media_assets); it disappears from the library and public pages. The stored file is kept.",
+  domain: "media",
+});
+
+const smsTemplateDelete = trashDeleteTool({
+  entity: "sms_template",
+  name: "sms_template_delete",
+  title: "Delete an SMS template",
+  description: "Deletes an SMS template (id from sms_list_templates).",
+  domain: "sms",
+});
+
+const projectItemDelete = trashDeleteTool({
+  entity: "project_item",
+  name: "project_item_delete",
+  title: "Delete a Project Manager item",
+  description: "Deletes a Project Manager item — project, phase, task or milestone (id from list_project_items).",
+  domain: "ops",
+});
+
+const businessCardsDelete = trashDeleteTool({
+  entity: "business_card",
+  name: "business_cards_delete",
+  title: "Delete a business card",
+  description: "Deletes a digital business card (id from list_business_cards); its public page stops working.",
+  domain: "crm",
+});
+
+const formSubmissionDelete = trashDeleteTool({
+  entity: "form_submission",
+  name: "form_submission_delete",
+  title: "Delete a form submission",
+  description: "Deletes a website form submission (id from list_form_submissions) — same as Delete on the Form Submissions screen.",
+  domain: "crm",
+});
+
+export const TRASH_TOOLS: ToolDef[] = [
+  trashList,
+  restore,
+  contactsDelete,
+  participantsArchive,
+  tagsDelete,
+  groupDelete,
+  socialPostDelete,
+  socialTemplateDelete,
+  mediaDelete,
+  smsTemplateDelete,
+  projectItemDelete,
+  businessCardsDelete,
+  formSubmissionDelete,
+];

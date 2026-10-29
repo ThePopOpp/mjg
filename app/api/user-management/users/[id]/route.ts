@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { ROLES } from "@/lib/rbac/roles";
 import { requireUserManager } from "@/lib/user-management/auth";
+import { isOwnerEmail } from "@/lib/user-management/constants";
 import { deleteUserProfile, getUserManagementProfile } from "@/lib/user-management/repository";
-
-// The owner account can never be deleted, even by another Super Admin.
-const OWNER_EMAILS = new Set(["jw@michaeljgauthier.com"]);
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -20,7 +18,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     if (!profile) return NextResponse.json({ error: "User not found." }, { status: 404 });
     const target = profile as { email?: string | null; role?: string | null };
 
-    if (target.email && OWNER_EMAILS.has(target.email.trim().toLowerCase())) {
+    // The owner account can never be deleted, even by another Super Admin.
+    if (isOwnerEmail(target.email)) {
       return NextResponse.json({ error: "The owner account cannot be deleted." }, { status: 403 });
     }
     // Only a Super Admin may delete a Super Admin (parity with the edit guard).

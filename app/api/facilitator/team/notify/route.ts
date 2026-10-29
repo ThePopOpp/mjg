@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       .from("participants")
       .select("id,email,first_name,last_name")
       .eq("id", participantId)
+      .is("deleted_at", null)
       .maybeSingle();
     if (error) throw error;
     if (!participant?.email) return NextResponse.json({ error: "Participant has no email." }, { status: 400 });

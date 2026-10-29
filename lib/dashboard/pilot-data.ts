@@ -14,13 +14,15 @@ export async function getPilotDashboardData() {
     ] = await Promise.all([
       supabase
         .from("participants")
-        .select("*, participant_tags(tags(id,name,category))")
+        .select("*, participant_tags(tags!inner(id,name,category))")
+        .is("deleted_at", null)
+        .is("participant_tags.tags.deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(100),
       supabase.from("check_in_submissions").select("*").eq("assessment", "created-for-more").order("created_at", { ascending: false }).limit(1000),
       supabase.from("survey_responses").select("*, participants(first_name,last_name,email,wave,source,participant_type)").order("created_at", { ascending: false }).limit(100),
       supabase.from("email_journey_events").select("*, participants(first_name,last_name,email)").order("scheduled_at", { ascending: true }).limit(80),
-      supabase.from("tags").select("id,name,category,participant_tags(participant_id)").order("name"),
+      supabase.from("tags").select("id,name,category,participant_tags(participant_id)").is("deleted_at", null).order("name"),
       supabase.from("notifications").select("*, participants(first_name,last_name,email)").order("created_at", { ascending: false }).limit(20),
       supabase.from("inner_circle_responses").select("*, participants(first_name,last_name,email)").order("created_at", { ascending: false }).limit(30),
     ]);
@@ -53,12 +55,12 @@ export async function getParticipantDetail(id: string) {
   try {
     const supabase = createSupabaseAdminClient();
     const [participant, checkIns, surveys, emailEvents, tags, allTags, activity] = await Promise.all([
-      supabase.from("participants").select("*").eq("id", id).maybeSingle(),
+      supabase.from("participants").select("*").eq("id", id).is("deleted_at", null).maybeSingle(),
       supabase.from("check_in_submissions").select("*").eq("assessment", "created-for-more").eq("participant_id", id).order("created_at", { ascending: false }),
       supabase.from("survey_responses").select("*").eq("participant_id", id).order("created_at", { ascending: false }),
       supabase.from("email_journey_events").select("*").eq("participant_id", id).order("scheduled_at", { ascending: true }),
-      supabase.from("participant_tags").select("tag_id,tags(id,name,category)").eq("participant_id", id),
-      supabase.from("tags").select("id,name,category").order("category").order("name"),
+      supabase.from("participant_tags").select("tag_id,tags!inner(id,name,category)").eq("participant_id", id).is("tags.deleted_at", null),
+      supabase.from("tags").select("id,name,category").is("deleted_at", null).order("category").order("name"),
       supabase.from("activity_logs").select("*").eq("participant_id", id).order("created_at", { ascending: false }).limit(50),
     ]);
 

@@ -21,13 +21,14 @@ export async function checkSmsConsent(phone: string, opts: { strict?: boolean } 
   if (!key) return { allowed: false, reason: "That isn't a valid phone number." };
   const supabase = createSupabaseAdminClient();
   const [participants, profiles, conversations] = await Promise.all([
-    supabase.from("participants").select("phone, sms_opt_in").not("phone", "is", null),
+    supabase.from("participants").select("phone, sms_opt_in, deleted_at").not("phone", "is", null),
     supabase.from("profiles").select("phone, sms_opt_in").not("phone", "is", null),
     supabase.from("sms_conversations").select("id, contact_number"),
   ]);
   const people = [...(participants.data ?? []), ...(profiles.data ?? [])].filter((p) => phoneKey(p.phone) === key);
+  // An archived participant's opt-out still blocks; their opt-in no longer grants consent.
   if (people.some((p) => p.sms_opt_in === false)) return { allowed: false, reason: "This number has opted out of texts." };
-  if (people.some((p) => p.sms_opt_in === true)) return { allowed: true, via: "opted_in" };
+  if (people.some((p) => p.sms_opt_in === true && !("deleted_at" in p && p.deleted_at))) return { allowed: true, via: "opted_in" };
   if (!strict) return { allowed: true, via: "not_opted_out" };
 
   const threadIds = (conversations.data ?? []).filter((c) => phoneKey(c.contact_number) === key).map((c) => c.id);
@@ -58,7 +59,7 @@ async function recipientRecord(kind: RecipientKind, id: string | null) {
 }
 
 async function templateBody(templateId: string) {
-  const { data } = await createSupabaseAdminClient().from("sms_templates").select("body").eq("id", templateId).maybeSingle();
+  const { data } = await createSupabaseAdminClient().from("sms_templates").select("body").eq("id", templateId).is("deleted_at", null).maybeSingle();
   if (!data) throw new Error("SMS template not found.");
   return data.body as string;
 }
@@ -135,6 +136,7 @@ export async function resolveBroadcastRecipients(input: BroadcastInput): Promise
 
   const table = audience === "profiles" ? "profiles" : "participants";
   let query = supabase.from(table).select(SELECT[table]).eq("sms_opt_in", true).not("phone", "is", null);
+  if (table === "participants") query = query.is("deleted_at", null);
   if (input.recipientIds?.length) query = query.in("id", input.recipientIds);
   const { data, error } = await query;
   if (error) throw error;
@@ -192,6 +194,7 @@ export async function listSmsTemplates(status: "active" | "draft" | "all" = "act
   let query = createSupabaseAdminClient()
     .from("sms_templates")
     .select("id, name, slug, body, available_fields, category, status, created_at, updated_at")
+    .is("deleted_at", null)
     .order("updated_at", { ascending: false });
   if (status !== "all") query = query.eq("status", status);
   const { data, error } = await query;

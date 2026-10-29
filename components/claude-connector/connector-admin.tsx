@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
 import { cn } from "@/lib/utils";
+import { ChatgptSetupDialog } from "./chatgpt-setup-dialog";
 
 // Settings for the Claude connector (MCP). Data: lib/mcp/admin.ts · API: /api/admin/mcp.
 
 export type ConnectorOverview = {
   enabled: boolean;
+  chatgptEnabled: boolean;
   connections: Array<{ id: string; kind: string; name: string; scopes: string[]; created_at: string; last_used_at: string | null; paused_at: string | null; profile: { email: string } | null }>;
   calls: Array<{
     id: number;
@@ -84,6 +86,8 @@ export function ClaudeConnectorAdmin({
   const [caps, setCaps] = useState({ sms: initial.caps.sms?.toString() ?? "", email: initial.caps.email?.toString() ?? "" });
 
   // One row per AI client (Claude registers more than once); off if any registration is off.
+  // ChatGPT has its own opt-in switch and always shows, connected or not.
+  const chatgptRegistrations = data.clients.filter((c) => c.client_label === "ChatGPT").length;
   const clientGroups = Object.values(
     data.clients.reduce<Record<string, { label: string; count: number; disabled: boolean; since: string }>>((acc, c) => {
       const g = (acc[c.client_label] ??= { label: c.client_label, count: 0, disabled: false, since: c.created_at });
@@ -92,7 +96,7 @@ export function ClaudeConnectorAdmin({
       if (c.created_at < g.since) g.since = c.created_at;
       return acc;
     }, {}),
-  );
+  ).filter((g) => g.label !== "ChatGPT");
 
   async function refresh(filter = clientFilter) {
     const qs = filter ? `?client=${encodeURIComponent(filter)}` : "";
@@ -261,6 +265,33 @@ export function ClaudeConnectorAdmin({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+            <div className="min-w-0">
+              <p className="font-medium">
+                ChatGPT
+                <Badge
+                  variant="outline"
+                  className={cn("ml-2 align-middle", data.chatgptEnabled ? "" : "border-[#b88a4a] text-[#8a6532] dark:text-[#d8bd86]")}
+                >
+                  {data.chatgptEnabled ? "On" : "Off"}
+                </Badge>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Opt-in — refused until switched on.{" "}
+                {chatgptRegistrations ? `${chatgptRegistrations} registration${chatgptRegistrations === 1 ? "" : "s"}.` : "Not connected yet."}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <ChatgptSetupDialog connectorUrl={connectorUrl} enabled={data.chatgptEnabled} />
+              {busy === "set_chatgpt_enabled" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              <Switch
+                checked={data.chatgptEnabled}
+                disabled={busy !== null}
+                onCheckedChange={(on) => call("set_chatgpt_enabled", { enabled: on })}
+                aria-label="ChatGPT on or off"
+              />
+            </div>
+          </div>
           {clientGroups.length ? (
             <ul className="divide-y">
               {clientGroups.map((g) => (
@@ -287,7 +318,7 @@ export function ClaudeConnectorAdmin({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">No AI client has connected yet.</p>
+            <p className="pt-3 text-sm text-muted-foreground">Claude hasn't connected yet.</p>
           )}
         </CardContent>
       </Card>

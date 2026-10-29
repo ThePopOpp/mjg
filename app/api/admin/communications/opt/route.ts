@@ -78,14 +78,14 @@ export async function GET(request: Request) {
     const supabase = createSupabaseAdminClient();
 
     const [participantSms, participantEmail, profileSms, profileEmail] = await Promise.all([
-      supabase.from("participants").select("id", { count: "exact", head: true }).eq("sms_opt_in", true),
-      supabase.from("participants").select("id", { count: "exact", head: true }).eq("email_opt_in", true),
+      supabase.from("participants").select("id", { count: "exact", head: true }).is("deleted_at", null).eq("sms_opt_in", true),
+      supabase.from("participants").select("id", { count: "exact", head: true }).is("deleted_at", null).eq("email_opt_in", true),
       supabase.from("profiles").select("id", { count: "exact", head: true }).eq("sms_opt_in", true).neq("role", "participant"),
       supabase.from("profiles").select("id", { count: "exact", head: true }).eq("email_opt_in", true).neq("role", "participant"),
     ]);
 
     const [totalParticipants, totalProfiles] = await Promise.all([
-      supabase.from("participants").select("id", { count: "exact", head: true }),
+      supabase.from("participants").select("id", { count: "exact", head: true }).is("deleted_at", null),
       supabase.from("profiles").select("id", { count: "exact", head: true }).neq("role", "participant"),
     ]);
 

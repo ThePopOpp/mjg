@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Activity, CheckCircle2, Church, CircleUserRound, MailCheck, UsersRound, MessageSquareText, MessagesSquare, CornerUpLeft } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
@@ -29,6 +30,7 @@ export default async function DashboardPage() {
   if (profileForRole?.role === ROLES.PARTICIPANT) {
     return <ParticipantDashboard profile={profileForRole} />;
   }
+  if (profileForRole?.role === ROLES.CHURCH_ADMIN) redirect("/dashboard/church");
 
   const [data, profile, checkInStats, recentCheckIns, invStats, recentInvitations] = await Promise.all([getPilotDashboardData(), getCurrentProfile(), getCheckInSubmissionStats(), listCheckInSubmissions(6), getInvitationCounts(), getRecentInvitations()]);
   const pilotMetrics = getPilotMetrics(data);

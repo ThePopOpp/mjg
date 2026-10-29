@@ -61,7 +61,7 @@ async function facilitatorLeadsAuditOwner(facilitatorId: string, auditEmail: str
   if (!auditEmail) return false;
   const supabase = createSupabaseAdminClient();
 
-  const { data: participant } = await supabase.from("participants").select("id").ilike("email", auditEmail).maybeSingle();
+  const { data: participant } = await supabase.from("participants").select("id").ilike("email", auditEmail).is("deleted_at", null).maybeSingle();
   if (!participant) return false;
 
   const { data: teams } = await supabase.from("facilitator_teams").select("id").eq("facilitator_id", facilitatorId);

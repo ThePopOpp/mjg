@@ -23,14 +23,19 @@ export type McpActor = {
 
 export type AuthFailure = { status: 401 | 403 | 503; error: string; description: string };
 
-export async function isMcpEnabled(): Promise<boolean> {
+async function getSwitches() {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase.from("mcp_settings").select("enabled").eq("id", 1).maybeSingle();
-  return Boolean(data?.enabled);
+  const { data } = await supabase.from("mcp_settings").select("enabled, chatgpt_enabled").eq("id", 1).maybeSingle();
+  return { enabled: Boolean(data?.enabled), chatgptEnabled: Boolean(data?.chatgpt_enabled) };
+}
+
+export async function isMcpEnabled(): Promise<boolean> {
+  return (await getSwitches()).enabled;
 }
 
 export async function authenticateMcpRequest(request: Request): Promise<McpActor | AuthFailure> {
-  if (!(await isMcpEnabled())) {
+  const switches = await getSwitches();
+  if (!switches.enabled) {
     return { status: 503, error: "temporarily_unavailable", description: "The MJG connector is switched off in Settings → Claude & Agents." };
   }
 
@@ -60,7 +65,7 @@ export async function authenticateMcpRequest(request: Request): Promise<McpActor
       .select("client_label, disabled_at")
       .eq("client_id", token.client_id)
       .maybeSingle();
-    const refusal = clientGate(client);
+    const refusal = clientGate(client, switches);
     if (refusal) return { status: 403, error: "access_denied", description: refusal };
     clientLabel = client?.client_label ?? null;
   }

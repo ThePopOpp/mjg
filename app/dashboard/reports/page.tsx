@@ -9,6 +9,7 @@ import { listCheckInSubmissions, getCheckInSubmissionStats } from "@/lib/check-i
 import { getEnergyAuditStats } from "@/lib/energy-audit/submissions";
 import { getBookWaitlistStats } from "@/lib/book-waitlist/repository";
 import { SECTION_MAX, TOTAL_MAX } from "@/lib/energy-audit/energy-audit";
+import { getDistribution, getWaveRows } from "@/lib/dashboard/reports";
 
 export default async function ReportsPage() {
   const [data, submissions, checkInStats, energyStats, waitlistStats] = await Promise.all([
@@ -277,33 +278,4 @@ function BarRow({ label, value, max }: { label: string; value: number; max: numb
       </div>
     </div>
   );
-}
-
-function getDistribution(values: string[]) {
-  const counts = values.reduce<Record<string, number>>((acc, value) => {
-    acc[value] = (acc[value] ?? 0) + 1;
-    return acc;
-  }, {});
-
-  return Object.entries(counts)
-    .map(([label, count]) => ({ label, count }))
-    .sort((a, b) => b.count - a.count);
-}
-
-function getWaveRows(participants: any[], checkIns: any[], surveys: any[]) {
-  const waveKeys = Array.from(new Set(participants.map((row) => row.wave ?? row.source).filter(Boolean))).sort();
-
-  return waveKeys.map((wave) => {
-    const waveParticipants = participants.filter((row) => row.wave === wave || row.source === wave);
-    const participantIds = new Set(waveParticipants.map((row) => row.id));
-
-    return {
-      wave,
-      participants: waveParticipants.length,
-      optedIn: waveParticipants.filter((row) => row.email_journey_opt_in).length,
-      checkIns: checkIns.filter((row) => participantIds.has(row.participant_id)).length,
-      surveys: surveys.filter((row) => row.participant_id && participantIds.has(row.participant_id)).length,
-      innerCircle: waveParticipants.filter((row) => row.inner_circle_status === "accepted").length,
-    };
-  });
 }

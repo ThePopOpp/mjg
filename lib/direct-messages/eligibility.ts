@@ -37,7 +37,7 @@ export async function getGroupPeople(profile: { id: string; role: string; email:
   } else if (profile.role === ROLES.PARTICIPANT) {
     const addr = lc(profile.email);
     if (!addr) return [];
-    const { data: mine } = await supabase.from("participants").select("id").ilike("email", addr);
+    const { data: mine } = await supabase.from("participants").select("id").ilike("email", addr).is("deleted_at", null);
     const myIds = (mine ?? []).map((r: any) => r.id as string);
     if (!myIds.length) return [];
     const { data: myMemb } = await supabase.from("facilitator_team_members").select("team_id").in("participant_id", myIds);
@@ -46,7 +46,7 @@ export async function getGroupPeople(profile: { id: string; role: string; email:
     const { data: members } = await supabase.from("facilitator_team_members").select("participant_id").in("team_id", teamIds);
     const memberIds = Array.from(new Set((members ?? []).map((m: any) => m.participant_id as string))).filter((id) => !myIds.includes(id));
     if (memberIds.length) {
-      const { data: teammates } = await supabase.from("participants").select("email").in("id", memberIds);
+      const { data: teammates } = await supabase.from("participants").select("email").in("id", memberIds).is("deleted_at", null);
       (teammates ?? []).forEach((p: any) => { const e = lc(p.email); if (e) emails.add(e); });
     }
     const { data: teams } = await supabase.from("facilitator_teams").select("facilitator_id").in("id", teamIds);

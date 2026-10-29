@@ -9,6 +9,7 @@ export default async function SmsTemplatesPage() {
     .from("sms_templates")
     .select("id, name, slug, body, category, status, available_fields, updated_at")
     .in("status", ["draft", "active"])
+    .is("deleted_at", null)
     .order("updated_at", { ascending: false });
 
   return (

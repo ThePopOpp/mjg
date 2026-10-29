@@ -80,7 +80,7 @@ export async function deleteAccount(id: string): Promise<void> {
 export async function getSocialTemplateData(): Promise<{ templates: SocialTemplate[]; automations: SocialAutomation[] }> {
   const sb = createSupabaseAdminClient();
   const [t, a] = await Promise.all([
-    sb.from("social_templates").select("*").order("updated_at", { ascending: false }),
+    sb.from("social_templates").select("*").is("deleted_at", null).order("updated_at", { ascending: false }),
     sb.from("social_automations").select("*, template:social_templates(name, slug)"),
   ]);
   if (t.error) throw new Error(t.error.message);
@@ -89,13 +89,13 @@ export async function getSocialTemplateData(): Promise<{ templates: SocialTempla
 }
 export async function listActiveTemplates(): Promise<SocialTemplate[]> {
   const sb = createSupabaseAdminClient();
-  const { data, error } = await sb.from("social_templates").select("*").eq("status", "active").order("name");
+  const { data, error } = await sb.from("social_templates").select("*").eq("status", "active").is("deleted_at", null).order("name");
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as SocialTemplate[];
 }
 export async function getTemplate(id: string): Promise<SocialTemplate | null> {
   const sb = createSupabaseAdminClient();
-  const { data, error } = await sb.from("social_templates").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await sb.from("social_templates").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
   if (error) throw new Error(error.message);
   return (data ?? null) as unknown as SocialTemplate | null;
 }
@@ -161,6 +161,7 @@ export async function listPosts(opts: { status?: string; limit?: number } = {}):
   const sb = createSupabaseAdminClient();
   let q = sb.from("social_posts")
     .select("*, account:social_accounts(display_name, platform), template:social_templates(name)")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(opts.limit ?? 500);
   if (opts.status) q = q.eq("status", opts.status);
@@ -216,7 +217,7 @@ export async function deletePost(id: string): Promise<void> {
 // Publish a post now via the platform adapter (live API wiring is in publish.ts).
 export async function publishPost(id: string): Promise<SocialPost> {
   const sb = createSupabaseAdminClient();
-  const { data: post, error } = await sb.from("social_posts").select("*").eq("id", id).maybeSingle();
+  const { data: post, error } = await sb.from("social_posts").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
   if (error) throw new Error(error.message);
   if (!post) throw new Error("Post not found.");
   if (!post.account_id) throw new Error("Choose an account before publishing.");
@@ -250,7 +251,7 @@ export async function publishPost(id: string): Promise<SocialPost> {
 export async function publishDuePosts(limit = 25): Promise<{ attempted: number; published: number; failed: number }> {
   const sb = createSupabaseAdminClient();
   const { data } = await sb.from("social_posts").select("id")
-    .eq("status", "scheduled").lte("scheduled_at", new Date().toISOString())
+    .eq("status", "scheduled").lte("scheduled_at", new Date().toISOString()).is("deleted_at", null)
     .order("scheduled_at", { ascending: true }).limit(limit);
   let published = 0, failed = 0;
   for (const p of data ?? []) {
@@ -301,7 +302,7 @@ export async function saveAutomation(input: { event_key: string; template_id: st
 export async function getSocialReport(rangeDays = 30): Promise<SocialReport> {
   const sb = createSupabaseAdminClient();
   const since = new Date(Date.now() - rangeDays * 86400000).toISOString();
-  const { data } = await sb.from("social_posts").select("*").gte("created_at", since).limit(2000);
+  const { data } = await sb.from("social_posts").select("*").gte("created_at", since).is("deleted_at", null).limit(2000);
   const posts = (data ?? []) as unknown as SocialPost[];
 
   const published = posts.filter((p) => p.status === "published");

@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
     const supabase = createSupabaseAdminClient();
     // Whether this person is new decides what an unticked SMS box means: a new
     // record starts opted OUT, an existing one is left exactly as it was.
+    // Not filtered by deleted_at: email is unique, so an archived row is updated in place (and stays archived).
     const { data: priorRows } = await supabase.from("participants").select("id").eq("email", email).limit(1);
     const priorParticipant = priorRows?.[0] ?? null;
     const participant = await upsertParticipant({

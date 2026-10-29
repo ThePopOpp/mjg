@@ -19,7 +19,7 @@ export async function getParticipantTeam(email: string | null | undefined): Prom
   const supabase = createSupabaseAdminClient();
 
   // Find this participant's record(s) by email.
-  const { data: mine } = await supabase.from("participants").select("id").ilike("email", addr);
+  const { data: mine } = await supabase.from("participants").select("id").ilike("email", addr).is("deleted_at", null);
   const myIds = (mine ?? []).map((r: any) => r.id as string);
   if (!myIds.length) return empty;
 
@@ -36,6 +36,7 @@ export async function getParticipantTeam(email: string | null | undefined): Prom
     .from("participants")
     .select("id,first_name,last_name,email,phone,wave,check_in_status,survey_status,journey_status,inner_circle_status,created_at")
     .in("id", memberIds)
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   const all = (data ?? []) as TeamParticipant[];

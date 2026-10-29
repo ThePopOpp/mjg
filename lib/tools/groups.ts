@@ -46,7 +46,7 @@ const groupUpdate: ToolDef = {
   name: "group_update",
   title: "Edit a group listing",
   description:
-    "Changes a group's details. Fields: title, description, audience (men|women|couples|mixed|youth), meetingDay (0=Sun…6=Sat), meetingTime (HH:MM 24h), timezone, frequency (weekly|biweekly), startDate (YYYY-MM-DD), durationWeeks, format (in_person|online|hybrid), venueName, addressLine, city, state, postalCode, showExactAddress, capacity, bookingMode (auto|approval). Address changes re-geocode.",
+    "Changes a group's details. Fields: title, description, audience (men|women|couples|mixed|youth), meetingDay (0=Sun…6=Sat), meetingTime (HH:MM 24h), timezone, frequency (weekly|biweekly), startDate (YYYY-MM-DD), durationWeeks, format (in_person|online|hybrid), venueName, addressLine, city, state, postalCode, showExactAddress, capacity, bookingMode (auto|approval), churchId (official church group — the church must have approved the facilitator; null clears it). Address changes re-geocode.",
   domain: "people",
   inputSchema: { type: "object", properties: { id: GROUP_ID, changes: { type: "object" } }, required: ["id", "changes"] },
   risk: "write",

@@ -28,7 +28,7 @@ export async function getMcpOverview(options: { client?: ClientFilter } = {}) {
   if (options.client) callsQuery = callsQuery.eq("client_label", options.client);
 
   const [settings, tokens, calls, approvals, tasks, clients, caps] = await Promise.all([
-    supabase.from("mcp_settings").select("enabled, updated_at").eq("id", 1).maybeSingle(),
+    supabase.from("mcp_settings").select("enabled, chatgpt_enabled, updated_at").eq("id", 1).maybeSingle(),
     supabase
       .from("mcp_tokens")
       .select("id, kind, name, scopes, created_at, last_used_at, expires_at, refresh_expires_at, paused_at, profile:profiles!mcp_tokens_profile_id_fkey(email)")
@@ -63,6 +63,7 @@ export async function getMcpOverview(options: { client?: ClientFilter } = {}) {
   });
   return {
     enabled: Boolean(settings.data?.enabled),
+    chatgptEnabled: Boolean(settings.data?.chatgpt_enabled),
     connections: live,
     calls: (calls.data ?? []).map((c) => ({ ...c, restorable: trashed.has(`${c.entity}:${c.record_id}`) && /_delete$/.test(c.tool) })),
     clients: clients.data ?? [],
@@ -89,6 +90,13 @@ export async function setClientDisabled(label: string, disabled: boolean, by: st
     .from("mcp_oauth_clients")
     .update({ disabled_at: disabled ? new Date().toISOString() : null, disabled_by: disabled ? by : null })
     .eq("client_label", label);
+  if (error) throw error;
+}
+
+/** ChatGPT is opt-in (off until a Super Admin turns it on); checked on every call. */
+export async function setChatgptEnabled(enabled: boolean, by: string) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase.from("mcp_settings").update({ chatgpt_enabled: enabled, updated_by: by, updated_at: new Date().toISOString() }).eq("id", 1);
   if (error) throw error;
 }
 

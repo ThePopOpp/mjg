@@ -58,8 +58,13 @@ export async function registerClient(body: Record<string, unknown>) {
   if (!redirectUris.length || redirectUris.length > 10 || !redirectUris.every(isAllowedRedirect)) {
     throw new OAuthError("invalid_redirect_uri", "redirect_uris must be https (or http on localhost).");
   }
+  // Public clients only (PKCE, no secret). A client asking for a secret method
+  // (ChatGPT's docs don't pin one down) is registered as public instead and told
+  // so in the response — RFC 7591 §3.2.1 lets the server replace requested values.
   const authMethod = body.token_endpoint_auth_method ?? "none";
-  if (authMethod !== "none") throw new OAuthError("invalid_client_metadata", "Only public clients (token_endpoint_auth_method: none) are supported.");
+  if (typeof authMethod !== "string" || !["none", "client_secret_post", "client_secret_basic"].includes(authMethod)) {
+    throw new OAuthError("invalid_client_metadata", "Only public clients (token_endpoint_auth_method: none) are supported.");
+  }
 
   const clientName = typeof body.client_name === "string" ? body.client_name.slice(0, 120) : "MCP client";
   const clientId = newSecret(PREFIX.client).slice(0, 40);

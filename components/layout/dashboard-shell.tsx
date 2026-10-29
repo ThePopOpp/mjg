@@ -8,7 +8,7 @@ import { DashboardActionTokenProvider } from "@/components/layout/dashboard-acti
 import { DmUnreadProvider, useDmUnread } from "@/components/direct-messages/dm-unread";
 import { InstallAppButton } from "@/components/pwa/install-app-button";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
-import { dashboardNav, facilitatorNav, participantNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
+import { churchAdminNav, dashboardNav, facilitatorNav, participantNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -31,7 +31,11 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
   const pathname = usePathname();
 
   // Facilitators and participants get their own scoped sidebars; everyone else gets the admin nav.
-  const navForRole = profile.role === ROLES.FACILITATOR ? facilitatorNav : profile.role === ROLES.PARTICIPANT ? participantNav : dashboardNav;
+  const navForRole =
+    profile.role === ROLES.FACILITATOR ? facilitatorNav
+    : profile.role === ROLES.PARTICIPANT ? participantNav
+    : profile.role === ROLES.CHURCH_ADMIN ? churchAdminNav
+    : dashboardNav;
 
   // Permission-filter: drop items the role can't see; drop now-empty groups.
   const visibleEntries: NavEntry[] = navForRole

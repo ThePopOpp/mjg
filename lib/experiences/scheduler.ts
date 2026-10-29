@@ -86,6 +86,13 @@ async function processSendEvent(
     await markEvent(supabase, event.id, "skipped", now, "Attendee opted out, missing email, or experience not active.");
     return { id: event.id, status: "skipped", reason: "Opted out / inactive." };
   }
+  if (attendee.participant_id) {
+    const { data: linked } = await supabase.from("participants").select("deleted_at").eq("id", attendee.participant_id).maybeSingle();
+    if (linked?.deleted_at) {
+      await markEvent(supabase, event.id, "skipped", now, "Participant was archived.");
+      return { id: event.id, status: "skipped", reason: "Participant archived." };
+    }
+  }
   if (!event.template_id) {
     await markEvent(supabase, event.id, "skipped", now, `No email template configured for step ${event.step_number}.`);
     return { id: event.id, status: "skipped", reason: `No template for step ${event.step_number}.` };

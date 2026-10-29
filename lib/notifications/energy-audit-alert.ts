@@ -29,7 +29,7 @@ export async function resolveEnergyAuditTeam(email: string | null): Promise<Ener
   if (!normalized) return empty;
 
   const supabase = createSupabaseAdminClient();
-  const { data: participant } = await supabase.from("participants").select("id").ilike("email", normalized).maybeSingle();
+  const { data: participant } = await supabase.from("participants").select("id").ilike("email", normalized).is("deleted_at", null).maybeSingle();
   if (!participant) return empty;
 
   const { data: memberships } = await supabase

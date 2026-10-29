@@ -3,11 +3,13 @@ import { SurveyResponsesDashboard } from "@/components/surveys/survey-responses-
 import { SurveyBuilder } from "@/components/pilot/survey-builder";
 import { getPilotDashboardData } from "@/lib/dashboard/pilot-data";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { getCurrentProfile } from "@/lib/auth/server";
+import { ROLES } from "@/lib/rbac/roles";
 
 export const dynamic = "force-dynamic";
 
 export default async function SurveysPage() {
-  const data = await getPilotDashboardData();
+  const [data, profile] = await Promise.all([getPilotDashboardData(), getCurrentProfile()]);
 
   return (
     <div className="space-y-6">
@@ -22,7 +24,7 @@ export default async function SurveysPage() {
           <SurveyResponsesDashboard surveys={data.surveys as any[]} />
         </TabsContent>
         <TabsContent value="builder" className="mt-4">
-          <SurveyBuilder />
+          <SurveyBuilder canSetMcpReadable={profile?.role === ROLES.SUPER_ADMIN} />
         </TabsContent>
       </Tabs>
     </div>

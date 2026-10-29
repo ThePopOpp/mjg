@@ -50,6 +50,7 @@ export async function searchMedia(
     .from("media_assets")
     .select("*")
     .neq("status", "deleted")
+    .is("deleted_at", null)
     .order("updated_at", { ascending: false })
     .limit(Math.min(120, opts.limit ?? 60));
   if (opts.assetType && opts.assetType !== "all") query = query.eq("asset_type", opts.assetType);
@@ -63,7 +64,7 @@ export async function searchMedia(
 
 export async function getMediaItem(id: string): Promise<MediaItem | null> {
   const sb = createSupabaseAdminClient();
-  const { data, error } = await sb.from("media_assets").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await sb.from("media_assets").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
   if (error) throw new Error(error.message);
   return data ? toItem(data as Record<string, unknown>) : null;
 }

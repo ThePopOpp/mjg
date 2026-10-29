@@ -70,6 +70,7 @@ export async function loadCardsForViewer(opts: { all: boolean; staffId: string |
     .from("business_cards")
     .select(CARD_SELECT)
     .neq("status", "archived")
+    .is("deleted_at", null)
     .order("updated_at", { ascending: false });
   if (!opts.all) q = q.eq("staff_user_id", opts.staffId ?? "__none__");
   const { data, error } = await q;
@@ -83,6 +84,7 @@ export async function loadCardForEdit(id: string): Promise<BusinessCard | null> 
     .from("business_cards")
     .select(`${CARD_SELECT}, business_card_links(*), business_card_sections(*)`)
     .eq("id", id)
+    .is("deleted_at", null)
     .maybeSingle();
   if (error) throw new Error(error.message);
   return (data ?? null) as unknown as BusinessCard | null;
@@ -96,6 +98,7 @@ export async function loadPublicCardBySlug(slug: string): Promise<BusinessCard |
     .eq("slug", slug)
     .eq("status", "published")
     .eq("is_public", true)
+    .is("deleted_at", null)
     .maybeSingle();
   if (error) throw new Error(error.message);
   return (data ?? null) as unknown as BusinessCard | null;

@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     const { data: participant } = await supabase
       .from("participants")
       .select("id")
+      .is("deleted_at", null)
       .or(`phone.eq.${from},phone.eq.+${from.replace(/\D/g, "")}`)
       .maybeSingle();
 

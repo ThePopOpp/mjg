@@ -5,7 +5,7 @@ import { renderFaviconLinks } from "@/lib/public-site/static-pages";
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
   const supabase = createSupabaseAdminClient();
-  const { data: asset, error } = await supabase.from("media_assets").select("*").eq("slug", slug).neq("status", "deleted").maybeSingle();
+  const { data: asset, error } = await supabase.from("media_assets").select("*").eq("slug", slug).neq("status", "deleted").is("deleted_at", null).maybeSingle();
   if (error || !asset) notFound();
 
   return new Response(renderAsset(asset), {

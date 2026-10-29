@@ -174,6 +174,7 @@ export async function loadBookings(opts: { upcomingOnly?: boolean; limit?: numbe
   let q = sb
     .from("bookings")
     .select("*, booking_type:booking_types(name, slug, color)")
+    .is("deleted_at", null)
     .order("start_at", { ascending: true })
     .limit(opts.limit ?? 500);
   if (opts.upcomingOnly) q = q.gte("end_at", new Date().toISOString());
@@ -189,6 +190,7 @@ export async function loadBookingsForType(bookingTypeId: string, fromIso: string
     .select("start_at, end_at, status")
     .eq("booking_type_id", bookingTypeId)
     .neq("status", "canceled")
+    .is("deleted_at", null)
     .gte("end_at", fromIso)
     .lte("start_at", toIso);
   if (error) throw new Error(error.message);
@@ -218,6 +220,7 @@ export async function createBooking(input: {
     .select("id")
     .eq("booking_type_id", input.booking_type_id)
     .neq("status", "canceled")
+    .is("deleted_at", null)
     .lt("start_at", input.end_at)
     .gt("end_at", input.start_at);
   if (clashes && clashes.length) throw new Error("That time was just taken. Please pick another slot.");

@@ -244,7 +244,7 @@ export async function assignExperienceType(profileId: string, typeId: string) {
     const { data: members } = await supabase.from("facilitator_team_members").select("participant_id").in("team_id", teamIds);
     const pids = Array.from(new Set((members ?? []).map((m: any) => m.participant_id)));
     if (pids.length) {
-      const { data } = await supabase.from("participants").select("id,first_name,last_name,email").in("id", pids);
+      const { data } = await supabase.from("participants").select("id,first_name,last_name,email").in("id", pids).is("deleted_at", null);
       participants = data ?? [];
     }
   }

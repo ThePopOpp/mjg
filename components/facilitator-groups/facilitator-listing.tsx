@@ -21,13 +21,14 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 export function FacilitatorListing({
-  initialGroups, profile, fallbackName, tiles, experiences, finder, ownerName, ownerId,
+  initialGroups, profile, fallbackName, tiles, experiences, churches = [], finder, ownerName, ownerId,
 }: {
   initialGroups: OwnerGroup[];
   profile: FacilitatorProfileView | null;
   fallbackName: string;
   tiles: TileConfig;
   experiences: Array<{ id: string; name: string }>;
+  churches?: Array<{ id: string; name: string }>;
   finder: { mode: FinderMode; opensLabel: string | null };
   ownerName?: string | null; // set when an admin manages someone else's listing
   ownerId?: string | null;
@@ -107,7 +108,7 @@ export function FacilitatorListing({
               <>
                 <CardHeader><CardTitle>New group</CardTitle></CardHeader>
                 <CardContent>
-                  <GroupEditor key="new" group={null} ownerId={ownerId ?? null} tiles={tiles} experiences={experiences} actionToken={actionToken} onSaved={saved} onCancel={groups.length ? () => setSelected(groups[0].id) : undefined} />
+                  <GroupEditor key="new" group={null} ownerId={ownerId ?? null} tiles={tiles} experiences={experiences} churches={churches} actionToken={actionToken} onSaved={saved} onCancel={groups.length ? () => setSelected(groups[0].id) : undefined} />
                 </CardContent>
               </>
             ) : group ? (
@@ -124,7 +125,7 @@ export function FacilitatorListing({
                 </CardHeader>
                 <CardContent>
                   {view === "details" ? (
-                    <GroupEditor key={group.id} group={group} tiles={tiles} experiences={experiences} actionToken={actionToken} onSaved={saved} />
+                    <GroupEditor key={group.id} group={group} tiles={tiles} experiences={experiences} churches={churches} actionToken={actionToken} onSaved={saved} />
                   ) : (
                     <GroupRoster key={group.id} group={group} actionToken={actionToken} onChanged={reloadGroups} />
                   )}

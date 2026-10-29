@@ -23,7 +23,7 @@ export async function getParticipantSubmissions(email: string | null | undefined
   if (!addr) return [];
   const supabase = createSupabaseAdminClient();
 
-  const { data: mine } = await supabase.from("participants").select("id").ilike("email", addr);
+  const { data: mine } = await supabase.from("participants").select("id").ilike("email", addr).is("deleted_at", null);
   const ids = (mine ?? []).map((r: any) => r.id as string);
 
   const [surveysRes, formsRes] = await Promise.all([

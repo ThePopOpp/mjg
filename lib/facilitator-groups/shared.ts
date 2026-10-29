@@ -36,6 +36,8 @@ export type GroupInput = {
   capacity?: number;
   bookingMode?: BookingMode;
   experienceId?: string | null;
+  /** Official church group. Needs an approved facilitator application for that church. */
+  churchId?: string | null;
 };
 
 export type OwnerGroup = {
@@ -44,6 +46,7 @@ export type OwnerGroup = {
   facilitatorId: string;
   teamId: string | null;
   experienceId: string | null;
+  churchId: string | null;
   title: string;
   description: string | null;
   audience: Audience;

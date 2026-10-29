@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, type Permission } from "@/lib/rbac/permissions";
 import { isSelfServeRole } from "@/lib/user-management/self-registration";
+import { ROLES } from "@/lib/rbac/roles";
 
 /**
  * Server-side page/layout guard. Redirects to login if signed out, or to
@@ -27,6 +28,6 @@ export async function requirePagePermission(permission: Permission, path = "/das
 export async function requireStaffPage(path = "/dashboard") {
   const profile = await getCurrentProfile();
   if (!profile) redirect(`/login?next=${encodeURIComponent(path)}`);
-  if (isSelfServeRole(profile.role)) redirect("/access-restricted");
+  if (isSelfServeRole(profile.role) || profile.role === ROLES.CHURCH_ADMIN) redirect("/access-restricted");
   return profile;
 }

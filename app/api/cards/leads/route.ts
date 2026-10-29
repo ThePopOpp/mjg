@@ -14,9 +14,9 @@ export async function POST(request: Request) {
   const sb = createSupabaseAdminClient();
   const cardSelect = "id, slug, display_name, card_name, staff_user_id, automations";
   const lookup = body.cardId
-    ? sb.from("business_cards").select(cardSelect).eq("id", body.cardId).maybeSingle()
+    ? sb.from("business_cards").select(cardSelect).eq("id", body.cardId).is("deleted_at", null).maybeSingle()
     : body.slug
-      ? sb.from("business_cards").select(cardSelect).eq("slug", body.slug).maybeSingle()
+      ? sb.from("business_cards").select(cardSelect).eq("slug", body.slug).is("deleted_at", null).maybeSingle()
       : null;
   const card = lookup ? (await lookup).data : null;
   if (!card) return NextResponse.json({ error: "Card not found." }, { status: 404 });

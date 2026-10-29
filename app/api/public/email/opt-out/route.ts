@@ -15,6 +15,7 @@ export async function POST(request: Request) {
     const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? null;
     const ua = request.headers.get("user-agent") ?? null;
 
+    // Includes archived participants on purpose: an opt-out must always be recorded.
     const { data: participant } = await supabase
       .from("participants")
       .select("id")

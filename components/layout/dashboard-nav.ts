@@ -3,6 +3,7 @@ import {
   BatteryCharging,
   BookMarked,
   BookOpen,
+  Church,
   Bot,
   CalendarClock,
   CalendarRange,
@@ -51,6 +52,7 @@ export const dashboardNav: NavEntry[] = [
     kind: "group", label: "Community", icon: Users, items: [
       { href: "/dashboard/participants", label: "Participants", icon: UsersRound, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
       { href: "/dashboard/facilitators", label: "Facilitators & Groups", icon: MapPinned, permission: PERMISSIONS.MANAGE_USERS },
+      { href: "/dashboard/churches", label: "Churches", icon: Church, permission: PERMISSIONS.MANAGE_CHURCHES },
       { href: "/dashboard/contacts", label: "Contacts", icon: UserCircle, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
       { href: "/dashboard/waves", label: "Waves", icon: Waves, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
       { href: "/dashboard/check-in-results", label: "Check-In Results", icon: CheckSquare, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
@@ -114,6 +116,7 @@ export const facilitatorNav: NavEntry[] = [
   { kind: "item", href: "/dashboard", label: "Dashboard", icon: Home },
   { kind: "item", href: "/dashboard/team", label: "My Team", icon: UsersRound },
   { kind: "item", href: "/dashboard/facilitator-listing", label: "Facilitator Listing", icon: MapPinned },
+  { kind: "item", href: "/dashboard/my-church", label: "My Church", icon: Church },
   { kind: "item", href: "/dashboard/my-experiences", label: "Experiences", icon: Sparkles },
   { kind: "item", href: "/dashboard/downloads", label: "Downloads", icon: Download },
   { kind: "item", href: "/dashboard/resources", label: "Resources", icon: Newspaper },
@@ -128,8 +131,18 @@ export const participantNav: NavEntry[] = [
   { kind: "item", href: "/dashboard", label: "Dashboard", icon: Home },
   { kind: "item", href: "/dashboard/team", label: "My Team", icon: UsersRound },
   { kind: "item", href: "/groups", label: "Find a Group", icon: MapPinned },
+  { kind: "item", href: "/dashboard/my-church", label: "My Church", icon: Church },
   { kind: "item", href: "/dashboard/downloads", label: "Downloads", icon: Download },
   { kind: "item", href: "/dashboard/resources", label: "Resources", icon: Newspaper },
+  { kind: "item", href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },
+  { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
+  { kind: "item", href: "/dashboard/preferences", label: "Settings", icon: Settings },
+];
+
+// Church admins (dashboard-only, never the connector) review facilitator applications for
+// their church. Nothing else in the admin dashboard is theirs.
+export const churchAdminNav: NavEntry[] = [
+  { kind: "item", href: "/dashboard/church", label: "My Church", icon: Church },
   { kind: "item", href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },
   { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
   { kind: "item", href: "/dashboard/preferences", label: "Settings", icon: Settings },

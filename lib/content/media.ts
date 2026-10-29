@@ -23,7 +23,7 @@ export type MediaAssetInput = {
 export async function getMediaStudioData() {
   const supabase = createSupabaseAdminClient();
   const [assets, collections, targets] = await Promise.all([
-    supabase.from("media_assets").select("*").neq("status", "deleted").order("updated_at", { ascending: false }).limit(150),
+    supabase.from("media_assets").select("*").neq("status", "deleted").is("deleted_at", null).order("updated_at", { ascending: false }).limit(150),
     supabase.from("media_collections").select("*").neq("status", "deleted").order("updated_at", { ascending: false }).limit(80),
     supabase.from("media_publish_targets").select("*").eq("enabled", true).limit(200),
   ]);
@@ -62,6 +62,7 @@ export async function getPublishedAudioForTarget(target: string, limit = 6) {
     .select("*")
     .eq("asset_type", "audio")
     .eq("status", "published")
+    .is("deleted_at", null)
     .not("file_url", "is", null)
     .order("updated_at", { ascending: false })
     .limit(100);
@@ -102,6 +103,7 @@ export async function getOrderedAudioForTarget(target: string, limit = 100) {
     .select("*")
     .eq("asset_type", "audio")
     .eq("status", "published")
+    .is("deleted_at", null)
     .not("file_url", "is", null)
     .order("created_at", { ascending: true })
     .limit(300);
@@ -127,6 +129,7 @@ export async function getAudioForTargetIncludingDrafts(target: string) {
     .select("*")
     .eq("asset_type", "audio")
     .neq("status", "deleted")
+    .is("deleted_at", null)
     .order("created_at", { ascending: true })
     .limit(300);
 
@@ -147,7 +150,7 @@ export async function saveAudioSortOrder(orderedIds: string[], actorUserId?: str
   const supabase = createSupabaseAdminClient();
   if (!orderedIds.length) return { updated: 0 };
 
-  const { data, error } = await supabase.from("media_assets").select("id, metadata").in("id", orderedIds);
+  const { data, error } = await supabase.from("media_assets").select("id, metadata").in("id", orderedIds).is("deleted_at", null);
   if (error) throw error;
 
   const existing = new Map((data ?? []).map((row) => [row.id as string, row.metadata]));

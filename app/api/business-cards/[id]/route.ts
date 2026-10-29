@@ -17,7 +17,7 @@ async function authorize(request: Request, id: string, actionToken?: string) {
   const actor = await requireParticipantManager(request, actionToken);
   const isAdmin = ADMIN_ROLES.includes(actor.role);
   const { data } = await createSupabaseAdminClient()
-    .from("business_cards").select("staff_user_id").eq("id", id).maybeSingle();
+    .from("business_cards").select("staff_user_id").eq("id", id).is("deleted_at", null).maybeSingle();
   if (!data) throw new CardError("Card not found.", 404);
   if (!isAdmin && data.staff_user_id !== actor.id) {
     throw new CardError("You can only manage your own card.", 403);

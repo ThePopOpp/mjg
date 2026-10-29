@@ -88,6 +88,8 @@ export async function POST(request: Request) {
   }
 }
 
+// Consent lookups deliberately include archived (deleted_at) participants so a STOP/START
+// is always recorded against the record that owns the number.
 async function handleOptOut(supabase: ReturnType<typeof createSupabaseAdminClient>, phone: string, now: string) {
   const { data: participant } = await supabase
     .from("participants")

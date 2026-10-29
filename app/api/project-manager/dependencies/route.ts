@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const boardId = request.nextUrl.searchParams.get("board_id") || "default";
     const [depsRes, itemsRes] = await Promise.all([
       supabase.from("project_schedule_dependencies").select("*").eq("board_id", boardId).order("created_at", { ascending: true }),
-      supabase.from("project_schedule_items").select("*").eq("board_id", boardId),
+      supabase.from("project_schedule_items").select("*").eq("board_id", boardId).is("deleted_at", null),
     ]);
     if (depsRes.error) throw depsRes.error;
     if (itemsRes.error) throw itemsRes.error;

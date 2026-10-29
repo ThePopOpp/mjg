@@ -101,6 +101,7 @@ const searchParticipants: AgentTool = {
     const { data, error } = await supabase
       .from("participants")
       .select("id, first_name, last_name, email, phone, wave, participant_type, source, created_at")
+      .is("deleted_at", null)
       .or(`first_name.ilike.${like},last_name.ilike.${like},email.ilike.${like},phone.ilike.${like}`)
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -142,12 +143,12 @@ const getPilotOverview: AgentTool = {
     const count = (table: string) =>
       supabase.from(table).select("*", { count: "exact", head: true });
     const [participants, checkIns, surveys, calls, sms, waves] = await Promise.all([
-      count("participants"),
+      count("participants").is("deleted_at", null),
       count("check_in_results"),
       count("survey_responses"),
       count("calls"),
       count("sms_conversations"),
-      supabase.from("participants").select("wave"),
+      supabase.from("participants").select("wave").is("deleted_at", null),
     ]);
     const byWave: Record<string, number> = {};
     (waves.data ?? []).forEach((r: any) => {
@@ -341,7 +342,7 @@ const listFormSubmissions: AgentTool = {
   async execute(args) {
     const supabase = createSupabaseAdminClient();
     const limit = Math.min(Number(args.limit) || 20, 100);
-    const { data, error } = await supabase.from("form_submissions").select("*").order("created_at", { ascending: false }).limit(limit);
+    const { data, error } = await supabase.from("form_submissions").select("*").is("deleted_at", null).order("created_at", { ascending: false }).limit(limit);
     if (error) throw new Error(error.message);
     return { count: data?.length ?? 0, submissions: data ?? [] };
   },
@@ -943,7 +944,7 @@ const listTags: AgentTool = {
   requiresConfirmation: false,
   async execute() {
     const supabase = createSupabaseAdminClient();
-    const { data, error } = await supabase.from("tags").select("id, name, category").order("name");
+    const { data, error } = await supabase.from("tags").select("id, name, category").is("deleted_at", null).order("name");
     if (error) throw new Error(error.message);
     return { tags: data ?? [] };
   },
@@ -983,6 +984,7 @@ const listBusinessCards: AgentTool = {
       .from("business_cards")
       .select("id, card_name, display_name, slug, status, view_count, click_count, owner:profiles!business_cards_staff_user_id_fkey(full_name)")
       .neq("status", "archived")
+      .is("deleted_at", null)
       .order("updated_at", { ascending: false })
       .limit(50);
     if (error) throw new Error(error.message);

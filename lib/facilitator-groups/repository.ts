@@ -2,6 +2,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ROLES } from "@/lib/rbac/roles";
 import { geocode } from "@/lib/maps/geocode";
 import { fuzzPoint } from "@/lib/maps/geo";
+import { assertChurchGroupAllowed } from "@/lib/churches/repository";
 import type {
   FacilitatorProfileInput,
   FinderMode,
@@ -43,6 +44,7 @@ function rowToGroup(r: any, counts?: { taken: number; pending: number; waitlist:
     facilitatorId: r.facilitator_id,
     teamId: r.team_id ?? null,
     experienceId: r.experience_id ?? null,
+    churchId: r.church_id ?? null,
     title: r.title,
     description: r.description ?? null,
     audience: r.audience,
@@ -120,6 +122,7 @@ export async function listGroupsForFacilitator(profileId: string): Promise<Owner
     .select("*")
     .eq("facilitator_id", profileId)
     .neq("status", "archived")
+    .is("deleted_at", null)
     .order("created_at", { ascending: true });
   if (error) throw error;
   const counts = await reservationCounts((data ?? []).map((g) => g.id));
@@ -128,7 +131,7 @@ export async function listGroupsForFacilitator(profileId: string): Promise<Owner
 
 export async function getGroup(id: string): Promise<OwnerGroup | null> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase.from("facilitator_groups").select("*").eq("id", id).maybeSingle();
+  const { data } = await supabase.from("facilitator_groups").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
   if (!data) return null;
   const counts = await reservationCounts([data.id]);
   return rowToGroup(data, counts.get(data.id));
@@ -174,6 +177,7 @@ function inputToRow(input: Partial<GroupInput>): Record<string, unknown> {
   if (has("capacity")) row.capacity = clampInt(input.capacity, 1, 200, 10);
   if (has("bookingMode")) row.booking_mode = input.bookingMode === "auto" ? "auto" : "approval";
   if (has("experienceId")) row.experience_id = str(input.experienceId);
+  if (has("churchId")) row.church_id = str(input.churchId);
   return row;
 }
 
@@ -200,6 +204,7 @@ export async function createGroup(facilitatorId: string, input: GroupInput, acto
   const supabase = createSupabaseAdminClient();
   const title = String(input.title ?? "").trim();
   if (!title) throw new Error("Give your group a name.");
+  await assertChurchGroupAllowed(facilitatorId, str(input.churchId));
 
   // Every group has its own team, so confirmed members land on the facilitator's team.
   const { data: team, error: teamErr } = await supabase
@@ -229,6 +234,7 @@ export async function updateGroup(actor: Actor, groupId: string, input: Partial<
   const supabase = createSupabaseAdminClient();
   const row = inputToRow(input);
   if ("title" in row && !row.title) throw new Error("Give your group a name.");
+  if (row.church_id && row.church_id !== current.churchId) await assertChurchGroupAllowed(current.facilitatorId, row.church_id as string);
   if (row.capacity != null && Number(row.capacity) < current.spotsTaken) {
     throw new Error(`${current.spotsTaken} spots are already confirmed — capacity can't go below that.`);
   }
@@ -293,6 +299,7 @@ export async function listAllGroups() {
     .from("facilitator_groups")
     .select("*, profiles:facilitator_id(first_name,last_name,email)")
     .neq("status", "archived")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
   if (error) throw error;
   const counts = await reservationCounts((data ?? []).map((g) => g.id));

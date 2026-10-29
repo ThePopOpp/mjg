@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldSelect } from "@/components/ui/field-select";
 import { useDashboardActionToken } from "@/components/layout/dashboard-action-token";
+import { McpReadableToggle } from "@/components/assessments/mcp-readable-toggle";
 import {
   type PilotForm, type SurveyDefinition, type SurveyField, type SurveyFieldType,
   SURVEY_FIELD_TYPES, TYPE_HAS_OPTIONS, newFieldId, surveyTypeForSlug,
@@ -15,7 +16,7 @@ import {
 
 const slugify = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
 
-export function SurveyBuilder() {
+export function SurveyBuilder({ canSetMcpReadable = false }: { canSetMcpReadable?: boolean }) {
   const token = useDashboardActionToken();
   const [forms, setForms] = React.useState<PilotForm[]>([]);
   const [current, setCurrent] = React.useState<PilotForm | null>(null);
@@ -117,6 +118,7 @@ export function SurveyBuilder() {
             <Button size="sm" variant="outline" onClick={save} disabled={busy}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <Check className="h-4 w-4" /> : null} Save draft</Button>
             <Button size="sm" onClick={publish} disabled={busy}><Send className="h-4 w-4" /> Publish</Button>
           </div>
+          {canSetMcpReadable && <McpReadableToggle assessment={current.slug} disabledReason={current.id ? undefined : "Save this survey once to choose whether Claude and ChatGPT can read its responses."} />}
           <Textarea value={current.description ?? ""} onChange={(e) => setCurrent({ ...current, description: e.target.value })} placeholder="Intro / description shown above the survey…" className="min-h-[52px]" />
 
           <div className="space-y-2">

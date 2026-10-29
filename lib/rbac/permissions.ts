@@ -21,6 +21,8 @@ export const PERMISSIONS = {
   // Super-Admin-only (same pattern as MANAGE_CMS): the Claude connector (MCP) —
   // its on/off switch, connections, agent tokens and approvals.
   MANAGE_CONNECTOR: "manage_connector",
+  // Super-Admin-only (same pattern as MANAGE_CMS): churches, church admins and their applications.
+  MANAGE_CHURCHES: "manage_churches",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -55,6 +57,10 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
   [ROLES.PASTOR_ELDER_REVIEWER]: [
     PERMISSIONS.VIEW_DASHBOARD,
     PERMISSIONS.REVIEW_CONTENT,
+  ],
+  // Church admins review facilitator applications for their own church (/dashboard/church).
+  [ROLES.CHURCH_ADMIN]: [
+    PERMISSIONS.VIEW_DASHBOARD,
   ],
   [ROLES.PARTICIPANT]: [
     PERMISSIONS.VIEW_DASHBOARD,

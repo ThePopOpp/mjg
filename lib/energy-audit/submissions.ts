@@ -73,13 +73,16 @@ export type EnergyAuditStats = {
 };
 
 /** Aggregates for the admin Energy Audit page and the Reports block. */
-export async function getEnergyAuditStats(): Promise<EnergyAuditStats> {
+export async function getEnergyAuditStats(range: { since?: string; until?: string } = {}): Promise<EnergyAuditStats> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
+  let query = supabase
     .from("check_in_submissions")
     .select("email,total_score,stage,lowest_layer,layer_scores,created_at")
     .eq("assessment", ENERGY_AUDIT_ASSESSMENT)
     .limit(5000);
+  if (range.since) query = query.gte("created_at", range.since);
+  if (range.until) query = query.lte("created_at", range.until);
+  const { data } = await query;
   const rows = data ?? [];
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
 

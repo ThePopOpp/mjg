@@ -87,11 +87,12 @@ export async function getUserManagementData() {
         .select("*, participants(id,first_name,last_name,email), user:profiles!participant_user_links_user_id_fkey(id,full_name,email)")
         .order("created_at", { ascending: false })
         .limit(100),
-      supabase.from("form_submissions").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("form_submissions").select("*").is("deleted_at", null).order("created_at", { ascending: false }).limit(100),
       supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(100),
       supabase
         .from("participants")
         .select("id,first_name,last_name,email,phone,participant_type,wave,check_in_status,journey_status,created_at")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(500),
     ]);
@@ -451,7 +452,7 @@ export async function getUserManagementProfile(id: string) {
       .select("*, participants(id,first_name,last_name,email,phone,wave,participant_type)")
       .eq("user_id", id)
       .order("created_at", { ascending: false }),
-    supabase.from("form_submissions").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(50),
+    supabase.from("form_submissions").select("*").eq("user_id", id).is("deleted_at", null).order("created_at", { ascending: false }).limit(50),
   ]);
 
   return {
@@ -513,11 +514,12 @@ export async function upsertProfile(input: {
         invited_by: input.invitedBy || null,
         related_participant_id: input.relatedParticipantId || null,
         notes: input.notes || null,
-        status_changed_by: previous?.status !== input.status ? input.actorUserId ?? null : null,
-        status_changed_at: previous?.status !== input.status ? new Date().toISOString() : null,
-        status_change_reason: previous?.status !== input.status ? input.statusChangeReason ?? null : null,
-        role_changed_by: previous?.role !== input.role ? input.actorUserId ?? null : null,
-        role_changed_at: previous?.role !== input.role ? new Date().toISOString() : null,
+        // Only stamp who/when/why when the status or role actually changes; leaving
+        // the keys out keeps the last change's record on an ordinary edit.
+        ...(previous?.status !== input.status
+          ? { status_changed_by: input.actorUserId ?? null, status_changed_at: new Date().toISOString(), status_change_reason: input.statusChangeReason ?? null }
+          : {}),
+        ...(previous?.role !== input.role ? { role_changed_by: input.actorUserId ?? null, role_changed_at: new Date().toISOString() } : {}),
         updated_at: new Date().toISOString(),
       },
       { onConflict: "id" },

@@ -10,6 +10,7 @@ export default async function CommunicationsPage() {
     supabase
       .from("participants")
       .select("id, first_name, last_name, email, phone, sms_opt_in, email_opt_in, sms_opt_in_at, sms_opt_out_at, email_opt_in_at, email_opt_out_at")
+      .is("deleted_at", null)
       .order("first_name"),
     supabase
       .from("profiles")

@@ -19,7 +19,7 @@ type Form = {
   title: string; description: string; audience: string; language: string; churchOrg: string;
   meetingDay: string; meetingTime: string; timezone: string; frequency: string; startDate: string; durationWeeks: string;
   format: string; venueName: string; addressLine: string; city: string; state: string; postalCode: string; showExactAddress: boolean;
-  capacity: string; bookingMode: string; experienceId: string;
+  capacity: string; bookingMode: string; experienceId: string; churchId: string;
 };
 
 function toForm(g: OwnerGroup | null): Form {
@@ -30,7 +30,7 @@ function toForm(g: OwnerGroup | null): Form {
     durationWeeks: String(g?.durationWeeks ?? 6), format: g?.format ?? "in_person", venueName: g?.venueName ?? "",
     addressLine: g?.addressLine ?? "", city: g?.city ?? "", state: g?.state ?? "", postalCode: g?.postalCode ?? "",
     showExactAddress: g?.showExactAddress ?? false, capacity: String(g?.capacity ?? 10), bookingMode: g?.bookingMode ?? "approval",
-    experienceId: g?.experienceId ?? "",
+    experienceId: g?.experienceId ?? "", churchId: g?.churchId ?? "",
   };
 }
 
@@ -42,6 +42,7 @@ function toInput(f: Form): GroupInput {
     durationWeeks: Number(f.durationWeeks) || 6, format: f.format as GroupInput["format"], venueName: f.venueName,
     addressLine: f.addressLine, city: f.city, state: f.state, postalCode: f.postalCode, showExactAddress: f.showExactAddress,
     capacity: Number(f.capacity) || 10, bookingMode: f.bookingMode as "auto" | "approval", experienceId: f.experienceId || null,
+    churchId: f.churchId || null,
   };
 }
 
@@ -62,12 +63,14 @@ function Field({ label, children, className }: { label: string; children: React.
 }
 
 export function GroupEditor({
-  group, tiles, experiences, actionToken, onSaved, onCancel, ownerId,
+  group, tiles, experiences, churches = [], actionToken, onSaved, onCancel, ownerId,
 }: {
   group: OwnerGroup | null; // null = new
   ownerId?: string | null; // admin creating a group for someone else
   tiles: TileConfig;
   experiences: Array<{ id: string; name: string }>;
+  /** Churches that approved this facilitator (official church groups). */
+  churches?: Array<{ id: string; name: string }>;
   actionToken: string | null;
   onSaved: (g: OwnerGroup) => void;
   onCancel?: () => void;
@@ -199,6 +202,16 @@ export function GroupEditor({
               options={[{ value: "", label: "None" }, ...experiences.map((e) => ({ value: e.id, label: e.name }))]}
             />
             <p className="text-xs text-muted-foreground">Confirmed members also receive this experience's emails.</p>
+          </Field>
+        ) : null}
+        {churches.length || form.churchId ? (
+          <Field label="Official church group (optional)" className="max-w-md">
+            <FieldSelect
+              value={form.churchId}
+              onChange={(v) => set("churchId", v)}
+              options={[{ value: "", label: "Not a church group" }, ...churches.map((c) => ({ value: c.id, label: c.name }))]}
+            />
+            <p className="text-xs text-muted-foreground">Only churches that approved you as a facilitator (My Church) are listed.</p>
           </Field>
         ) : null}
       </Section>

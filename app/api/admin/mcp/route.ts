@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireSuperAdmin } from "@/lib/user-management/auth";
-import { decideApproval, getMcpOverview, restoreFromActivity, revokeConnection, setClientDisabled, setMcpEnabled } from "@/lib/mcp/admin";
+import { decideApproval, getMcpOverview, restoreFromActivity, revokeConnection, setChatgptEnabled, setClientDisabled, setMcpEnabled } from "@/lib/mcp/admin";
 import { setDailyCaps } from "@/lib/mcp/caps";
 import { createAgentToken } from "@/lib/mcp/oauth";
 import { AGENT_SCOPE_DOMAINS } from "@/lib/mcp/scopes";
@@ -32,6 +32,9 @@ export async function POST(request: Request) {
     switch (body.action) {
       case "set_enabled":
         await setMcpEnabled(Boolean(body.enabled), profile.id);
+        return NextResponse.json({ ok: true });
+      case "set_chatgpt_enabled":
+        await setChatgptEnabled(Boolean(body.enabled), profile.id);
         return NextResponse.json({ ok: true });
       case "set_client_disabled":
         await setClientDisabled(String(body.label), Boolean(body.disabled), profile.id);

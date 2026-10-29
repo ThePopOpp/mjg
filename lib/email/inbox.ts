@@ -176,7 +176,7 @@ export async function updateEmailMessageAction(input: {
 async function findRelatedRecords(email: string) {
   const supabase = createSupabaseAdminClient();
   const [participant, profile] = await Promise.all([
-    supabase.from("participants").select("id").eq("email", email).maybeSingle(),
+    supabase.from("participants").select("id").eq("email", email).is("deleted_at", null).maybeSingle(),
     supabase.from("profiles").select("id").eq("email", email).maybeSingle(),
   ]);
 

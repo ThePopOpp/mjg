@@ -247,6 +247,7 @@ export async function getRecipientsForAudience(audience: "profiles" | "participa
   const { data, error } = await supabase
     .from("participants")
     .select("id,email,first_name,last_name,phone,wave,source,participant_type,check_in_status,survey_status,inner_circle_status")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
@@ -271,7 +272,7 @@ export async function countRecipientsForAudience(audience: "profiles" | "partici
   const query =
     audience === "profiles"
       ? supabase.from("profiles").select("id", { count: "exact", head: true }).eq("status", "active")
-      : supabase.from("participants").select("id", { count: "exact", head: true }).not("email", "is", null);
+      : supabase.from("participants").select("id", { count: "exact", head: true }).is("deleted_at", null).not("email", "is", null);
   const { count, error } = await query;
   if (error) throw error;
   return count ?? 0;
@@ -324,7 +325,7 @@ export async function sendDueJourneyEmails(input: { actorUserId?: string; limit?
 
   const { data: events, error } = await supabase
     .from("email_journey_events")
-    .select("*, participants(id,email,first_name,last_name,phone,wave,source,participant_type,check_in_status,survey_status,inner_circle_status,email_journey_opt_in)")
+    .select("*, participants(id,email,first_name,last_name,phone,wave,source,participant_type,check_in_status,survey_status,inner_circle_status,email_journey_opt_in,deleted_at)")
     .eq("status", "scheduled")
     .lte("scheduled_at", now)
     .order("scheduled_at", { ascending: true })
@@ -341,6 +342,14 @@ export async function sendDueJourneyEmails(input: { actorUserId?: string; limit?
         .update({ status: "skipped", error_message: "Participant email missing or journey opt-in is false.", last_attempt_at: now, updated_at: now })
         .eq("id", event.id);
       results.push({ id: event.id, status: "skipped", reason: "Missing email or opt-in." });
+      continue;
+    }
+    if (participant.deleted_at) {
+      await supabase
+        .from("email_journey_events")
+        .update({ status: "skipped", error_message: "Participant was archived.", last_attempt_at: now, updated_at: now })
+        .eq("id", event.id);
+      results.push({ id: event.id, status: "skipped", reason: "Participant archived." });
       continue;
     }
 

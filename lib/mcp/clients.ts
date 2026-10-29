@@ -15,8 +15,17 @@ export function labelForClient(name: string | null | undefined, redirectUris: re
   return "Other";
 }
 
-/** Refusal text when a person's client has been switched off, or null if it may call. */
-export function clientGate(client: { client_label?: string | null; disabled_at?: string | null } | null): string | null {
+/**
+ * Refusal text when a person's client has been switched off, or null if it may call.
+ * ChatGPT is opt-in: refused until mcp_settings.chatgpt_enabled is on.
+ */
+export function clientGate(
+  client: { client_label?: string | null; disabled_at?: string | null } | null,
+  settings: { chatgptEnabled?: boolean } = {},
+): string | null {
+  if (client?.client_label === "ChatGPT" && !settings.chatgptEnabled) {
+    return "ChatGPT isn't switched on for MJG yet. A Super Admin can turn it on in Settings → Claude & Agents → AI clients.";
+  }
   if (!client?.disabled_at) return null;
   const label = client.client_label && client.client_label !== "Other" ? client.client_label : "This client";
   return `${label} is switched off for MJG in Settings → Claude & Agents.`;

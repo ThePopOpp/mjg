@@ -18,7 +18,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const isAdmin = ADMIN_ROLES.includes(actor.role);
   if (!isAdmin) {
     const { data } = await createSupabaseAdminClient()
-      .from("business_cards").select("staff_user_id").eq("id", id).maybeSingle();
+      .from("business_cards").select("staff_user_id").eq("id", id).is("deleted_at", null).maybeSingle();
     if (!data || data.staff_user_id !== actor.id) {
       return NextResponse.json({ error: "You can only view analytics for your own card." }, { status: 403 });
     }

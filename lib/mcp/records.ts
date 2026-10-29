@@ -20,8 +20,25 @@ export type RecordEntity = {
 const personName = (r: Record<string, any>) =>
   [r.first_name, r.last_name].filter(Boolean).join(" ") || r.email || r.phone || r.id;
 
+const titled = (r: Record<string, any>) => r.title || r.name || r.card_name || r.display_name || r.id;
+
 export const RECORD_ENTITIES: Record<string, RecordEntity> = {
   contact: { table: "contacts", label: personName, trash: { deleteTool: "contacts_delete" } },
+  participant: { table: "participants", label: personName, trash: { deleteTool: "participants_archive" } },
+  tag: { table: "tags", label: (r) => r.name, trash: { deleteTool: "tags_delete" } },
+  facilitator_group: { table: "facilitator_groups", label: titled, trash: { deleteTool: "group_delete" } },
+  social_post: { table: "social_posts", label: (r) => `${r.platform} post: ${String(r.body_text ?? "").slice(0, 60)}`, trash: { deleteTool: "social_post_delete" } },
+  social_template: { table: "social_templates", label: titled, trash: { deleteTool: "social_template_delete" } },
+  media_asset: { table: "media_assets", label: titled, trash: { deleteTool: "media_delete" } },
+  sms_template: { table: "sms_templates", label: titled, trash: { deleteTool: "sms_template_delete" } },
+  project_item: { table: "project_schedule_items", label: titled, trash: { deleteTool: "project_item_delete" } },
+  business_card: { table: "business_cards", label: titled, trash: { deleteTool: "business_cards_delete" } },
+  form_submission: { table: "form_submissions", label: (r) => `${r.form_type}: ${r.email ?? r.subject ?? r.id}`, trash: { deleteTool: "form_submission_delete" } },
+  // Snapshots only (no trash): bookings are cancelled, users deactivated.
+  booking: { table: "bookings", label: (r) => `${r.invitee_name} · ${r.start_at}` },
+  profile: { table: "profiles", label: (r) => r.full_name || r.email },
+  church: { table: "churches", label: (r) => r.name },
+  journey_event: { table: "email_journey_events", label: (r) => `${r.event_key ?? "journey email"} · ${r.scheduled_at}` },
 };
 
 export function getEntity(entity: string): RecordEntity {
@@ -51,10 +68,10 @@ function trashTable(entity: string): string {
   return def.table;
 }
 
-/** A live (not deleted) record, or an error naming what's wrong. */
+/** A live (not deleted) record, or an error naming what's wrong. Works for any entity with deleted_at. */
 export async function getLiveRecord(entity: string, id: string) {
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase.from(trashTable(entity)).select("*").eq("id", id).maybeSingle();
+  const { data, error } = await supabase.from(getEntity(entity).table).select("*").eq("id", id).maybeSingle();
   if (error) throw error;
   if (!data) throw new Error(`No ${entity} with id ${id}.`);
   if (data.deleted_at) throw new Error(`That ${entity} is already in the trash.`);

@@ -41,6 +41,8 @@ type ContactInput = {
   consent?: Consent;
 };
 
+// Upserts on email (unique), so an archived participant is updated in place and stays
+// archived (deleted_at is left untouched).
 export async function upsertParticipant(input: ContactInput) {
   const supabase = createSupabaseAdminClient();
   const normalizedEmail = input.email.trim().toLowerCase();

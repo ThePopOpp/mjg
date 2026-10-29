@@ -73,6 +73,7 @@ export async function loadProjectManagerData(boardId = "default", viewer?: PmVie
       .from("project_schedule_items")
       .select("*")
       .eq("board_id", boardId)
+      .is("deleted_at", null)
       .order("start_date", { ascending: true })
       .order("sort_order", { ascending: true }),
     supabase
@@ -100,9 +101,9 @@ export async function loadProjectManagerData(boardId = "default", viewer?: PmVie
   const itemIds = decorated.map((i) => i.id);
   const visibleSet = new Set(itemIds);
 
-  // Only keep dependencies whose endpoints are both visible to this viewer.
+  // Only keep dependencies whose endpoints are both visible to this viewer (and not soft-deleted).
   const allDeps = (dependencies.data || []) as ProjectScheduleDependency[];
-  const visibleDeps = viewer ? allDeps.filter((d) => visibleSet.has(d.source_item_id) && visibleSet.has(d.target_item_id)) : allDeps;
+  const visibleDeps = allDeps.filter((d) => visibleSet.has(d.source_item_id) && visibleSet.has(d.target_item_id));
 
   let attachments: ProjectItemAttachment[] = [];
   let links: ProjectItemLink[] = [];
@@ -174,7 +175,7 @@ export async function loadProjectLinkOptions(): Promise<ProjectLinkOptions> {
   const supabase = createSupabaseAdminClient();
   const [u, p, c] = await Promise.all([
     supabase.from("profiles").select("id, full_name, email").in("status", ["active", "invited"]).order("full_name").limit(500),
-    supabase.from("participants").select("id, first_name, last_name, email, phone").order("created_at", { ascending: false }).limit(500),
+    supabase.from("participants").select("id, first_name, last_name, email, phone").is("deleted_at", null).order("created_at", { ascending: false }).limit(500),
     supabase.from("contacts").select("id, first_name, last_name, email, phone").is("deleted_at", null).eq("status", "active").order("created_at", { ascending: false }).limit(500),
   ]);
   const name = (a?: string | null, b?: string | null) => `${a ?? ""} ${b ?? ""}`.trim();

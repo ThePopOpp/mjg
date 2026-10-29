@@ -91,7 +91,7 @@ export async function joinBookWaitlist(input: JoinWaitlistInput): Promise<JoinWa
 
   const [{ data: profile }, { data: participant }, { data: existing }] = await Promise.all([
     supabase.from("profiles").select("id,role,first_name,last_name,phone").ilike("email", email).maybeSingle(),
-    supabase.from("participants").select("id").ilike("email", email).maybeSingle(),
+    supabase.from("participants").select("id").ilike("email", email).is("deleted_at", null).maybeSingle(),
     supabase.from("book_waitlist_requests").select("id,status").ilike("email", email).maybeSingle(),
   ]);
 

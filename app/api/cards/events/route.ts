@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   let cardId = body.cardId;
   if (!cardId && body.slug) {
     const { data } = await createSupabaseAdminClient()
-      .from("business_cards").select("id").eq("slug", body.slug).maybeSingle();
+      .from("business_cards").select("id").eq("slug", body.slug).is("deleted_at", null).maybeSingle();
     cardId = data?.id;
   }
   if (!cardId) return NextResponse.json({ error: "Card not found." }, { status: 404 });

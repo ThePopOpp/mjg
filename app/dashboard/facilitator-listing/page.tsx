@@ -7,6 +7,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { tileConfig } from "@/lib/maps/config";
 import { getFacilitatorProfile, getFinderSettings, isGroupAdmin, listGroupsForFacilitator } from "@/lib/facilitator-groups/repository";
 import { applyPendingPrefill } from "@/lib/facilitator-groups/import";
+import { approvedChurchIdsFor, listChurches } from "@/lib/churches/repository";
 
 export const dynamic = "force-dynamic";
 
@@ -33,11 +34,13 @@ export default async function FacilitatorListingPage({ searchParams }: { searchP
   // Imported facilitators: turn their imported details into a profile + draft group once.
   if (!managingOther) await applyPendingPrefill({ id: owner.id, email: owner.email });
 
-  const [groups, fp, finder, { data: experiences }] = await Promise.all([
+  const [groups, fp, finder, { data: experiences }, approvedChurchIds, churches] = await Promise.all([
     listGroupsForFacilitator(owner.id),
     getFacilitatorProfile(owner.id),
     getFinderSettings(),
     supabase.from("experiences").select("id,name").eq("facilitator_id", owner.id).not("status", "in", "(completed,cancelled)").order("start_date", { ascending: false }),
+    approvedChurchIdsFor(owner.id),
+    listChurches(),
   ]);
 
   return (
@@ -52,6 +55,7 @@ export default async function FacilitatorListingPage({ searchParams }: { searchP
         fallbackName={owner.name}
         tiles={tileConfig()}
         experiences={(experiences ?? []).map((e: any) => ({ id: e.id, name: e.name }))}
+        churches={churches.filter((c) => approvedChurchIds.includes(c.id)).map((c) => ({ id: c.id, name: c.name }))}
         finder={finder}
         ownerName={managingOther ? owner.name : null}
         ownerId={managingOther ? owner.id : null}

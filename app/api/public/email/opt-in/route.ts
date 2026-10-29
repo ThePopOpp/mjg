@@ -15,6 +15,8 @@ export async function POST(request: Request) {
     const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? null;
     const ua = request.headers.get("user-agent") ?? null;
 
+    // Not filtered by deleted_at: participants are unique by email, so consent is recorded
+    // on the existing record even if archived (the person stays archived).
     const { data: participant } = await supabase
       .from("participants")
       .select("id")

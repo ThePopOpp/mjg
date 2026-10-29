@@ -15,7 +15,7 @@
     "legal:import": "node scripts/import-legal-docs.mjs",
     "stripe:sync": "node scripts/stripe-sync-catalogue.mjs",
     "test:marketing": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --test lib/marketing/content/content.test.mjs",
-    "test:mcp": "node --experimental-strip-types --no-warnings --conditions=react-server --import ./scripts/test-loader.mjs --test lib/mcp/mcp.test.mjs",
+    "test:mcp": "node --experimental-strip-types --no-warnings --conditions=react-server --import ./scripts/test-loader.mjs --test lib/mcp/mcp.test.mjs lib/mcp/phase3.test.mjs lib/mcp/church.test.mjs",
     "test:groups": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --test lib/facilitator-groups/groups.test.mjs",
     "test:steward": "node --experimental-strip-types lib/steward/lifecycle.test.mjs && node --experimental-strip-types lib/steward/state.test.mjs",
     "steward:db:bootstrap": "node steward/node_modules/@workflow/world-postgres/bin/setup.js"

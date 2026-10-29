@@ -33,6 +33,7 @@ export async function getPublishedMedia(assetType: "audio" | "document" | "video
     .select("*")
     .eq("asset_type", assetType)
     .eq("status", "published")
+    .is("deleted_at", null)
     .order("updated_at", { ascending: false })
     .limit(limit);
   if (error) return [];

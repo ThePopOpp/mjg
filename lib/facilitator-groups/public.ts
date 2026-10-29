@@ -103,7 +103,7 @@ async function hydrate(rows: any[]): Promise<PublicGroup[]> {
 
 export async function listPublicGroups(filters: GroupFilters = {}): Promise<{ groups: PublicGroup[]; center: GeoPoint | null; nearNotFound: boolean }> {
   const supabase = createSupabaseAdminClient();
-  let q = supabase.from("facilitator_groups").select(PUBLIC_COLUMNS).eq("status", "published");
+  let q = supabase.from("facilitator_groups").select(PUBLIC_COLUMNS).eq("status", "published").is("deleted_at", null);
   if (filters.day != null && Number.isFinite(filters.day)) q = q.eq("meeting_day", filters.day);
   if (filters.format) q = q.eq("format", filters.format);
   if (filters.audience) q = q.eq("audience", filters.audience);
@@ -139,7 +139,7 @@ export async function listPublicGroups(filters: GroupFilters = {}): Promise<{ gr
 
 export async function getPublicGroup(slug: string): Promise<PublicGroup | null> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase.from("facilitator_groups").select(PUBLIC_COLUMNS).eq("slug", slug).eq("status", "published").maybeSingle();
+  const { data } = await supabase.from("facilitator_groups").select(PUBLIC_COLUMNS).eq("slug", slug).eq("status", "published").is("deleted_at", null).maybeSingle();
   if (!data) return null;
   return (await hydrate([data]))[0];
 }
@@ -150,7 +150,7 @@ export async function getPublicFacilitator(slug: string): Promise<{ facilitator:
   if (!fp || !fp.is_public) return null;
   const facilitator = (await facilitatorsById([fp.profile_id])).get(fp.profile_id);
   if (!facilitator) return null;
-  const { data } = await supabase.from("facilitator_groups").select(PUBLIC_COLUMNS).eq("facilitator_id", fp.profile_id).eq("status", "published");
+  const { data } = await supabase.from("facilitator_groups").select(PUBLIC_COLUMNS).eq("facilitator_id", fp.profile_id).eq("status", "published").is("deleted_at", null);
   return { facilitator, groups: await hydrate(data ?? []) };
 }
 

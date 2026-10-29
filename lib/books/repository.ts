@@ -128,6 +128,7 @@ export async function listBookableAssets(): Promise<BookableAsset[]> {
     .select("id, title, asset_type, file_url, mime_type, updated_at")
     .in("asset_type", ["photo", "document"])
     .neq("status", "deleted")
+    .is("deleted_at", null)
     .not("file_url", "is", null)
     .order("updated_at", { ascending: false })
     .limit(200);
@@ -171,7 +172,8 @@ export async function listBooks(): Promise<Book[]> {
     const { data: assets } = await supabase
       .from("media_assets")
       .select("id, file_url")
-      .in("id", [...assetIds]);
+      .in("id", [...assetIds])
+      .is("deleted_at", null);
     for (const a of assets ?? []) {
       if (a.file_url) assetUrlById.set(a.id as string, a.file_url as string);
     }

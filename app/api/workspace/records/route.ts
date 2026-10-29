@@ -39,7 +39,7 @@ export async function GET(request: Request) {
       const { data } = await query;
       for (const r of data ?? []) results.push({ recordType: "plan", recordId: r.id, label: r.name || "Untitled plan", sublabel: r.status ?? null, href: `/dashboard/plans/${r.id}` });
     } else if (type === "participant") {
-      let query = supabase.from("participants").select("id,first_name,last_name,email").order("created_at", { ascending: false }).limit(20);
+      let query = supabase.from("participants").select("id,first_name,last_name,email").is("deleted_at", null).order("created_at", { ascending: false }).limit(20);
       if (q) query = query.or(`first_name.ilike.${like},last_name.ilike.${like},email.ilike.${like}`);
       const { data } = await query;
       for (const r of data ?? []) results.push({ recordType: "participant", recordId: r.id, label: `${r.first_name ?? ""} ${r.last_name ?? ""}`.trim() || r.email || "Participant", sublabel: r.email ?? null, href: `/dashboard/participants/${r.id}` });
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
       for (const r of data ?? []) results.push({ recordType: "booking", recordId: r.id, label: r.title || "Booking", sublabel: r.start_at ? new Date(r.start_at).toLocaleDateString() : (r.status ?? null), href: `/dashboard/bookings` });
     } else if (type === "project") {
       // Project Manager "projects" are distinct project_title/project_id on schedule items.
-      const { data } = await supabase.from("project_schedule_items").select("project_id,project_title").not("project_id", "is", null).limit(400);
+      const { data } = await supabase.from("project_schedule_items").select("project_id,project_title").not("project_id", "is", null).is("deleted_at", null).limit(400);
       const seen = new Set<string>();
       for (const r of data ?? []) {
         const pid = (r as any).project_id as string;

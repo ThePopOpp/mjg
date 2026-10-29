@@ -19,7 +19,8 @@ export async function getParticipantCheckIns(email: string): Promise<Participant
   const { data: participants } = await supabase
     .from("participants")
     .select("id")
-    .ilike("email", normalized);
+    .ilike("email", normalized)
+    .is("deleted_at", null);
   const ids = (participants ?? []).map((p) => p.id);
   if (!ids.length) return [];
 

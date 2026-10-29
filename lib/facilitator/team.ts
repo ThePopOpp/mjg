@@ -58,6 +58,7 @@ export async function getFacilitatorTeam(profileId: string): Promise<{
         .from("participants")
         .select("id,first_name,last_name,email,phone,wave,check_in_status,survey_status,journey_status,inner_circle_status,created_at")
         .in("id", participantIds)
+        .is("deleted_at", null)
         .order("created_at", { ascending: false });
       participants = (data ?? []) as TeamParticipant[];
     }

@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   // Ownership guard for non-admins editing an existing card.
   if (payload.id && !isAdmin) {
     const { data } = await createSupabaseAdminClient()
-      .from("business_cards").select("staff_user_id").eq("id", payload.id).maybeSingle();
+      .from("business_cards").select("staff_user_id").eq("id", payload.id).is("deleted_at", null).maybeSingle();
     if (!data || data.staff_user_id !== actor.id) {
       return NextResponse.json({ error: "You can only edit your own card." }, { status: 403 });
     }
