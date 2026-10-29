@@ -13,6 +13,7 @@ import {
   secondsFromNow,
   verifyPkce,
 } from "./tokens";
+import { labelForClient } from "./clients";
 
 // The OAuth 2.1 authorization server behind the MJG MCP (public clients, PKCE).
 //
@@ -62,8 +63,24 @@ export async function registerClient(body: Record<string, unknown>) {
 
   const clientName = typeof body.client_name === "string" ? body.client_name.slice(0, 120) : "MCP client";
   const clientId = newSecret(PREFIX.client).slice(0, 40);
+  const clientLabel = labelForClient(clientName, redirectUris);
   const supabase = createSupabaseAdminClient();
-  const { error } = await supabase.from("mcp_oauth_clients").insert({ client_id: clientId, client_name: clientName, redirect_uris: redirectUris });
+  // Registering again can't get round the client's off switch (Settings → Claude & Agents).
+  const { data: switchedOff } = await supabase
+    .from("mcp_oauth_clients")
+    .select("disabled_at, disabled_by")
+    .eq("client_label", clientLabel)
+    .not("disabled_at", "is", null)
+    .limit(1)
+    .maybeSingle();
+  const { error } = await supabase.from("mcp_oauth_clients").insert({
+    client_id: clientId,
+    client_name: clientName,
+    redirect_uris: redirectUris,
+    client_label: clientLabel,
+    disabled_at: switchedOff?.disabled_at ?? null,
+    disabled_by: switchedOff?.disabled_by ?? null,
+  });
   if (error) throw error;
 
   return {

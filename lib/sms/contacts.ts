@@ -63,7 +63,7 @@ export async function listSmsDirectory(): Promise<SmsContact[]> {
   const [profiles, participants, contacts] = await Promise.all([
     supabase.from("profiles").select("id, first_name, last_name, full_name, email, phone, avatar_url, status, updated_at").not("phone", "is", null).limit(2000),
     supabase.from("participants").select("id, first_name, last_name, email, phone, updated_at").not("phone", "is", null).limit(2000),
-    supabase.from("contacts").select("id, first_name, last_name, email, phone, updated_at").not("phone", "is", null).limit(2000),
+    supabase.from("contacts").select("id, first_name, last_name, email, phone, updated_at").is("deleted_at", null).not("phone", "is", null).limit(2000),
   ]);
 
   const byKey = new Map<string, { contact: SmsContact; score: number; updatedAt: number }>();

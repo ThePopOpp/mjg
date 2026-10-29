@@ -770,6 +770,7 @@ const listContacts: AgentTool = {
     let query = supabase
       .from("contacts")
       .select("id, first_name, last_name, email, phone, company, church, type, status, source")
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(limit);
     const q = String(args.search ?? "").trim();

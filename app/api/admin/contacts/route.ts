@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     let query = supabase
       .from("contacts")
       .select("*", { count: "exact" })
+      .is("deleted_at", null)
       .eq("type", type)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);

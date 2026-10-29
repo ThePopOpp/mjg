@@ -28,6 +28,12 @@ const HIGH_RISK = new Set([
 /** Tools that change state without Shepherd asking first (its own memory). */
 const UNGATED_WRITES = new Set(["remember", "forget"]);
 
+/** Lifted tools that change one known record, so the audit log keeps before/after. */
+const RECORDS: Record<string, ToolDef["record"]> = {
+  create_contact: { entity: "contact", id: (_a, r) => r?.id },
+  update_contact: { entity: "contact", id: (a) => a.id },
+};
+
 function riskOf(tool: AgentTool): ToolRisk {
   if (HIGH_RISK.has(tool.name)) return "high";
   if (tool.requiresConfirmation || UNGATED_WRITES.has(tool.name)) return "write";
@@ -68,6 +74,7 @@ export function adaptShepherdTool(tool: AgentTool): ToolDef {
     risk: riskOf(tool),
     minRole: "super_admin",
     summarize: tool.summarize,
+    record: RECORDS[tool.name],
     run: (args, ctx) => tool.execute(args, { actorId: ctx.actorId, actorEmail: ctx.actorEmail }),
   };
 }

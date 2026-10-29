@@ -7,7 +7,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const { id } = await params;
     await requireParticipantManager(request);
     const supabase = createSupabaseAdminClient();
-    const { data, error } = await supabase.from("contacts").select("*").eq("id", id).single();
+    const { data, error } = await supabase.from("contacts").select("*").eq("id", id).is("deleted_at", null).single();
     if (error) throw error;
     return NextResponse.json({ contact: data });
   } catch (err) {

@@ -11,6 +11,7 @@ import { LEGAL_TOOLS } from "./legal";
 import { OPS_TOOLS } from "./ops";
 import { SHEPHERD_TOOLS } from "./shepherd-adapter";
 import { SMS_TOOLS } from "./sms";
+import { TRASH_TOOLS } from "./trash";
 import { WEBSITE_PLUS_TOOLS } from "./website-plus";
 import type { ToolDef } from "./types";
 
@@ -20,6 +21,8 @@ import type { ToolDef } from "./types";
 
 export const TOOLS: ToolDef[] = [
   ...CORE_TOOLS,
+  // Soft delete: trash, restore, and the delete tools (never a hard delete)
+  ...TRASH_TOOLS,
   // P1 · website & content
   ...CONTENT_TOOLS,
   ...WEBSITE_PLUS_TOOLS,

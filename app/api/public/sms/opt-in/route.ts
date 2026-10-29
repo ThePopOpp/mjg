@@ -45,6 +45,7 @@ export async function POST(request: Request) {
       const { data: existingContact } = await supabase
         .from("contacts")
         .select("id")
+        .is("deleted_at", null)
         .or(`phone.eq.${phone},phone.eq.+${digits}`)
         .maybeSingle();
       let contactId = existingContact?.id ?? null;

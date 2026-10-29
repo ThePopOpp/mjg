@@ -2,12 +2,14 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getActiveProfileRole } from "@/lib/user-management/auth";
 import { ROLES } from "@/lib/rbac/roles";
 import type { ToolContext } from "@/lib/tools/types";
+import { AGENT_LABEL, clientGate } from "./clients";
 import { hashSecret } from "./tokens";
 
 // Who is calling the MCP endpoint. Checked on EVERY request, in this order:
 //   1. the kill switch (mcp_settings.enabled),
 //   2. the bearer token: known, not revoked, not expired,
-//   3. the person behind it: still an active Super Admin right now.
+//   3. the client it came from (Claude, ChatGPT…) isn't switched off,
+//   4. the person behind it: still an active Super Admin right now.
 // So switching the connector off, revoking a token, deactivating someone or
 // changing their role takes effect on the very next call.
 
@@ -51,6 +53,18 @@ export async function authenticateMcpRequest(request: Request): Promise<McpActor
     return { status: 403, error: "access_denied", description: "This agent is paused in Settings → Claude & Agents." };
   }
 
+  let clientLabel: string | null = token.kind === "agent" ? AGENT_LABEL : null;
+  if (token.client_id) {
+    const { data: client } = await supabase
+      .from("mcp_oauth_clients")
+      .select("client_label, disabled_at")
+      .eq("client_id", token.client_id)
+      .maybeSingle();
+    const refusal = clientGate(client);
+    if (refusal) return { status: 403, error: "access_denied", description: refusal };
+    clientLabel = client?.client_label ?? null;
+  }
+
   const resolved = await getActiveProfileRole(token.profile_id);
   if (!resolved || resolved.role !== ROLES.SUPER_ADMIN) {
     return { status: 403, error: "insufficient_scope", description: "The MJG connector is limited to active Super Admins." };
@@ -72,6 +86,7 @@ export async function authenticateMcpRequest(request: Request): Promise<McpActor
       tokenKind: token.kind as "user" | "agent",
       tokenId: token.id,
       clientId: token.client_id,
+      clientLabel,
     },
   };
 }

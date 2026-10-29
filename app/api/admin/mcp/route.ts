@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireSuperAdmin } from "@/lib/user-management/auth";
-import { decideApproval, getMcpOverview, revokeConnection, setMcpEnabled } from "@/lib/mcp/admin";
+import { decideApproval, getMcpOverview, restoreFromActivity, revokeConnection, setClientDisabled, setMcpEnabled } from "@/lib/mcp/admin";
+import { setDailyCaps } from "@/lib/mcp/caps";
 import { createAgentToken } from "@/lib/mcp/oauth";
 import { AGENT_SCOPE_DOMAINS } from "@/lib/mcp/scopes";
 import { resolveTask, setAgentPaused } from "@/lib/agents/tasks";
@@ -11,7 +12,8 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     await requireSuperAdmin(request);
-    return NextResponse.json(await getMcpOverview());
+    const client = new URL(request.url).searchParams.get("client");
+    return NextResponse.json(await getMcpOverview({ client: client || null }));
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Failed." }, { status: 403 });
   }
@@ -31,6 +33,20 @@ export async function POST(request: Request) {
       case "set_enabled":
         await setMcpEnabled(Boolean(body.enabled), profile.id);
         return NextResponse.json({ ok: true });
+      case "set_client_disabled":
+        await setClientDisabled(String(body.label), Boolean(body.disabled), profile.id);
+        return NextResponse.json({ ok: true });
+      case "set_caps": {
+        const cap = (v: unknown) => (v === null || v === undefined || v === "" ? null : Number(v));
+        const caps = { sms: cap(body.sms), email: cap(body.email) };
+        if ([caps.sms, caps.email].some((n) => n !== null && (!Number.isFinite(n) || n < 0))) {
+          return NextResponse.json({ error: "Limits must be 0 or more, or left blank for no limit." }, { status: 400 });
+        }
+        await setDailyCaps(caps, profile.id);
+        return NextResponse.json({ ok: true });
+      }
+      case "restore":
+        return NextResponse.json(await restoreFromActivity(String(body.entity), String(body.id)));
       case "revoke":
         await revokeConnection(String(body.id));
         return NextResponse.json({ ok: true });

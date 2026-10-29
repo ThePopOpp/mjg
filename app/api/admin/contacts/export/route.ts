@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     await requireParticipantManager(request, actionToken);
     const supabase = createSupabaseAdminClient();
 
-    let query = supabase.from("contacts").select("*").order("created_at", { ascending: false }).limit(5000);
+    let query = supabase.from("contacts").select("*").is("deleted_at", null).order("created_at", { ascending: false }).limit(5000);
     if (type)   query = query.eq("type", type);
     if (status) query = query.eq("status", status);
 

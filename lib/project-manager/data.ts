@@ -175,7 +175,7 @@ export async function loadProjectLinkOptions(): Promise<ProjectLinkOptions> {
   const [u, p, c] = await Promise.all([
     supabase.from("profiles").select("id, full_name, email").in("status", ["active", "invited"]).order("full_name").limit(500),
     supabase.from("participants").select("id, first_name, last_name, email, phone").order("created_at", { ascending: false }).limit(500),
-    supabase.from("contacts").select("id, first_name, last_name, email, phone").eq("status", "active").order("created_at", { ascending: false }).limit(500),
+    supabase.from("contacts").select("id, first_name, last_name, email, phone").is("deleted_at", null).eq("status", "active").order("created_at", { ascending: false }).limit(500),
   ]);
   const name = (a?: string | null, b?: string | null) => `${a ?? ""} ${b ?? ""}`.trim();
   const users: LinkOption[] = (u.data || []).map((r) => ({ id: r.id, name: r.full_name || r.email || "User", email: r.email ?? null, phone: null }));

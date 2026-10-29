@@ -47,6 +47,8 @@ export type ToolContext = {
   tokenKind?: "user" | "agent";
   tokenId?: string;
   clientId?: string | null;
+  /** "Claude", "ChatGPT", "Other" (OAuth clients) or "Agent"; recorded in audit logs. */
+  clientLabel?: string | null;
 };
 
 export type ToolDef = {
@@ -64,6 +66,9 @@ export type ToolDef = {
   summarize?: (args: any) => string;
   /** Optional richer preview for high-risk tools (counts, diffs, amounts). */
   preview?: (args: any, ctx: ToolContext) => Promise<unknown>;
+  /** The record a write changes (an entity in lib/mcp/records.ts), so the audit
+   *  log keeps a before/after snapshot. `id` gets the result too, for creates. */
+  record?: { entity: string | ((args: any) => string); id: (args: any, result?: any) => string | undefined };
   run: (args: any, ctx: ToolContext) => Promise<unknown>;
 };
 

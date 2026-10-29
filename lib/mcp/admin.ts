@@ -3,17 +3,31 @@ import { getTool } from "@/lib/tools";
 import type { ToolContext } from "@/lib/tools/types";
 import { getActiveProfileRole } from "@/lib/user-management/auth";
 import { ROLES } from "@/lib/rbac/roles";
-import { logToolCall } from "./audit";
-import { errorText } from "./server";
+import { getDailyCaps } from "./caps";
+import { inTrash, restoreRecord } from "./records";
+import { AGENT_LABEL } from "./clients";
+import { executeTool } from "./execute";
 import { listTasks } from "@/lib/agents/tasks";
 
 // Dashboard side of the connector (Settings → Claude & Agents): the on/off
 // switch, connections and agent tokens, the activity log, and the approval
-// queue for high-risk actions requested by agents. Callers check Super Admin.
+// queue for high-risk actions requested by agents, the AI clients (Claude,
+// ChatGPT) with their own switches, and the daily send limits. Callers check
+// Super Admin.
 
-export async function getMcpOverview() {
+/** Activity filter: one AI client's calls ("Claude", "ChatGPT", "Other", "Agent"). */
+export type ClientFilter = string | null;
+
+export async function getMcpOverview(options: { client?: ClientFilter } = {}) {
   const supabase = createSupabaseAdminClient();
-  const [settings, tokens, calls, approvals, tasks] = await Promise.all([
+  let callsQuery = supabase
+    .from("mcp_tool_calls")
+    .select("id, created_at, tool, risk, status, error, duration_ms, client_label, entity, record_id, profile:profiles(email)")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (options.client) callsQuery = callsQuery.eq("client_label", options.client);
+
+  const [settings, tokens, calls, approvals, tasks, clients, caps] = await Promise.all([
     supabase.from("mcp_settings").select("enabled, updated_at").eq("id", 1).maybeSingle(),
     supabase
       .from("mcp_tokens")
@@ -21,19 +35,25 @@ export async function getMcpOverview() {
       .is("revoked_at", null)
       .order("created_at", { ascending: false })
       .limit(100),
-    supabase
-      .from("mcp_tool_calls")
-      .select("id, created_at, tool, risk, status, error, duration_ms, profile:profiles(email)")
-      .order("created_at", { ascending: false })
-      .limit(50),
+    callsQuery,
     supabase
       .from("mcp_pending_confirmations")
       .select("id, tool, preview, created_at, expires_at, token:mcp_tokens(name), profile:profiles!mcp_pending_confirmations_profile_id_fkey(email)")
       .eq("status", "awaiting_approval")
       .order("created_at", { ascending: false }),
     listTasks({ limit: 30 }),
+    supabase
+      .from("mcp_oauth_clients")
+      .select("client_id, client_name, client_label, redirect_uris, disabled_at, created_at")
+      .order("created_at", { ascending: false })
+      .limit(50),
+    getDailyCaps(),
   ]);
-  for (const r of [settings, tokens, calls, approvals]) if (r.error) throw r.error;
+  for (const r of [settings, tokens, calls, approvals, clients]) if (r.error) throw r.error;
+
+  // A successful delete whose record is still in the trash can be restored from the activity list.
+  const deletes = (calls.data ?? []).filter((c) => c.status === "ok" && c.entity && c.record_id && /_delete$/.test(c.tool));
+  const trashed = await inTrash(deletes.map((c) => ({ entity: c.entity as string, id: c.record_id as string })));
 
   const now = Date.now();
   // A person's connection is live while its refresh token is; an agent token while unexpired.
@@ -44,7 +64,9 @@ export async function getMcpOverview() {
   return {
     enabled: Boolean(settings.data?.enabled),
     connections: live,
-    calls: calls.data ?? [],
+    calls: (calls.data ?? []).map((c) => ({ ...c, restorable: trashed.has(`${c.entity}:${c.record_id}`) && /_delete$/.test(c.tool) })),
+    clients: clients.data ?? [],
+    caps,
     approvals: approvals.data ?? [],
     tasks,
   };
@@ -54,6 +76,25 @@ export async function setMcpEnabled(enabled: boolean, by: string) {
   const supabase = createSupabaseAdminClient();
   const { error } = await supabase.from("mcp_settings").upsert({ id: 1, enabled, updated_by: by, updated_at: new Date().toISOString() });
   if (error) throw error;
+}
+
+/**
+ * Switches one AI client off or back on — every registration with that label
+ * (Claude registers more than once). Checked on every call; a client that
+ * registers again while switched off starts off too (lib/mcp/oauth.ts).
+ */
+export async function setClientDisabled(label: string, disabled: boolean, by: string) {
+  const supabase = createSupabaseAdminClient();
+  const { error } = await supabase
+    .from("mcp_oauth_clients")
+    .update({ disabled_at: disabled ? new Date().toISOString() : null, disabled_by: disabled ? by : null })
+    .eq("client_label", label);
+  if (error) throw error;
+}
+
+/** Restore from the Activity list (a delete made through the connector). */
+export async function restoreFromActivity(entity: string, id: string) {
+  return restoreRecord(entity, id);
 }
 
 export async function revokeConnection(id: string) {
@@ -89,17 +130,13 @@ export async function decideApproval(id: string, decision: "approve" | "reject",
     via: "mcp",
     tokenKind: "agent",
     tokenId: claimed.token_id,
+    clientLabel: AGENT_LABEL,
   };
-  const started = Date.now();
-  try {
-    const result = await tool.run(claimed.args, ctx);
-    await logToolCall({ ctx, tool: tool.name, risk: tool.risk, args: claimed.args, status: "ok", durationMs: Date.now() - started });
+  const outcome = await executeTool(tool, claimed.args, ctx);
+  if (outcome.ok) {
     await supabase.from("mcp_pending_confirmations").update({ status: "executed", result: { ok: true } }).eq("id", id);
-    return { ok: true as const, result };
-  } catch (err) {
-    const message = errorText(err);
-    await logToolCall({ ctx, tool: tool.name, risk: tool.risk, args: claimed.args, status: "error", error: message, durationMs: Date.now() - started });
-    await supabase.from("mcp_pending_confirmations").update({ status: "failed", result: { error: message } }).eq("id", id);
-    throw new Error(`Approved, but it failed: ${message}`);
+    return { ok: true as const, result: outcome.result };
   }
+  await supabase.from("mcp_pending_confirmations").update({ status: "failed", result: { error: outcome.error } }).eq("id", id);
+  throw new Error(`Approved, but it failed: ${outcome.error}`);
 }

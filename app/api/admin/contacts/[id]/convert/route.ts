@@ -18,6 +18,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .from("contacts")
       .select("*")
       .eq("id", id)
+      .is("deleted_at", null)
       .single();
     if (fetchErr || !contact) return NextResponse.json({ error: "Contact not found." }, { status: 404 });
     if (contact.status === "converted") return NextResponse.json({ error: "Already converted." }, { status: 400 });

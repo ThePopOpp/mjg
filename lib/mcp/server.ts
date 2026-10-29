@@ -7,6 +7,7 @@ import { ROLES } from "@/lib/rbac/roles";
 import type { McpActor } from "./auth";
 import { logToolCall } from "./audit";
 import { claimConfirmation, createConfirmation, recordConfirmationResult, CONFIRM_TTL_MINUTES } from "./confirm";
+import { errorText, executeTool } from "./execute";
 import { allowCall } from "./rate-limit";
 
 // The MJG MCP server. Stateless: a fresh server is built per HTTP request for
@@ -72,16 +73,7 @@ const CONFIRM_DEFINITION: Tool = {
   annotations: { title: "Confirm a high-risk action", readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true },
 };
 
-/** Readable text for any thrown value — Supabase/PostgREST errors are plain objects, not Errors. */
-export function errorText(err: unknown): string {
-  if (err instanceof Error) return err.message;
-  if (err && typeof err === "object") {
-    const e = err as { message?: string; hint?: string; details?: unknown };
-    if (e.message) return [e.message, e.hint].filter(Boolean).join(" — ");
-    return JSON.stringify(err).slice(0, 500);
-  }
-  return String(err);
-}
+export { errorText };
 
 function text(value: unknown, isError = false): CallToolResult {
   let body = typeof value === "string" ? value : JSON.stringify(value ?? null, null, 2);
@@ -90,16 +82,8 @@ function text(value: unknown, isError = false): CallToolResult {
 }
 
 async function runTool(tool: ToolDef, args: unknown, ctx: ToolContext): Promise<CallToolResult> {
-  const started = Date.now();
-  try {
-    const result = await tool.run(args, ctx);
-    await logToolCall({ ctx, tool: tool.name, risk: tool.risk, args, status: "ok", durationMs: Date.now() - started });
-    return text(result ?? { ok: true });
-  } catch (err) {
-    const message = errorText(err);
-    await logToolCall({ ctx, tool: tool.name, risk: tool.risk, args, status: "error", error: message, durationMs: Date.now() - started });
-    return text(`Error: ${message}`, true);
-  }
+  const outcome = await executeTool(tool, args, ctx);
+  return outcome.ok ? text(outcome.result ?? { ok: true }) : text(`Error: ${outcome.error}`, true);
 }
 
 export function createMcpServer(actor: McpActor): Server {

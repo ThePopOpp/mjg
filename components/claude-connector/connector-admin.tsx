@@ -15,7 +15,22 @@ import { cn } from "@/lib/utils";
 export type ConnectorOverview = {
   enabled: boolean;
   connections: Array<{ id: string; kind: string; name: string; scopes: string[]; created_at: string; last_used_at: string | null; paused_at: string | null; profile: { email: string } | null }>;
-  calls: Array<{ id: number; created_at: string; tool: string; risk: string | null; status: string; error: string | null; duration_ms: number | null; profile: { email: string } | null }>;
+  calls: Array<{
+    id: number;
+    created_at: string;
+    tool: string;
+    risk: string | null;
+    status: string;
+    error: string | null;
+    duration_ms: number | null;
+    client_label: string | null;
+    entity: string | null;
+    record_id: string | null;
+    restorable: boolean;
+    profile: { email: string } | null;
+  }>;
+  clients: Array<{ client_id: string; client_name: string | null; client_label: string; redirect_uris: string[]; disabled_at: string | null; created_at: string }>;
+  caps: { sms: number | null; email: number | null };
   approvals: Array<{ id: string; tool: string; preview: { summary?: string; details?: unknown } | null; created_at: string; expires_at: string; token: { name: string } | null }>;
   tasks: Array<{ id: string; title: string; status: string; priority: string; result: string | null; created_at: string; completed_at: string | null; agent: { name: string } | null }>;
 };
@@ -30,6 +45,9 @@ const TASK_TONE: Record<string, string> = {
 };
 
 type ScopeDomain = { key: string; label: string };
+
+/** Activity filter options; values match mcp_tool_calls.client_label. */
+const CLIENT_FILTERS = ["Claude", "ChatGPT", "Agent", "Other"] as const;
 type Level = "none" | "read" | "write";
 
 const when = (iso: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "—");
@@ -62,9 +80,28 @@ export function ClaudeConnectorAdmin({
   const [levels, setLevels] = useState<Record<string, Level>>({});
   const [expiresInDays, setExpiresInDays] = useState("90");
   const [newSecret, setNewSecret] = useState<string | null>(null);
+  const [clientFilter, setClientFilter] = useState("");
+  const [caps, setCaps] = useState({ sms: initial.caps.sms?.toString() ?? "", email: initial.caps.email?.toString() ?? "" });
+
+  // One row per AI client (Claude registers more than once); off if any registration is off.
+  const clientGroups = Object.values(
+    data.clients.reduce<Record<string, { label: string; count: number; disabled: boolean; since: string }>>((acc, c) => {
+      const g = (acc[c.client_label] ??= { label: c.client_label, count: 0, disabled: false, since: c.created_at });
+      g.count += 1;
+      g.disabled ||= Boolean(c.disabled_at);
+      if (c.created_at < g.since) g.since = c.created_at;
+      return acc;
+    }, {}),
+  );
+
+  async function refresh(filter = clientFilter) {
+    const qs = filter ? `?client=${encodeURIComponent(filter)}` : "";
+    const fresh = await fetch(`/api/admin/mcp${qs}`, { headers: { "x-mjg-action-token": actionToken ?? "" } });
+    if (fresh.ok) setData(await fresh.json());
+  }
 
   async function call(action: string, payload: Record<string, unknown> = {}) {
-    setBusy(action + (payload.id ?? ""));
+    setBusy(action + (payload.id ?? payload.label ?? ""));
     setError(null);
     try {
       const res = await fetch("/api/admin/mcp", {
@@ -74,8 +111,7 @@ export function ClaudeConnectorAdmin({
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error || "Something went wrong.");
-      const fresh = await fetch("/api/admin/mcp", { headers: { "x-mjg-action-token": actionToken ?? "" } });
-      if (fresh.ok) setData(await fresh.json());
+      await refresh();
       return json;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -216,6 +252,73 @@ export function ClaudeConnectorAdmin({
         </CardContent>
       </Card>
 
+      {/* AI clients */}
+      <Card>
+        <CardHeader>
+          <CardTitle>AI clients</CardTitle>
+          <CardDescription>
+            Claude and ChatGPT reach the same tools under the same rules. Switch one off to refuse every call from it, starting with the next one.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {clientGroups.length ? (
+            <ul className="divide-y">
+              {clientGroups.map((g) => (
+                <li key={g.label} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">
+                      {g.label}
+                      {g.disabled ? <Badge variant="outline" className="ml-2 align-middle border-[#b88a4a] text-[#8a6532] dark:text-[#d8bd86]">Off</Badge> : null}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {g.count} registration{g.count === 1 ? "" : "s"} · first connected {when(g.since)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {busy === `set_client_disabled${g.label}` ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    <Switch
+                      checked={!g.disabled}
+                      disabled={busy !== null}
+                      onCheckedChange={(on) => call("set_client_disabled", { label: g.label, disabled: !on })}
+                      aria-label={`${g.label} on or off`}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">No AI client has connected yet.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Limits */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Limits</CardTitle>
+          <CardDescription>
+            Total one-person sends through the connector in any 24 hours, across every person, client and agent. Leave blank for no limit. Broadcasts
+            always need a confirmed preview showing how many people they reach.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-1.5 text-sm">
+              <span className="font-medium">Texts per day</span>
+              <Input type="number" min={0} placeholder="No limit" value={caps.sms} onChange={(e) => setCaps((v) => ({ ...v, sms: e.target.value }))} />
+            </label>
+            <label className="space-y-1.5 text-sm">
+              <span className="font-medium">Emails per day</span>
+              <Input type="number" min={0} placeholder="No limit" value={caps.email} onChange={(e) => setCaps((v) => ({ ...v, email: e.target.value }))} />
+            </label>
+          </div>
+          <Button disabled={busy !== null} onClick={() => call("set_caps", { sms: caps.sms, email: caps.email })}>
+            {busy === "set_caps" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Save limits
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Agent tasks */}
       <Card>
         <CardHeader>
@@ -319,9 +422,27 @@ export function ClaudeConnectorAdmin({
 
       {/* Activity */}
       <Card>
-        <CardHeader>
-          <CardTitle>Recent activity</CardTitle>
-          <CardDescription>The last 50 calls through the connector.</CardDescription>
+        <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3 space-y-0">
+          <div>
+            <CardTitle>Recent activity</CardTitle>
+            <CardDescription className="mt-1">The last 50 calls through the connector. Deletes can be restored here.</CardDescription>
+          </div>
+          <select
+            value={clientFilter}
+            onChange={(e) => {
+              setClientFilter(e.target.value);
+              void refresh(e.target.value);
+            }}
+            className="h-9 rounded-md border bg-background px-2 text-sm"
+            aria-label="Show calls from"
+          >
+            <option value="">All clients</option>
+            {CLIENT_FILTERS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
         </CardHeader>
         <CardContent>
           {data.calls.length ? (
@@ -331,6 +452,7 @@ export function ClaudeConnectorAdmin({
                   <tr>
                     <th className="py-2 pr-3 font-medium">When</th>
                     <th className="py-2 pr-3 font-medium">Who</th>
+                    <th className="py-2 pr-3 font-medium">Client</th>
                     <th className="py-2 pr-3 font-medium">Tool</th>
                     <th className="py-2 pr-3 font-medium">Outcome</th>
                   </tr>
@@ -340,6 +462,7 @@ export function ClaudeConnectorAdmin({
                     <tr key={c.id}>
                       <td className="whitespace-nowrap py-2 pr-3 text-muted-foreground">{when(c.created_at)}</td>
                       <td className="py-2 pr-3">{c.profile?.email ?? "—"}</td>
+                      <td className="py-2 pr-3 text-muted-foreground">{c.client_label ?? "—"}</td>
                       <td className="py-2 pr-3 font-mono text-[12.5px]">
                         {c.tool}
                         {c.risk === "high" ? <Badge variant="outline" className="ml-2">high</Badge> : null}
@@ -347,6 +470,17 @@ export function ClaudeConnectorAdmin({
                       <td className="py-2 pr-3">
                         <span className={cn("rounded px-1.5 py-0.5 text-xs font-medium", STATUS_TONE[c.status] ?? "bg-muted")}>{c.status}</span>
                         {c.error ? <span className="ml-2 text-xs text-muted-foreground">{c.error.slice(0, 120)}</span> : null}
+                        {c.restorable && c.entity && c.record_id ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="ml-2 h-7 px-2 text-xs"
+                            disabled={busy !== null}
+                            onClick={() => call("restore", { entity: c.entity, id: c.record_id })}
+                          >
+                            Restore
+                          </Button>
+                        ) : null}
                       </td>
                     </tr>
                   ))}

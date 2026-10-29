@@ -28,6 +28,11 @@ export async function logToolCall(input: {
   status: "ok" | "error" | "denied" | "preview" | "invalid";
   error?: string;
   durationMs?: number;
+  /** The record the call changed (lib/mcp/records.ts), with snapshots either side. */
+  entity?: string;
+  recordId?: string;
+  before?: unknown;
+  after?: unknown;
 }) {
   try {
     const supabase = createSupabaseAdminClient();
@@ -35,12 +40,17 @@ export async function logToolCall(input: {
       token_id: input.ctx?.tokenId ?? null,
       profile_id: input.ctx?.actorId ?? null,
       client_id: input.ctx?.clientId ?? null,
+      client_label: input.ctx?.clientLabel ?? null,
       tool: input.tool,
       risk: input.risk ?? null,
       args: input.args === undefined ? null : redactArgs(input.args),
       status: input.status,
       error: input.error?.slice(0, 2000) ?? null,
       duration_ms: input.durationMs ?? null,
+      entity: input.entity ?? null,
+      record_id: input.recordId ?? null,
+      before: input.before === undefined ? null : redactArgs(input.before),
+      after: input.after === undefined ? null : redactArgs(input.after),
     });
     if (error) console.error("[mcp] audit insert failed", error.message);
   } catch (err) {

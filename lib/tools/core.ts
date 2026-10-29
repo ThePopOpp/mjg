@@ -17,6 +17,7 @@ const whoami: ToolDef = {
     email: ctx.actorEmail,
     role: ctx.role,
     connection: ctx.tokenKind === "agent" ? "agent token" : "signed-in person",
+    client: ctx.clientLabel ?? "unknown",
     via: ctx.via,
   }),
 };
