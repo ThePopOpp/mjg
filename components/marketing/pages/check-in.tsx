@@ -11,7 +11,7 @@ import { pageCheckIn } from "@/lib/marketing/content/scopes/page-assessments";
 import { Actions, Band, ButtonLink, Eyebrow, Heading, SectionIntro, Split, TextLink, keepTogether } from "../primitives";
 import { CheckInIntroButtons } from "../check-in-intro-buttons";
 
-export async function CheckInPage({ redirectTo, dashboardHref }: { redirectTo: string | null; dashboardHref: string | null }) {
+export async function CheckInPage({ redirectTo, dashboardHref, signedIn }: { redirectTo: string | null; dashboardHref: string | null; signedIn: boolean }) {
   const { hero, after, privacy } = await getScopeContent(pageCheckIn);
 
   return (
@@ -29,7 +29,7 @@ export async function CheckInPage({ redirectTo, dashboardHref }: { redirectTo: s
       <section className="pb-16 md:pb-20">
         {/* No card around it: the tool draws its own cards. */}
         <div className="mx-auto w-full max-w-[880px] px-5 sm:px-8">
-          <CreatedForMoreAssessment redirectTo={redirectTo} dashboardHref={dashboardHref} />
+          <CreatedForMoreAssessment redirectTo={redirectTo} dashboardHref={dashboardHref} signedIn={signedIn} />
         </div>
       </section>
 

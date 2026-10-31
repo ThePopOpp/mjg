@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useAssessmentAutosave } from "@/components/assessments/use-assessment-autosave";
+import { AutosaveNote, SaveResultsModal } from "@/components/assessments/save-results-modal";
 import { LAYERS, SCALE, MAX_SCORE, TOTAL_STATEMENTS, PATHWAYS, NEXT_STEP_OPTIONS, LOWEST_LAYER_GUIDANCE, PILLAR_GUIDANCE, scoreCheckIn, type CheckInScore } from "@/lib/check-in/created-for-more";
 
 /** Rating guide — shown in the "Check-In Form 101" dialog on the Check-In pages. */
@@ -29,8 +31,11 @@ export function CheckInScaleGuide() {
  * the next step by itself; Back and Next move freely, and the stepper jumps to
  * any layer. The answers, their keys, the scoring and what is saved are exactly
  * as before — only the presentation is stepped.
+ *
+ * Results save to a signed-in member's account as soon as they're shown, so Steward
+ * can see them; signed-out visitors are asked to sign in (useAssessmentAutosave).
  */
-export function CreatedForMoreAssessment({ redirectTo, dashboardHref }: { redirectTo?: string | null; dashboardHref?: string | null } = {}) {
+export function CreatedForMoreAssessment({ redirectTo, dashboardHref, signedIn = false }: { redirectTo?: string | null; dashboardHref?: string | null; signedIn?: boolean } = {}) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [step, setStep] = useState(0);
   const [showResults, setShowResults] = useState(false);
@@ -43,6 +48,7 @@ export function CreatedForMoreAssessment({ redirectTo, dashboardHref }: { redire
   const score = useMemo(() => (showResults ? scoreCheckIn(answers) : null), [showResults, answers]);
   const layer = LAYERS[step];
   const last = step === LAYERS.length - 1;
+  const autosave = useAssessmentAutosave({ assessment: "created-for-more", label: "Check-In", signedIn, answers, ready: showResults && complete });
   const answeredIn = (index: number, a = answers) => LAYERS[index].statements.filter((_, i) => a[`${LAYERS[index].key}:${i}`]).length;
 
   const goTo = (next: number) => {
@@ -66,7 +72,7 @@ export function CreatedForMoreAssessment({ redirectTo, dashboardHref }: { redire
     }
   };
   const seeResults = () => { setShowResults(true); setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); };
-  const retake = () => { setAnswers({}); setStep(0); setShowResults(false); setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); };
+  const retake = () => { autosave.newAttempt(); setAnswers({}); setStep(0); setShowResults(false); setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); };
 
   return (
     <div ref={topRef} className="scroll-mt-24 space-y-6">
@@ -167,12 +173,37 @@ export function CreatedForMoreAssessment({ redirectTo, dashboardHref }: { redire
         <Button onClick={seeResults} disabled={!complete}>See my results <ArrowRight className="ml-2 h-4 w-4" /></Button>
       </div>
 
-      {showResults && score ? <Results ref={resultsRef} score={score} answers={answers} onRetake={retake} redirectTo={redirectTo} dashboardHref={dashboardHref} /> : null}
+      {showResults && score ? (
+        <Results
+          ref={resultsRef}
+          score={score}
+          answers={answers}
+          onRetake={retake}
+          redirectTo={redirectTo}
+          dashboardHref={dashboardHref}
+          signedIn={signedIn}
+          submissionId={autosave.submissionId}
+          note={<AutosaveNote status={autosave.status} onSignIn={() => autosave.setModalOpen(true)} onRetry={autosave.retry} />}
+        />
+      ) : null}
+      <SaveResultsModal open={autosave.modalOpen} onOpenChange={autosave.setModalOpen} label="Check-In" />
     </div>
   );
 }
 
-const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Record<string, number>; onRetake: () => void; redirectTo?: string | null; dashboardHref?: string | null }>(function Results({ score, answers, onRetake, redirectTo, dashboardHref }, ref) {
+type ResultsProps = {
+  score: CheckInScore;
+  answers: Record<string, number>;
+  onRetake: () => void;
+  redirectTo?: string | null;
+  dashboardHref?: string | null;
+  signedIn: boolean;
+  /** The row the auto-save created; "Send my results" adds to it rather than adding a row. */
+  submissionId: string | null;
+  note: React.ReactNode;
+};
+
+const Results = forwardRef<HTMLDivElement, ResultsProps>(function Results({ score, answers, onRetake, redirectTo, dashboardHref, signedIn, submissionId, note }, ref) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pathways, setPathways] = useState<string[]>([]);
@@ -186,7 +217,7 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
   async function send() {
     setBusy(true); setError(null);
     try {
-      const res = await fetch("/api/check-in/created-for-more", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, answers, chosenPathways: pathways }) });
+      const res = await fetch("/api/check-in/created-for-more", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, answers, chosenPathways: pathways, submissionId }) });
       const data = await res.json();
       if (!res.ok) setError(data.error || "Something went wrong.");
       else {
@@ -208,6 +239,8 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
         <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{score.stageMeaning}</p>
         <p className="mx-auto mt-2 max-w-2xl text-sm font-medium">Suggested next step: {score.stageNextStep}</p>
       </div>
+
+      {note}
 
       {/* Layer breakdown */}
       <Card><CardContent className="p-0">
@@ -258,18 +291,21 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
       {/* Capture */}
       {sent ? (
         <Card><CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="flex items-center gap-3 text-sm"><Check className="h-5 w-5 shrink-0 text-primary" /><span>Thank you — your results have been saved{emailed ? " and a copy is on its way to your inbox" : email ? " and we'll be in touch" : ""}.{redirectTo ? " Taking you to your dashboard…" : ""}</span></p>
+          <p className="flex items-center gap-3 text-sm"><Check className="h-5 w-5 shrink-0 text-primary" /><span>Thank you — your results have been saved{emailed ? " and a copy is on its way to your inbox" : email || signedIn ? " and we'll be in touch" : ""}.{redirectTo ? " Taking you to your dashboard…" : ""}</span></p>
           <Button className="shrink-0" onClick={() => window.location.assign(dashboardHref ?? "/login?next=/dashboard")}>
             {dashboardHref ? "Go to your dashboard" : "Log in to your dashboard"} <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </CardContent></Card>
       ) : (
         <Card><CardContent className="space-y-3 p-5">
-          <p className="text-sm font-semibold">Send me my results and next step</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" />
-          </div>
+          <p className="text-sm font-semibold">{signedIn ? "Email me my results and next step" : "Send me my results and next step"}</p>
+          {/* Signed in: the results go to the account's email. */}
+          {!signedIn ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" />
+            </div>
+          ) : null}
           <div className="space-y-1.5">
             <p className="text-xs text-muted-foreground">Which next steps feel most helpful right now? <span className="italic">Select all that apply.</span></p>
             <div className="grid gap-1.5">
@@ -296,7 +332,7 @@ const Results = forwardRef<HTMLDivElement, { score: CheckInScore; answers: Recor
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <div className="flex items-center justify-between">
             <Button variant="ghost" size="sm" onClick={onRetake}><RotateCcw className="mr-2 h-4 w-4" /> Retake</Button>
-            <Button onClick={send} disabled={busy}>{busy ? "Saving…" : "Send my results"}</Button>
+            <Button onClick={send} disabled={busy}>{busy ? "Saving…" : signedIn ? "Email my results" : "Send my results"}</Button>
           </div>
         </CardContent></Card>
       )}

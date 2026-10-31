@@ -13,10 +13,15 @@ import {
 import { ENERGY_AUDIT_ASSESSMENT } from "@/lib/energy-audit/submissions";
 import { sendEnergyAuditResultsEmail } from "@/lib/energy-audit/results-email";
 import { alertEnergyAudit } from "@/lib/notifications/energy-audit-alert";
+import { ownedSubmission } from "@/lib/assessments/save";
 
 // Public endpoint: saves an Energy Audit Check-In. Signed-in users are saved to their MJG
 // account automatically (by profile email); anonymous visitors may leave a name + email to
 // receive their results. Scores are always recomputed here — never trusted from the client.
+//
+// Signed-in members' scores are already saved when the results screen is shown
+// (lib/assessments/save.ts); "Save" then passes that submissionId and this adds their
+// next step and reflections to the same row — no second row, no second team alert.
 
 const SOURCES = SECTIONS.map((s) => s.key) as EnergySource[];
 const clip = (v: unknown, max = 1000) => (typeof v === "string" ? v.trim().slice(0, max) : "");
@@ -69,10 +74,31 @@ export async function POST(request: Request) {
     const email = rawEmail && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(rawEmail) ? rawEmail.toLowerCase() : null;
 
     const supabase = createSupabaseAdminClient();
+    const owned = await ownedSubmission(body.submissionId, signedIn ? profile!.id : null, ENERGY_AUDIT_ASSESSMENT);
+    if (owned) {
+      const { error: updateError } = await supabase
+        .from("check_in_submissions")
+        .update({
+          details: { ...(owned.details ?? {}), interpretationKey: score.interpretation.key, lowestTied: score.lowestTied, nextStep, reflections },
+        })
+        .eq("id", owned.id);
+      if (updateError) throw updateError;
+      let emailed = false;
+      if (email && body.sendEmail !== false) {
+        const sent = await sendEnergyAuditResultsEmail({ to: email, name, score, nextStep, auditId: owned.id, profileId: profile!.id }).catch((e) => {
+          console.error("[energy-audit] results email failed", e instanceof Error ? e.message : e);
+          return { sent: false } as const;
+        });
+        emailed = sent.sent;
+      }
+      return NextResponse.json({ ok: true, id: owned.id, savedToAccount: true, emailed, score });
+    }
+
     const { data: saved, error } = await supabase
       .from("check_in_submissions")
       .insert({
         assessment: ENERGY_AUDIT_ASSESSMENT,
+        profile_id: signedIn ? profile!.id : null,
         name,
         email,
         answers,

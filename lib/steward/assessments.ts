@@ -44,11 +44,15 @@ import {
 // allowed to draw on: it comes from the assessment documents, not from the
 // model's general idea of what a Christian life coach would say.
 //
-// MATCHED BY EMAIL, and that is a known weakness. Both Check-Ins are public and
-// take any email address, so a result filed under a member's email may not have
-// been taken by them. Everything here is labelled self-reported with its date,
-// and the instructions tell Steward to hold it as a starting point ("does that
-// still fit?") rather than a verdict on their life.
+// MATCHED BY ACCOUNT FIRST. Results taken while signed in (or attached after
+// signing in) carry profile_id and save the moment they're shown
+// (lib/assessments/save.ts) — no "Send my results" press needed. Older rows, and
+// results a visitor sent with only an email, are still matched by email, which
+// is weaker: both Check-Ins are public and take any email address, so a result
+// filed under a member's email may not have been taken by them. Everything here
+// is labelled self-reported with its date, and the instructions tell Steward to
+// hold it as a starting point ("does that still fit?") rather than a verdict on
+// their life.
 
 /** How many past results to report for a trend. */
 const HISTORY = 5;
@@ -73,17 +77,21 @@ async function memberEmail(profileId: string): Promise<string | null> {
 }
 
 async function memberRows(profileId: string): Promise<Row[]> {
-  const email = await memberEmail(profileId);
-  if (!email) return [];
   const db = createSupabaseAdminClient();
-  const { data } = await db
-    .from("check_in_submissions")
-    .select("id,assessment,total_score,stage,layer_scores,lowest_pillar,answers,details,created_at")
-    .in("assessment", ["created-for-more", ENERGY_AUDIT_ASSESSMENT])
-    .ilike("email", email)
-    .order("created_at", { ascending: false })
-    .limit(HISTORY * 4);
-  return (data ?? []) as Row[];
+  const email = await memberEmail(profileId);
+  const select = "id,assessment,total_score,stage,layer_scores,lowest_pillar,answers,details,created_at";
+  const assessments = ["created-for-more", ENERGY_AUDIT_ASSESSMENT];
+  const [linked, byEmail] = await Promise.all([
+    db.from("check_in_submissions").select(select).in("assessment", assessments).eq("profile_id", profileId)
+      .order("created_at", { ascending: false }).limit(HISTORY * 4),
+    email
+      ? db.from("check_in_submissions").select(select).in("assessment", assessments).is("profile_id", null).ilike("email", email)
+          .order("created_at", { ascending: false }).limit(HISTORY * 4)
+      : Promise.resolve({ data: [] as Row[] }),
+  ]);
+  return [...((linked.data ?? []) as Row[]), ...((byEmail.data ?? []) as Row[])]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, HISTORY * 4);
 }
 
 const day = (iso: string) => iso.slice(0, 10);

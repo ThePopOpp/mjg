@@ -6,9 +6,16 @@ import { upsertParticipant } from "@/lib/pilot/repository";
 import { PARTICIPANT_TYPES } from "@/lib/pilot/constants";
 import { scoreCheckIn, MAX_SCORE, type CheckInScore } from "@/lib/check-in/created-for-more";
 import { alertCheckIn } from "@/lib/notifications/check-in-alert";
+import { getCurrentProfile } from "@/lib/auth/server";
+import { ownedSubmission } from "@/lib/assessments/save";
 
 // Public endpoint: saves a Created for More Check-In submission, emails the taker their
 // results (if they gave an email), notifies the team, and returns the score.
+//
+// Signed-in members' results are already saved when they're shown
+// (lib/assessments/save.ts); their "Send my results" passes that submissionId, so
+// this updates the same row with their chosen next steps and emails them —
+// no second row, no second team alert.
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
@@ -29,6 +36,27 @@ export async function POST(request: Request) {
       : typeof body.chosenPathway === "string" && body.chosenPathway ? [body.chosenPathway.slice(0, 60)] : [];
     const score = scoreCheckIn(answers);
     const supabase = createSupabaseAdminClient();
+
+    const profile = await getCurrentProfile().catch(() => null);
+    const profileId = profile && profile.id !== "local-preview" ? profile.id : null;
+    const owned = await ownedSubmission(body.submissionId, profileId, "created-for-more");
+    if (owned) {
+      const { error: updateError } = await supabase
+        .from("check_in_submissions")
+        .update({ chosen_pathway: pathways[0] ?? null, chosen_pathways: pathways })
+        .eq("id", owned.id);
+      if (updateError) throw updateError;
+      const to = validEmail ?? profile!.email;
+      let emailed = false;
+      if (to) {
+        const sent = await sendResultsEmail({ to, name: name ?? ([profile!.firstName, profile!.lastName].filter(Boolean).join(" ") || null), score }).catch((e) => {
+          console.error("[created-for-more] results email failed", e instanceof Error ? e.message : e);
+          return null;
+        });
+        emailed = Boolean(sent && sent.ok && !sent.skipped);
+      }
+      return NextResponse.json({ ok: true, id: owned.id, score, emailed });
+    }
 
     // Attach the taker as a participant (so they show in the participant list + stats),
     // linked by email — the same key the rest of the pilot uses. Best-effort.
@@ -53,6 +81,7 @@ export async function POST(request: Request) {
 
     const { error } = await supabase.from("check_in_submissions").insert({
       assessment: "created-for-more",
+      profile_id: profileId,
       name,
       email: validEmail ?? email,
       participant_id: participantId,

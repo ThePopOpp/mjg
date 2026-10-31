@@ -23,5 +23,7 @@ export default async function CreatedForMoreCheckInPage({ searchParams }: { sear
   // already signed in. Anonymous visitors don't have a dashboard, so no button.
   const profile = await getCurrentProfile();
   const dashboardHref = redirectTo ?? (profile ? "/dashboard" : null);
-  return <CheckInPage redirectTo={redirectTo} dashboardHref={dashboardHref} />;
+  // Signed in → results save to the account as soon as they're shown.
+  const signedIn = Boolean(profile && profile.id !== "local-preview" && profile.email);
+  return <CheckInPage redirectTo={redirectTo} dashboardHref={dashboardHref} signedIn={signedIn} />;
 }

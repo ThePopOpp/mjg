@@ -11,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useAssessmentAutosave } from "@/components/assessments/use-assessment-autosave";
+import { AutosaveNote, SaveResultsModal } from "@/components/assessments/save-results-modal";
 import {
   REFLECTION_QUESTIONS, SCALE, SECTIONS, SECTION_MAX, TOTAL_MAX, TOTAL_STATEMENTS,
   answerKey, isComplete, isSectionComplete, scoreEnergyAudit, sectionByKey,
@@ -84,6 +86,18 @@ export function EnergyAuditFlow({
 
   const score = useMemo(() => (isComplete(answers) ? scoreEnergyAudit(answers) : null), [answers]);
 
+  // Scores save to a signed-in member's account as soon as the results show, so Steward
+  // can see them; signed-out visitors are asked to sign in. "Save" later adds the next
+  // step and reflections to the same row.
+  const autosave = useAssessmentAutosave({
+    assessment: "energy-audit",
+    label: "Energy Audit",
+    signedIn,
+    answers,
+    ready: Boolean(score) && ["results", "next-step", "reflect", "journey"].includes(step),
+    persistAttempt: true,
+  });
+
   function go(next: Step) {
     setStep(next);
     requestAnimationFrame(() => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -104,6 +118,7 @@ export function EnergyAuditFlow({
   }
 
   function startOver() {
+    autosave.newAttempt();
     writeSaved(null);
     setResumable(null);
     setAnswers({});
@@ -117,7 +132,7 @@ export function EnergyAuditFlow({
   return (
     <div ref={topRef} className="mx-auto max-w-3xl scroll-mt-24">
       {step === "intro" ? (
-        <Intro resumable={resumable} onBegin={() => go("teaching")} onResume={resume} onStartOver={startOver} />
+        <Intro resumable={resumable} onBegin={() => { autosave.newAttempt(); go("teaching"); }} onResume={resume} onStartOver={startOver} />
       ) : null}
 
       {step === "teaching" ? <Teaching onBack={() => go("intro")} onContinue={() => go(SECTIONS[0].key)} /> : null}
@@ -133,7 +148,12 @@ export function EnergyAuditFlow({
       ) : null}
 
       {step === "results" && score ? (
-        <Results score={score} onBack={() => go(SECTIONS[SECTIONS.length - 1].key)} onContinue={() => go("next-step")} />
+        <Results
+          score={score}
+          note={<AutosaveNote status={autosave.status} onSignIn={() => autosave.setModalOpen(true)} onRetry={autosave.retry} />}
+          onBack={() => go(SECTIONS[SECTIONS.length - 1].key)}
+          onContinue={() => go("next-step")}
+        />
       ) : null}
 
       {step === "next-step" && score ? (
@@ -155,10 +175,13 @@ export function EnergyAuditFlow({
           onReflectionsChange={setReflections}
           signedIn={signedIn}
           firstName={firstName}
+          submissionId={autosave.submissionId}
           onBack={() => go("next-step")}
           onSaved={() => go("journey")}
         />
       ) : null}
+
+      <SaveResultsModal open={autosave.modalOpen} onOpenChange={autosave.setModalOpen} label="Energy Audit" />
 
       {step === "journey" ? <Journey dashboardHref={dashboardHref} signedIn={signedIn} onRetake={startOver} /> : null}
 
@@ -425,10 +448,12 @@ function SectionStep({
 
 function Results({
   score,
+  note,
   onBack,
   onContinue,
 }: {
   score: ReturnType<typeof scoreEnergyAudit>;
+  note: React.ReactNode;
   onBack: () => void;
   onContinue: () => void;
 }) {
@@ -450,6 +475,8 @@ function Results({
           {score.interpretation.reflection}
         </p>
       </div>
+
+      {note}
 
       {/* All four tanks side by side, so strongest and lowest read at a glance */}
       <Card>
@@ -687,6 +714,7 @@ function ReflectAndSave({
   onReflectionsChange,
   signedIn,
   firstName,
+  submissionId,
   onBack,
   onSaved,
 }: {
@@ -696,6 +724,8 @@ function ReflectAndSave({
   onReflectionsChange: (v: Record<string, string>) => void;
   signedIn: boolean;
   firstName?: string | null;
+  /** The row the auto-save created; saving adds the next step and reflections to it. */
+  submissionId: string | null;
   onBack: () => void;
   onSaved: () => void;
 }) {
@@ -714,7 +744,7 @@ function ReflectAndSave({
       const res = await fetch("/api/energy-audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers, nextStep, reflections, name, email }),
+        body: JSON.stringify({ answers, nextStep, reflections, name, email, submissionId }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
@@ -789,7 +819,9 @@ function ReflectAndSave({
             <p className="font-semibold">{signedIn ? "Save your audit" : "Save your results"}</p>
             {signedIn ? (
               <p className="text-sm text-muted-foreground">
-                {firstName ? `${firstName}, your` : "Your"} scores, next step{answeredReflections ? `, and ${answeredReflections} reflection${answeredReflections === 1 ? "" : "s"}` : ""} will be saved to your MJG account, and we&rsquo;ll email you a copy.
+                {submissionId
+                  ? <>{firstName ? `${firstName}, your` : "Your"} scores are already saved to your MJG account. Add your next step{answeredReflections ? ` and ${answeredReflections} reflection${answeredReflections === 1 ? "" : "s"}` : ""} too, and we&rsquo;ll email you a copy.</>
+                  : <>{firstName ? `${firstName}, your` : "Your"} scores, next step{answeredReflections ? `, and ${answeredReflections} reflection${answeredReflections === 1 ? "" : "s"}` : ""} will be saved to your MJG account, and we&rsquo;ll email you a copy.</>}
               </p>
             ) : (
               <>
