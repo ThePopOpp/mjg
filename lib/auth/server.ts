@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { VIEW_ROLE_COOKIE, loadViewRoles, resolveViewRole } from "@/lib/auth/view-role";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ROLES, canAccessDashboard, normalizeAppRole, type AppRole } from "@/lib/rbac/roles";
 
@@ -9,7 +11,12 @@ export type DashboardProfile = {
   email: string;
   firstName: string;
   lastName: string;
+  /** The role pages act as — the "View as" role when one is chosen (see lib/auth/view-role.ts). */
   role: AppRole;
+  /** The profile's real role. */
+  primaryRole: AppRole;
+  /** Roles this profile may view as, primary first; more than one shows the switcher. */
+  viewRoles: AppRole[];
   status: "active" | "invited" | "pending" | "suspended" | "archived" | "inactive";
   avatarUrl: string | null;
 };
@@ -24,6 +31,8 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
       firstName: "MJG",
       lastName: "Admin",
       role: ROLES.SUPER_ADMIN,
+      primaryRole: ROLES.SUPER_ADMIN,
+      viewRoles: [ROLES.SUPER_ADMIN],
       status: "active",
       avatarUrl: null,
     };
@@ -64,8 +73,10 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
   const userEmail = (user.email ?? "").trim().toLowerCase();
   const profileEmail = (profile?.email ?? userEmail).trim().toLowerCase();
   const isOwner = OWNER_EMAILS.has(userEmail) || OWNER_EMAILS.has(profileEmail);
-  const role = isOwner ? ROLES.SUPER_ADMIN : normalizeAppRole(profile?.role) ?? ROLES.PARTICIPANT;
+  const primaryRole = isOwner ? ROLES.SUPER_ADMIN : normalizeAppRole(profile?.role) ?? ROLES.PARTICIPANT;
   const status = isOwner ? "active" : profile?.status ?? "active";
+  const viewRoles = profile && status === "active" ? await loadViewRoles(profile.id, primaryRole) : [primaryRole];
+  const role = viewRoles.length > 1 ? resolveViewRole((await cookies()).get(VIEW_ROLE_COOKIE)?.value, viewRoles) : primaryRole;
 
   return {
     id: profile?.id ?? user.id,
@@ -73,6 +84,8 @@ export async function getCurrentProfile(): Promise<DashboardProfile | null> {
     firstName: profile?.first_name ?? "",
     lastName: profile?.last_name ?? "",
     role,
+    primaryRole,
+    viewRoles,
     status,
     avatarUrl: profile?.avatar_url ?? null,
   };

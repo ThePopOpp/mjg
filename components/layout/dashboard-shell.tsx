@@ -8,6 +8,7 @@ import { DashboardActionTokenProvider } from "@/components/layout/dashboard-acti
 import { DmUnreadProvider, useDmUnread } from "@/components/direct-messages/dm-unread";
 import { InstallAppButton } from "@/components/pwa/install-app-button";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
+import { ViewAsBanner, ViewAsSwitcher } from "@/components/layout/view-as";
 import { churchAdminNav, dashboardNav, facilitatorNav, participantNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -198,6 +199,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
                 <InstallAppButton />
               </span>
               <MessagesBell />
+              {profile.viewRoles.length > 1 && <ViewAsSwitcher role={profile.role} viewRoles={profile.viewRoles} />}
               <ThemeToggle />
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-medium">{displayName}</p>
@@ -219,6 +221,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
               </form>
             </div>
           </div>
+          <ViewAsBanner role={profile.role} primaryRole={profile.primaryRole} />
         </header>
 
         <DashboardActionTokenProvider token={actionToken}>

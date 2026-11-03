@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { VIEW_ROLE_COOKIE } from "@/lib/auth/view-role";
 
 // Sign-out MUST be a POST. Next.js prefetches <Link> destinations with GET
 // requests, so a GET sign-out route was being executed automatically on every
@@ -9,7 +10,9 @@ export async function POST(request: NextRequest) {
   await supabase?.auth.signOut();
   const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
   // 303 so the browser follows with a GET to /login after the POST.
-  return NextResponse.redirect(new URL("/login?message=Signed%20out", origin), 303);
+  const res = NextResponse.redirect(new URL("/login?message=Signed%20out", origin), 303);
+  res.cookies.delete(VIEW_ROLE_COOKIE);
+  return res;
 }
 
 // A stray GET (old bookmark, prefetch) just bounces to /login — it never ends the session.
