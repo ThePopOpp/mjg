@@ -150,7 +150,7 @@ export function EnergyAuditFlow({
       {step === "results" && score ? (
         <Results
           score={score}
-          note={<AutosaveNote status={autosave.status} onSignIn={() => autosave.setModalOpen(true)} onRetry={autosave.retry} />}
+          note={<AutosaveNote status={autosave.status} onSignIn={() => autosave.setModalOpen(true)} onRetry={autosave.retry} assessment="energy-audit" />}
           onBack={() => go(SECTIONS[SECTIONS.length - 1].key)}
           onContinue={() => go("next-step")}
         />
@@ -181,7 +181,7 @@ export function EnergyAuditFlow({
         />
       ) : null}
 
-      <SaveResultsModal open={autosave.modalOpen} onOpenChange={autosave.setModalOpen} label="Energy Audit" />
+      <SaveResultsModal open={autosave.modalOpen} onOpenChange={autosave.setModalOpen} assessment="energy-audit" label="Energy Audit" />
 
       {step === "journey" ? <Journey dashboardHref={dashboardHref} signedIn={signedIn} onRetake={startOver} /> : null}
 

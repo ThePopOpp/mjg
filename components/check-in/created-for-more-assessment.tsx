@@ -183,10 +183,10 @@ export function CreatedForMoreAssessment({ redirectTo, dashboardHref, signedIn =
           dashboardHref={dashboardHref}
           signedIn={signedIn}
           submissionId={autosave.submissionId}
-          note={<AutosaveNote status={autosave.status} onSignIn={() => autosave.setModalOpen(true)} onRetry={autosave.retry} />}
+          note={<AutosaveNote status={autosave.status} onSignIn={() => autosave.setModalOpen(true)} onRetry={autosave.retry} assessment="created-for-more" />}
         />
       ) : null}
-      <SaveResultsModal open={autosave.modalOpen} onOpenChange={autosave.setModalOpen} label="Check-In" />
+      <SaveResultsModal open={autosave.modalOpen} onOpenChange={autosave.setModalOpen} assessment="created-for-more" label="Check-In" />
     </div>
   );
 }

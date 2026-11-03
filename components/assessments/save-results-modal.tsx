@@ -1,18 +1,19 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowRight, Check, Loader2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { AutosaveStatus } from "@/components/assessments/use-assessment-autosave";
+import { STEWARD_HANDOFF_SECONDS, stewardHandoffHref } from "@/lib/assessments/steward-handoff";
 
-// Where people land after signing in or registering from the modal. Their waiting
-// results are attached there by PendingAssessmentClaimer (mounted in the root layout).
-const AFTER_SIGN_IN = "/dashboard";
-
-/** Shown to signed-out visitors when their results appear: sign in or lose them. */
-export function SaveResultsModal({ open, onOpenChange, label }: { open: boolean; onOpenChange: (open: boolean) => void; label: string }) {
-  const next = encodeURIComponent(AFTER_SIGN_IN);
+/** Shown to signed-out visitors when their results appear: sign in or lose them.
+ *  Signing in or registering lands them in Steward, where PendingAssessmentClaimer
+ *  (root layout) attaches the waiting results before Steward's first turn. */
+export function SaveResultsModal({ open, onOpenChange, label, assessment }: { open: boolean; onOpenChange: (open: boolean) => void; label: string; assessment: string }) {
+  const next = encodeURIComponent(stewardHandoffHref(assessment));
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md gap-0 p-0">
@@ -47,8 +48,37 @@ export function SaveResultsModal({ open, onOpenChange, label }: { open: boolean;
   );
 }
 
-/** One line under the results: saved to the account (with a way to Steward), or not yet. */
-export function AutosaveNote({ status, onSignIn, onRetry }: { status: AutosaveStatus; onSignIn: () => void; onRetry: () => void }) {
+/** Once saved, counts down and opens Steward about these results — once per page
+ *  visit, so going back to review answers doesn't send them again. */
+function useStewardHandoff(saved: boolean, assessment: string) {
+  const router = useRouter();
+  const href = stewardHandoffHref(assessment);
+  const [left, setLeft] = useState<number | null>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (!saved || started.current) return;
+    started.current = true;
+    router.prefetch(href);
+    setLeft(STEWARD_HANDOFF_SECONDS);
+  }, [saved, href, router]);
+
+  useEffect(() => {
+    if (left === null) return;
+    if (left <= 0) {
+      router.push(href);
+      return;
+    }
+    const t = setTimeout(() => setLeft((n) => (n === null ? null : n - 1)), 1000);
+    return () => clearTimeout(t);
+  }, [left, href, router]);
+
+  return { href, left, stay: () => setLeft(null) };
+}
+
+/** One line under the results: saved to the account (then on to Steward), or not yet. */
+export function AutosaveNote({ status, onSignIn, onRetry, assessment }: { status: AutosaveStatus; onSignIn: () => void; onRetry: () => void; assessment: string }) {
+  const handoff = useStewardHandoff(status === "saved", assessment);
   if (status === "idle") return null;
   return (
     <div className="flex flex-col items-center justify-between gap-3 rounded-lg border border-[#b88a4a]/40 bg-[#b88a4a]/[0.06] px-4 py-3 text-sm sm:flex-row">
@@ -56,9 +86,17 @@ export function AutosaveNote({ status, onSignIn, onRetry }: { status: AutosaveSt
         <p className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Saving to your account…</p>
       ) : status === "saved" ? (
         <>
-          <p className="flex items-center gap-2"><Check className="h-4 w-4 shrink-0 text-[#b88a4a]" /> Saved to your account. Steward can see these results.</p>
-          <Button asChild size="sm" variant="outline" className="shrink-0">
-            <Link href="/steward">Talk to Steward about them <ArrowRight className="ml-2 h-4 w-4" /></Link>
+          <div className="space-y-1 text-center sm:text-left">
+            <p className="flex items-center justify-center gap-2 sm:justify-start"><Check className="h-4 w-4 shrink-0 text-[#b88a4a]" /> Saved to your account. Steward can see these results.</p>
+            {handoff.left !== null ? (
+              <p className="text-muted-foreground" aria-live="polite">
+                Taking you to Steward in {handoff.left}s ·{" "}
+                <button type="button" onClick={handoff.stay} className="underline-offset-4 hover:text-foreground hover:underline">Stay on this page</button>
+              </p>
+            ) : null}
+          </div>
+          <Button asChild size="sm" variant={handoff.left !== null ? "default" : "outline"} className="shrink-0">
+            <Link href={handoff.href}>Talk to Steward about them <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </>
       ) : status === "error" ? (

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowUp, BookOpen, Check, Loader2, Mic, Square } from "lucide-react";
 import { useEveAgent } from "eve/react";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { CONVERSATION_CHOICES, STEWARD_OPENING_LINE, type ConversationChoice } from "@/lib/steward/blueprint";
 import { NEW_CONVERSATION_EVENT } from "@/components/steward/member-sidebar";
+import { readPending } from "@/components/assessments/use-assessment-autosave";
+import { stewardHandoffOpener } from "@/lib/assessments/steward-handoff";
 
 // Steward, talking for real.
 //
@@ -270,6 +273,30 @@ export function LiveConversation() {
         });
     });
   }
+
+  // Arriving from a finished assessment (/steward?from=<key>): open the conversation
+  // with the member asking about those results. Results finished while signed out
+  // are attached by PendingAssessmentClaimer on this same page load, so wait for that
+  // first — Steward's first turn should already see them. The param is dropped so a
+  // refresh doesn't ask again.
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const handedOff = React.useRef(false);
+  React.useEffect(() => {
+    const from = searchParams.get("from");
+    const opener = stewardHandoffOpener(from);
+    if (!opener || handedOff.current) return;
+    handedOff.current = true;
+    router.replace("/steward", { scroll: false });
+    void (async () => {
+      for (let i = 0; i < 20 && readPending().some((p) => p.assessment === from); i++) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+      send(opener);
+    })();
+    // Once per page load, by design.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function pickMode(next: ConversationChoice) {
     setMode(next);
