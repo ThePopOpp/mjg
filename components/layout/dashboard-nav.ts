@@ -3,6 +3,7 @@ import {
   BatteryCharging,
   BookMarked,
   BookOpen,
+  Building2,
   Church,
   Bot,
   CalendarClock,
@@ -27,6 +28,7 @@ import {
   MessageSquareText,
   NotebookPen,
   PanelsTopLeft,
+  Receipt,
   Phone,
   Settings,
   Share2,
@@ -105,6 +107,7 @@ export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/reports", label: "Reports", icon: FileBarChart, permission: PERMISSIONS.VIEW_REPORTS },
   { kind: "item", href: "/dashboard/guide", label: "Team Guide", icon: BookOpen },
   { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
+  { kind: "item", href: "/dashboard/billing", label: "Purchases & Billing", icon: Receipt },
   { kind: "item", href: "/dashboard/settings", label: "Settings", icon: Settings, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/user-management", label: "User Management", icon: BarChart3, permission: PERMISSIONS.MANAGE_USERS },
 ];
@@ -122,6 +125,7 @@ export const facilitatorNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/resources", label: "Resources", icon: Newspaper },
   { kind: "item", href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },
   { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
+  { kind: "item", href: "/dashboard/billing", label: "Purchases & Billing", icon: Receipt },
   { kind: "item", href: "/dashboard/preferences", label: "Settings", icon: Settings },
 ];
 
@@ -136,14 +140,17 @@ export const participantNav: NavEntry[] = [
   { kind: "item", href: "/dashboard/resources", label: "Resources", icon: Newspaper },
   { kind: "item", href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },
   { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
+  { kind: "item", href: "/dashboard/billing", label: "Purchases & Billing", icon: Receipt },
   { kind: "item", href: "/dashboard/preferences", label: "Settings", icon: Settings },
 ];
 
-// Church admins (dashboard-only, never the connector) review facilitator applications for
-// their church. Nothing else in the admin dashboard is theirs.
-export const churchAdminNav: NavEntry[] = [
-  { kind: "item", href: "/dashboard/church", label: "My Church", icon: Church },
-  { kind: "item", href: "/dashboard/direct-messages", label: "Direct Messages", icon: MessageSquareText },
-  { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
-  { kind: "item", href: "/dashboard/preferences", label: "Settings", icon: Settings },
-];
+// Church admins get the whole facilitator sidebar, with My Church pointing at the church they
+// run (approvals) and their church's public profile.
+export const churchAdminNav: NavEntry[] = facilitatorNav.flatMap((entry): NavEntry[] =>
+  entry.kind === "item" && entry.href === "/dashboard/my-church"
+    ? [
+        { kind: "item", href: "/dashboard/church", label: "My Church", icon: Church },
+        { kind: "item", href: "/dashboard/church/profile", label: "Church Profile", icon: Building2 },
+      ]
+    : [entry],
+);

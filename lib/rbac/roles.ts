@@ -56,3 +56,13 @@ export function canAccessPortal(role: string | null | undefined) {
   const normalized = normalizeAppRole(role);
   return canAccessDashboard(role) || normalized === ROLES.PARTICIPANT || normalized === ROLES.CHURCH_ADMIN;
 }
+
+// Church admins get every facilitator feature (team, Facilitator Listing, Experiences,
+// facilitator Steward offer) plus their church's approvals and profile. Use this for any
+// "is this a facilitator?" check; ROLES.FACILITATOR alone misses church admins.
+export const FACILITATOR_ROLES = [ROLES.FACILITATOR, ROLES.CHURCH_ADMIN] as const satisfies readonly AppRole[];
+
+export function isFacilitatorRole(role: string | null | undefined) {
+  const normalized = normalizeAppRole(role);
+  return Boolean(normalized && (FACILITATOR_ROLES as readonly AppRole[]).includes(normalized));
+}

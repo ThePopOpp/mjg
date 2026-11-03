@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { FACILITATOR_ROLES } from "@/lib/rbac/roles";
 
 export type ChallengeTypeOption = { id: string; name: string; slug: string };
 
@@ -43,7 +44,7 @@ export async function grantChallengeTypeVisibility(typeId: string, visibility: V
   const supabase = createSupabaseAdminClient();
   let targets: string[] = [];
   if (visibility.mode === "all") {
-    const { data } = await supabase.from("profiles").select("id").eq("role", "facilitator").eq("status", "active");
+    const { data } = await supabase.from("profiles").select("id").in("role", [...FACILITATOR_ROLES]).eq("status", "active");
     targets = (data ?? []).map((r: any) => r.id as string);
   } else {
     targets = Array.from(new Set((visibility.facilitatorIds ?? []).filter(Boolean)));

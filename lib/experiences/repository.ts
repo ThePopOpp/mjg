@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { FACILITATOR_ROLES } from "@/lib/rbac/roles";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { sendTemplateEmail } from "@/lib/email/templates";
 import { computeStepDate } from "./schedule";
@@ -62,7 +63,7 @@ export async function getFacilitators() {
   const { data, error } = await supabase
     .from("profiles")
     .select("id,first_name,last_name,full_name,email")
-    .eq("role", "facilitator")
+    .in("role", [...FACILITATOR_ROLES])
     .eq("status", "active")
     .order("full_name", { ascending: true });
   if (error) throw error;

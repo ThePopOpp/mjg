@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Activity, CheckCircle2, Church, CircleUserRound, MailCheck, UsersRound, MessageSquareText, MessagesSquare, CornerUpLeft } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
@@ -19,18 +18,18 @@ import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { CollapsibleSection } from "@/components/dashboard/collapsible-section";
 import { FacilitatorDashboard } from "@/components/facilitator/facilitator-dashboard";
 import { ParticipantDashboard } from "@/components/participant/participant-dashboard";
-import { ROLES } from "@/lib/rbac/roles";
+import { ROLES, isFacilitatorRole } from "@/lib/rbac/roles";
 
 export default async function DashboardPage() {
   const profileForRole = await getCurrentProfile();
-  // Facilitators and participants get scoped dashboards rather than the admin overview.
-  if (profileForRole?.role === ROLES.FACILITATOR) {
+  // Facilitators (and church admins, who get everything a facilitator has) and participants
+  // get scoped dashboards rather than the admin overview.
+  if (profileForRole && isFacilitatorRole(profileForRole.role)) {
     return <FacilitatorDashboard profile={profileForRole} />;
   }
   if (profileForRole?.role === ROLES.PARTICIPANT) {
     return <ParticipantDashboard profile={profileForRole} />;
   }
-  if (profileForRole?.role === ROLES.CHURCH_ADMIN) redirect("/dashboard/church");
 
   const [data, profile, checkInStats, recentCheckIns, invStats, recentInvitations] = await Promise.all([getPilotDashboardData(), getCurrentProfile(), getCheckInSubmissionStats(), listCheckInSubmissions(6), getInvitationCounts(), getRecentInvitations()]);
   const pilotMetrics = getPilotMetrics(data);

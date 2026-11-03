@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { can, PERMISSIONS } from "@/lib/rbac/permissions";
-import { ROLES } from "@/lib/rbac/roles";
+import { isFacilitatorRole } from "@/lib/rbac/roles";
 import { getEnergyAuditById } from "@/lib/energy-audit/submissions";
 import { energyAuditPdfFilename, renderEnergyAuditPdf } from "@/lib/energy-audit/pdf";
 
@@ -33,7 +33,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     const isOwner = Boolean(auditEmail && auditEmail === profile.email.toLowerCase());
     const isAdmin = can(profile.role, PERMISSIONS.MANAGE_PARTICIPANTS);
     const isFacilitator =
-      !isOwner && !isAdmin && profile.role === ROLES.FACILITATOR
+      !isOwner && !isAdmin && isFacilitatorRole(profile.role)
         ? await facilitatorLeadsAuditOwner(profile.id, auditEmail)
         : false;
 

@@ -1,14 +1,14 @@
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { DmInbox } from "@/components/direct-messages/dm-inbox";
 import { getCurrentProfile } from "@/lib/auth/server";
-import { ROLES } from "@/lib/rbac/roles";
+import { ROLES, isFacilitatorRole } from "@/lib/rbac/roles";
 
 export const dynamic = "force-dynamic";
 
 export default async function DirectMessagesPage() {
   const profile = await getCurrentProfile();
   // Admins message anyone; facilitators/participants can start conversations within their group.
-  const canStart = profile?.role === ROLES.SUPER_ADMIN || profile?.role === ROLES.ADMIN || profile?.role === ROLES.FACILITATOR || profile?.role === ROLES.PARTICIPANT;
+  const canStart = profile?.role === ROLES.SUPER_ADMIN || profile?.role === ROLES.ADMIN || isFacilitatorRole(profile?.role) || profile?.role === ROLES.PARTICIPANT;
 
   return (
     <div className="space-y-6">

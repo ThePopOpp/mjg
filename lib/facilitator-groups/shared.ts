@@ -94,6 +94,8 @@ export type Reservation = {
 };
 
 /** What the public pages get — never the private address/coordinates unless shown on purpose. */
+export type PublicGroupChurch = { name: string; slug: string; logoUrl: string | null; website: string | null };
+
 export type PublicGroup = {
   id: string;
   slug: string;
@@ -120,6 +122,8 @@ export type PublicGroup = {
   spotsLeft: number;
   bookingMode: BookingMode;
   facilitator: PublicFacilitator;
+  /** The church this is an official group of, when its church is active. */
+  church: PublicGroupChurch | null;
   distanceMiles?: number | null;
 };
 

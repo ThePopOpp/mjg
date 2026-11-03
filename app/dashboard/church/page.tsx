@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { buttonVariants } from "@/components/ui/button";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FacilitatorApplicationList } from "@/components/churches/churches-admin";
@@ -49,6 +51,19 @@ export default async function ChurchAdminPage() {
         title={churches.length === 1 ? churches[0].name : "My Church"}
         description="Approve the facilitators who lead groups for your church. Only approved facilitators can list a group as an official church group."
       />
+      <div className="flex flex-wrap gap-2">
+        <Link href={churches.length === 1 ? "/dashboard/church/profile" : `/dashboard/church/profile?church=${churches[0]?.id ?? ""}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+          Edit church profile
+        </Link>
+        {churches.length === 1 ? (
+          <Link href={`/churches/${churches[0].slug}`} target="_blank" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            View public page
+          </Link>
+        ) : null}
+        <Link href="/dashboard/facilitator-listing" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          List a group for your church
+        </Link>
+      </div>
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Waiting for you{pending.length ? ` (${pending.length})` : ""}</h2>
         <FacilitatorApplicationList applications={pending} />

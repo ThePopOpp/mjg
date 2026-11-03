@@ -1,17 +1,22 @@
 import Link from "next/link";
-import { UsersRound, ClipboardCheck, Route, HeartHandshake, MessageSquareText, MessagesSquare, CornerUpLeft } from "lucide-react";
+import { UsersRound, ClipboardCheck, Route, HeartHandshake, MessageSquareText, MessagesSquare, CornerUpLeft, Church, UserCheck, Hourglass } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { StatCardRow } from "@/components/dashboard/stat-card-row";
 import { getDmStats } from "@/lib/direct-messages/data";
 import { getFacilitatorTeam } from "@/lib/facilitator/team";
+import { adminChurchIdsFor, listFacilitatorApplications } from "@/lib/churches/repository";
+import { ROLES } from "@/lib/rbac/roles";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { DashboardProfile } from "@/lib/auth/server";
 
 export async function FacilitatorDashboard({ profile }: { profile: DashboardProfile }) {
   const myName = [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim();
-  const [dmStats, team] = await Promise.all([
+  const isChurchAdmin = profile.role === ROLES.CHURCH_ADMIN;
+  const [dmStats, team, church] = await Promise.all([
     getDmStats(profile.id),
     getFacilitatorTeam(profile.id),
+    isChurchAdmin ? churchStats(profile.id) : Promise.resolve(null),
   ]);
 
   const dmCards = [
@@ -30,10 +35,24 @@ export async function FacilitatorDashboard({ profile }: { profile: DashboardProf
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Facilitator"
+        eyebrow={isChurchAdmin ? "Church Admin" : "Facilitator"}
         title={`Welcome${myName ? `, ${myName}` : ""}`}
-        description="Your team and your conversations at a glance."
+        description={isChurchAdmin ? "Your church, your team and your conversations at a glance." : "Your team and your conversations at a glance."}
       />
+
+      {church ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold tracking-tight">Your Church</h2>
+            <Link href="/dashboard/church" className="text-xs font-medium text-primary hover:underline">Open My Church</Link>
+          </div>
+          <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <MetricCard label="Waiting for approval" value={String(church.pending)} detail={church.pending ? "Facilitators to review" : "Nothing waiting"} icon={Hourglass} />
+            <MetricCard label="Approved facilitators" value={String(church.approved)} detail="Can list official groups" icon={UserCheck} />
+            <MetricCard label="Official church groups" value={String(church.groups)} detail="Listed under your church" icon={Church} />
+          </StatCardRow>
+        </div>
+      ) : null}
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -73,4 +92,23 @@ export async function FacilitatorDashboard({ profile }: { profile: DashboardProf
       </div>
     </div>
   );
+}
+
+async function churchStats(profileId: string) {
+  const churchIds = await adminChurchIdsFor(profileId);
+  if (!churchIds.length) return { pending: 0, approved: 0, groups: 0 };
+  const [applications, { count }] = await Promise.all([
+    listFacilitatorApplications({ churchIds }),
+    createSupabaseAdminClient()
+      .from("facilitator_groups")
+      .select("id", { count: "exact", head: true })
+      .in("church_id", churchIds)
+      .is("deleted_at", null)
+      .neq("status", "archived"),
+  ]);
+  return {
+    pending: applications.filter((a) => a.status === "pending").length,
+    approved: applications.filter((a) => a.status === "approved").length,
+    groups: count ?? 0,
+  };
 }

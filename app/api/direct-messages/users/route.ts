@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { listMessageableUsers } from "@/lib/direct-messages/data";
 import { getGroupPeople } from "@/lib/direct-messages/eligibility";
 import { requireActiveProfile } from "@/lib/user-management/auth";
-import { ROLES } from "@/lib/rbac/roles";
+import { ROLES, isFacilitatorRole } from "@/lib/rbac/roles";
 
 // The people-picker for starting a new DM.
 // Admins message anyone; facilitators/participants message their group only.
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
       const users = await listMessageableUsers(me.id, search || undefined);
       return NextResponse.json({ ok: true, users });
     }
-    if (me.role === ROLES.FACILITATOR || me.role === ROLES.PARTICIPANT) {
+    if (isFacilitatorRole(me.role) || me.role === ROLES.PARTICIPANT) {
       let users = await getGroupPeople(me);
       if (search) users = users.filter((u) => `${u.name} ${u.email}`.toLowerCase().includes(search));
       return NextResponse.json({ ok: true, users });

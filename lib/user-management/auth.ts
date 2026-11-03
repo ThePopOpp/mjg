@@ -103,7 +103,7 @@ export async function requireFacilitator(request?: Request, actionToken?: string
   if (!profile || profile.status !== "active") {
     throw new Error("Active profile required.");
   }
-  if (!(role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN || role === ROLES.FACILITATOR)) {
+  if (!(role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN || role === ROLES.FACILITATOR || role === ROLES.CHURCH_ADMIN)) {
     throw new Error("Facilitator permission required.");
   }
 

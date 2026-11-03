@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentProfile } from "@/lib/auth/server";
+import { stripeCustomerFor } from "@/lib/billing/purchases";
 import { checkOfferAvailability, describeBilling, getOffer } from "@/lib/steward/catalogue";
 import { getTaxPolicy } from "@/lib/steward/config";
 import { getStripe, isStripeConfigured } from "@/lib/steward/stripe";
@@ -105,12 +106,19 @@ export async function POST(request: Request) {
 
     const lineItem = { price: offer.stripe_price_id as string, quantity: 1 };
 
+    // One Stripe customer per member, so Purchases & Billing and the Customer Portal show
+    // everything they've bought: reuse theirs, or have Checkout create one (payment mode
+    // otherwise checks out as a guest with no customer).
+    const existingCustomer = await stripeCustomerFor(profile.id);
+
     const session = await stripe.checkout.sessions.create({
       mode,
       line_items: [lineItem],
       ...(coupon ? { discounts: [{ coupon: coupon.stripe_coupon_id }] } : {}),
       client_reference_id: profile.id,
-      customer_email: profile.email,
+      ...(existingCustomer
+        ? { customer: existingCustomer }
+        : { customer_email: profile.email, ...(mode === "payment" ? { customer_creation: "always" as const } : {}) }),
 
       // Read back by the webhook. Without these the payment cannot be
       // attributed to a member, so the webhook treats them as required.

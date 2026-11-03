@@ -20,7 +20,18 @@ export type Church = {
   website: string | null;
   status: ChurchStatus;
   createdAt: string;
+  description: string | null;
+  email: string | null;
+  phone: string | null;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  postalCode: string | null;
+  denomination: string | null;
+  logoUrl: string | null;
+  photos: ChurchPhoto[];
 };
+
+export type ChurchPhoto = { url: string; caption: string | null };
 
 export type ChurchInput = { name?: string; city?: string | null; state?: string | null; website?: string | null };
 
@@ -53,7 +64,27 @@ const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : null
 export const personName = (p: any) => [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim() || p?.email || "Unknown";
 
 function rowToChurch(r: any): Church {
-  return { id: r.id, name: r.name, slug: r.slug, city: r.city ?? null, state: r.state ?? null, website: r.website ?? null, status: r.status, createdAt: r.created_at };
+  return {
+    id: r.id,
+    name: r.name,
+    slug: r.slug,
+    city: r.city ?? null,
+    state: r.state ?? null,
+    website: r.website ?? null,
+    status: r.status,
+    createdAt: r.created_at,
+    description: r.description ?? null,
+    email: r.email ?? null,
+    phone: r.phone ?? null,
+    addressLine1: r.address_line1 ?? null,
+    addressLine2: r.address_line2 ?? null,
+    postalCode: r.postal_code ?? null,
+    denomination: r.denomination ?? null,
+    logoUrl: r.logo_url ?? null,
+    photos: Array.isArray(r.photos)
+      ? r.photos.filter((p: any) => p && typeof p.url === "string").map((p: any) => ({ url: p.url, caption: typeof p.caption === "string" && p.caption.trim() ? p.caption.trim() : null }))
+      : [],
+  };
 }
 
 export function requireSuperAdminActor(actor: ChurchActor) {
@@ -328,7 +359,7 @@ export async function getFacilitatorApplication(id: string): Promise<Facilitator
 
 /** A facilitator names their church and asks its admin to approve them. */
 export async function submitFacilitatorApplication(actor: ChurchActor, input: { churchId: string; message?: string | null }) {
-  if (!(actor.role === ROLES.FACILITATOR || actor.role === ROLES.SUPER_ADMIN || actor.role === ROLES.ADMIN)) {
+  if (!(actor.role === ROLES.FACILITATOR || actor.role === ROLES.CHURCH_ADMIN || actor.role === ROLES.SUPER_ADMIN || actor.role === ROLES.ADMIN)) {
     throw new Error("Only facilitators can apply to lead a church group.");
   }
   const church = await getChurch(input.churchId);
@@ -380,12 +411,15 @@ export async function decideFacilitatorApplication(actor: ChurchActor, id: strin
   return decided;
 }
 
-/** Churches that have approved this facilitator. */
+/** Churches that have approved this facilitator — and any church they administer, which needs no application. */
 export async function approvedChurchIdsFor(profileId: string): Promise<string[]> {
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase.from("facilitator_applications").select("church_id").eq("profile_id", profileId).eq("status", "approved");
+  const [{ data, error }, adminOf] = await Promise.all([
+    supabase.from("facilitator_applications").select("church_id").eq("profile_id", profileId).eq("status", "approved"),
+    adminChurchIdsFor(profileId),
+  ]);
   if (error) throw error;
-  return (data ?? []).map((r: any) => r.church_id as string);
+  return Array.from(new Set([...(data ?? []).map((r: any) => r.church_id as string), ...adminOf]));
 }
 
 /** Throws with a clear message unless the facilitator may run an official group for this church. */

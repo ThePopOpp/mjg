@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { findOrCreateConversation, listConversations, sendMessage } from "@/lib/direct-messages/data";
 import { getGroupMemberIds } from "@/lib/direct-messages/eligibility";
 import { requireActiveProfile } from "@/lib/user-management/auth";
-import { ROLES } from "@/lib/rbac/roles";
+import { ROLES, isFacilitatorRole } from "@/lib/rbac/roles";
 
 function fail(error: unknown, fallback: string) {
   const message = error instanceof Error ? error.message : fallback;
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     const isAdmin = me.role === ROLES.SUPER_ADMIN || me.role === ROLES.ADMIN;
     if (!isAdmin) {
-      if (me.role !== ROLES.FACILITATOR && me.role !== ROLES.PARTICIPANT) {
+      if (!isFacilitatorRole(me.role) && me.role !== ROLES.PARTICIPANT) {
         throw new Error("Starting a new conversation requires permission.");
       }
       const allowed = await getGroupMemberIds(me);

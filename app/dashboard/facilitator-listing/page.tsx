@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { FacilitatorListing } from "@/components/facilitator-groups/facilitator-listing";
 import { getCurrentProfile } from "@/lib/auth/server";
-import { ROLES } from "@/lib/rbac/roles";
+import { isFacilitatorRole } from "@/lib/rbac/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { tileConfig } from "@/lib/maps/config";
 import { getFacilitatorProfile, getFinderSettings, isGroupAdmin, listGroupsForFacilitator } from "@/lib/facilitator-groups/repository";
@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export default async function FacilitatorListingPage({ searchParams }: { searchParams: Promise<{ as?: string }> }) {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login?next=/dashboard/facilitator-listing");
-  if (!(profile.role === ROLES.FACILITATOR || isGroupAdmin(profile.role))) redirect("/access-restricted");
+  if (!(isFacilitatorRole(profile.role) || isGroupAdmin(profile.role))) redirect("/access-restricted");
 
   const { as } = await searchParams;
   const supabase = createSupabaseAdminClient();

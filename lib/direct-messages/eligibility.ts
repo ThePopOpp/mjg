@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { ROLES } from "@/lib/rbac/roles";
+import { ROLES, isFacilitatorRole } from "@/lib/rbac/roles";
 import { getFacilitatorTeam } from "@/lib/facilitator/team";
 
 export type DmPerson = { id: string; name: string; email: string };
@@ -31,7 +31,7 @@ export async function getGroupPeople(profile: { id: string; role: string; email:
   const emails = new Set<string>();
   const profileIds = new Set<string>();
 
-  if (profile.role === ROLES.FACILITATOR) {
+  if (isFacilitatorRole(profile.role)) {
     const team = await getFacilitatorTeam(profile.id);
     team.participants.forEach((p) => { const e = lc(p.email); if (e) emails.add(e); });
   } else if (profile.role === ROLES.PARTICIPANT) {

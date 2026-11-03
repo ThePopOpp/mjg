@@ -2,7 +2,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { geocode, type GeoPoint } from "@/lib/maps/geocode";
 import { distanceMiles } from "@/lib/maps/geo";
 import { reservationCounts } from "./repository";
-import { timeOfDay, type PublicFacilitator, type PublicGroup } from "./shared";
+import { timeOfDay, type PublicFacilitator, type PublicGroup, type PublicGroupChurch } from "./shared";
 
 // Public (Find a Group) reads. Published groups only, and the private address/coordinates
 // never leave this file unless the facilitator chose to show the exact address.
@@ -58,7 +58,7 @@ async function facilitatorsById(ids: string[]): Promise<Map<string, PublicFacili
   return out;
 }
 
-function toPublic(r: any, taken: number, facilitator: PublicFacilitator): PublicGroup {
+function toPublic(r: any, taken: number, facilitator: PublicFacilitator, church: PublicGroupChurch | null = null): PublicGroup {
   const exact = Boolean(r.show_exact_address) && r.format !== "online";
   const area = [r.city, r.state].filter(Boolean).join(", ");
   return {
@@ -87,18 +87,40 @@ function toPublic(r: any, taken: number, facilitator: PublicFacilitator): Public
     spotsLeft: Math.max(0, r.capacity - taken),
     bookingMode: r.booking_mode,
     facilitator,
+    church,
   };
 }
 
 const PUBLIC_COLUMNS =
-  "id,slug,title,description,audience,language,photo_url,church_org,meeting_day,meeting_time,timezone,frequency,start_date,duration_weeks,format,venue_name,address_line,city,state,postal_code,lat,lng,public_lat,public_lng,show_exact_address,capacity,booking_mode,status,facilitator_id";
+  "id,slug,title,description,audience,language,photo_url,church_org,meeting_day,meeting_time,timezone,frequency,start_date,duration_weeks,format,venue_name,address_line,city,state,postal_code,lat,lng,public_lat,public_lng,show_exact_address,capacity,booking_mode,status,facilitator_id,church_id";
 
 async function hydrate(rows: any[]): Promise<PublicGroup[]> {
-  const [counts, facilitators] = await Promise.all([
+  const [counts, facilitators, churches] = await Promise.all([
     reservationCounts(rows.map((r) => r.id)),
     facilitatorsById(Array.from(new Set(rows.map((r) => r.facilitator_id)))),
+    churchesById(Array.from(new Set(rows.map((r) => r.church_id).filter(Boolean)))),
   ]);
-  return rows.map((r) => toPublic(r, counts.get(r.id)?.taken ?? 0, facilitators.get(r.facilitator_id) ?? { profileId: r.facilitator_id, slug: null, name: "MJG Facilitator", photoUrl: null, churchOrg: null, city: null, state: null, bio: null }));
+  return rows.map((r) =>
+    toPublic(
+      r,
+      counts.get(r.id)?.taken ?? 0,
+      facilitators.get(r.facilitator_id) ?? { profileId: r.facilitator_id, slug: null, name: "MJG Facilitator", photoUrl: null, churchOrg: null, city: null, state: null, bio: null },
+      (r.church_id && churches.get(r.church_id)) || null,
+    ),
+  );
+}
+
+async function churchesById(ids: string[]): Promise<Map<string, PublicGroupChurch>> {
+  const out = new Map<string, PublicGroupChurch>();
+  if (!ids.length) return out;
+  const { data } = await createSupabaseAdminClient()
+    .from("churches")
+    .select("id,name,slug,logo_url,website")
+    .in("id", ids)
+    .eq("status", "active")
+    .is("deleted_at", null);
+  for (const c of data ?? []) out.set(c.id, { name: c.name, slug: c.slug, logoUrl: c.logo_url ?? null, website: c.website ?? null });
+  return out;
 }
 
 export async function listPublicGroups(filters: GroupFilters = {}): Promise<{ groups: PublicGroup[]; center: GeoPoint | null; nearNotFound: boolean }> {
@@ -142,6 +164,19 @@ export async function getPublicGroup(slug: string): Promise<PublicGroup | null> 
   const { data } = await supabase.from("facilitator_groups").select(PUBLIC_COLUMNS).eq("slug", slug).eq("status", "published").is("deleted_at", null).maybeSingle();
   if (!data) return null;
   return (await hydrate([data]))[0];
+}
+
+/** A church's published official groups, for its public page. */
+export async function listPublicGroupsForChurch(churchId: string): Promise<PublicGroup[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase
+    .from("facilitator_groups")
+    .select(PUBLIC_COLUMNS)
+    .eq("church_id", churchId)
+    .eq("status", "published")
+    .is("deleted_at", null)
+    .order("start_date", { ascending: true, nullsFirst: false });
+  return hydrate(data ?? []);
 }
 
 export async function getPublicFacilitator(slug: string): Promise<{ facilitator: PublicFacilitator; groups: PublicGroup[] } | null> {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, Clock, Globe, MapPin, Users } from "lucide-react";
+import { ArrowLeft, CalendarDays, Church, Clock, Globe, MapPin, Users } from "lucide-react";
 import { GroupActions } from "@/components/groups/group-actions";
 import { GroupLocationMap } from "@/components/groups/group-location-map";
 import { Initials, spotsText, startLabel } from "@/components/groups/group-card";
@@ -50,7 +50,7 @@ export default async function GroupPage({ params }: { params: Promise<{ slug: st
 
       <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0">
-          <Eyebrow>{group.churchOrg || "The 6-Week Challenge"}</Eyebrow>
+          <Eyebrow>{group.church?.name || group.churchOrg || "The 6-Week Challenge"}</Eyebrow>
           <h1 className="mt-3 text-balance font-display text-[clamp(2rem,4.4vw,3rem)] font-semibold leading-[1.08] tracking-tight">{group.title}</h1>
 
           <dl className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -85,7 +85,27 @@ export default async function GroupPage({ params }: { params: Promise<{ slug: st
             </div>
           ) : null}
 
-          <div className="mt-10 rounded-xl border bg-card p-5">
+          {group.church ? (
+            <Link
+              href={`/churches/${group.church.slug}`}
+              className="mt-10 flex items-center gap-4 rounded-xl border bg-card p-5 no-underline transition hover:border-gold/60"
+            >
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-background">
+                {group.church.logoUrl ? (
+                  <img src={group.church.logoUrl} alt="" className="h-full w-full object-contain p-1" />
+                ) : (
+                  <Church className="h-6 w-6 text-gold" />
+                )}
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">An official group of</span>
+                <span className="block font-display text-xl text-foreground">{group.church.name}</span>
+                <span className="block text-sm font-semibold text-gold-deep dark:text-gold-light">About the church</span>
+              </span>
+            </Link>
+          ) : null}
+
+          <div className={cn(group.church ? "mt-4" : "mt-10", "rounded-xl border bg-card p-5")}>
             <div className="flex items-center gap-4">
               <Initials name={group.facilitator.name} photo={group.facilitator.photoUrl} className="h-14 w-14 text-lg" />
               <div className="min-w-0">

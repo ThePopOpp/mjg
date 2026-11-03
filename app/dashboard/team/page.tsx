@@ -11,7 +11,7 @@ import { TeamEnergyAudits } from "@/components/energy-audit/team-energy-audits";
 
 export const dynamic = "force-dynamic";
 
-const FACILITATOR_ALLOWED = new Set<string>([ROLES.FACILITATOR, ROLES.ADMIN, ROLES.SUPER_ADMIN]);
+const FACILITATOR_ALLOWED = new Set<string>([ROLES.FACILITATOR, ROLES.CHURCH_ADMIN, ROLES.ADMIN, ROLES.SUPER_ADMIN]);
 
 export default async function TeamPage() {
   const profile = await getCurrentProfile();
