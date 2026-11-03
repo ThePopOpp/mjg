@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { listChallengeVideos } from "@/lib/six-week-challenge/repository";
+import { getOrderedAudioForTarget, LISTEN_TARGET } from "@/lib/content/media";
 
 export type MediaItem = {
   id: string;
@@ -23,6 +24,12 @@ function toMediaItem(row: any): MediaItem {
     duration_seconds: row.duration_seconds ?? null,
     thumbnail_url: row.metadata?.thumbnail_url ?? null,
   };
+}
+
+/** Audiobook chapters: the audio ticked for the Listen page in Media Studio, in the
+ * chapter order arranged there (same source as /listen). */
+export async function getAudiobookTracks(): Promise<MediaItem[]> {
+  return (await getOrderedAudioForTarget(LISTEN_TARGET, 100)).map(toMediaItem);
 }
 
 /** Published media assets of a given type, newest first. (No dedicated getters exist for

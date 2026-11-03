@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Headphones, Video, FileType2, LayoutGrid, LayoutList, Download, Play } from "lucide-react";
+import { BookAudio, FileText, Headphones, Video, FileType2, LayoutGrid, LayoutList, Download, Play } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -39,7 +39,7 @@ function ViewToggle({ layout, onChange }: { layout: Layout; onChange: (l: Layout
   );
 }
 
-export function ResourcesLibrary({ posts, audio, video, documents, challengeVideos = [] }: { posts: NewsPost[]; audio: MediaItem[]; video: MediaItem[]; documents: MediaItem[]; challengeVideos?: LibraryVideo[] }) {
+export function ResourcesLibrary({ posts, audio, audiobooks = [], video, documents, challengeVideos = [] }: { posts: NewsPost[]; audio: MediaItem[]; audiobooks?: MediaItem[]; video: MediaItem[]; documents: MediaItem[]; challengeVideos?: LibraryVideo[] }) {
   const [layout, setLayout] = useState<Layout>("grid");
 
   return (
@@ -48,6 +48,7 @@ export function ResourcesLibrary({ posts, audio, video, documents, challengeVide
         <TabsList>
           <TabsTrigger value="blog"><FileText className="mr-2 h-4 w-4" /> Blog Posts</TabsTrigger>
           <TabsTrigger value="audio"><Headphones className="mr-2 h-4 w-4" /> Audio</TabsTrigger>
+          <TabsTrigger value="audiobooks"><BookAudio className="mr-2 h-4 w-4" /> Audiobooks</TabsTrigger>
           <TabsTrigger value="video"><Video className="mr-2 h-4 w-4" /> Video</TabsTrigger>
           <TabsTrigger value="documents"><FileType2 className="mr-2 h-4 w-4" /> Documents</TabsTrigger>
         </TabsList>
@@ -59,6 +60,9 @@ export function ResourcesLibrary({ posts, audio, video, documents, challengeVide
       </TabsContent>
       <TabsContent value="audio" className="mt-4">
         {!audio.length ? <Empty label="No audio published yet." /> : <AudioView items={audio} layout={layout} />}
+      </TabsContent>
+      <TabsContent value="audiobooks" className="mt-4">
+        {!audiobooks.length ? <Empty label="No audiobooks published yet." /> : <AudioView items={audiobooks} layout={layout} numbered />}
       </TabsContent>
       <TabsContent value="video" className="mt-4">
         {!video.length && !challengeVideos.length ? <Empty label="No videos published yet." /> : null}
@@ -115,13 +119,13 @@ function BlogView({ posts, layout }: { posts: NewsPost[]; layout: Layout }) {
   );
 }
 
-function AudioView({ items, layout }: { items: MediaItem[]; layout: Layout }) {
+function AudioView({ items, layout, numbered = false }: { items: MediaItem[]; layout: Layout; numbered?: boolean }) {
   return (
     <div className={cn(layout === "grid" ? "grid gap-3 md:grid-cols-2" : "space-y-3")}>
-      {items.map((a) => (
+      {items.map((a, i) => (
         <Card key={a.id}><CardContent className="space-y-2 p-4">
           <div className="flex items-start justify-between gap-2">
-            <div><p className="font-medium">{a.title}</p>{a.description ? <p className="text-sm text-muted-foreground">{a.description}</p> : null}</div>
+            <div>{numbered ? <p className="text-xs font-semibold uppercase tracking-wide text-[#8a6532] dark:text-[#e2ca9a]">Chapter {i + 1}</p> : null}<p className="font-medium">{a.title}</p>{a.description ? <p className="text-sm text-muted-foreground">{a.description}</p> : null}</div>
             {duration(a.duration_seconds) ? <span className="shrink-0 text-xs text-muted-foreground">{duration(a.duration_seconds)}</span> : null}
           </div>
           {a.file_url ? <audio controls preload="none" src={a.file_url} className="w-full" /> : null}
