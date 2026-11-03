@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { listChallengeVideos } from "@/lib/six-week-challenge/repository";
 
 export type MediaItem = {
   id: string;
@@ -73,5 +74,33 @@ export async function getPublishedNews(limit = 30): Promise<NewsPost[]> {
     category: p.category?.name ?? null,
     publish_at: p.publish_at ?? null,
     created_at: p.created_at,
+  }));
+}
+
+/** A 6-Week Challenge video, trimmed to what a library card needs. */
+export type LibraryVideo = {
+  slug: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  thumbnailUrl: string | null;
+  thumbnailDark: string | null;
+  durationLabel: string | null;
+  available: boolean;
+};
+
+/** The 6-Week Challenge videos (challenge_videos, edited in Media Studio) for Resources → Video. */
+export async function getChallengeLibraryVideos(): Promise<LibraryVideo[]> {
+  const videos = await listChallengeVideos();
+  return videos.map((v) => ({
+    slug: v.slug,
+    badge: v.badge,
+    title: v.title,
+    subtitle: v.subtitle,
+    thumbnailUrl: v.thumbnailUrl,
+    thumbnailDark: v.thumbnailDark ?? null,
+    durationLabel: v.durationLabel,
+    // Media Studio's availability chip wins; otherwise a video with a source is watchable.
+    available: v.availability === "coming_soon" ? false : v.availability === "available" || Boolean(v.youtubeId || v.driveId || v.videoUrl),
   }));
 }

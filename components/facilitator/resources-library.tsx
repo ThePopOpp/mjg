@@ -5,7 +5,8 @@ import { FileText, Headphones, Video, FileType2, LayoutGrid, LayoutList, Downloa
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import type { MediaItem, NewsPost } from "@/lib/facilitator/content";
+import { ChallengeVideoGrid } from "@/components/facilitator/challenge-videos";
+import type { LibraryVideo, MediaItem, NewsPost } from "@/lib/facilitator/content";
 
 type Layout = "grid" | "list";
 
@@ -38,7 +39,7 @@ function ViewToggle({ layout, onChange }: { layout: Layout; onChange: (l: Layout
   );
 }
 
-export function ResourcesLibrary({ posts, audio, video, documents }: { posts: NewsPost[]; audio: MediaItem[]; video: MediaItem[]; documents: MediaItem[] }) {
+export function ResourcesLibrary({ posts, audio, video, documents, challengeVideos = [] }: { posts: NewsPost[]; audio: MediaItem[]; video: MediaItem[]; documents: MediaItem[]; challengeVideos?: LibraryVideo[] }) {
   const [layout, setLayout] = useState<Layout>("grid");
 
   return (
@@ -60,7 +61,19 @@ export function ResourcesLibrary({ posts, audio, video, documents }: { posts: Ne
         {!audio.length ? <Empty label="No audio published yet." /> : <AudioView items={audio} layout={layout} />}
       </TabsContent>
       <TabsContent value="video" className="mt-4">
-        {!video.length ? <Empty label="No videos published yet." /> : <MediaLinkView items={video} layout={layout} kind="video" />}
+        {!video.length && !challengeVideos.length ? <Empty label="No videos published yet." /> : null}
+        {challengeVideos.length ? (
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-muted-foreground">The 6-Week Challenge</h3>
+            <ChallengeVideoGrid videos={challengeVideos} layout={layout} />
+          </div>
+        ) : null}
+        {video.length ? (
+          <div className={cn("space-y-3", challengeVideos.length && "mt-6")}>
+            {challengeVideos.length ? <h3 className="text-sm font-semibold text-muted-foreground">More videos</h3> : null}
+            <MediaLinkView items={video} layout={layout} kind="video" />
+          </div>
+        ) : null}
       </TabsContent>
       <TabsContent value="documents" className="mt-4">
         {!documents.length ? <Empty label="No documents published yet." /> : <MediaLinkView items={documents} layout={layout} kind="document" />}
