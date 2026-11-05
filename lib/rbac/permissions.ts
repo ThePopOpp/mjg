@@ -23,6 +23,9 @@ export const PERMISSIONS = {
   MANAGE_CONNECTOR: "manage_connector",
   // Super-Admin-only (same pattern as MANAGE_CMS): churches, church admins and their applications.
   MANAGE_CHURCHES: "manage_churches",
+  // Super-Admin-only (same pattern as MANAGE_CMS): the ForgedLife integration — access
+  // requests, churches and groups sent from theforged.life, its event log and switches.
+  MANAGE_FORGEDLIFE: "manage_forgedlife",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
