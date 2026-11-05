@@ -12,7 +12,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // fresh sitting begins (a retake). Forms that resume progress after a refresh pass
 // persistAttempt so the resumed sitting keeps its row. Signed in → POST /api/assessments/[key]/save, debounced,
 // one row per attempt. Signed out → the results wait in this browser
-// (PendingAssessmentClaimer attaches them after sign-in) and the save-results modal opens.
+// (PendingAssessmentClaimer attaches them after sign-in) and the save-results modal opens,
+// where saveAsGuest() files them on the server under the visitor's name and email — so
+// they survive a forgotten password, a closed tab or a different device.
 
 const PENDING_KEY = "mjg-pending-assessments";
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -90,7 +92,18 @@ export async function postAssessment(assessment: string, answers: Record<string,
   return { status: res.status, id: typeof data.id === "string" ? (data.id as string) : null };
 }
 
-export type AutosaveStatus = "idle" | "saving" | "saved" | "error" | "needs-account";
+export async function postGuestAssessment(assessment: string, answers: Record<string, number>, attemptId: string, name: string, email: string) {
+  const res = await fetch(`/api/assessments/${encodeURIComponent(assessment)}/guest`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ answers, attemptId, name, email }),
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok && typeof data.id === "string", id: typeof data.id === "string" ? (data.id as string) : null, error: typeof data.error === "string" ? (data.error as string) : null };
+}
+
+/** "guest-saved": signed out, but saved under the name and email they typed. */
+export type AutosaveStatus = "idle" | "saving" | "saved" | "error" | "needs-account" | "guest-saved";
 
 export function useAssessmentAutosave({
   assessment,
@@ -111,6 +124,7 @@ export function useAssessmentAutosave({
   const [status, setStatus] = useState<AutosaveStatus>("idle");
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [guest, setGuest] = useState<{ name: string; email: string } | null>(null);
   const attemptRef = useRef<string | null>(null);
   const promptedRef = useRef<string | null>(null);
   const [retryTick, setRetryTick] = useState(0);
@@ -127,7 +141,7 @@ export function useAssessmentAutosave({
 
     const holdForSignIn = () => {
       stashPending({ assessment, label, answers, attemptId, savedAt: Date.now() });
-      setStatus("needs-account");
+      setStatus(guest ? "guest-saved" : "needs-account");
       if (promptedRef.current !== attemptId) {
         promptedRef.current = attemptId;
         setModalOpen(true);
@@ -136,6 +150,8 @@ export function useAssessmentAutosave({
 
     if (!signedIn) {
       holdForSignIn();
+      // Already saved under their email this sitting: keep that row in step with edited answers.
+      if (guest) void postGuestAssessment(assessment, answers, attemptId, guest.name, guest.email).catch(() => undefined);
       return;
     }
 
@@ -159,9 +175,30 @@ export function useAssessmentAutosave({
     };
     // `key` stands in for `answers` (a new object each render).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, ready, signedIn, assessment, label, persistAttempt, retryTick]);
+  }, [key, ready, signedIn, assessment, label, persistAttempt, retryTick, guest]);
 
   const retry = useCallback(() => setRetryTick((n) => n + 1), []);
+
+  /** Signed out: file these results under the visitor's name and email. The pending copy
+   *  stays in this browser so signing in here still attaches them to the account. */
+  const saveAsGuest = useCallback(
+    async (name: string, email: string): Promise<string | null> => {
+      const attemptId = attemptRef.current;
+      if (!attemptId) return "Your results aren't ready yet.";
+      try {
+        const res = await postGuestAssessment(assessment, answers, attemptId, name, email);
+        if (!res.ok) return res.error ?? "We couldn't save your results. Please try again.";
+        setSubmissionId(res.id);
+        setGuest({ name: name.trim(), email: email.trim().toLowerCase() });
+        setStatus("guest-saved");
+        return null;
+      } catch {
+        return "We couldn't save your results. Please try again.";
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [assessment, key],
+  );
 
   /** A fresh sitting: the next results save as a new row. */
   const newAttempt = useCallback(() => {
@@ -169,7 +206,8 @@ export function useAssessmentAutosave({
     storeAttempt(assessment, null);
     setStatus("idle");
     setSubmissionId(null);
+    setGuest(null);
   }, [assessment]);
 
-  return { status, submissionId, modalOpen, setModalOpen, retry, newAttempt };
+  return { status, submissionId, modalOpen, setModalOpen, retry, newAttempt, saveAsGuest, guestEmail: guest?.email ?? null };
 }

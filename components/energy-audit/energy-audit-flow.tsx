@@ -181,7 +181,7 @@ export function EnergyAuditFlow({
         />
       ) : null}
 
-      <SaveResultsModal open={autosave.modalOpen} onOpenChange={autosave.setModalOpen} assessment="energy-audit" label="Energy Audit" />
+      <SaveResultsModal open={autosave.modalOpen} onOpenChange={autosave.setModalOpen} onSaveAsGuest={autosave.saveAsGuest} guestEmail={autosave.guestEmail} assessment="energy-audit" label="Energy Audit" />
 
       {step === "journey" ? <Journey dashboardHref={dashboardHref} signedIn={signedIn} onRetake={startOver} /> : null}
 

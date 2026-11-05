@@ -14,7 +14,7 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const nextPath = safeNextPath(searchParams.get("next"));
   const message = searchParams.get("message");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<string | null>(message);

@@ -52,7 +52,7 @@ const CARDS: {
   },
 ];
 
-export function RegisterForm({ next = null }: { next?: string | null } = {}) {
+export function RegisterForm({ next = null, email = "" }: { next?: string | null; email?: string } = {}) {
   const [choice, setChoice] = useState<Choice | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -62,7 +62,7 @@ export function RegisterForm({ next = null }: { next?: string | null } = {}) {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    email,
     phone: "",
     password: "",
     groupName: "",

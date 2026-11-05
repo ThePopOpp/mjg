@@ -8,8 +8,10 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     const email = typeof body.email === "string" ? body.email.trim() : "";
     if (email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      // Fire the send; swallow any error (missing user, etc.) to avoid enumeration.
-      await sendPasswordResetEmail(email).catch(() => undefined);
+      // The caller always gets ok (no account enumeration), but a failed send is logged so
+      // "I never got the reset email" can be traced in the server logs.
+      const result = await sendPasswordResetEmail(email).catch((e: unknown) => ({ ok: false, reason: e instanceof Error ? e.message : String(e) }));
+      if (!result.ok) console.error("[auth] password reset email not sent", { domain: email.split("@")[1], reason: result.reason });
     }
     return NextResponse.json({ ok: true });
   } catch {

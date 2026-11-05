@@ -13,9 +13,9 @@ export const metadata = {
   description: "Register as a Participant or a Facilitator to join the 6-Week Challenge.",
 };
 
-export default async function RegisterPage({ searchParams }: { searchParams?: Promise<{ next?: string }> }) {
+export default async function RegisterPage({ searchParams }: { searchParams?: Promise<{ next?: string; email?: string }> }) {
   const profile = await getCurrentProfile();
-  const { next: rawNext } = (await searchParams) ?? {};
+  const { next: rawNext, email } = (await searchParams) ?? {};
   // e.g. /groups/<slug> — after registering, people come back to the group they were looking at.
   const next = rawNext ? safeNextPath(rawNext) : null;
   if (profile?.status === "active" && canAccessPortal(profile.role)) {
@@ -44,7 +44,7 @@ export default async function RegisterPage({ searchParams }: { searchParams?: Pr
         </p>
       </div>
 
-      <RegisterForm next={next} />
+      <RegisterForm next={next} email={typeof email === "string" ? email.slice(0, 254) : ""} />
     </main>
   );
 }

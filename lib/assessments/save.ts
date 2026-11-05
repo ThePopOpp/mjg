@@ -14,7 +14,10 @@ import { getAssessment } from "@/lib/assessments/registry";
 // edited answers and the sign-in hand-off update that row instead of adding rows.
 // A retake is a new attempt, which keeps Steward's trend history.
 
-export type SaveProfile = { id: string; email: string; firstName: string; lastName: string };
+/** `id` is null for a signed-out visitor who saved with their name and email: the row is
+ *  filed under that email (Steward matches it once they sign in with it), and attaches to
+ *  their account when they sign in on this browser (PendingAssessmentClaimer). */
+export type SaveProfile = { id: string | null; email: string; firstName: string; lastName: string };
 
 export type SaveResult = { id: string; created: boolean };
 
@@ -54,7 +57,7 @@ export async function saveAssessmentResult(input: {
       .from("check_in_submissions")
       .update({
         ...computed,
-        profile_id: input.profile.id,
+        profile_id: input.profile.id ?? existing.profile_id,
         name: existing.name ?? name,
         email: existing.email ?? email,
         details: { ...(existing.details ?? {}), ...computedDetails, attempt_id: input.attemptId },
