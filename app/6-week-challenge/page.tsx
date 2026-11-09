@@ -97,11 +97,12 @@ export default async function SixWeekChallengeHubPage() {
 
   return (
     <SiteShell>
-      {/* Hero: a defined band with a soft gold glow, two ways in, and the shape of the six weeks. */}
-      <section className={`${SITE_CONTENT_BOX} pt-8 md:pt-12`}>
-        <div className="relative overflow-hidden rounded-3xl border bg-card px-6 py-12 shadow-sm sm:px-10 md:px-14 md:py-16">
-          <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#b88a4a]/20 blur-3xl" />
-          <div aria-hidden className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-[#b88a4a]/10 blur-3xl" />
+      {/* Hero: a full-width band with a soft gold glow; its content sits in the same box as
+          the nav, so it lines up with the logo on the left and the theme toggle on the right. */}
+      <section className="relative overflow-hidden bg-card">
+        <div className={`${SITE_CONTENT_BOX} relative py-14 md:py-20`}>
+          <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-[#b88a4a]/20 blur-3xl" />
+          <div aria-hidden className="pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 rounded-full bg-[#b88a4a]/10 blur-3xl" />
           <div className="relative max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#b88a4a]/40 bg-background/60 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
               <span aria-hidden>✦</span> The Life You&rsquo;re Building
