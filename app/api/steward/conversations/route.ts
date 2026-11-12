@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { canExportStewardHistory } from "@/lib/steward/export-access";
 
 // The member's conversation list.
 //
@@ -22,14 +23,19 @@ export async function GET() {
   if (!profile) return NextResponse.json({ error: "Sign in to continue." }, { status: 401 });
 
   const db = createSupabaseAdminClient();
-  const { data } = await db
-    .from("steward_conversations")
-    .select("session_id, title, last_active_at")
-    .eq("profile_id", profile.id)
-    .order("last_active_at", { ascending: false })
-    .limit(20);
+  const [{ data }, canExport] = await Promise.all([
+    db
+      .from("steward_conversations")
+      .select("session_id, title, last_active_at")
+      .eq("profile_id", profile.id)
+      .order("last_active_at", { ascending: false })
+      .limit(20),
+    // Owner tooling (Mike and Jeremy only). The export route checks again.
+    canExportStewardHistory(profile.id).catch(() => false),
+  ]);
 
   return NextResponse.json({
+    canExport,
     conversations: (data ?? []).map((row) => ({
       sessionId: row.session_id as string,
       title: row.title as string,

@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, Check, Menu, MessageCircle, MoreHorizontal, Plus } from "lucide-react";
+import { BookOpen, Check, Download, Loader2, Menu, MessageCircle, MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -71,13 +71,16 @@ function SidebarBody({
     href === "/steward" ? pathname === "/steward" : pathname.startsWith(href);
 
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
+  const [canExport, setCanExport] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
     void fetch("/api/steward/conversations", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { conversations: [] }))
-      .then((json: { conversations?: Conversation[] }) => {
-        if (!cancelled) setConversations(json.conversations ?? []);
+      .then((json: { conversations?: Conversation[]; canExport?: boolean }) => {
+        if (cancelled) return;
+        setConversations(json.conversations ?? []);
+        setCanExport(Boolean(json.canExport));
       })
       .catch(() => {
         // An empty rail is better than a broken one; the conversation itself
@@ -157,6 +160,8 @@ function SidebarBody({
         )}
       </div>
 
+      {canExport && conversations.length > 0 ? <ExportConversations conversations={conversations} /> : null}
+
       {nextStep ? (
         <div className="rounded-xl border border-[#b88a4a]/50 bg-[#b88a4a]/[0.07] p-3">
           <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-[#b88a4a]">
@@ -178,6 +183,108 @@ function SidebarBody({
           <span className="block truncate text-[12px] text-muted-foreground">{planLabel}</span>
         </span>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Owner tooling: download your own Steward conversations as one Markdown file
+ * for Mike's ChatGPT Steward to review. Only rendered when the server says this
+ * account may export (lib/steward/export-access.ts); the export route checks
+ * again, so hiding the button is convenience, not the boundary.
+ */
+function ExportConversations({ conversations }: { conversations: Conversation[] }) {
+  const [open, setOpen] = React.useState(false);
+  const [picked, setPicked] = React.useState<Set<string>>(() => new Set());
+  const [busy, setBusy] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  async function download(sessionIds: string[] | null) {
+    setBusy(true);
+    setError(null);
+    try {
+      const qs = sessionIds ? `?sessions=${encodeURIComponent(sessionIds.join(","))}` : "";
+      const res = await fetch(`/api/steward/export${qs}`, { cache: "no-store" });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(body.error ?? `Export failed (${res.status}).`);
+      }
+      const blob = await res.blob();
+      const name =
+        res.headers.get("content-disposition")?.match(/filename="([^"]+)"/)?.[1] ?? "steward-conversations.md";
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+      setOpen(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Export failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="rounded-xl border bg-card p-2.5">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2 rounded-lg px-1 text-left text-[13px] font-semibold"
+        aria-expanded={open}
+      >
+        <Download className="h-4 w-4 shrink-0 text-[#b88a4a]" />
+        Export conversations
+      </button>
+      {open ? (
+        <div className="mt-2 space-y-2">
+          <p className="px-1 text-[11.5px] leading-snug text-muted-foreground">
+            Downloads your conversations as one file, with review instructions for ChatGPT. Pick some, or export all.
+          </p>
+          <div className="scroll-slim max-h-40 space-y-0.5 overflow-auto">
+            {conversations.map((c) => (
+              <label key={c.sessionId} className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-1 text-[12.5px] hover:bg-muted">
+                <input
+                  type="checkbox"
+                  className="accent-[#b88a4a]"
+                  checked={picked.has(c.sessionId)}
+                  onChange={(e) =>
+                    setPicked((prev) => {
+                      const next = new Set(prev);
+                      if (e.target.checked) next.add(c.sessionId);
+                      else next.delete(c.sessionId);
+                      return next;
+                    })
+                  }
+                />
+                <span className="min-w-0 flex-1 truncate">{c.title}</span>
+              </label>
+            ))}
+          </div>
+          {error ? <p className="px-1 text-[11.5px] text-destructive">{error}</p> : null}
+          <div className="flex gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 flex-1 text-[12px]"
+              disabled={busy || picked.size === 0}
+              onClick={() => void download([...picked])}
+            >
+              Selected ({picked.size})
+            </Button>
+            <Button
+              size="sm"
+              className="h-7 flex-1 gap-1 bg-[#b88a4a] text-[12px] text-white hover:bg-[#a67c42]"
+              disabled={busy}
+              onClick={() => void download(null)}
+            >
+              {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+              Export all
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
