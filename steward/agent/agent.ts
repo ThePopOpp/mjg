@@ -48,6 +48,15 @@ let cached: { at: number; value: { provider: string; model: string } } | null = 
 const CACHE_MS = 30_000;
 
 async function resolveModel(): Promise<{ provider: string; model: string }> {
+  // Local testing only: try a model without touching the dashboard setting,
+  // which production reads from the same database. Ignored in production so a
+  // stray env var can never silently change what members talk to.
+  const override = process.env.NODE_ENV !== "production" ? process.env.STEWARD_MODEL_OVERRIDE?.trim() : "";
+  if (override) {
+    const [provider, model] = override.includes("/") ? override.split("/", 2) : ["openai", override];
+    return { provider, model };
+  }
+
   if (cached && Date.now() - cached.at < CACHE_MS) return cached.value;
 
   const base = process.env.MJG_APP_URL?.trim().replace(/\/+$/, "");

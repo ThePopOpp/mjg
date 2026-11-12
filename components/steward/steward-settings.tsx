@@ -52,7 +52,10 @@ const CHOICES: Record<string, { value: string; label: string; note?: string }[]>
     { value: "openrouter", label: "OpenRouter", note: "Routes to third parties — widens the privacy review" },
   ],
   "agent.model.id": [
-    { value: "gpt-4o", label: "gpt-4o", note: "Stronger. Holds Steward's voice better" },
+    { value: "gpt-6-sol", label: "gpt-6-sol", note: "Recommended. Best in the V2 quality test (15.0/16)" },
+    { value: "gpt-6-luna", label: "gpt-6-luna", note: "GPT-6. 14.2/16 in the V2 quality test" },
+    { value: "gpt-6-astra", label: "gpt-6-astra", note: "GPT-6. 14.2/16 in the V2 quality test" },
+    { value: "gpt-4o", label: "gpt-4o", note: "Previous default. Shorter, more generic answers" },
     { value: "gpt-4o-mini", label: "gpt-4o-mini", note: "Cheaper and faster. Drifts into generic-assistant voice" },
   ],
   "promotion.max_per_conversation": [

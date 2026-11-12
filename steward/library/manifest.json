@@ -1,0 +1,79 @@
+{
+  "label": "D0.7.3-R1",
+  "vector_store_id": "vs_6af61b4ace408191b55946559ad80ed0",
+  "built_at": "2026-11-12T20:04:12.139Z",
+  "files": [
+    {
+      "file": "00_Control_Register.md",
+      "bytes": 138004,
+      "sha256": "2045f2950cd08c886893c7dd3e7538494668eaf6c19c489a8fe9f1c749591a37",
+      "openai_file_id": "file-R5whSLqgux7DnYfBpBARpn"
+    },
+    {
+      "file": "02_Framework_Blueprint_Assessments.md",
+      "bytes": 139528,
+      "sha256": "8b40b8a9e2fc7cbe52cea0dbaf43f56421cc8e99be9d2364afbf6419283b76a5",
+      "openai_file_id": "file-2p7TTKuMvHFqN2tSh2gnkJ"
+    },
+    {
+      "file": "03_Conversation_Sensitive_Safety.md",
+      "bytes": 75755,
+      "sha256": "7f972b7150c6f0268239cfb9cdd1972af34768c36bc4f559e005807cf3c47622",
+      "openai_file_id": "file-UZTEFCFWjryVALwxZ6o4qm"
+    },
+    {
+      "file": "04_Product_Journey_New_Features.md",
+      "bytes": 172631,
+      "sha256": "066eadd8571610745a0580f9dd31759d8e50ee7d5f03af2a84090cb549af0442",
+      "openai_file_id": "file-XXYTwanH6mZ9YKE9EZbz3p"
+    },
+    {
+      "file": "05_Data_Privacy_Security.md",
+      "bytes": 368491,
+      "sha256": "8d5aea4b1a592780e161bcf1787d8b48373b24dd5b463a2e342e098ec9cdbb32",
+      "openai_file_id": "file-3ED7bjHL9RgsAd84NE8qA2"
+    },
+    {
+      "file": "06_Safety_Support_Release.md",
+      "bytes": 258765,
+      "sha256": "cca7cb6a2165edd15526c6e71d992b6ba6dcab83d432bb6da59b6af78b8889e6",
+      "openai_file_id": "file-J3xfER8TXojVUkCKyya6Tf"
+    },
+    {
+      "file": "07_Commerce_Scripture_Rights.md",
+      "bytes": 412567,
+      "sha256": "21711e15a1b598b77906e841a61a2a9a6be80cd5170a329272ea29794570bf83",
+      "openai_file_id": "file-4U84XXZciYvWwzQGdZwZeG"
+    },
+    {
+      "file": "08_Engineering_Experience_Operations.md",
+      "bytes": 216173,
+      "sha256": "633d5598bd9ff9167357403825595ee384741e4c1e8be61277a5d415693db293",
+      "openai_file_id": "file-TMUprJFCZQh9mReJvDVWBs"
+    },
+    {
+      "file": "09_Test_Suite_Quality_Control.md",
+      "bytes": 255903,
+      "sha256": "1d7f1f3440bc6ef62970f55dbf1ed55a518fde7c5590af5b1fefb578be37a92d",
+      "openai_file_id": "file-GS8YddFMxmU2ECKEPEsre8"
+    },
+    {
+      "file": "10_Teaching_Reference_Library.md",
+      "bytes": 615306,
+      "sha256": "c408ec1e75516bd590994d4e9b978047f5d2158f75531af663df57e670d0c4d6",
+      "openai_file_id": "file-JP3ZCW567RrzG3vyhEMNeS"
+    },
+    {
+      "file": "11_Change_Impact_Decisions.md",
+      "bytes": 137546,
+      "sha256": "6c7155a5470fb8f8c252b07736fce9c9e64793f2fb12d060cc220a3a44796b09",
+      "openai_file_id": "file-X1D6uY5ico7Z2Gyz2YKRXG"
+    },
+    {
+      "file": "Statement-of-Faith.txt",
+      "bytes": 2633,
+      "sha256": "b587d8af30ad22d695e48d78608cc6cbbf05d928cd3c6527c58ca305ac9e4e87",
+      "openai_file_id": "file-K3oFPAUEVApF5hg3dRAFSe"
+    }
+  ]
+}

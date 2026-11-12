@@ -43,35 +43,120 @@ const MODE_PREAMBLE: Record<ConversationChoice, string> = {
 };
 
 /**
- * Minimal formatting for Steward's replies.
- *
- * Steward is told to write prose, not markdown — a four-point list with bold
- * headings is the generic-assistant voice the docset is trying to avoid. But a
- * model will occasionally emit `**bold**` anyway, and raw asterisks on screen
- * look broken, so this renders the two things that actually slip through:
- * paragraph breaks and bold spans.
- *
- * Deliberately NOT a markdown renderer. Model output is rendered as text, never
- * as HTML, so there is no path from a reply to markup in the page.
+ * Minimal formatting for Steward's replies: paragraphs, bold spans, short
+ * lists and small headings. Deliberately NOT a markdown renderer — model output
+ * is rendered as text, never as HTML, so there is no path from a reply to
+ * markup in the page.
+ */
+function Inline({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/(\*\*[^*]+\*\*)/g).map((piece, j) =>
+        piece.startsWith("**") && piece.endsWith("**") && piece.length > 4 ? (
+          <strong key={j} className="font-semibold">
+            {piece.slice(2, -2)}
+          </strong>
+        ) : (
+          <React.Fragment key={j}>{piece.replace(/(^|\s)\*([^*\s][^*]*)\*(?=\s|[.,;:!?]|$)/g, "$1$2")}</React.Fragment>
+        ),
+      )}
+    </>
+  );
+}
+
+const BULLET = /^\s*[-*•]\s+/;
+const NUMBERED = /^\s*\d+[.)]\s+/;
+const HEADING = /^\s*#{1,6}\s+/;
+const TABLE_ROW = /^\s*\|.*\|\s*$/;
+const TABLE_RULE = /^\s*\|[\s:|-]+\|\s*$/;
+
+/**
+ * V2 Steward teaches at depth, so a reply may carry a short list (a score
+ * overview, three paths) or a small heading. Those render as real lists rather
+ * than raw "- " and "###". Still React elements only — nothing from the model
+ * becomes HTML.
  */
 function Formatted({ text }: { text: string }) {
-  const paragraphs = text.split(/\n{2,}/).filter((p) => p.trim().length > 0);
+  const blocks = text.split(/\n{2,}/).filter((p) => p.trim().length > 0);
 
   return (
     <>
-      {paragraphs.map((paragraph, i) => (
-        <p key={i} className={i > 0 ? "mt-3" : undefined}>
-          {paragraph.split(/(\*\*[^*]+\*\*)/g).map((piece, j) =>
-            piece.startsWith("**") && piece.endsWith("**") && piece.length > 4 ? (
-              <strong key={j} className="font-semibold">
-                {piece.slice(2, -2)}
-              </strong>
-            ) : (
-              <React.Fragment key={j}>{piece}</React.Fragment>
-            ),
-          )}
-        </p>
-      ))}
+      {blocks.map((block, i) => {
+        const lines = block.split("\n").filter((l) => l.trim().length > 0);
+        const space = i > 0 ? "mt-3" : undefined;
+
+        // A score overview often comes as a small table.
+        if (lines.length >= 2 && lines.every((l) => TABLE_ROW.test(l))) {
+          const rows = lines
+            .filter((l) => !TABLE_RULE.test(l))
+            .map((l) => l.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim()));
+          const hasHead = TABLE_RULE.test(lines[1] ?? "");
+          const head = hasHead ? rows[0] : null;
+          const body = hasHead ? rows.slice(1) : rows;
+          return (
+            <div key={i} className={cn(space, "overflow-x-auto")}>
+              <table className="w-full border-collapse text-[14px]">
+                {head ? (
+                  <thead>
+                    <tr>
+                      {head.map((c, j) => (
+                        <th key={j} className="border-b px-2 py-1.5 text-left font-semibold first:pl-0">
+                          <Inline text={c} />
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                ) : null}
+                <tbody>
+                  {body.map((r, k) => (
+                    <tr key={k} className="border-b border-border/60 last:border-0">
+                      {r.map((c, j) => (
+                        <td key={j} className="px-2 py-1.5 align-top first:pl-0">
+                          <Inline text={c} />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
+        if (lines.every((l) => BULLET.test(l) || NUMBERED.test(l))) {
+          const ordered = NUMBERED.test(lines[0]);
+          const List = ordered ? "ol" : "ul";
+          return (
+            <List key={i} className={cn(space, "space-y-1.5 pl-5", ordered ? "list-decimal" : "list-disc")}>
+              {lines.map((l, j) => (
+                <li key={j}>
+                  <Inline text={l.replace(ordered ? NUMBERED : BULLET, "")} />
+                </li>
+              ))}
+            </List>
+          );
+        }
+
+        return (
+          <React.Fragment key={i}>
+            {lines.map((l, j) =>
+              HEADING.test(l) ? (
+                <p key={j} className={cn(i > 0 || j > 0 ? "mt-3" : undefined, "font-semibold")}>
+                  <Inline text={l.replace(HEADING, "").replace(/\*\*/g, "")} />
+                </p>
+              ) : BULLET.test(l) || NUMBERED.test(l) ? (
+                <p key={j} className="mt-1 pl-4 -indent-4">
+                  <Inline text={`${NUMBERED.test(l) ? l.trim() : `• ${l.replace(BULLET, "")}`}`} />
+                </p>
+              ) : (
+                <p key={j} className={j === 0 ? space : "mt-1"}>
+                  <Inline text={l} />
+                </p>
+              ),
+            )}
+          </React.Fragment>
+        );
+      })}
     </>
   );
 }

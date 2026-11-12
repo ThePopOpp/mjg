@@ -57,7 +57,7 @@ import {
 /** How many past results to report for a trend. */
 const HISTORY = 5;
 
-type Row = {
+export type AssessmentRow = {
   id: string;
   assessment: string;
   total_score: number | null;
@@ -93,6 +93,8 @@ async function memberRows(profileId: string): Promise<Row[]> {
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
     .slice(0, HISTORY * 4);
 }
+
+type Row = AssessmentRow;
 
 const day = (iso: string) => iso.slice(0, 10);
 
@@ -235,7 +237,11 @@ function trend(rows: Row[]) {
 
 /** Scores and bands only — for the per-turn context. */
 export async function assessmentSnapshot(profileId: string) {
-  const rows = await memberRows(profileId);
+  return snapshotFromRows(await memberRows(profileId));
+}
+
+/** Pure: the snapshot for a set of submissions, newest first. Shared with the quality harness. */
+export function snapshotFromRows(rows: AssessmentRow[]) {
   const checkIns = rows.filter((r) => r.assessment === "created-for-more");
   const audits = rows.filter((r) => r.assessment === ENERGY_AUDIT_ASSESSMENT);
   return {
@@ -246,7 +252,11 @@ export async function assessmentSnapshot(profileId: string) {
 
 /** Everything about their latest results, plus how they have moved. */
 export async function assessmentDetail(profileId: string) {
-  const rows = await memberRows(profileId);
+  return detailFromRows(await memberRows(profileId));
+}
+
+/** Pure: the detail for a set of submissions, newest first. Shared with the quality harness. */
+export function detailFromRows(rows: AssessmentRow[]) {
   const checkIns = rows.filter((r) => r.assessment === "created-for-more");
   const audits = rows.filter((r) => r.assessment === ENERGY_AUDIT_ASSESSMENT);
   return {

@@ -532,6 +532,36 @@ export async function proposeWording(args: {
 }
 
 /**
+ * A field version, only if it sits on this Blueprint. Approve and decline both
+ * go through here first, so a guessed version id from someone else's Blueprint
+ * can neither be acted on nor confirmed to exist.
+ */
+async function ownedVersion(db: ReturnType<typeof createSupabaseAdminClient>, blueprintId: string, versionId: string) {
+  const notYours = new StewardBlueprintError("That proposal is not on your Blueprint.");
+  const { data: version } = await db
+    .from("steward_field_versions")
+    .select("id, field_id, content_state, superseded_at")
+    .eq("id", versionId)
+    .maybeSingle();
+  if (!version) throw notYours;
+
+  const { data: field } = await db
+    .from("steward_fields")
+    .select("id, section_id")
+    .eq("id", version.field_id as string)
+    .maybeSingle();
+  if (!field) throw notYours;
+
+  const { data: section } = await db
+    .from("steward_sections")
+    .select("id, blueprint_id, page_slug")
+    .eq("id", field.section_id as string)
+    .maybeSingle();
+  if (!section || section.blueprint_id !== blueprintId) throw notYours;
+  return { version, section };
+}
+
+/**
  * The participant approves specific wording. This is the only path onto a
  * Blueprint.
  *
@@ -554,28 +584,7 @@ export async function approveWording(args: {
   try {
     // Ownership BEFORE anything else: a guessed version id from someone else's
     // Blueprint must not reveal that it exists.
-    const { data: version } = await db
-      .from("steward_field_versions")
-      .select("id, field_id, content_state, superseded_at")
-      .eq("id", args.versionId)
-      .maybeSingle();
-
-    const notYours = new StewardBlueprintError("That proposal is not on your Blueprint.");
-    if (!version) throw notYours;
-
-    const { data: field } = await db
-      .from("steward_fields")
-      .select("id, section_id")
-      .eq("id", version.field_id as string)
-      .maybeSingle();
-    if (!field) throw notYours;
-
-    const { data: section } = await db
-      .from("steward_sections")
-      .select("id, blueprint_id, page_slug")
-      .eq("id", field.section_id as string)
-      .maybeSingle();
-    if (!section || section.blueprint_id !== blueprintId) throw notYours;
+    const { version, section } = await ownedVersion(db, blueprintId, args.versionId);
     if (version.superseded_at) throw new StewardBlueprintError("That wording has already been replaced.");
 
     const now = new Date().toISOString();
@@ -629,12 +638,16 @@ export async function declineWording(args: {
   idempotencyKey: string;
 }): Promise<Receipt> {
   const db = createSupabaseAdminClient();
+  const blueprintId = await ensureBlueprint(args.profileId);
   const { receipt, alreadyDone } = await openReceipt(db, args.profileId, "blueprint.decline", args.idempotencyKey, {
     version: args.versionId,
   });
   if (alreadyDone) return receipt;
 
   try {
+    // Same ownership check as approval. Without it, any signed-in member could
+    // retire a pending proposal on someone else's Blueprint by its id.
+    await ownedVersion(db, blueprintId, args.versionId);
     const { error } = await db
       .from("steward_field_versions")
       .update({ content_state: "superseded", superseded_at: new Date().toISOString() })

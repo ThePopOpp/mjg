@@ -18,6 +18,8 @@
     "test:mcp": "node --experimental-strip-types --no-warnings --conditions=react-server --import ./scripts/test-loader.mjs --test lib/mcp/mcp.test.mjs lib/mcp/phase3.test.mjs lib/mcp/church.test.mjs",
     "test:groups": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --test lib/facilitator-groups/groups.test.mjs",
     "test:steward": "node --experimental-strip-types lib/steward/lifecycle.test.mjs && node --experimental-strip-types lib/steward/state.test.mjs",
+    "steward:quality": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --env-file=.env.local scripts/steward-quality-harness.mjs",
+    "steward:library:build": "node --env-file=.env.local scripts/steward-library-build.mjs",
     "steward:db:bootstrap": "node steward/node_modules/@workflow/world-postgres/bin/setup.js"
   },
   "dependencies": {
