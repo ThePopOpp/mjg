@@ -36,6 +36,20 @@ FROM node:24-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000
 
+# Email template downloads (PDF / Word) render the real email HTML in Chromium so they
+# look exactly like the dashboard preview (lib/email/render-html.ts). The emails use Arial
+# and Georgia: Liberation Sans is fontconfig's built-in stand-in for Arial, and Gelasio
+# (metric-compatible with Georgia, OFL) is aliased to Georgia below.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends chromium fontconfig fonts-liberation2 fonts-noto-color-emoji \
+ && rm -rf /var/lib/apt/lists/*
+ADD https://github.com/google/fonts/raw/main/ofl/gelasio/Gelasio%5Bwght%5D.ttf /usr/share/fonts/truetype/gelasio/Gelasio.ttf
+ADD https://github.com/google/fonts/raw/main/ofl/gelasio/Gelasio-Italic%5Bwght%5D.ttf /usr/share/fonts/truetype/gelasio/Gelasio-Italic.ttf
+RUN chmod 644 /usr/share/fonts/truetype/gelasio/*.ttf \
+ && printf '<?xml version="1.0"?>\n<!DOCTYPE fontconfig SYSTEM "fonts.dtd">\n<fontconfig><alias binding="same"><family>Georgia</family><prefer><family>Gelasio</family></prefer></alias></fontconfig>\n' > /etc/fonts/conf.d/35-georgia-gelasio.conf \
+ && fc-cache -f
+ENV CHROMIUM_PATH=/usr/bin/chromium
+
 COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next

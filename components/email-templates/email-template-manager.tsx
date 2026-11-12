@@ -44,8 +44,8 @@ const SORT_LABELS: Record<SortKey, string> = {
 };
 type ExportFormat = "pdf" | "docx" | "txt" | "json";
 const EXPORT_OPTIONS: { format: ExportFormat; label: string; hint: string }[] = [
-  { format: "pdf", label: "PDF", hint: "Copy, ready to read or print" },
-  { format: "docx", label: "Word", hint: "Edit with Track Changes" },
+  { format: "pdf", label: "PDF", hint: "Exactly as the email looks" },
+  { format: "docx", label: "Word", hint: "The email, plus its copy to edit" },
   { format: "txt", label: "Plain text", hint: ".txt" },
   { format: "json", label: "JSON", hint: "Everything, HTML included" },
 ];
