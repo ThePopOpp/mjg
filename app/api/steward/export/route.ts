@@ -30,7 +30,7 @@ const PER_SESSION_TIMEOUT_MS = 30_000;
 async function readTranscript(sessionId: string, cookie: string) {
   const base = process.env.STEWARD_AGENT_URL?.trim().replace(/\/+$/, "");
   if (!base) throw new Error("Steward is not configured on this server.");
-  const res = await fetch(`${base}/eve/v1/sessions/${encodeURIComponent(sessionId)}/stream?includeTailIndex=1`, {
+  const res = await fetch(`${base}/eve/v1/session/${encodeURIComponent(sessionId)}/stream?includeTailIndex=1`, {
     headers: { cookie, accept: "application/x-ndjson" },
     cache: "no-store",
     signal: AbortSignal.timeout(PER_SESSION_TIMEOUT_MS),

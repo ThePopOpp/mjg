@@ -5,7 +5,7 @@
 // Pure — no I/O — so it is tested directly (conversation-export.test.mjs).
 //
 // The stream is eve's own durable event log for a session (NDJSON from
-// GET /eve/v1/sessions/:id/stream). Only the events that matter for a review
+// GET /eve/v1/session/:id/stream). Only the events that matter for a review
 // are read: what the member said, what Steward said, which tools it used with
 // what input, which model answered, and anything that failed. Model reasoning
 // is deliberately left out — it is not what the member saw.
