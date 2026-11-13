@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { CONVERSATION_CHOICES, STEWARD_OPENING_LINE, type ConversationChoice } from "@/lib/steward/blueprint";
-import { NEW_CONVERSATION_EVENT } from "@/components/steward/member-sidebar";
+import { CONVERSATIONS_CHANGED_EVENT, NEW_CONVERSATION_EVENT } from "@/components/steward/member-sidebar";
 import { readPending } from "@/components/assessments/use-assessment-autosave";
 import { stewardHandoffOpener } from "@/lib/assessments/steward-handoff";
 
@@ -252,8 +252,14 @@ function useDictation(onText: (text: string) => void) {
   return { supported, listening, toggle };
 }
 
-export function LiveConversation() {
-  const agent = useEveAgent();
+/**
+ * `sessionId` reopens one of the member's own past conversations: eve replays
+ * its durable stream from the start, and the member carries on where they left
+ * off. The page keys this component by it, so switching conversations remounts
+ * with its own eve session rather than mixing two.
+ */
+export function LiveConversation({ sessionId: reopen = null }: { sessionId?: string | null } = {}) {
+  const agent = useEveAgent(reopen ? { initialSession: { sessionId: reopen, streamIndex: 0 }, resume: true } : undefined);
   const [draft, setDraft] = React.useState("");
   const [mode, setMode] = React.useState<ConversationChoice | null>(null);
   const [pending, setPending] = React.useState<Pending[]>([]);
@@ -275,7 +281,7 @@ export function LiveConversation() {
     setDraft((current) => (current ? `${current.trimEnd()} ${text.trim()}` : text.trim()));
   });
 
-  const busy = agent.status === "submitted" || agent.status === "streaming";
+  const busy = agent.status === "submitted" || agent.status === "streaming" || agent.status === "resuming";
   // Flat, UIMessage-shaped projection. `conversation.turns` is a record of
   // runtime turns, not the renderable transcript — the messages live here.
   const messages = agent.conversation?.messages ?? [];
@@ -350,6 +356,11 @@ export function LiveConversation() {
           if (!res.ok) return;
           registered.current = true;
           pendingTitle.current = null;
+          // A new conversation gets its own address, so a refresh reopens it
+          // and the rail can show it as the open one. replaceState does not
+          // re-render the page, so the live turn is not interrupted.
+          if (!reopen) window.history.replaceState(null, "", `/steward?c=${encodeURIComponent(sessionId)}`);
+          window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
         })
         .catch(() => {
           // A conversation missing from the rail is cosmetic; it must never
@@ -431,7 +442,9 @@ export function LiveConversation() {
           <span className="min-w-0">
             <span className="block text-[14px] font-semibold leading-tight">Steward</span>
             <span className="block truncate text-[12px] text-muted-foreground">
-              {agent.status === "streaming"
+              {agent.status === "resuming"
+                ? "Opening conversation…"
+                : agent.status === "streaming"
                 ? "Responding…"
                 : agent.status === "submitted"
                   ? "Thinking…"
@@ -474,7 +487,17 @@ export function LiveConversation() {
       {/* Transcript */}
       <div ref={scrollRef} className="scroll-slim min-h-0 flex-1 overflow-auto px-5 pb-2 pt-6 md:px-7 md:pt-7">
         <div className="mx-auto flex w-full max-w-[760px] flex-col gap-6">
-          {messages.length === 0 ? (
+          {reopen && messages.length === 0 ? (
+            agent.status === "error" ? (
+              <p className="py-6 text-[14px] text-muted-foreground" role="alert">
+                That conversation could not be opened. Start a new one from the menu.
+              </p>
+            ) : (
+              <p className="flex items-center gap-2 py-6 text-[14px] text-muted-foreground" role="status">
+                <Loader2 className="h-4 w-4 animate-spin" /> Opening your conversation…
+              </p>
+            )
+          ) : messages.length === 0 ? (
             <div className="flex flex-col items-start gap-4 py-6">
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Steward</p>
               {/* Shown here as well as said by the agent, so the first screen is
@@ -639,7 +662,7 @@ export function LiveConversation() {
               </div>
             ))}
 
-          {agent.status === "error" ? (
+          {agent.status === "error" && !(reopen && messages.length === 0) ? (
             <p className="text-[13px] text-destructive" role="alert">
               Steward could not answer that. Nothing has been lost — try again, or come back in a moment.
             </p>

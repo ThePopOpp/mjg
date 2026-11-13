@@ -6,6 +6,7 @@ import { getBlueprint, proposeWording } from "@/lib/steward/blueprint-service";
 import { assessmentDetail, assessmentSnapshot } from "@/lib/steward/assessments";
 import { searchLibrary } from "@/lib/steward/library-search";
 import libraryManifest from "@/steward/library/manifest.json";
+import { claimSession, sessionOwnedBy } from "@/lib/steward/session-owners";
 
 // THE ONLY THINGS STEWARD CAN DO.
 //
@@ -252,6 +253,10 @@ export const AGENT_TOOLS = {
   "assessments.snapshot": (profileId: string) => assessmentSnapshot(profileId),
   "assessments.detail": (profileId: string) => assessmentDetail(profileId),
   "library.search": (_profileId: string, args: { query?: string }) => searchTeachingLibrary(args),
+  // Not model tools: the Steward container's own session-ownership guard
+  // (steward/agent/lib/session-ownership.ts). No eve tool calls these.
+  "session.claim": (profileId: string, args: { sessionId?: unknown }) => claimSession(profileId, args),
+  "session.owned": (profileId: string, args: { sessionId?: unknown }) => sessionOwnedBy(profileId, args),
 } as const;
 
 export type AgentToolName = keyof typeof AGENT_TOOLS;

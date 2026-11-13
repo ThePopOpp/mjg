@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BookOpen, Check, Download, Loader2, Menu, MessageCircle, MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -31,6 +31,9 @@ import { cn } from "@/lib/utils";
 
 /** Fired at the open conversation, which owns the eve session. */
 export const NEW_CONVERSATION_EVENT = "steward:new-conversation";
+
+/** Fired by the open conversation once it is registered, so the rail refreshes. */
+export const CONVERSATIONS_CHANGED_EVENT = "steward:conversations-changed";
 
 type Conversation = { sessionId: string; title: string; lastActiveAt: string };
 
@@ -67,6 +70,8 @@ function SidebarBody({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const openSession = pathname === "/steward" ? searchParams.get("c") : null;
   const isActive = (href: string) =>
     href === "/steward" ? pathname === "/steward" : pathname.startsWith(href);
 
@@ -75,19 +80,23 @@ function SidebarBody({
 
   React.useEffect(() => {
     let cancelled = false;
-    void fetch("/api/steward/conversations", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : { conversations: [] }))
-      .then((json: { conversations?: Conversation[]; canExport?: boolean }) => {
-        if (cancelled) return;
-        setConversations(json.conversations ?? []);
-        setCanExport(Boolean(json.canExport));
-      })
-      .catch(() => {
-        // An empty rail is better than a broken one; the conversation itself
-        // does not depend on this list.
-      });
+    const load = () =>
+      void fetch("/api/steward/conversations", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : { conversations: [] }))
+        .then((json: { conversations?: Conversation[]; canExport?: boolean }) => {
+          if (cancelled) return;
+          setConversations(json.conversations ?? []);
+          setCanExport(Boolean(json.canExport));
+        })
+        .catch(() => {
+          // An empty rail is better than a broken one; the conversation itself
+          // does not depend on this list.
+        });
+    load();
+    window.addEventListener(CONVERSATIONS_CHANGED_EVENT, load);
     return () => {
       cancelled = true;
+      window.removeEventListener(CONVERSATIONS_CHANGED_EVENT, load);
     };
   }, [pathname]);
 
@@ -101,11 +110,10 @@ function SidebarBody({
         className="w-full justify-center gap-2 font-semibold"
         onClick={() => {
           onNavigate?.();
-          if (pathname === "/steward") {
-            window.dispatchEvent(new Event(NEW_CONVERSATION_EVENT));
-          } else {
-            router.push("/steward");
-          }
+          // Reset whatever is open, and leave any reopened conversation's
+          // address so a refresh does not bring it back.
+          window.dispatchEvent(new Event(NEW_CONVERSATION_EVENT));
+          if (pathname !== "/steward" || openSession) router.push("/steward");
         }}
       >
         <Plus className="h-4 w-4" /> New conversation
@@ -144,19 +152,27 @@ function SidebarBody({
             Nothing here yet. Conversations you have with Steward appear in this list.
           </p>
         ) : (
-          conversations.map((conversation) => (
-            <button
-              key={conversation.sessionId}
-              type="button"
-              title={conversation.title}
-              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13.5px] transition-colors hover:bg-muted"
-            >
-              <span className="min-w-0 flex-1 truncate">{conversation.title}</span>
-              <span className="shrink-0 text-[11px] text-muted-foreground">
-                {relativeDay(conversation.lastActiveAt)}
-              </span>
-            </button>
-          ))
+          conversations.map((conversation) => {
+            const open = openSession === conversation.sessionId;
+            return (
+              <Link
+                key={conversation.sessionId}
+                href={`/steward?c=${encodeURIComponent(conversation.sessionId)}`}
+                onClick={onNavigate}
+                title={conversation.title}
+                aria-current={open ? "page" : undefined}
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13.5px] no-underline transition-colors",
+                  open ? "bg-[#b88a4a]/15 font-semibold text-[#b88a4a]" : "text-foreground hover:bg-muted",
+                )}
+              >
+                <span className="min-w-0 flex-1 truncate">{conversation.title}</span>
+                <span className="shrink-0 text-[11px] text-muted-foreground">
+                  {relativeDay(conversation.lastActiveAt)}
+                </span>
+              </Link>
+            );
+          })
         )}
       </div>
 

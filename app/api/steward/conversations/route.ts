@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { canExportStewardHistory } from "@/lib/steward/export-access";
+import { sessionOwnedBy } from "@/lib/steward/session-owners";
 
 // The member's conversation list.
 //
@@ -60,6 +61,13 @@ export async function POST(request: Request) {
     : "New conversation";
 
   const db = createSupabaseAdminClient();
+
+  // Only a session the Steward container recorded as THIS member's can be
+  // registered (steward_session_owners, written when eve created it). Without
+  // this, someone could list another member's not-yet-registered session id as
+  // their own conversation.
+  const { owned } = await sessionOwnedBy(profile.id, { sessionId }).catch(() => ({ owned: false }));
+  if (!owned) return NextResponse.json({ error: "Not permitted." }, { status: 403 });
 
   // Scoped to this member on both sides: a guessed session id belonging to
   // someone else updates nothing, because the lookup checks ownership and the

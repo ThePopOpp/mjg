@@ -2,12 +2,13 @@
   "name": "mjg-steward-agent",
   "private": true,
   "type": "module",
-  "description": "Steward — the member-facing agent. Its own eve project root so the agent definition, build output and dependencies stay separate from the Next.js app.",
+  "description": "Steward \u2014 the member-facing agent. Its own eve project root so the agent definition, build output and dependencies stay separate from the Next.js app.",
   "scripts": {
     "build": "eve build",
     "start": "eve start",
     "test:auth": "node tests/supabase-principal.test.mjs",
-    "check": "eve info"
+    "check": "eve info",
+    "test:ownership": "node --experimental-strip-types --test tests/session-ownership.test.mjs"
   },
   "dependencies": {
     "@workflow/world-postgres": "^5.0.3",

@@ -22,9 +22,16 @@
 //     sharing a principalId, cross-member isolation bugs cannot surface in
 //     development. Local testing uses a real token instead.
 
+//
+// Authentication alone is not enough: eve does not check that a session id in
+// the path belongs to the caller. withSessionOwnership records the owner when a
+// session is created and refuses everyone else on every session route — see
+// lib/session-ownership.ts.
+
 import { eveChannel } from "eve/channels/eve";
 import { supabasePrincipal } from "../lib/supabase-principal.ts";
+import { withSessionOwnership } from "../lib/session-ownership.ts";
 
-export default eveChannel({
-  auth: [supabasePrincipal()],
-});
+const authenticate = supabasePrincipal();
+
+export default withSessionOwnership(eveChannel({ auth: [authenticate] }), authenticate);
