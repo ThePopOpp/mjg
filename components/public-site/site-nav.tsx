@@ -3,10 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, Menu, Moon, Sun, X } from "lucide-react";
-import { joinJourneyHref, publicNavItems, type NavItem } from "@/lib/public-site/nav-items";
+import { ACCOUNT_LABEL, joinJourneyHref, publicNavItems, type NavItem } from "@/lib/public-site/nav-items";
 import { cn } from "@/lib/utils";
+import { LogoutButton, SIGNED_IN_LINKS, useSignedIn } from "./account-menu-items";
 
 const GOLD = "#b88a4a";
+const MOBILE_AUTH_CLASS =
+  "rounded-lg border px-4 py-3 text-center text-[0.95rem] font-semibold text-foreground no-underline";
 
 /**
  * The public site navigation, for the React app pages (/book-waitlist,
@@ -16,11 +19,21 @@ const GOLD = "#b88a4a";
  * Desktop: Home · About · Mission · Resources▾ · Contact · Account▾ · theme toggle.
  * "Join the Journey" is mobile-only. Mobile is a full-page menu.
  */
-export function SiteNav({ siteUrl, items: itemsOverride }: { siteUrl: string; items?: NavItem[] }) {
+export function SiteNav({
+  siteUrl,
+  items: itemsOverride,
+  signedIn: signedInFromServer,
+}: {
+  siteUrl: string;
+  items?: NavItem[];
+  /** Pass when the server already knows (the Steward shell) so the menu is right on first paint. */
+  signedIn?: boolean;
+}) {
   // "" for the app origin → app pages become relative paths so Next can soft-navigate.
   // The Frontend Editor passes `items` so CMS-owned pages follow the navigation
   // Mike manages in the dashboard; every other page keeps the code-owned nav.
   const items = itemsOverride?.length ? itemsOverride : publicNavItems(siteUrl, "");
+  const signedIn = useSignedIn(signedInFromServer) === true;
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -54,8 +67,11 @@ export function SiteNav({ siteUrl, items: itemsOverride }: { siteUrl: string; it
     };
   }, []);
 
-  const resources = items.find((i) => i.label === "Resources");
-  const account = items.find((i) => i.label === "Account");
+  const isAccount = (i: NavItem) => i.label === ACCOUNT_LABEL || i.label === "Account";
+  const account = items.find(isAccount);
+  // Every dropdown other than the account menu; the mobile menu flattens their links.
+  const menus = items.filter((i) => i.children && !isAccount(i));
+  const contact = items.find((i) => i.label === "Contact");
 
   return (
     <nav ref={navRef} className="sticky top-0 z-50 w-full border-b bg-background">
@@ -100,9 +116,18 @@ export function SiteNav({ siteUrl, items: itemsOverride }: { siteUrl: string; it
                   {openDropdown === item.label ? (
                     <div className="absolute right-0 top-full pt-[0.7rem]">
                       <div className="min-w-[180px] rounded-[10px] border bg-background p-1.5 shadow-lg">
-                        {item.children.map((c) => (
-                          <NavChildLink key={c.label} href={c.href} label={c.label} onNavigate={() => setOpenDropdown(null)} />
-                        ))}
+                        {isAccount(item) && signedIn ? (
+                          <>
+                            {SIGNED_IN_LINKS.map((c) => (
+                              <NavChildLink key={c.id} href={c.href} label={c.label} onNavigate={() => setOpenDropdown(null)} />
+                            ))}
+                            <LogoutButton className="block w-full rounded-md px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-muted hover:text-[#b88a4a]" />
+                          </>
+                        ) : (
+                          item.children.map((c) => (
+                            <NavChildLink key={c.label} href={c.href} label={c.label} onNavigate={() => setOpenDropdown(null)} />
+                          ))
+                        )}
                       </div>
                     </div>
                   ) : null}
@@ -134,26 +159,31 @@ export function SiteNav({ siteUrl, items: itemsOverride }: { siteUrl: string; it
             {/* Order per spec: the top-level links, Resources' children flattened, the CTA,
                 then Contact, the auth pair and the toggle. */}
             {items
-              .filter((i) => i.label !== "Account" && i.label !== "Contact")
+              .filter((i) => !isAccount(i) && i.label !== "Contact" && i.href)
               .map((item) => (
                 <MobileRow key={item.label} href={item.href!} label={item.label} onNavigate={() => setMenuOpen(false)} />
               ))}
-            {(resources?.children ?? []).map((c) => (
-              <MobileRow key={c.label} href={c.href} label={c.label} onNavigate={() => setMenuOpen(false)} />
-            ))}
+            {menus
+              .flatMap((m) => (m.children ?? []).filter((c) => c.href !== m.href))
+              .map((c) => (
+                <MobileRow key={`${c.label}-${c.href}`} href={c.href} label={c.label} onNavigate={() => setMenuOpen(false)} />
+              ))}
             <MobileRow href={joinJourneyHref(siteUrl)} label="Join the Journey" onNavigate={() => setMenuOpen(false)} />
-            <MobileRow href={items.find((i) => i.label === "Contact")!.href!} label="Contact" onNavigate={() => setMenuOpen(false)} />
+            {contact?.href ? (
+              <MobileRow href={contact.href} label={contact.label} onNavigate={() => setMenuOpen(false)} />
+            ) : null}
             <li className="mt-4 grid grid-cols-2 gap-2.5">
-              {(account?.children ?? []).map((c) => (
+              {(signedIn ? SIGNED_IN_LINKS : account?.children ?? []).map((c) => (
                 <Link
                   key={c.label}
                   href={c.href}
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-lg border px-4 py-3 text-center text-[0.95rem] font-semibold no-underline"
+                  className={MOBILE_AUTH_CLASS}
                 >
                   {c.label}
                 </Link>
               ))}
+              {signedIn ? <LogoutButton className={MOBILE_AUTH_CLASS} /> : null}
             </li>
             <li className="mt-4">
               <ThemeToggle full />

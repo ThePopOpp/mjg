@@ -42,7 +42,8 @@ export default async function StewardMemberLayout({ children }: { children: Reac
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
-      <SiteNav siteUrl={publicSiteUrl()} />
+      {/* Signed in by construction: the redirect above admits no one else. */}
+      <SiteNav siteUrl={publicSiteUrl()} signedIn />
 
       <div className="mx-auto grid min-h-0 w-full max-w-[1160px] flex-1 grid-cols-1 md:grid-cols-[244px_minmax(0,1fr)] md:px-8">
         <MemberSidebar {...rail} />

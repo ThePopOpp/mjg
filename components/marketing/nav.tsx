@@ -8,11 +8,15 @@ import type { NavContent } from "@/lib/marketing/content/scopes/global";
 import { cn } from "@/lib/utils";
 import { CONTAINER, buttonClass } from "./primitives";
 import { MarketingThemeToggle } from "./theme-toggle";
+import { LogoutButton, SIGNED_IN_LINKS, useSignedIn } from "@/components/public-site/account-menu-items";
 
 // The marketing header (SiteNav.dc.html): sticky 60px bar, a "Discover" mega
 // menu of four columns, Steward and Contact, an account menu, the two persistent
 // calls to action and the theme toggle. Below 1024px it becomes a full-screen
 // menu. All labels and links come from the global:nav content scope.
+
+const ACCOUNT_ITEM =
+  "block rounded-md px-3 py-2 text-[14px] no-underline hover:bg-muted hover:text-gold-deep dark:hover:text-gold-light";
 
 /** Preview copies live under /site-preview; treat them as the page they preview. */
 function normalize(path: string) {
@@ -40,6 +44,9 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
     else timers.current.set(setter, setTimeout(() => setter(false), 140));
   };
   const accountId = useId();
+  // Signed in → Dashboard + Log out; otherwise the content-managed Login / Register.
+  const signedIn = useSignedIn() === true;
+  const accountLinks = signedIn ? SIGNED_IN_LINKS : nav.accountLinks;
 
   const discoverActive = nav.columns.some((c) => matches(pathname, c.href) || c.links.some((l) => matches(pathname, l.href)));
 
@@ -137,13 +144,18 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
             {accountOpen ? (
               <div id={accountId} className="absolute right-0 top-full z-10 pt-2">
                 <ul className="min-w-[180px] rounded-[10px] border bg-background p-1.5 shadow-[0_18px_48px_rgba(20,20,20,0.12)]">
-                  {nav.accountLinks.map((l) => (
+                  {accountLinks.map((l) => (
                     <li key={l.id}>
-                      <a href={l.href} className="block rounded-md px-3 py-2 text-[14px] no-underline hover:bg-muted hover:text-gold-deep dark:hover:text-gold-light">
+                      <a href={l.href} className={ACCOUNT_ITEM}>
                         {l.label}
                       </a>
                     </li>
                   ))}
+                  {signedIn ? (
+                    <li>
+                      <LogoutButton className={cn(ACCOUNT_ITEM, "w-full text-left")} />
+                    </li>
+                  ) : null}
                 </ul>
               </div>
             ) : null}
@@ -245,11 +257,12 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
             ))}
           </ul>
           <div className="mt-6 grid grid-cols-2 gap-3">
-            {nav.accountLinks.map((l) => (
+            {accountLinks.map((l) => (
               <a key={l.id} href={l.href} className={buttonClass("outline", "h-11 text-sm")}>
                 {l.label}
               </a>
             ))}
+            {signedIn ? <LogoutButton className={buttonClass("outline", "h-11 text-sm")} /> : null}
             <Link href={nav.secondaryCta.href} className={buttonClass("outline", "h-11 text-sm")}>
               {nav.secondaryCta.label}
             </Link>
