@@ -206,6 +206,8 @@ export type FrameworkContent = {
   layers: Record<LayerKey, Layer>;
   pillarNames: { family: string; fitness: string; fun: string; finances: string };
   bedrockNote: string;
+  /** Drift + Return runs through every layer; it is not an eighth layer. */
+  driftNote: string;
   hint: string;
 };
 
@@ -224,7 +226,7 @@ const LAYER_LABELS: Record<LayerKey, string> = {
   foundation: "Foundation",
   pillars: "Four Pillars",
   rail: "Guardrails",
-  habits: "Keystone Habits",
+  habits: "Keystone Rhythms",
   energy: "Energy",
   legacy: "Legacy",
 };
@@ -253,6 +255,7 @@ const framework = defineSection<FrameworkContent>({
       })),
     },
     { key: "bedrockNote", label: "Note beside Bedrock", kind: "text", maxLength: 120 },
+    { key: "driftNote", label: "Drift + Return note", kind: "textarea", maxLength: 240 },
     { key: "hint", label: "Hint under the temple", kind: "text", maxLength: 160 },
   ],
   defaults: {
@@ -260,34 +263,34 @@ const framework = defineSection<FrameworkContent>({
       bedrock: {
         number: "01",
         name: "Bedrock",
-        part: "Crepidoma",
+        part: "The ground",
         eyebrow: "Layer 01",
-        title: "Bedrock — Faith & Identity",
+        title: "Bedrock — Faith + Identity",
         body: "Your identity is deeper than what you accomplish, own, or produce. Faith is not just one room in the house; it shapes the entire structure.",
-        caption: "Faith & Identity",
+        caption: "Faith + Identity",
       },
       foundation: {
         number: "02",
         name: "Foundation",
-        part: "Stylobate",
+        part: "The base",
         eyebrow: "Layer 02",
-        title: "Foundation — Mission, Values, Calling & Purpose",
+        title: "Foundation — Mission + Values + Direction",
         body: "What matters most to you? What does faithful living look like in this season? Foundation translates conviction into direction.",
-        caption: "Mission · Values · Calling · Purpose",
+        caption: "Mission · Values · Direction",
       },
       pillars: {
         number: "03",
         name: "Four Pillars",
-        part: "Columns",
+        part: "The columns",
         eyebrow: "Layer 03",
-        title: "Four Pillars — Family, Fitness, Fun & Finances",
+        title: "Four Pillars — Family, Fitness, Fun + Finances",
         body: "Relationships, health, joy, and financial resources are connected. Strengthening one while neglecting the others eventually affects the whole life.",
         caption: "Family · Fitness · Fun · Finances",
       },
       rail: {
         number: "04",
         name: "Guardrails",
-        part: "Balustrades",
+        part: "The railings",
         eyebrow: "Layer 04 · Both sides",
         title: "Guardrails — Boundaries That Protect",
         body: "Pre-decided limits protect your priorities, integrity, relationships, and freedom before pressure creates regret.",
@@ -295,17 +298,17 @@ const framework = defineSection<FrameworkContent>({
       },
       habits: {
         number: "05",
-        name: "Keystone Habits",
-        part: "Architrave",
+        name: "Keystone Rhythms",
+        part: "The beam",
         eyebrow: "Layer 05",
-        title: "Keystone Habits — Rhythms That Strengthen",
-        body: "Small, repeatable actions shape the life you live more than occasional bursts of motivation.",
+        title: "Keystone Rhythms — Rhythms That Strengthen",
+        body: "Small, repeatable practices sustain alignment and help you return. They shape the life you live more than occasional bursts of motivation.",
         caption: "Rhythms that strengthen",
       },
       energy: {
         number: "06",
         name: "Energy",
-        part: "Frieze",
+        part: "The band",
         eyebrow: "Layer 06",
         title: "Energy — Capacity to Live It",
         body: "Physical, emotional, mental, and spiritual energy must be received, invested, renewed, and protected.",
@@ -314,7 +317,7 @@ const framework = defineSection<FrameworkContent>({
       legacy: {
         number: "07",
         name: "Legacy",
-        part: "Pediment",
+        part: "The roof",
         eyebrow: "Layer 07 · Roof",
         title: "Legacy — What You Multiply While Living",
         body: "Your legacy takes shape in the people you influence, equip, serve, and encourage now. Generosity grows when others learn to practice and pass it on. Estate arrangements may support continuity but do not define Legacy Giving.",
@@ -323,6 +326,7 @@ const framework = defineSection<FrameworkContent>({
     },
     pillarNames: { family: "Family", fitness: "Fitness", fun: "Fun", finances: "Finances" },
     bedrockNote: "Not one room in the house — it shapes the entire structure.",
+    driftNote: "Drift + Return runs through the whole Blueprint: notice drift early, and return to what matters without starting over.",
     hint: "Hover a part of the building to explore · click to pin · plays on its own while in view",
   },
 });
@@ -402,7 +406,7 @@ const joinForm = defineSection<JoinFormContent>({
       { id: "steward", label: "Steward" },
     ],
     finePrint:
-      "Your information will only be used to send you updates about The Stewardship Blueprint. No spam, ever. Unsubscribe at any time.",
+      "We use your information only for the choices you make above — email updates, plus any optional texts, feedback, or follow-up you select. Unchecked boxes give no permission. No spam, ever. Unsubscribe at any time.",
     successTitle: "Welcome to the journey.",
     successBody:
       "Check your email — we’ve sent your welcome note and your account details. As you get started, consider taking the free Created for More Check-In.",

@@ -1,4 +1,4 @@
-import { LAYERS, TOTAL_STATEMENTS, scoreCheckIn } from "@/lib/check-in/created-for-more";
+import { checkInDetails, completeAnswers, scoreCheckIn } from "@/lib/check-in/created-for-more";
 import { SECTIONS, answerKey, isComplete, isRating, scoreEnergyAudit } from "@/lib/energy-audit/energy-audit";
 import { ENERGY_AUDIT_ASSESSMENT } from "@/lib/energy-audit/submissions";
 
@@ -34,16 +34,8 @@ const createdForMore: AssessmentDefinition = {
   label: "Created for More Check-In",
   path: "/created-for-more-check-in",
   cleanAnswers(raw) {
-    const source = asObject(raw);
-    const answers: Record<string, number> = {};
-    for (const layer of LAYERS) {
-      layer.statements.forEach((_, i) => {
-        const key = `${layer.key}:${i}`;
-        const n = Number(source[key]);
-        if (isRating(n)) answers[key] = n;
-      });
-    }
-    return Object.keys(answers).length >= TOTAL_STATEMENTS ? answers : null;
+    // All 28, each a whole 1–5 — never a manufactured score from partial answers.
+    return completeAnswers(raw);
   },
   columns(answers) {
     const score = scoreCheckIn(answers);
@@ -55,6 +47,10 @@ const createdForMore: AssessmentDefinition = {
       lowest_layer: score.lowestLayer,
       lowest_pillar: score.lowestPillar,
     };
+  },
+  details(answers) {
+    // The version actually taken, tied layers and each Pillar's own response.
+    return checkInDetails(scoreCheckIn(answers));
   },
 };
 

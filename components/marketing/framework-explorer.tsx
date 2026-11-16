@@ -100,6 +100,11 @@ export function FrameworkExplorer({
         <div className="min-w-0">
           <FrameworkTemple framework={framework} select={select} onChange={onChange} />
           <p className="mt-3 text-center text-[12px] text-muted-foreground">{framework.hint}</p>
+          {framework.driftNote ? (
+            <p className="mx-auto mt-4 max-w-[46ch] text-pretty rounded-lg border border-gold/40 bg-gold/5 px-4 py-3 text-center text-[13.5px] leading-6">
+              {framework.driftNote}
+            </p>
+          ) : null}
         </div>
       </div>
     </div>

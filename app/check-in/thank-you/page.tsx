@@ -39,7 +39,7 @@ export default async function CheckInThankYouPage({
             {stage ? (
               <>
                 <p>{stage.meaning}</p>
-                <p className="text-foreground"><span className="font-semibold">Suggested next step:</span> {stage.nextStep}</p>
+                <p className="text-foreground"><span className="font-semibold">One possible next step:</span> {stage.nextStep}</p>
               </>
             ) : (
               <p>Your results are saved with your submission. The point is not to judge your life — it is to see it clearly enough to steward it wisely.</p>
@@ -54,7 +54,7 @@ export default async function CheckInThankYouPage({
           <CardHeader><CardTitle>What your lowest layer may be telling you</CardTitle></CardHeader>
           <CardContent className="space-y-3 leading-7 text-muted-foreground">
             <p>{drift.driftPattern}</p>
-            <p className="text-foreground"><span className="font-semibold">One faithful next step:</span> {drift.nextStep}</p>
+            <p className="text-foreground"><span className="font-semibold">One possible faithful step:</span> {drift.nextStep}</p>
           </CardContent>
         </Card>
       ) : null}

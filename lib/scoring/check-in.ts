@@ -77,9 +77,10 @@ export function scoreCheckIn(scores: CheckInScores): CheckInScoreResult {
   };
 }
 
+// The /140 bands (v4, unchanged boundaries): 112–140, 84–111, 56–83, 28–55.
 export function getScoreRangeCategory(totalScore: number) {
-  if (totalScore >= 100 && totalScore <= 125) return SCORE_RANGE_LABELS.aligned;
-  if (totalScore >= 75) return SCORE_RANGE_LABELS.stretched;
-  if (totalScore >= 50) return SCORE_RANGE_LABELS.drifting;
+  if (totalScore >= 112) return SCORE_RANGE_LABELS.aligned;
+  if (totalScore >= 84) return SCORE_RANGE_LABELS.stretched;
+  if (totalScore >= 56) return SCORE_RANGE_LABELS.drifting;
   return SCORE_RANGE_LABELS.rebuild;
 }

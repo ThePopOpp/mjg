@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useAssessmentAutosave } from "@/components/assessments/use-assessment-autosave";
 import { AutosaveNote, SaveResultsModal } from "@/components/assessments/save-results-modal";
-import { LAYERS, SCALE, MAX_SCORE, TOTAL_STATEMENTS, PATHWAYS, NEXT_STEP_OPTIONS, LOWEST_LAYER_GUIDANCE, PILLAR_GUIDANCE, scoreCheckIn, type CheckInScore } from "@/lib/check-in/created-for-more";
+import { LAYERS, SCALE, MAX_SCORE, TOTAL_STATEMENTS, PATHWAYS, NEXT_STEP_OPTIONS, LOWEST_LAYER_GUIDANCE, LOWEST_LAYER_NOTE, PILLAR_GUIDANCE, SCORE_NOTE, SUPPORT_NOTE, scoreCheckIn, type CheckInScore } from "@/lib/check-in/created-for-more";
 
 /** Rating guide — shown in the "Check-In Form 101" dialog on the Check-In pages. */
 export function CheckInScaleGuide() {
@@ -212,7 +212,6 @@ const Results = forwardRef<HTMLDivElement, ResultsProps>(function Results({ scor
   const [sent, setSent] = useState(false);
   const [emailed, setEmailed] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const guidance = LOWEST_LAYER_GUIDANCE[score.lowestLayerKey];
 
   async function send() {
     setBusy(true); setError(null);
@@ -237,7 +236,8 @@ const Results = forwardRef<HTMLDivElement, ResultsProps>(function Results({ scor
         <div className="mt-2 text-5xl font-bold">{score.total}<span className="text-2xl font-medium text-muted-foreground"> / {MAX_SCORE}</span></div>
         <p className="mt-1 text-lg font-semibold">{score.stage}</p>
         <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{score.stageMeaning}</p>
-        <p className="mx-auto mt-2 max-w-2xl text-sm font-medium">Suggested next step: {score.stageNextStep}</p>
+        <p className="mx-auto mt-2 max-w-2xl text-sm font-medium">One possible next step: {score.stageNextStep}</p>
+        <p className="mx-auto mt-2 max-w-2xl text-xs text-muted-foreground">{SCORE_NOTE}</p>
       </div>
 
       {note}
@@ -258,25 +258,55 @@ const Results = forwardRef<HTMLDivElement, ResultsProps>(function Results({ scor
         </div>
       </CardContent></Card>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Card><CardContent className="p-4"><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Strongest layer</p><p className="mt-1 font-medium">{score.strongestLayer}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Lowest layer{score.lowestPillar ? ` · ${score.lowestPillar}` : ""}</p><p className="mt-1 font-medium">{score.lowestLayer}</p></CardContent></Card>
-      </div>
-
-      {guidance ? (
-        <Card><CardContent className="space-y-2 p-4">
-          <p className="text-sm font-semibold">What your lowest layer may be telling you</p>
-          <p className="text-sm text-muted-foreground">{guidance.drift}</p>
-          <p className="text-sm"><span className="font-medium text-primary">One faithful next step: </span>{guidance.step}</p>
-          {score.lowestPillar && PILLAR_GUIDANCE[score.lowestPillar] ? (
-            <p className="text-sm"><span className="font-medium text-primary">{score.lowestPillar}: </span>{PILLAR_GUIDANCE[score.lowestPillar].step}</p>
-          ) : null}
+      {score.lowestLayers.length === LAYERS.length ? (
+        <Card><CardContent className="p-4 text-sm">
+          <p className="font-medium">All seven layers scored the same.</p>
+          <p className="mt-1 text-muted-foreground">A tie does not need an automatic winner. Choose the layer that is most relevant to this season after reflection.</p>
         </CardContent></Card>
+      ) : (
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Card><CardContent className="p-4"><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Highest-scoring layer{score.strongestLayers.length > 1 ? "s" : ""}</p>{score.strongestLayers.map((l) => <p key={l} className="mt-1 font-medium">{l}</p>)}</CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Lowest-scoring layer{score.lowestLayers.length > 1 ? "s" : ""}</p>{score.lowestLayers.map((l) => <p key={l} className="mt-1 font-medium">{l}</p>)}</CardContent></Card>
+      </div>
+      )}
+
+      {score.lowestLayers.length < LAYERS.length ? (
+      <Card><CardContent className="space-y-3 p-4">
+        <p className="text-sm font-semibold">What your lowest layer{score.lowestLayerKeys.length > 1 ? "s" : ""} may be telling you</p>
+        <p className="text-xs text-muted-foreground">{LOWEST_LAYER_NOTE}</p>
+        {score.lowestLayerKeys.map((key) => {
+          const g = LOWEST_LAYER_GUIDANCE[key];
+          const layerTitle = LAYERS.find((l) => l.key === key)?.title ?? key;
+          return g ? (
+            <div key={key} className="space-y-1">
+              <p className="text-sm"><span className="font-medium">{layerTitle}: </span><span className="text-muted-foreground">{g.drift}</span></p>
+              <p className="text-sm"><span className="font-medium text-primary">One possible faithful step: </span>{g.step}</p>
+            </div>
+          ) : null;
+        })}
+      </CardContent></Card>
       ) : null}
+
+      {/* Each Pillar's own response, shown whether or not the layer is lowest. */}
+      <Card><CardContent className="space-y-2 p-4">
+        <p className="text-sm font-semibold">Your Four Pillars</p>
+        <p className="text-xs text-muted-foreground">Each Pillar is one statement scored out of 5 — a starting signal, not a full assessment. Choose the most relevant area, not automatically the lowest.</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {Object.entries(score.pillarResponses).map(([pillar, value]) => (
+            <div key={pillar} className="rounded-md border p-3">
+              <p className="flex items-center justify-between text-sm font-medium"><span>{pillar}</span><span>{value}/5</span></p>
+              {score.lowestPillars.includes(pillar) && PILLAR_GUIDANCE[pillar] ? (
+                <p className="mt-1 text-xs text-muted-foreground">{PILLAR_GUIDANCE[pillar].meaning} <span className="text-foreground">{PILLAR_GUIDANCE[pillar].step}</span></p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </CardContent></Card>
 
       {/* Pathways */}
       <div>
-        <p className="mb-2 text-sm font-semibold">Choose your recommended pathway</p>
+        <p className="mb-2 text-sm font-semibold">Choose your next step</p>
+        <p className="mb-2 text-xs text-muted-foreground">Begin with one step, not a total life overhaul. None of these requires a purchase or depends on your score.</p>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {PATHWAYS.map((p) => (
             <Card key={p.key}><CardContent className="flex h-full flex-col gap-1 p-4">
@@ -287,6 +317,8 @@ const Results = forwardRef<HTMLDivElement, ResultsProps>(function Results({ scor
           ))}
         </div>
       </div>
+
+      <p className="text-xs leading-5 text-muted-foreground">{SUPPORT_NOTE}</p>
 
       {/* Capture */}
       {sent ? (

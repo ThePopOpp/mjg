@@ -133,7 +133,7 @@ export const CHALLENGE_VIDEOS: ChallengeVideo[] = [
     title: "Strengthen the Structure",
     subtitle: "Choose one keystone rhythm and one renewal rhythm.",
     description:
-      "You are shaped less by inspiration than by rhythm. Michael walks through keystone habits and how to steward your physical, emotional, mental, and spiritual energy. Design one habit, protect one rhythm of renewal, and run it for seven days.",
+      "You are shaped less by inspiration than by rhythm. Michael walks through keystone rhythms and how to steward your physical, emotional, mental, and spiritual energy. Design one keystone rhythm, protect one rhythm of renewal, and run it for seven days.",
     youtubeId: null,
     embedDirect: false,
     videoUrl: "https://vimeo.com/1239699941",

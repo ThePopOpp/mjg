@@ -4,7 +4,7 @@ import { sendSmtpEmail } from "@/lib/email/smtp";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { PARTICIPANT_TYPES } from "@/lib/pilot/constants";
-import { scoreCheckIn, MAX_SCORE, type CheckInScore } from "@/lib/check-in/created-for-more";
+import { checkInDetails, completeAnswers, scoreCheckIn, MAX_SCORE, SCORE_NOTE, type CheckInScore } from "@/lib/check-in/created-for-more";
 import { alertCheckIn } from "@/lib/notifications/check-in-alert";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { ownedSubmission } from "@/lib/assessments/save";
@@ -19,14 +19,10 @@ import { ownedSubmission } from "@/lib/assessments/save";
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
-    const answers: Record<string, number> = {};
-    if (body.answers && typeof body.answers === "object") {
-      for (const [k, v] of Object.entries(body.answers)) {
-        const n = Number(v);
-        if (Number.isFinite(n) && n >= 1 && n <= 5) answers[k] = n;
-      }
-    }
-    if (!Object.keys(answers).length) return NextResponse.json({ error: "No answers were provided." }, { status: 400 });
+    // All 28, each a whole 1–5. A partial or malformed set is refused rather than
+    // scored: a missing answer is never counted as 0 or "neutral".
+    const answers = completeAnswers(body.answers);
+    if (!answers) return NextResponse.json({ error: "Please answer every statement first." }, { status: 400 });
 
     const name = typeof body.name === "string" ? body.name.trim().slice(0, 200) || null : null;
     const email = typeof body.email === "string" ? body.email.trim().slice(0, 200) || null : null;
@@ -94,6 +90,7 @@ export async function POST(request: Request) {
       lowest_pillar: score.lowestPillar,
       chosen_pathway: pathways[0] ?? null,
       chosen_pathways: pathways,
+      details: checkInDetails(score),
     });
     if (error) throw error;
 
@@ -154,17 +151,19 @@ async function sendResultsEmail({ to, name, score }: { to: string; name: string 
       <div style="font-size:16px;font-weight:700;color:${ink};margin-top:4px;">${escapeHtml(score.stage)}</div>
       <p style="font-size:14px;color:#7a736a;margin:8px 0 0;">${escapeHtml(score.stageMeaning)}</p>
     </div>
-    <p style="margin:0 0 6px;"><strong>Suggested next step:</strong> ${escapeHtml(score.stageNextStep)}</p>
-    <p style="margin:0 0 4px;"><strong>Strongest layer:</strong> ${escapeHtml(score.strongestLayer)}</p>
-    <p style="margin:0 0 18px;"><strong>Lowest layer${score.lowestPillar ? ` · ${escapeHtml(score.lowestPillar)}` : ""}:</strong> ${escapeHtml(score.lowestLayer)}</p>
+    <p style="margin:0 0 6px;"><strong>One possible next step:</strong> ${escapeHtml(score.stageNextStep)}</p>
+    <p style="margin:0 0 4px;"><strong>Highest-scoring layer${score.strongestLayers.length > 1 ? "s" : ""}:</strong> ${escapeHtml(score.strongestLayer)}</p>
+    <p style="margin:0 0 4px;"><strong>Lowest-scoring layer${score.lowestLayers.length > 1 ? "s" : ""}:</strong> ${escapeHtml(score.lowestLayer)}</p>
+    ${score.lowestPillar ? `<p style="margin:0 0 4px;"><strong>Lowest Pillar:</strong> ${escapeHtml(score.lowestPillar)}</p>` : ""}
+    <p style="font-size:13px;color:#7a736a;margin:8px 0 18px;">${escapeHtml(SCORE_NOTE)} A lowest score begins a question; you choose the priority that fits this season.</p>
     <table role="presentation" width="100%" style="border-collapse:collapse;border-top:1px solid #e7e1d5;margin:0 0 22px;">${layerRows}</table>
     <p style="text-align:center;margin:0 0 10px;"><a href="${site}/dashboard" style="display:inline-block;background:${ink};color:#fff;text-decoration:none;padding:13px 28px;border-radius:6px;font-size:14px;font-weight:700;">Go to your dashboard &rarr;</a></p>
     <p style="text-align:center;margin:0 0 8px;"><a href="${site}/created-for-more-check-in" style="display:inline-block;background:${gold};color:${ink};text-decoration:none;padding:13px 28px;border-radius:6px;font-size:14px;font-weight:700;">Try the Created for More Check-In Again</a></p>
-    <p style="font-size:12px;color:#9a948b;margin:22px 0 0;">The goal isn't a perfect score — it's greater awareness. This is a mirror and a map, not a pass/fail test.</p>
+    <p style="font-size:12px;color:#9a948b;margin:22px 0 0;">Created for More Check-In v4. This is a mirror and a map, not a pass/fail test, and it does not measure your worth, salvation, or spiritual maturity.</p>
     <p style="font-size:13px;color:#7a736a;margin:14px 0 0;">— Michael J. Gauthier</p>
   </div>`;
 
-  const text = `Your Created for More Check-In\n\nHi ${first}, thank you for taking the Check-In.\n\nScore: ${score.total} / ${MAX_SCORE} — ${score.stage}\n${score.stageMeaning}\n\nSuggested next step: ${score.stageNextStep}\nStrongest layer: ${score.strongestLayer}\nLowest layer${score.lowestPillar ? ` · ${score.lowestPillar}` : ""}: ${score.lowestLayer}\n\nLayers:\n${score.layerScores.map((l) => `- ${l.title} · ${l.subtitle}: ${l.score}/20`).join("\n")}\n\nGo to your dashboard: ${site}/dashboard\nTry the Created for More Check-In again: ${site}/created-for-more-check-in\n\n— Michael J. Gauthier`;
+  const text = `Your Created for More Check-In\n\nHi ${first}, thank you for taking the Check-In.\n\nScore: ${score.total} / ${MAX_SCORE} — ${score.stage}\n${score.stageMeaning}\n\nOne possible next step: ${score.stageNextStep}\nHighest-scoring layer(s): ${score.strongestLayer}\nLowest-scoring layer(s): ${score.lowestLayer}${score.lowestPillar ? `\nLowest Pillar: ${score.lowestPillar}` : ""}\n\n${SCORE_NOTE}\n\nLayers:\n${score.layerScores.map((l) => `- ${l.title} · ${l.subtitle}: ${l.score}/20`).join("\n")}\n\nGo to your dashboard: ${site}/dashboard\nTry the Created for More Check-In again: ${site}/created-for-more-check-in\n\n— Michael J. Gauthier`;
 
   return sendSmtpEmail({ to, subject: "Your Created for More Check-In results", html, text });
 }

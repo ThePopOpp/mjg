@@ -1,7 +1,11 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
+  CHECK_IN_V3,
   LAYERS,
   LAYER_STATUS,
+  LOWEST_LAYER_NOTE,
+  SCORE_NOTE,
+  layersForVersion,
   LOWEST_LAYER_GUIDANCE,
   MAX_SCORE,
   PILLAR_GUIDANCE,
@@ -104,9 +108,19 @@ function daysAgo(iso: string): number {
 
 // == Created for More Check-In ===============================================
 
+/**
+ * The version this result was actually taken on. Results saved before v4 carry
+ * no version and were v3. Their answers are read against v3's wording; v3 and
+ * v4 totals are not one clean improvement curve.
+ */
+function checkInVersion(row: Row): string {
+  const v = row.details?.version;
+  return typeof v === "string" && v ? v : CHECK_IN_V3;
+}
+
 function layerResults(row: Row) {
   const scores = new Map((row.layer_scores ?? []).map((l) => [l.key, Number(l.score) || 0]));
-  return LAYERS.map((layer) => {
+  return layersForVersion(checkInVersion(row)).map((layer) => {
     const score = scores.get(layer.key) ?? 0;
     const status = LAYER_STATUS.find((s) => score >= s.min && score <= s.max) ?? LAYER_STATUS[LAYER_STATUS.length - 1];
     return { key: layer.key, layer: `${layer.title} — ${layer.subtitle}`, score, out_of: 20, status: status.status };
@@ -120,6 +134,7 @@ function checkInSnapshot(row: Row) {
   return {
     taken: day(row.created_at),
     days_ago: daysAgo(row.created_at),
+    version: checkInVersion(row),
     total: row.total_score,
     out_of: MAX_SCORE,
     stage: row.stage,
@@ -141,7 +156,9 @@ function checkInDetail(row: Row) {
     ...snapshot,
     stage_meaning: band?.meaning ?? null,
     stage_next_step: band?.nextStep ?? null,
-    layers: LAYERS.map((layer, i) => ({
+    score_note: SCORE_NOTE,
+    lowest_layer_note: LOWEST_LAYER_NOTE,
+    layers: layersForVersion(snapshot.version).map((layer, i) => ({
       ...snapshot.layers[i],
       core_question: layer.coreQuestion,
       status_meaning: LAYER_STATUS.find((s) => s.status === snapshot.layers[i].status)?.meaning ?? null,
@@ -156,7 +173,10 @@ function checkInDetail(row: Row) {
       layer: LAYERS.find((l) => l.key === key)?.title ?? key,
       ...LOWEST_LAYER_GUIDANCE[key],
     })),
-    guidance_for_lowest_pillar: row.lowest_pillar ? PILLAR_GUIDANCE[row.lowest_pillar] ?? null : null,
+    // Ties are stored joined ("Family / Fun"); guidance for each.
+    guidance_for_lowest_pillar: row.lowest_pillar
+      ? row.lowest_pillar.split(" / ").map((p) => ({ pillar: p, ...(PILLAR_GUIDANCE[p] ?? {}) }))
+      : null,
   };
 }
 
@@ -232,7 +252,14 @@ function energyDetail(row: Row) {
 // == Public shapes ============================================================
 
 function trend(rows: Row[]) {
-  return rows.slice(0, HISTORY).map((r) => ({ taken: day(r.created_at), total: r.total_score, result: r.stage }));
+  return rows.slice(0, HISTORY).map((r) => ({
+    taken: day(r.created_at),
+    total: r.total_score,
+    result: r.stage,
+    // Check-In wording changed between versions: a difference across a version
+    // boundary is not a clean "improved by X points".
+    ...(r.assessment === "created-for-more" ? { version: checkInVersion(r) } : {}),
+  }));
 }
 
 /** Scores and bands only — for the per-turn context. */

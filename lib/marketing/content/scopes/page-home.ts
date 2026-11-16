@@ -323,7 +323,7 @@ const steward = defineSection<StewardBand>({
       {
         id: "m2",
         from: "steward",
-        text: "Your Blueprint names “present with Kristi and the kids on weeknights” as a priority. Three late meetings landed there this week. Would a guardrail help — a hard stop at 5:30 on Tuesdays and Thursdays?",
+        text: "Your Blueprint names “present with my family on weeknights” as a priority. Three late meetings landed there this week. Would a guardrail help — a hard stop at 5:30 on Tuesdays and Thursdays?",
       },
     ],
     proposal: {

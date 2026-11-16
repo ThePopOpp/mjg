@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import styles from "./framework-temple.module.css";
 
 // The Stewardship Blueprint as a building: pediment = Legacy, frieze = Energy,
-// architrave = Keystone Habits, four columns = Pillars, balustrades on both
+// architrave = Keystone Rhythms, four columns = Pillars, balustrades on both
 // sides = Guardrails, stylobate = Foundation, stepped crepidoma = Bedrock.
 //
 // It walks through the layers on its own while it is on screen; hovering or
@@ -183,7 +183,7 @@ export function FrameworkTemple({
         <span className="min-w-0 truncate text-xs text-band-text">{L.energy.caption}</span>
       </button>
 
-      {/* Architrave · Keystone Habits */}
+      {/* Architrave · Keystone Rhythms */}
       <button
         {...habits.props}
         className={cn(habits.cls, "flex h-[34px] w-full items-center justify-between gap-3 px-[22px] text-left")}
@@ -257,7 +257,7 @@ export function FrameworkTemple({
             <span className="min-w-0 truncate text-[11.5px] text-muted-foreground">{L.foundation.caption}</span>
           </button>
 
-          {/* Crepidoma · Bedrock */}
+          {/* the ground (Bedrock) · Bedrock */}
           <button {...bedrock.props} className={cn(styles.part, "block h-24 w-full border-0 bg-transparent p-0 text-left")} style={{ opacity: bedrock.opacity }}>
             <span
               className={cn("absolute inset-x-0 top-0 h-[52px]", pinned === "bedrock" && styles.pinned)}

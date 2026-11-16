@@ -66,6 +66,9 @@ export async function StewardshipBlueprintPage() {
             );
           })}
         </ol>
+        {framework.driftNote ? (
+          <p className="mx-auto mt-8 max-w-[60ch] text-pretty rounded-lg border border-gold/40 bg-gold/5 px-5 py-4 text-center text-[15px] leading-7">{framework.driftNote}</p>
+        ) : null}
         <Actions>
           <ButtonLink cta={building.primaryCta} />
           <ButtonLink cta={building.secondaryCta} variant="outline" />

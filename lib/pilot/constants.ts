@@ -18,12 +18,13 @@ export const PARTICIPANT_TYPES = {
   PASTOR_ELDER: "pastor_elder_church_leader",
 } as const;
 
-// The Created for More Check-In — the full Stewardship Blueprint: 7 layers,
+// The Created for More Check-In (v4 wording — keep in step with
+// lib/check-in/created-for-more.ts) — the full Stewardship Blueprint: 7 layers,
 // 4 statements each, rated 1-5 → a Blueprint Alignment Score out of 140.
 export const CHECK_IN_SECTIONS = [
   {
     key: "bedrock",
-    title: "Bedrock — Faith & Identity",
+    title: "Bedrock — Faith + Identity",
     lowestTag: "Lowest: Bedrock",
     coreQuestion: "Is my identity rooted in something deeper than performance and pressure?",
     questions: [
@@ -35,7 +36,7 @@ export const CHECK_IN_SECTIONS = [
   },
   {
     key: "foundation",
-    title: "Foundation — Mission, Values & Purpose",
+    title: "Foundation — Mission + Values + Direction",
     lowestTag: "Lowest: Foundation",
     coreQuestion: "Am I living with clarity about what kind of life I am building?",
     questions: [
@@ -47,9 +48,9 @@ export const CHECK_IN_SECTIONS = [
   },
   {
     key: "pillars",
-    title: "The Four Pillars — Family, Fitness, Fun & Finances",
+    title: "The Four Pillars — Family, Fitness, Fun + Finances",
     lowestTag: "Lowest: Four Pillars",
-    coreQuestion: "Are the areas I stand on every day actually able to hold weight?",
+    coreQuestion: "Are the areas I steward every day receiving the attention they need?",
     questions: [
       "The people I love are receiving my presence, not just my provision. (Family)",
       "My sleep, movement, and health support the life I want to build. (Fitness)",
@@ -73,19 +74,19 @@ export const CHECK_IN_SECTIONS = [
     key: "habits",
     title: "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
     lowestTag: "Lowest: Keystone Rhythms",
-    coreQuestion: "Do my daily habits move me toward the life I say I want?",
+    coreQuestion: "Do my repeated rhythms support the life I say I want?",
     questions: [
-      "I have identified one or two habits that, if kept, would change everything else.",
+      "I have identified one or two keystone rhythms that strengthen other important areas of my life.",
       "My mornings or evenings have a rhythm that supports who I am trying to become.",
-      "When a keystone rhythm slips, I notice quickly and recover instead of spiraling.",
-      "My habits are shaping my identity, not just filling my to-do list.",
+      "When a keystone rhythm slips, I notice quickly and return instead of spiraling.",
+      "My rhythms support who I am becoming, rather than simply filling my to-do list.",
     ],
   },
   {
     key: "energy",
-    title: "Energy — The Resource Beneath Every Other Resource",
+    title: "Energy — Capacity to Receive, Renew, Direct, and Protect",
     lowestTag: "Lowest: Energy",
-    coreQuestion: "Am I stewarding the energy beneath everything I do?",
+    coreQuestion: "Am I renewing and wisely directing the energy entrusted to me?",
     questions: [
       "I know where my physical, emotional, mental, and spiritual energy actually goes.",
       "I have rhythms of renewal built in before I hit empty, not just after.",
@@ -95,14 +96,14 @@ export const CHECK_IN_SECTIONS = [
   },
   {
     key: "legacy",
-    title: "Legacy — What Your Life Multiplies",
+    title: "Legacy — What Your Life Multiplies Now",
     lowestTag: "Lowest: Legacy",
-    coreQuestion: "What is my life producing beyond me?",
+    coreQuestion: "What am I helping others learn, practice, and pass on while I am living?",
     questions: [
-      "I am intentionally shaping what the next generation sees in me.",
-      "My time, money, and influence are aligned with what I want to leave behind.",
-      "I have had a real conversation about legacy with someone I love.",
-      "I am building something today that will outlast me.",
+      "I intentionally model the values I hope others will learn from my life.",
+      "I use my time, resources, and influence to help others grow in what matters now.",
+      "I model and explain generosity and invite others to practice it with me.",
+      "I give others opportunities to practice what they are learning and encourage them to pass it on.",
     ],
   },
 ] as const;
@@ -112,8 +113,8 @@ export type CheckInSectionKey = (typeof CHECK_IN_SECTIONS)[number]["key"];
 export const REFLECTION_PROMPTS = [
   "In this season, I sense I need to pay attention to:",
   "This week, I will take this small action:",
-  "One person I may need to talk with about this is:",
-  "One rhythm, habit, or calendar adjustment that could help is:",
+  "One safe person I may invite into a conversation or accountability is:",
+  "One rhythm, Guardrail, or calendar adjustment that could help is:",
 ] as const;
 
 export const DEFAULT_TAGS = [
@@ -165,9 +166,9 @@ export const GENERAL_SURVEY_FIELDS = [
     label: "Which area was your lowest score?",
     type: "select",
     options: [
-      "Bedrock — Faith & Identity",
-      "Foundation — Mission, Values & Purpose",
-      "The Four Pillars — Family, Fitness, Fun & Finances",
+      "Bedrock — Faith + Identity",
+      "Foundation — Mission + Values + Direction",
+      "The Four Pillars — Family, Fitness, Fun + Finances",
       "Guardrails",
       "Keystone Rhythms",
       "Energy",

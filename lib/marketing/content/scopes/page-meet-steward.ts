@@ -45,7 +45,7 @@ const hero = defineSection<Hero>({
       { id: "m3", from: "member", text: "Dinner together without my phone." },
     ],
     proposal: {
-      label: "Draft keystone habit",
+      label: "Draft keystone rhythm",
       text: "“Weeknight dinner at the table, phones in the drawer.”",
       approve: "Approve",
       edit: "Edit",
