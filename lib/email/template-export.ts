@@ -70,6 +70,7 @@ const LABELS: Record<string, string> = {
   six_week_challenge: "The 6 Week Challenge",
   six_week_challenge_participant: "6WC · Participant",
   six_week_challenge_facilitator: "6WC · Facilitator",
+  facilitator_welcome: "Facilitator Welcome Series",
   email_journey: "7-Day Journey",
 };
 const label = (s: string | null) => LABELS[s || ""] ?? (s || "general").replace(/_/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());

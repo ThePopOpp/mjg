@@ -8,6 +8,11 @@ export type SendEmailInput = {
   html: string;
   text?: string;
   replyTo?: string;
+  /**
+   * Display name for this send only (e.g. "Michael J. Gauthier | Stewardship
+   * Blueprint"). The address is always the configured, authenticated one.
+   */
+  fromName?: string;
   attachments?: Array<{
     filename: string;
     content: Buffer;
@@ -54,8 +59,9 @@ async function sendViaResend(input: SendEmailInput): Promise<SmtpResult> {
   // Give the sender a display name so inboxes show "MJG" instead of the bare local
   // part ("hello"). If RESEND_FROM_EMAIL already carries a name ("MJG <hello@…>"),
   // respect it; otherwise wrap the address with RESEND_FROM_NAME (default "MJG").
-  const fromName = (process.env.RESEND_FROM_NAME ?? "MJG").trim();
-  const from = fromEmail.includes("<") || !fromName ? fromEmail : `${fromName} <${fromEmail}>`;
+  const fromName = (input.fromName ?? process.env.RESEND_FROM_NAME ?? "MJG").trim();
+  const bareEmail = fromEmail.includes("<") ? fromEmail.replace(/^.*<([^>]+)>.*$/, "$1") : fromEmail;
+  const from = input.fromName ? `${displayName(fromName)} <${bareEmail}>` : fromEmail.includes("<") || !fromName ? fromEmail : `${fromName} <${fromEmail}>`;
 
   const replyTo = input.replyTo?.trim() || process.env.RESEND_REPLY_TO?.trim() || from;
 
@@ -88,6 +94,11 @@ async function sendViaResend(input: SendEmailInput): Promise<SmtpResult> {
   return { ok: true, skipped: false, messageId: data.id };
 }
 
+/** A display name that is safe inside an address header: quoted, no newlines. */
+function displayName(name: string) {
+  return '"' + name.replace(/[\r\n"\\]/g, "").trim() + '"';
+}
+
 export async function sendSmtpEmail(input: SendEmailInput): Promise<SmtpResult> {
   if (hasResendConfig()) {
     return sendViaResend(input);
@@ -116,7 +127,8 @@ export async function sendSmtpEmail(input: SendEmailInput): Promise<SmtpResult> 
     auth: { user, pass },
   });
 
-  const from = process.env.NOTIFICATION_FROM_EMAIL || user;
+  const fromAddress = process.env.NOTIFICATION_FROM_EMAIL || user;
+  const from = input.fromName && fromAddress && !fromAddress.includes("<") ? `${displayName(input.fromName)} <${fromAddress}>` : fromAddress;
 
   const info = await transporter.sendMail({
     from,

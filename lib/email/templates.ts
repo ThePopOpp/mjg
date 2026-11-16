@@ -117,6 +117,9 @@ export async function sendTemplateEmail(input: {
   recipient: EmailRecipient;
   actorUserId?: string;
   bcc?: string | string[];
+  /** Per-send display name and reply-to (the from address is always the configured one). */
+  fromName?: string;
+  replyTo?: string;
 }) {
   const supabase = createSupabaseAdminClient();
   const { data: template, error } = await supabase.from("email_templates").select("*").eq("id", input.templateId).maybeSingle();
@@ -143,7 +146,7 @@ export async function sendTemplateEmail(input: {
   };
 
   try {
-    const result = await sendSmtpEmail({ to: input.recipient.email, subject, html, text, bcc: input.bcc });
+    const result = await sendSmtpEmail({ to: input.recipient.email, subject, html, text, bcc: input.bcc, fromName: input.fromName, replyTo: input.replyTo });
     const { data: log, error: logError } = await supabase
       .from("email_send_logs")
       .insert({

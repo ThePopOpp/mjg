@@ -3,9 +3,11 @@ import { TemplateMappingForm } from "@/components/email-templates/template-mappi
 import { EmailTabs } from "@/components/emails/email-tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getEmailTemplateData } from "@/lib/email/templates";
+import { FacilitatorWelcomeCard } from "@/components/emails/facilitator-welcome-card";
+import { getWelcomeOverview } from "@/lib/facilitator-welcome/admin";
 
 export default async function EmailAutomationsPage() {
-  const data = await getEmailTemplateData();
+  const [data, welcome] = await Promise.all([getEmailTemplateData(), getWelcomeOverview().catch(() => null)]);
 
   return (
     <div className="space-y-6">
@@ -23,6 +25,8 @@ export default async function EmailAutomationsPage() {
           <TemplateMappingForm templates={data.templates as any[]} mappings={data.mappings as any[]} />
         </CardContent>
       </Card>
+
+      {welcome ? <FacilitatorWelcomeCard initial={welcome} /> : null}
 
       <Card>
         <CardHeader>

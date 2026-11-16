@@ -1,3 +1,4 @@
+import { enrollFacilitatorWelcome } from "@/lib/facilitator-welcome/series";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { upsertProfile } from "@/lib/user-management/repository";
 import { ROLES, type AppRole } from "@/lib/rbac/roles";
@@ -89,8 +90,9 @@ export async function registerSelfServeAccount(input: SelfRegisterInput): Promis
           .join(" · ")
       : undefined;
 
+  let profileId: string | null = null;
   try {
-    await upsertProfile({
+    const profile = await upsertProfile({
       authUserId: authData.user.id,
       firstName,
       lastName,
@@ -100,11 +102,18 @@ export async function registerSelfServeAccount(input: SelfRegisterInput): Promis
       status: "active",
       notes: facilitatorContext,
     });
+    profileId = profile.id;
   } catch (error) {
     // Never leave an orphaned auth user behind if the profile write fails — otherwise the
     // email is taken but unusable and the person can't retry.
     await supabase.auth.admin.deleteUser(authData.user.id).catch(() => {});
     throw error;
+  }
+
+  // Facilitator Welcome Series — once per person, off until switched on. Never
+  // blocks or fails the signup (it catches its own errors).
+  if (role === ROLES.FACILITATOR) {
+    await enrollFacilitatorWelcome({ email, firstName, phone: input.phone, profileId, role, source: "mjg_register" });
   }
 
   return {

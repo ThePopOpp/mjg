@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { sendTemplateForEvent, sendTemplateEmail, experienceMonitorBcc } from "@/lib/email/templates";
-import { ROLES, type AppRole, isAppRole } from "@/lib/rbac/roles";
+import { ROLES, type AppRole, isAppRole, isFacilitatorRole } from "@/lib/rbac/roles";
+import { enrollFacilitatorWelcome } from "@/lib/facilitator-welcome/series";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { USER_STATUSES, type UserStatus } from "@/lib/user-management/constants";
 
@@ -383,6 +384,19 @@ export async function acceptUserInvitation(input: {
       metadata: { ...(invitation.metadata ?? {}), acceptedProfileId: profile.id },
     })
     .eq("id", invitation.id);
+
+  // Facilitator Welcome Series for invited facilitators (CSV import, admin
+  // invites). Deduped by email, so it's harmless if they were already welcomed.
+  if (isFacilitatorRole(invitation.role)) {
+    await enrollFacilitatorWelcome({
+      email,
+      firstName: input.firstName,
+      phone: input.phone || invitation.phone || null,
+      profileId: profile.id,
+      role: invitation.role,
+      source: "mjg_invite",
+    });
+  }
 
   await logUserActivity({
     userId: profile.id,

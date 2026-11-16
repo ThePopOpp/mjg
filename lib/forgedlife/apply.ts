@@ -1,6 +1,7 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { upsertParticipant } from "@/lib/pilot/repository";
 import { isSwitchOn } from "@/lib/forgedlife/switches";
+import { enrollFacilitatorWelcome } from "@/lib/facilitator-welcome/series";
 
 // Turns a ForgedLife event into rows in the forgedlife_* staging tables (and, for
 // users, a participant contact). Nothing here grants access, creates an account or
@@ -439,6 +440,17 @@ async function upsertGroup(g: ForgedGroup) {
     { onConflict: "forged_id" },
   );
   if (error) throw error;
+
+  // Leading a ForgedLife group is signing up to facilitate: welcome the leader
+  // (once per person — someone already welcomed through MJG is skipped by email).
+  // Live events only; test events never reach this function.
+  if (g.leader?.email && g.status !== "ended" && g.status !== "closed") {
+    await enrollFacilitatorWelcome({
+      email: g.leader.email,
+      firstName: (g.leader.name ?? "").trim().split(/\s+/)[0] || null,
+      source: "forgedlife",
+    });
+  }
 
   // An imported group that ForgedLife no longer offers publicly comes off the public finder.
   if (existing?.group_id && (!g.openToPublic || g.status === "ended" || g.status === "closed")) {

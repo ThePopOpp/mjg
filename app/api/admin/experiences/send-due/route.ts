@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { requireExperienceManager } from "@/lib/user-management/auth";
 import { sendDueExperienceEmails } from "@/lib/experiences/scheduler";
 import { cronSecretMatches, presentedSecret } from "@/lib/auth/cron-secret";
+import { sendDueFacilitatorWelcome } from "@/lib/facilitator-welcome/series";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Releases due Experience emails. Called on a schedule (e.g. a Coolify scheduled task
+ * Releases due Experience emails — and, on the same schedule, due Facilitator
+ * Welcome Series messages (lib/facilitator-welcome/series.ts), so the series
+ * needs no scheduled task of its own. Called on a schedule (e.g. a Coolify scheduled task
  * every ~10 min) with the EXPERIENCE_CRON_SECRET, or manually by an admin session.
  */
 async function handle(request: Request) {
@@ -23,7 +26,11 @@ async function handle(request: Request) {
   }
 
   const result = await sendDueExperienceEmails({ actorUserId: actorId, limit: Number(body.limit ?? 25) });
-  return NextResponse.json({ ok: true, ...result });
+  // Study emails go first; a welcome failure never fails the study run.
+  const facilitatorWelcome = await sendDueFacilitatorWelcome({ limit: 50 }).catch((e) => ({
+    error: e instanceof Error ? e.message : "Facilitator welcome run failed.",
+  }));
+  return NextResponse.json({ ok: true, ...result, facilitatorWelcome });
 }
 
 export async function POST(request: Request) {

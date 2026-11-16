@@ -68,6 +68,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   six_week_challenge: "The 6 Week Challenge",
   six_week_challenge_participant: "6WC · Participant",
   six_week_challenge_facilitator: "6WC · Facilitator",
+  facilitator_welcome: "Facilitator Welcome Series",
   general: "General",
   new_user_signup: "New User Sign-Up",
   login: "Login / Auth",
@@ -83,7 +84,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 const CATEGORY_ORDER = [
   "six_week_challenge", "six_week_challenge_participant", "six_week_challenge_facilitator",
-  "email_journey", "surveys", "inner_circle", "new_user_signup", "login",
+  "facilitator_welcome", "email_journey", "surveys", "inner_circle", "new_user_signup", "login",
   "participants", "waves", "check_in_results", "pastor_elder_review", "notifications",
   "blog_posts", "general",
 ];
