@@ -90,7 +90,7 @@ export const pageStewardshipBlueprint = defineScope({
     _seo: seoSection({
       title: "The Stewardship Blueprint",
       description:
-        "One framework for your whole life: faith and identity, mission and values, family, fitness, fun and finances, guardrails, keystone habits, energy, and legacy — seven layers that work together.",
+        "One framework for your whole life: faith and identity, mission and values, family, fitness, fun and finances, guardrails, keystone rhythms, energy, and legacy — seven layers that work together.",
     }),
     hero: frameworkHero,
     building,
@@ -142,10 +142,10 @@ const includes = defineSection<Includes>({
   defaults: {
     eyebrow: "What It Includes",
     title: "A Living Guide, Not Just Another Document.",
-    body: "Your Blueprint can bring together your faith and identity; your mission, values, and purpose; the person you are becoming; Family, Fitness, Fun, and Finances; financial direction; guardrails; drift signals; accountability; keystone habits; energy; and the legacy your life is multiplying through others.\n\nThe standard Personal Blueprint structure includes a cover and twelve supporting pages. Each section helps answer a practical question: *What should I remember, protect, decide, practice, or revisit?*\n\nIt should be personal enough to recognize yourself and usable enough to open on a difficult Tuesday.",
+    body: "Your Blueprint can bring together your faith and identity; your mission, values, and direction; the person you are becoming; Family, Fitness, Fun, and Finances; financial direction; guardrails; drift signals; accountability; Keystone Rhythms; energy; and the legacy your life is multiplying through others.\n\nThe full Personal Blueprint is a cover and twelve supporting pages. The free edition begins with three — your cover, My North Star, and a practical next step — and the same work carries forward if you go deeper. Each section helps answer a practical question: *What should I remember, protect, decide, practice, or revisit?*\n\nIt should be personal enough to recognize yourself and usable enough to open on a difficult Tuesday.",
     link: { label: "Explore the Framework →", href: "/stewardship-blueprint" },
     pagesLabel: "The thirteen pages",
-    galleryLabel: "A look inside",
+    galleryLabel: "A look inside · sample Blueprints",
   },
 });
 

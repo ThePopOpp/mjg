@@ -1,12 +1,14 @@
-// /personal-blueprint (personal-blueprint.dc.html). The page list and the sample
-// pages read BLUEPRINT_PAGES — the same thirteen pages Steward builds — so the
-// site can never describe a Blueprint the product does not make.
+// /personal-blueprint (personal-blueprint.dc.html). The page list reads
+// BLUEPRINT_PAGES — the same thirteen pages Steward builds — so the site can
+// never describe a Blueprint the product does not make. The sample pages are
+// real renders of fictional Blueprints (lib/marketing/blueprint-samples).
 
 import { getScopeContent } from "@/lib/marketing/content/read";
 import { pagePersonalBlueprint } from "@/lib/marketing/content/scopes/page-blueprint";
 import { formatPrice, listAllOffers, type StewardOffer } from "@/lib/steward/catalogue";
 import { BLUEPRINT_PAGES } from "@/lib/steward/blueprint";
-import { MediaFrame, MockArt } from "../media";
+import { MediaFrame } from "../media";
+import { BlueprintSamples } from "../blueprint-samples";
 import { Actions, Band, ButtonLink, Eyebrow, Heading, Prose, SectionIntro, Split, StatusPill, TextLink, keepTogether } from "../primitives";
 
 /** "From $19/mo" — the lowest price on sale right now, straight from the catalogue. */
@@ -64,25 +66,9 @@ export async function PersonalBlueprintPage() {
           </div>
         </Split>
 
-        <div className="mt-14 flex items-baseline justify-between gap-4">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold-deep dark:text-gold-light">{includes.galleryLabel}</p>
-          <p className="text-[12.5px] text-muted-foreground">
-            Scroll to see all {BLUEPRINT_PAGES.length} <span aria-hidden>→</span>
-          </p>
-        </div>
-        {/* A row of pages to scroll through; on large screens the first five fit without scrolling. */}
-        <div className="-mx-5 mt-4 overflow-x-auto px-5 pb-3 sm:-mx-8 sm:px-8 [scrollbar-width:thin]">
-          <ol className="flex snap-x snap-mandatory gap-4">
-            {BLUEPRINT_PAGES.map((page) => (
-              <li key={page.slug} className="w-[184px] shrink-0 snap-start sm:w-[200px]">
-                <MockArt
-                  mock={{ variant: "blueprint-page", title: page.title, subtitle: `Page ${page.number}` }}
-                  ratio="letter"
-                  className="rounded-md"
-                />
-              </li>
-            ))}
-          </ol>
+        {/* Real sample pages (fictional people) — lib/marketing/blueprint-samples. */}
+        <div className="mt-14">
+          <BlueprintSamples label={includes.galleryLabel} />
         </div>
       </Band>
 
