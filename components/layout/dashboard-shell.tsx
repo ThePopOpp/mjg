@@ -43,6 +43,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
     .map((entry): NavEntry | null => {
       if (entry.kind === "group") {
         const items = entry.items.filter((it) => !it.permission || can(profile.role, it.permission));
+        if (items.length === 1) return { kind: "item", ...items[0] };
         return items.length ? { ...entry, items } : null;
       }
       return !entry.permission || can(profile.role, entry.permission) ? entry : null;
@@ -51,6 +52,10 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
 
   const isActive = (href: string) => (href === "/dashboard" ? pathname === "/dashboard" : pathname === href || pathname.startsWith(`${href}/`));
   const groupActive = (g: NavGroup) => g.items.some((it) => isActive(it.href));
+  // Inside a group only the most specific match lights up (/dashboard/cms/editor
+  // shouldn't also highlight /dashboard/cms).
+  const groupItemActive = (g: NavGroup) => (href: string) =>
+    isActive(href) && !g.items.some((o) => o.href.length > href.length && o.href.startsWith(`${href}/`) && isActive(o.href));
 
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -143,7 +148,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
                 open={isGroupOpen(entry)}
                 active={groupActive(entry)}
                 onToggle={() => toggleGroup(entry)}
-                isItemActive={isActive}
+                isItemActive={groupItemActive(entry)}
                 onNavigate={() => setMobileOpen(false)}
               />
             ) : (

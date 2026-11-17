@@ -48,7 +48,8 @@ export type NavLeaf = { href: string; label: string; icon: LucideIcon; permissio
 export type NavGroup = { kind: "group"; label: string; icon: LucideIcon; items: NavLeaf[] };
 export type NavEntry = ({ kind: "item" } & NavLeaf) | NavGroup;
 
-// Sidebar navigation. Items render flat; a group renders as a collapsible accordion.
+// Sidebar navigation. Items render flat; a group renders as a collapsible accordion
+// (a group left with one visible item, after permissions, renders as that item).
 export const dashboardNav: NavEntry[] = [
   { kind: "item", href: "/dashboard", label: "Dashboard", icon: Home },
   {
@@ -67,7 +68,23 @@ export const dashboardNav: NavEntry[] = [
       { href: "/dashboard/inner-circle", label: "Inner Circle", icon: CalendarRange, permission: PERMISSIONS.MANAGE_PARTICIPANTS },
     ],
   },
-  { kind: "item", href: "/dashboard/blog-posts", label: "Blog Posts", icon: FileText, permission: PERMISSIONS.REVIEW_CONTENT },
+  {
+    kind: "group", label: "Experiences", icon: Sparkles, items: [
+      { href: "/dashboard/experiences", label: "All Experiences", icon: Sparkles, permission: PERMISSIONS.MANAGE_EXPERIENCES },
+      { href: "/dashboard/experiences/automation", label: "Email Automation", icon: MailCheck, permission: PERMISSIONS.MANAGE_EXPERIENCES },
+    ],
+  },
+  {
+    // Day-to-day work tools. Project Manager, Plans and Bookings are staff-only
+    // (requireStaffPage); Workspace and Reports carry their own permissions.
+    kind: "group", label: "Manage", icon: NotebookPen, items: [
+      { href: "/dashboard/workspace", label: "Workspace", icon: NotebookPen, permission: PERMISSIONS.MANAGE_WORKSPACE },
+      { href: "/dashboard/project-manager", label: "Project Manager", icon: FolderKanban },
+      { href: "/dashboard/plans", label: "Plans", icon: ClipboardList },
+      { href: "/dashboard/bookings", label: "Bookings & Events", icon: CalendarClock },
+      { href: "/dashboard/reports", label: "Reports", icon: FileBarChart, permission: PERMISSIONS.VIEW_REPORTS },
+    ],
+  },
   {
     kind: "group", label: "Communications", icon: MessagesSquare, items: [
       { href: "/dashboard/emails", label: "Emails", icon: MailCheck, permission: PERMISSIONS.MANAGE_SETTINGS },
@@ -78,38 +95,41 @@ export const dashboardNav: NavEntry[] = [
       { href: "/dashboard/business-cards", label: "Business Cards", icon: IdCard, permission: PERMISSIONS.MANAGE_SETTINGS },
     ],
   },
-  { kind: "item", href: "/dashboard/project-manager", label: "Project Manager", icon: FolderKanban },
-  { kind: "item", href: "/dashboard/plans", label: "Plans", icon: ClipboardList },
-  { kind: "item", href: "/dashboard/workspace", label: "Workspace", icon: NotebookPen, permission: PERMISSIONS.MANAGE_WORKSPACE },
-  { kind: "item", href: "/dashboard/bookings", label: "Bookings & Events", icon: CalendarClock },
   {
-    kind: "group", label: "Experiences", icon: Sparkles, items: [
-      { href: "/dashboard/experiences", label: "All Experiences", icon: Sparkles, permission: PERMISSIONS.MANAGE_EXPERIENCES },
-      { href: "/dashboard/experiences/automation", label: "Email Automation", icon: MailCheck, permission: PERMISSIONS.MANAGE_EXPERIENCES },
+    // Everyone sees their own billing; Stripe (coupons, products) is Super-Admin only.
+    kind: "group", label: "Purchases & Billing", icon: Receipt, items: [
+      { href: "/dashboard/billing", label: "Purchases & Billing", icon: Receipt },
+      { href: "/dashboard/stripe", label: "Stripe", icon: CreditCard, permission: PERMISSIONS.MANAGE_STRIPE },
     ],
   },
-  { kind: "item", href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
-  // Steward (the member product) settings — retention and provider. Super-Admin
-  // only, enforced in app/dashboard/steward/page.tsx and on the API route.
-  { kind: "item", href: "/dashboard/steward", label: "Steward", icon: Sparkles, permission: PERMISSIONS.MANAGE_SETTINGS },
-  // Commerce: coupons today, products/orders later. Super-Admin only.
-  { kind: "item", href: "/dashboard/stripe", label: "Stripe", icon: CreditCard, permission: PERMISSIONS.MANAGE_STRIPE },
-  // The Claude connector (MCP): on/off, connections, agent tokens, approvals. Super-Admin only.
-  { kind: "item", href: "/dashboard/claude", label: "Claude & Agents", icon: Plug, permission: PERMISSIONS.MANAGE_CONNECTOR },
-  { kind: "item", href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
-  { kind: "item", href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
+  {
+    // Shepherd (the admin AI Agent), Steward (the member product's settings, Super-Admin
+    // only, enforced in app/dashboard/steward/page.tsx and on the API route) and the
+    // Claude connector (MCP: on/off, connections, agent tokens, approvals).
+    kind: "group", label: "Artificial Intelligence", icon: Bot, items: [
+      { href: "/dashboard/ai-agent", label: "AI Agent", icon: Bot, permission: PERMISSIONS.MANAGE_SETTINGS },
+      { href: "/dashboard/steward", label: "Steward", icon: Sparkles, permission: PERMISSIONS.MANAGE_SETTINGS },
+      { href: "/dashboard/claude", label: "Claude & Agents", icon: Plug, permission: PERMISSIONS.MANAGE_CONNECTOR },
+    ],
+  },
+  {
+    kind: "group", label: "Media Studio", icon: MonitorPlay, items: [
+      { href: "/dashboard/media-studio", label: "Media Studio", icon: MonitorPlay, permission: PERMISSIONS.MANAGE_SETTINGS },
+      { href: "/dashboard/assets", label: "Assets", icon: Palette, permission: PERMISSIONS.MANAGE_SETTINGS },
+    ],
+  },
   {
     // The Frontend Editor ("Editor") nests under CMS: same Super-Admin guard
     // (app/dashboard/cms/layout.tsx wraps everything below /dashboard/cms).
-    kind: "group", label: "CMS", icon: PanelsTopLeft, items: [
+    // Blog Posts keeps its own, wider permission (content reviewers).
+    kind: "group", label: "Content Manager", icon: PanelsTopLeft, items: [
       { href: "/dashboard/cms", label: "CMS", icon: PanelsTopLeft, permission: PERMISSIONS.MANAGE_CMS },
       { href: "/dashboard/cms/editor", label: "Editor", icon: SquarePen, permission: PERMISSIONS.MANAGE_CMS },
+      { href: "/dashboard/blog-posts", label: "Blog Posts", icon: FileText, permission: PERMISSIONS.REVIEW_CONTENT },
     ],
   },
-  { kind: "item", href: "/dashboard/reports", label: "Reports", icon: FileBarChart, permission: PERMISSIONS.VIEW_REPORTS },
   { kind: "item", href: "/dashboard/guide", label: "Team Guide", icon: BookOpen },
   { kind: "item", href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
-  { kind: "item", href: "/dashboard/billing", label: "Purchases & Billing", icon: Receipt },
   { kind: "item", href: "/dashboard/settings", label: "Settings", icon: Settings, permission: PERMISSIONS.MANAGE_SETTINGS },
   { kind: "item", href: "/dashboard/user-management", label: "User Management", icon: BarChart3, permission: PERMISSIONS.MANAGE_USERS },
 ];
