@@ -20,6 +20,7 @@ const FIELDS = [
   { key: "instagram_url", label: "Instagram", hint: "Social row under the signature." },
   { key: "facebook_url", label: "Facebook", hint: "Full profile URL, including the numeric ID. Shown simply as “Facebook”." },
   { key: "linkedin_url", label: "LinkedIn", hint: "Social row under the signature." },
+  { key: "mailing_address", label: "Postal address", hint: "Shown in every email's footer beside the unsubscribe link. Required by law for these emails; a PO box is fine." },
 ] as const;
 
 type FieldKey = (typeof FIELDS)[number]["key"];
@@ -59,7 +60,7 @@ export function FacilitatorWelcomeCard({ initial }: { initial: WelcomeOverview }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    void save(values, "Links saved.");
+    void save(values, "Settings saved.");
   }
 
   const on = overview.settings.enabled;
@@ -72,7 +73,7 @@ export function FacilitatorWelcomeCard({ initial }: { initial: WelcomeOverview }
             <CardTitle>Facilitator Welcome Series</CardTitle>
             <CardDescription className="mt-1 max-w-2xl">
               Email 1 right after a confirmed facilitator signup (MJG registration, accepted facilitator invite, or a ForgedLife group leader), a same-day
-              Welcome Text with SMS consent (9am–8pm Arizona), Email 2 two days later and Email 3 five days later. Once per person. Study emails go first.
+              Welcome Text with SMS consent (11am–5pm Arizona, daytime in every US time zone), Email 2 two days later and Email 3 five days later. Once per person. Study emails go first.
             </CardDescription>
           </div>
           <label className="flex items-center gap-3 text-sm font-medium">
@@ -104,9 +105,9 @@ export function FacilitatorWelcomeCard({ initial }: { initial: WelcomeOverview }
               <Label htmlFor={`fw-${f.key}`}>{f.label}</Label>
               <Input
                 id={`fw-${f.key}`}
-                type="url"
-                inputMode="url"
-                placeholder="https://"
+                type={f.key === "mailing_address" ? "text" : "url"}
+                inputMode={f.key === "mailing_address" ? "text" : "url"}
+                placeholder={f.key === "mailing_address" ? "PO Box 123, City, AZ 85000" : "https://"}
                 value={values[f.key]}
                 onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
               />
@@ -114,7 +115,7 @@ export function FacilitatorWelcomeCard({ initial }: { initial: WelcomeOverview }
             </div>
           ))}
           <div className="flex items-center gap-3 md:col-span-2">
-            <Button type="submit" disabled={busy}>{busy ? "Saving…" : "Save links"}</Button>
+            <Button type="submit" disabled={busy}>{busy ? "Saving…" : "Save settings"}</Button>
             {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </div>

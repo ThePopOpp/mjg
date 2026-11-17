@@ -69,6 +69,11 @@ export async function saveWelcomeSettings(input: Record<string, unknown>, actorI
       (next as Record<string, unknown>)[field] = v;
     }
   }
+  if ("mailing_address" in input) {
+    const v = typeof input.mailing_address === "string" ? input.mailing_address.trim().replace(/\s*\n\s*/g, ", ") : "";
+    if (v.length > 300) throw new Error("Postal address is too long.");
+    next.mailing_address = v || null;
+  }
   if ("enabled" in input) next.enabled = input.enabled === true;
 
   const current = await getWelcomeSettings();

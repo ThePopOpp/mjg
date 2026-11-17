@@ -67,6 +67,14 @@ export async function POST(request: Request) {
       });
     }
 
+    // The Facilitator Welcome Series also keeps its own record, so an opt-out sticks
+    // for someone who isn't a contact or account (e.g. a ForgedLife group leader).
+    await supabase
+      .from("facilitator_welcome_enrollments")
+      .update({ unsubscribed_at: now })
+      .ilike("email", email)
+      .is("unsubscribed_at", null);
+
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to process opt-out.";

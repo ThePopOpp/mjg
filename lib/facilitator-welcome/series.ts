@@ -19,8 +19,11 @@ import { isFacilitatorRole } from "@/lib/rbac/roles";
 //     6-Week Challenge email to the same person waits (deferForStudy).
 //   • No assessment reminders — nothing here follows up on Email 2's invitation.
 //   • Separate from study automation — no copy here promises study materials.
+//   • Unsubscribe — every email carries an unsubscribe link (/email/opt-out) and
+//     the postal address; anyone who has opted out of email is skipped.
 //   • Off until ready — enrollment and sending both require settings.enabled,
-//     and enabling requires the handbook URL and at least one social link.
+//     and enabling requires the handbook URL, the postal address and at least
+//     one social link.
 
 export const SENDER_NAME = "Michael J. Gauthier | Stewardship Blueprint";
 
@@ -37,11 +40,13 @@ export const STEPS = [
 export type StepKey = (typeof STEPS)[number]["key"];
 
 /**
- * Texts go out 9am–8pm in the program's time zone (Arizona, no DST — the same
- * convention as lib/experiences/schedule.ts). No per-person time zone is stored.
+ * Texts go out 11am–5pm Arizona time (no DST — the same convention as
+ * lib/experiences/schedule.ts). No per-person time zone is stored, so the window
+ * is the one that is daytime everywhere in the US: 8am in Hawaii at the earliest,
+ * 8pm on the East Coast in summer at the latest.
  */
 const PROGRAM_UTC_OFFSET_HOURS = -7;
-const SMS_WINDOW = { start: 9, end: 20 };
+const SMS_WINDOW = { start: 11, end: 17 };
 
 /** A welcome this close to a study email to the same person waits. */
 const STUDY_GAP = 6 * HOUR;
@@ -56,6 +61,7 @@ export type WelcomeSettings = {
   instagram_url: string | null;
   facebook_url: string | null;
   linkedin_url: string | null;
+  mailing_address: string | null;
 };
 
 export type WelcomeSource = "mjg_register" | "mjg_invite" | "forgedlife" | "admin";
@@ -65,7 +71,7 @@ const db = () => createSupabaseAdminClient();
 export async function getWelcomeSettings(): Promise<WelcomeSettings> {
   const { data, error } = await db()
     .from("facilitator_welcome_settings")
-    .select("enabled, handbook_url, assessment_url, resources_url, instagram_url, facebook_url, linkedin_url")
+    .select("enabled, handbook_url, assessment_url, resources_url, instagram_url, facebook_url, linkedin_url, mailing_address")
     .eq("id", 1)
     .maybeSingle();
   if (error) throw error;
@@ -78,6 +84,7 @@ export async function getWelcomeSettings(): Promise<WelcomeSettings> {
       instagram_url: null,
       facebook_url: null,
       linkedin_url: null,
+      mailing_address: null,
     }
   );
 }
@@ -88,6 +95,7 @@ const filled = (v: string | null | undefined) => typeof v === "string" && v.trim
 export function readinessProblems(s: WelcomeSettings): string[] {
   const problems: string[] = [];
   if (!filled(s.handbook_url)) problems.push("The Facilitator Handbook URL is not set (used in Email 1 and the Welcome Text).");
+  if (!filled(s.mailing_address)) problems.push("The postal address is not set (required in the footer of every email).");
   if (!filled(s.instagram_url) && !filled(s.facebook_url) && !filled(s.linkedin_url)) {
     problems.push("No social links are set (Email 3 invites people to connect on social media).");
   }
@@ -118,6 +126,30 @@ function socialRowHtml(s: WelcomeSettings) {
 function socialRowText(s: WelcomeSettings) {
   const links = socialLinks(s);
   return links.length ? `\nConnect with Michael: ${links.map((l) => `${l.label} ${l.url.trim()}`).join(" | ")}` : "";
+}
+
+export const unsubscribeUrl = () => `${(process.env.NEXT_PUBLIC_SITE_URL ?? "https://michaeljgauthier.com").replace(/\/$/, "")}/email/opt-out`;
+
+/** Footer under the social row: why they got it, how to stop, and the postal address. */
+function unsubscribeHtml(s: WelcomeSettings) {
+  const address = escapeHtml((s.mailing_address ?? "").trim());
+  return `<p style="margin:14px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:#a39b8e;">You're receiving this because you signed up to facilitate. <a href="${escapeHtml(unsubscribeUrl())}" style="color:#8a8275;text-decoration:underline;">Unsubscribe</a>${address ? `<br />${address}` : ""}</p>`;
+}
+
+function unsubscribeText(s: WelcomeSettings) {
+  const address = (s.mailing_address ?? "").trim();
+  return `\nYou're receiving this because you signed up to facilitate. Unsubscribe: ${unsubscribeUrl()}${address ? `\n${address}` : ""}`;
+}
+
+/** Opted out of email anywhere we record it: this series, their account, or their contact. */
+async function hasOptedOut(email: string, enrollmentId: string): Promise<boolean> {
+  const client = db();
+  const [{ data: enrollment }, { data: profile }, { data: participant }] = await Promise.all([
+    client.from("facilitator_welcome_enrollments").select("unsubscribed_at").eq("id", enrollmentId).maybeSingle(),
+    client.from("profiles").select("email_opt_in").ilike("email", email).limit(1).maybeSingle(),
+    client.from("participants").select("email_opt_in").ilike("email", email).limit(1).maybeSingle(),
+  ]);
+  return Boolean(enrollment?.unsubscribed_at) || profile?.email_opt_in === false || participant?.email_opt_in === false;
 }
 
 // ── Enrollment ───────────────────────────────────────────────────────────────
@@ -340,8 +372,13 @@ async function processEvent(row: EventRow, settings: WelcomeSettings): Promise<O
     return { kind: "sent" };
   }
 
+  if (await hasOptedOut(person.email, person.id)) return { kind: "skipped", reason: "Unsubscribed from email." };
   const template = await templateBySlug(step.template);
   if (!template) return { kind: "skipped", reason: `Template ${step.template} is missing or archived.` };
+  // The unsubscribe footer is not optional: an edited template that lost it doesn't send.
+  if (!template.html.includes("{{unsubscribe_html}}")) {
+    return { kind: "failed", error: `Template ${step.template} is missing {{unsubscribe_html}} (the unsubscribe footer).` };
+  }
   const greeting = (person.first_name ?? "").trim();
   const result = await sendTemplateEmail({
     templateId: template.id,
@@ -358,6 +395,9 @@ async function processEvent(row: EventRow, settings: WelcomeSettings): Promise<O
         resources_url: settings.resources_url,
         social_links_html: socialRowHtml(settings),
         social_links_text: socialRowText(settings),
+        unsubscribe_url: unsubscribeUrl(),
+        unsubscribe_html: unsubscribeHtml(settings),
+        unsubscribe_text: unsubscribeText(settings),
       },
     },
   });
@@ -366,9 +406,9 @@ async function processEvent(row: EventRow, settings: WelcomeSettings): Promise<O
 }
 
 async function templateBySlug(slug: string) {
-  const { data } = await db().from("email_templates").select("id, status").eq("slug", slug).maybeSingle();
+  const { data } = await db().from("email_templates").select("id, status, html_body").eq("slug", slug).maybeSingle();
   if (!data || data.status === "archived") return null;
-  return { id: data.id as string };
+  return { id: data.id as string, html: (data.html_body as string | null) ?? "" };
 }
 
 async function sendWelcomeText(person: EventRow["enrollment"], settings: WelcomeSettings) {
