@@ -63,6 +63,28 @@ export function FacilitatorWelcomeCard({ initial }: { initial: WelcomeOverview }
     void save(values, "Settings saved.");
   }
 
+  const [preview, setPreview] = useState<{ to: string; sent: number; text: string } | null>(null);
+
+  async function sendPreview() {
+    setBusy(true);
+    setMessage(null);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/facilitator-welcome", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-mjg-action-token": actionToken },
+        body: JSON.stringify({ action: "preview", actionToken }),
+      });
+      const payload = await res.json();
+      if (!res.ok) setError(payload.error ?? "Unable to send the preview.");
+      else setPreview(payload.preview);
+    } catch {
+      setError("Unable to send the preview. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const on = overview.settings.enabled;
 
   return (
@@ -120,6 +142,31 @@ export function FacilitatorWelcomeCard({ initial }: { initial: WelcomeOverview }
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </div>
         </form>
+
+        <div className="space-y-3 rounded-md border p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium">Preview the series</p>
+              <p className="text-xs text-muted-foreground">
+                Emails all three to you, exactly as a new facilitator gets them, marked “[Preview]”. Works while the series is off; nobody is enrolled.
+              </p>
+            </div>
+            <Button type="button" variant="outline" disabled={busy} onClick={() => void sendPreview()}>
+              {busy ? "Sending…" : "Email me a preview"}
+            </Button>
+          </div>
+          {preview ? (
+            <div className="space-y-2 text-sm">
+              <p className="text-muted-foreground">
+                Sent {preview.sent} emails to {preview.to}. Links and details not set yet show as stand-ins.
+              </p>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Welcome Text (sent same day, with SMS consent)</p>
+                <p className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-[13px]">{preview.text}</p>
+              </div>
+            </div>
+          ) : null}
+        </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-5">
           {[

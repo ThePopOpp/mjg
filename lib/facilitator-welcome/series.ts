@@ -388,21 +388,81 @@ async function processEvent(row: EventRow, settings: WelcomeSettings): Promise<O
       email: person.email,
       first_name: greeting,
       profile_id: person.profile_id ?? undefined,
-      merge_data: {
-        greeting_name: greeting ? escapeHtml(greeting) : "there",
-        handbook_url: settings.handbook_url ?? "",
-        assessment_url: settings.assessment_url,
-        resources_url: settings.resources_url,
-        social_links_html: socialRowHtml(settings),
-        social_links_text: socialRowText(settings),
-        unsubscribe_url: unsubscribeUrl(),
-        unsubscribe_html: unsubscribeHtml(settings),
-        unsubscribe_text: unsubscribeText(settings),
-      },
+      merge_data: emailMergeData(settings, greeting),
     },
   });
   if (result.skipped) return { kind: "failed", error: result.reason ?? "No email provider configured." };
   return { kind: "sent" };
+}
+
+function emailMergeData(settings: WelcomeSettings, greeting: string): Record<string, string> {
+  return {
+    greeting_name: greeting ? escapeHtml(greeting) : "there",
+    handbook_url: settings.handbook_url ?? "",
+    assessment_url: settings.assessment_url,
+    resources_url: settings.resources_url,
+    social_links_html: socialRowHtml(settings),
+    social_links_text: socialRowText(settings),
+    unsubscribe_url: unsubscribeUrl(),
+    unsubscribe_html: unsubscribeHtml(settings),
+    unsubscribe_text: unsubscribeText(settings),
+  };
+}
+
+// ── Preview ──────────────────────────────────────────────────────────────────
+
+const NOT_SET = "https://michaeljgauthier.com/?preview=link-not-set";
+
+/**
+ * The settings as a preview shows them: anything not set yet gets a visible
+ * stand-in, so the email looks complete and it's obvious what's missing.
+ */
+function previewSettings(s: WelcomeSettings): WelcomeSettings {
+  const noSocial = !filled(s.instagram_url) && !filled(s.facebook_url) && !filled(s.linkedin_url);
+  return {
+    ...s,
+    handbook_url: filled(s.handbook_url) ? s.handbook_url : NOT_SET,
+    instagram_url: noSocial ? NOT_SET : s.instagram_url,
+    facebook_url: noSocial ? NOT_SET : s.facebook_url,
+    linkedin_url: noSocial ? NOT_SET : s.linkedin_url,
+    mailing_address: filled(s.mailing_address) ? s.mailing_address : "[Postal address not set yet]",
+  };
+}
+
+/** The Welcome Text as it would read, with the current settings. */
+export async function welcomeTextPreview(firstName: string): Promise<string> {
+  const settings = previewSettings(await getWelcomeSettings());
+  const { data: template } = await db().from("sms_templates").select("body").eq("slug", "facilitator-welcome-sms").is("deleted_at", null).maybeSingle();
+  if (!template) return "(The welcome text template is missing.)";
+  const name = firstName.trim();
+  const body = name ? (template.body as string) : (template.body as string).replace(/,?\s*\{\{\s*first_name\s*\}\}/g, "");
+  return renderSmsTemplate(body, { first_name: name, handbook_url: settings.handbook_url ?? "" });
+}
+
+/**
+ * Sends all three welcome emails to one address (the signed-in admin), exactly as
+ * a new facilitator would get them, with "[Preview n/3]" on the subject. Works
+ * while the series is off; enrolls nobody and changes no counts.
+ */
+export async function sendWelcomePreview(to: string, firstName: string, actorUserId: string) {
+  const settings = previewSettings(await getWelcomeSettings());
+  const emails = STEPS.filter((step) => step.channel === "email");
+  const sent: string[] = [];
+  for (const [i, step] of emails.entries()) {
+    const template = await templateBySlug(step.template);
+    if (!template) throw new Error(`Template ${step.template} is missing or archived.`);
+    const result = await sendTemplateEmail({
+      templateId: template.id,
+      fromName: SENDER_NAME,
+      replyTo: process.env.FACILITATOR_WELCOME_REPLY_TO?.trim() || undefined,
+      subjectPrefix: `[Preview ${i + 1}/${emails.length}] `,
+      actorUserId,
+      recipient: { email: to, first_name: firstName, merge_data: emailMergeData(settings, firstName.trim()) },
+    });
+    if (result.skipped) throw new Error(result.reason ?? "No email provider is configured.");
+    sent.push(step.template);
+  }
+  return { to, sent: sent.length, text: await welcomeTextPreview(firstName) };
 }
 
 async function templateBySlug(slug: string) {

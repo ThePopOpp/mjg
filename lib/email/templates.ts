@@ -120,6 +120,8 @@ export async function sendTemplateEmail(input: {
   /** Per-send display name and reply-to (the from address is always the configured one). */
   fromName?: string;
   replyTo?: string;
+  /** Put in front of the subject, e.g. "[Preview] ". */
+  subjectPrefix?: string;
 }) {
   const supabase = createSupabaseAdminClient();
   const { data: template, error } = await supabase.from("email_templates").select("*").eq("id", input.templateId).maybeSingle();
@@ -128,7 +130,7 @@ export async function sendTemplateEmail(input: {
   if (template.status === "archived") throw new Error("Archived templates cannot be sent.");
 
   const mergeData = buildMergeData(input.recipient);
-  const subject = renderTemplate(template.subject, mergeData);
+  const subject = (input.subjectPrefix ?? "") + renderTemplate(template.subject, mergeData);
   const html = renderTemplate(template.html_body, mergeData);
   const text = renderTemplate(template.text_body || stripHtml(html), mergeData);
 
