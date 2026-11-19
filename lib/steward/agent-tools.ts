@@ -175,7 +175,7 @@ export async function proposeBlueprintWording(
   // for the same wording, and the model never has to reason about idempotency.
   const idempotencyKey = `agent:${profileId}:${args.page}:${args.field}:${hash(args.wording)}`;
 
-  const { receipt, versionId } = await proposeWording({
+  const { receipt, versionId, replacedPending } = await proposeWording({
     profileId,
     pageSlug: args.page,
     fieldKey: args.field,
@@ -202,7 +202,11 @@ export async function proposeBlueprintWording(
     page: args.page,
     field: args.field,
     wording: args.wording,
+    replaced_waiting_suggestion: (replacedPending ?? 0) > 0,
     tell_the_member:
+      ((replacedPending ?? 0) > 0
+        ? "This replaces the suggestion that was waiting on this field. "
+        : "") +
       "This is a proposal. It is not on their Blueprint until they approve these exact words, and they can change them.",
   };
 }

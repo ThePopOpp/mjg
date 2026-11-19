@@ -477,7 +477,7 @@ export async function proposeWording(args: {
   idempotencyKey: string;
   needsClarity?: boolean;
   clarityNote?: string;
-}): Promise<{ receipt: Receipt; versionId: string | null }> {
+}): Promise<{ receipt: Receipt; versionId: string | null; replacedPending?: number }> {
   const db = createSupabaseAdminClient();
   const blueprintId = await ensureBlueprint(args.profileId);
 
@@ -509,6 +509,19 @@ export async function proposeWording(args: {
 
     if (error) throw new StewardBlueprintError(error.message);
 
+    // One suggestion per field (Steward V2.1). A new proposal replaces any
+    // suggestion still waiting on this field — that is how Steward revises after
+    // a member's correction, instead of stacking a second card beside the
+    // rejected one. Approved wording is never touched here.
+    const { data: replaced } = await db
+      .from("steward_field_versions")
+      .update({ content_state: "superseded", superseded_at: new Date().toISOString() })
+      .eq("field_id", fieldId)
+      .eq("content_state", "proposed")
+      .is("superseded_at", null)
+      .neq("id", version.id as string)
+      .select("id");
+
     const settled = await settleReceipt(db, receipt.id, "confirmed", {
       target_table: "steward_field_versions",
       target_id: version.id as string,
@@ -520,10 +533,10 @@ export async function proposeWording(args: {
       action: "wording.proposed",
       targetTable: "steward_field_versions",
       targetId: version.id as string,
-      detail: { page: args.pageSlug, field: args.fieldKey },
+      detail: { page: args.pageSlug, field: args.fieldKey, replaces: (replaced ?? []).map((r) => r.id) },
     });
 
-    return { receipt: settled, versionId: version.id as string };
+    return { receipt: settled, versionId: version.id as string, replacedPending: (replaced ?? []).length };
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error";
     const settled = await settleReceipt(db, receipt.id, "failed", { error: message });
@@ -628,6 +641,85 @@ export async function approveWording(args: {
     const message = e instanceof Error ? e.message : "Unknown error";
     const settled = await settleReceipt(db, receipt.id, "failed", { error: message });
     return { receipt: settled, sectionState: null };
+  }
+}
+
+/**
+ * The member rewrites a pending proposal in their own words (Steward V2.1,
+ * CHG-V21-003). The old proposal is retired and the member's wording becomes
+ * the pending proposal for the same field.
+ *
+ * This does NOT approve anything. Approved wording already on the field stays
+ * exactly as it is until the member approves the new wording, which still goes
+ * through approveWording like every other path onto a Blueprint.
+ */
+export async function reviseWording(args: {
+  profileId: string;
+  versionId: string;
+  value: string;
+  idempotencyKey: string;
+}): Promise<{ receipt: Receipt; versionId: string | null }> {
+  const db = createSupabaseAdminClient();
+  const blueprintId = await ensureBlueprint(args.profileId);
+  const { receipt, alreadyDone } = await openReceipt(db, args.profileId, "blueprint.revise", args.idempotencyKey, {
+    version: args.versionId,
+  });
+  if (alreadyDone) return { receipt, versionId: receipt.target_id };
+
+  try {
+    const value = args.value.trim();
+    if (value.length === 0) throw new StewardBlueprintError("Your wording is empty.");
+    if (value.length > 2000) throw new StewardBlueprintError("That wording is too long for one field.");
+
+    // Ownership first, as with approve and decline.
+    const { version, section } = await ownedVersion(db, blueprintId, args.versionId);
+    if (version.content_state !== "proposed" || version.superseded_at) {
+      throw new StewardBlueprintError("That suggestion is no longer waiting on you.");
+    }
+
+    const now = new Date().toISOString();
+    // Retire the old proposal only if it is still pending, so two tabs can't both revise it.
+    const { data: retired, error: retireError } = await db
+      .from("steward_field_versions")
+      .update({ content_state: "superseded", superseded_at: now })
+      .eq("id", args.versionId)
+      .eq("content_state", "proposed")
+      .is("superseded_at", null)
+      .select("id");
+    if (retireError) throw new StewardBlueprintError(retireError.message);
+    if (!retired?.length) throw new StewardBlueprintError("That suggestion is no longer waiting on you.");
+
+    const { data: next, error } = await db
+      .from("steward_field_versions")
+      .insert({
+        field_id: version.field_id as string,
+        content_state: "proposed",
+        value,
+        proposed_by: "participant",
+      })
+      .select("id")
+      .single();
+    if (error) throw new StewardBlueprintError(error.message);
+
+    await audit(db, {
+      profileId: args.profileId,
+      actorType: "participant",
+      actorId: args.profileId,
+      action: "wording.revised",
+      targetTable: "steward_field_versions",
+      targetId: next.id as string,
+      detail: { page: section.page_slug, replaces: args.versionId },
+    });
+
+    const settled = await settleReceipt(db, receipt.id, "confirmed", {
+      target_table: "steward_field_versions",
+      target_id: next.id as string,
+    });
+    return { receipt: settled, versionId: next.id as string };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Unknown error";
+    const settled = await settleReceipt(db, receipt.id, "failed", { error: message });
+    return { receipt: settled, versionId: null };
   }
 }
 

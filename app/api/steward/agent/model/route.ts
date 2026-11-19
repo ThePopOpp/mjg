@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { getStewardConfigOrNull } from "@/lib/steward/config";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { INSTRUCTION_VERSION } from "@/steward/agent/lib/turn-context";
 
 // Which model Steward uses, resolved at session start.
 //
@@ -33,10 +34,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Not permitted." }, { status: 401 });
   }
 
-  const [provider, model, instructionVersion] = await Promise.all([
+  const [provider, model] = await Promise.all([
     getStewardConfigOrNull("agent.model.provider").catch(() => null),
     getStewardConfigOrNull("agent.model.id").catch(() => null),
-    getStewardConfigOrNull("agent.instruction_version").catch(() => null),
   ]);
 
   // An unset model falls back rather than failing the session: a member mid
@@ -46,7 +46,9 @@ export async function GET(request: Request) {
   const resolved = {
     provider: typeof provider === "string" && provider ? provider : FALLBACK.provider,
     model: typeof model === "string" && model ? model : FALLBACK.model,
-    instructionVersion: typeof instructionVersion === "string" ? instructionVersion : null,
+    // From the deployed code, not the hand-set agent.instruction_version setting,
+    // which still read v3 weeks after V2 shipped.
+    instructionVersion: INSTRUCTION_VERSION,
     usedFallback: !(typeof model === "string" && model),
   };
 

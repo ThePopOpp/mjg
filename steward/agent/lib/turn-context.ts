@@ -5,6 +5,14 @@
 // (scripts/steward-quality-harness.mjs) builds EXACTLY the same turn context the
 // live agent does. Wired into the agent by ../instructions/blueprint-context.ts.
 
+/**
+ * Which instructions this build carries. Reported in run telemetry and the
+ * conversation export straight from code, so the label can never drift from
+ * what is deployed (the old hand-set config value still said v3 weeks after V2
+ * shipped). Bump it whenever instructions.md or the turn context changes.
+ */
+export const INSTRUCTION_VERSION = "steward-instructions-v2.1-lqa-2026-11-19";
+
 export type Overview = {
   edition: string;
   pages: {
@@ -24,6 +32,8 @@ export type Snapshot = {
   check_in: {
     taken: string;
     days_ago: number;
+    /** e.g. "cfm-v4-2026-09-11"; results saved before v4 are "cfm-v3". */
+    version?: string;
     total: number | null;
     out_of: number;
     stage: string | null;
@@ -46,6 +56,12 @@ export type Snapshot = {
   } | null;
 };
 
+/** "cfm-v4-2026-09-11" → "version 4". Unknown formats are shown as recorded. */
+function checkInLabel(version: string): string {
+  const m = /^cfm-v(\d+)/.exec(version);
+  return m ? `version ${m[1]}` : version;
+}
+
 /**
  * Their Check-In results, supplied rather than fetched: without them Steward
  * answered every member the same way. Scores only here; statement ratings and
@@ -66,7 +82,7 @@ export function assessmentLines(snapshot: Snapshot | null): string[] {
   const c = snapshot.check_in;
   if (c) {
     lines.push(
-      `Created for More Check-In, taken ${when(c.days_ago, c.taken)}${c.times_taken > 1 ? `, ${c.times_taken} times in all` : ""}: ` +
+      `Created for More Check-In${c.version ? ` (${checkInLabel(c.version)})` : ""}, taken ${when(c.days_ago, c.taken)}${c.times_taken > 1 ? `, ${c.times_taken} times in all` : ""}: ` +
         `${c.total ?? "no complete total"}/${c.out_of}${c.stage ? `, "${c.stage}"` : ""}.`,
       ...c.layers.map((l) => `  ${l.layer}: ${l.score}/${l.out_of}, ${l.status}`),
       `  Lowest: ${c.lowest.join(" and ")}${c.lowest_pillar ? ` (lowest pillar: ${c.lowest_pillar})` : ""}. Strongest: ${c.strongest.join(" and ")}.`,
@@ -90,7 +106,8 @@ export function assessmentLines(snapshot: Snapshot | null): string[] {
   lines.push(
     "",
     "If they have just finished an assessment or ask what their results mean, lead with these: call " +
-      "read_assessments, give the dated overview with every section score exactly as above, interpret it from " +
+      "read_assessments, give the dated overview — which assessment and version, the total and every section score " +
+      "exactly as above, with what each means — interpret it from " +
       "their actual statement ratings, then offer the three paths (explore a strength, explore a concern, begin " +
       "the Free Personal Blueprint). Otherwise, bring results in when they bear on what the member raised, dated, " +
       "and check they still fit. The two assessments are separate instruments — never mix them.",
@@ -152,6 +169,11 @@ export const TURN_REMINDER = [
   "When you teach the framework, search the library first so it is the Blueprint's teaching, in your words.",
   "Help before you ask. At most one question, and only if it would improve your next answer.",
   "No menu of services, no generic intake questions, no claim that anything was saved or done without a receipt.",
+  "If this conversation is already under way, do not welcome them again or re-introduce yourself as an AI — you " +
+    "are their personal guide. If they are still confused after an explanation, change method: give a concrete " +
+    "example instead of restating the definition.",
+  "If they reject or correct proposed wording, rewrite it from what they have ALREADY said. Never ask them to " +
+    "repeat it.",
 ].join("\n");
 
 export function turnContext(overview: Overview | null, snapshot: Snapshot | null): string {

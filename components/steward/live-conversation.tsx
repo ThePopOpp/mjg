@@ -265,6 +265,8 @@ export function LiveConversation({ sessionId: reopen = null }: { sessionId?: str
   const [pending, setPending] = React.useState<Pending[]>([]);
   const [deciding, setDeciding] = React.useState<string | null>(null);
   const [decided, setDecided] = React.useState<Record<string, "approved" | "declined" | "failed">>({});
+  // The member editing a suggestion in place (Steward V2.1): which card, and their words.
+  const [editing, setEditing] = React.useState<{ proposalId: string; wording: string } | null>(null);
 
   // Registered from here rather than by the agent: this is the only place that
   // knows both the session id and what the member actually typed, and their own
@@ -314,6 +316,7 @@ export function LiveConversation({ sessionId: reopen = null }: { sessionId?: str
       setMode(null);
       setDraft("");
       setDecided({});
+      setEditing(null);
       void refreshPending();
     }
     window.addEventListener(NEW_CONVERSATION_EVENT, startFresh);
@@ -420,6 +423,34 @@ export function LiveConversation({ sessionId: reopen = null }: { sessionId?: str
         setDecided((d) => ({ ...d, [proposalId]: json.declined ? "declined" : "failed" }));
       }
       await refreshPending();
+    } catch {
+      setDecided((d) => ({ ...d, [proposalId]: "failed" }));
+    } finally {
+      setDeciding(null);
+    }
+  }
+
+  // The member's own rewrite replaces the suggestion. With `approve`, it then
+  // goes onto their Blueprint — confirmed only by the write receipt.
+  async function revise(proposalId: string, wording: string, approve: boolean) {
+    setDeciding(proposalId);
+    try {
+      const res = await fetch("/api/steward/blueprint/decision", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ proposalId, decision: "revise", wording, approve }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!json.revised) {
+        setDecided((d) => ({ ...d, [proposalId]: "failed" }));
+        return;
+      }
+      if (approve && typeof json.proposalId === "string") {
+        setDecided((d) => ({ ...d, [json.proposalId]: json.saved ? "approved" : "failed" }));
+      }
+      // Refresh first, then close the editor, so the old wording never flashes back.
+      await refreshPending();
+      setEditing(null);
     } catch {
       setDecided((d) => ({ ...d, [proposalId]: "failed" }));
     } finally {
@@ -604,6 +635,55 @@ export function LiveConversation({ sessionId: reopen = null }: { sessionId?: str
                   </p>
                 ) : null}
 
+                {editing?.proposalId === proposal.proposalId ? (
+                  <div className="mt-2 space-y-2.5">
+                    <Textarea
+                      autoFocus
+                      rows={3}
+                      aria-label={`Your wording for ${proposal.fieldLabel}`}
+                      value={editing.wording}
+                      onChange={(e) => setEditing({ proposalId: proposal.proposalId, wording: e.currentTarget.value })}
+                      className="font-serif text-[16px] leading-relaxed"
+                      maxLength={2000}
+                    />
+                    {outcome === "failed" ? (
+                      <p className="text-[13px] text-destructive">
+                        That did not save. Nothing has changed on your Blueprint — try again.
+                      </p>
+                    ) : null}
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        disabled={deciding !== null || !editing.wording.trim()}
+                        onClick={() => void revise(proposal.proposalId, editing.wording, true)}
+                        className="bg-[#b88a4a] text-white hover:bg-[#a67c42]"
+                      >
+                        {deciding === proposal.proposalId ? (
+                          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                        ) : null}
+                        Add my version to my Blueprint
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={deciding !== null || !editing.wording.trim()}
+                        onClick={() => void revise(proposal.proposalId, editing.wording, false)}
+                      >
+                        Keep as a suggestion
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-muted-foreground"
+                        disabled={deciding !== null}
+                        onClick={() => setEditing(null)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                <>
                 <p className="mt-2 font-serif text-[17px] leading-relaxed">&ldquo;{proposal.wording}&rdquo;</p>
 
                 {outcome === "failed" ? (
@@ -627,8 +707,17 @@ export function LiveConversation({ sessionId: reopen = null }: { sessionId?: str
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled={deciding !== null || busy}
-                    onClick={() => send("Change the wording — here's what I'd say instead: ")}
+                    disabled={deciding !== null}
+                    onClick={() => {
+                      // Edit in place. This used to SEND a half-sentence as the member's
+                      // message, so Steward got an empty correction and asked them to
+                      // type it all again (Mike's V2.1 findings LQA-05/06).
+                      setDecided((d) => {
+                        const { [proposal.proposalId]: _, ...rest } = d;
+                        return rest;
+                      });
+                      setEditing({ proposalId: proposal.proposalId, wording: proposal.wording });
+                    }}
                   >
                     Change the wording
                   </Button>
@@ -642,6 +731,8 @@ export function LiveConversation({ sessionId: reopen = null }: { sessionId?: str
                     Not now
                   </Button>
                 </div>
+                </>
+                )}
               </div>
             );
           })}

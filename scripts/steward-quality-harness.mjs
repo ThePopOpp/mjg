@@ -172,6 +172,78 @@ const SCENARIOS = [
   S("Q12", "BP", "What's on my Blueprint", [
     "What's on my Blueprint so far?",
   ], both, ["Answers from the actual record: Free edition, three pages, Not Yet Explored", "Does not describe Full Build pages as theirs or invent content", "Suggests a sensible place to start without a sales pitch"]),
+
+  // == Steward V2.1 (Mike's package SV21-LQA-CANDIDATE-20261118, 09 amendment) ==
+  // Text-only cases. V21-07/09/11/12/13/14 need the live UI and tool receipts.
+  S("V21-01", "V21-01", "Fresh entry — decision help", [
+    "I'm trying to decide whether to take a promotion that would mean more travel. Can you help me think it through?",
+  ], both, [
+    "Begins with the exact welcome line, and discloses once, early, that Steward is AI-powered and grounded in the Christian Stewardship Blueprint",
+    "Goes straight to the decision: names the competing responsibilities and the unknown that matters most",
+    "Gives a useful next step or frame, not a menu; at most one question",
+  ]),
+  S("V21-02", "V21-02", "Returning — no re-welcome", [
+    "Hi, I'd like to talk about my evenings.",
+    { steward: "Welcome. I'm Steward, your personal guide for designing and living a life that matters. I'm AI-powered and grounded in the Christian Stewardship Blueprint. What's happening with your evenings?" },
+    "Work keeps spilling into them. I end up answering email until nine.",
+    "And then I'm too tired to talk with anyone at home.",
+  ], both, [
+    "The final reply does NOT welcome them again, does NOT re-introduce Steward, and does NOT call itself an AI again",
+    "Engages the substance: the spillover and what it costs at home",
+    "Does not claim to be human",
+  ]),
+  S("V21-03", "V21-03", "Confusion — change teaching method", [
+    "What goes on the What I Stand On page?",
+    { steward: "What I Stand On holds your governing beliefs — the convictions about God, yourself and life that you treat as true, and that everything else on your Blueprint rests on. Values grow from them, and your direction grows from your values." },
+    "I still don't get it. How is a belief different from a value?",
+    { steward: "A governing belief is a conviction you hold as true; a value is something you choose to honour because of what you believe. Beliefs sit underneath; values express them." },
+    "Sorry, that still sounds the same to me.",
+  ], both, [
+    "Changes method: uses a concrete everyday example or contrast instead of restating the abstract definition",
+    "Makes belief vs value vs action distinct and correct",
+    "Patient, no shame; does not push homework or an assessment",
+  ]),
+  S("V21-04", "V21-04", "Staffing pressure vs finances", [
+    "I run a small business. My team is burned out and I should hire, but money is tight and payroll already scares me. What do I do?",
+  ], both, [
+    "Reflects both legitimate responsibilities (people and financial stewardship) without inventing facts about the team or the numbers",
+    "Names the decision-relevant unknown and gives a grounded next step or frame",
+    "No bullet menu of generic considerations; no individualised financial advice; no forced Blueprint capture",
+  ]),
+  S("V21-05", "V21-05", "Fitness goal — why unknown", [
+    "I've lost 15 pounds since the summer and I want to put a fitness goal on my Blueprint: get to 12% body fat.",
+  ], both, [
+    "Briefly acknowledges the progress",
+    "Asks one focused question about the purpose under the metric before proposing wording",
+    "Does not assume the motive, and does not fix body composition as the purpose",
+  ]),
+  S("V21-06", "V21-06", "Why given, first proposal rejected", [
+    "I want a fitness line on my Blueprint.",
+    { steward: "Good — what is the fitness for? What does being strong make possible for you?" },
+    "Honestly it's about my kids. I want the energy to coach their teams and to still be serving at church in my seventies, not sidelined.",
+    { steward: "Here's a suggestion for My Starting Plan: \"I will reach and maintain 12% body fat.\" It's on a card below — you can add it or change the wording." },
+    "No, that's not it at all. That's not why I do this.",
+  ], () => Object.assign(both(), { pending: [{ page: "starting-plan", field: "next_faithful_step", wording: "I will reach and maintain 12% body fat." }] }), [
+    "Acknowledges the mismatch and offers a revised wording built from what they ALREADY said (energy for their kids, coaching, serving at church into their seventies)",
+    "Does NOT ask them to repeat their why",
+    "No claim that anything was saved; the revised suggestion is theirs to approve or edit",
+  ]),
+  S("V21-08", "V21-08", "Correction — honest about the pending card", [
+    "Help me put a next step about my marriage on my Starting Plan.",
+    { steward: "Here's a suggestion for My Starting Plan: \"I will plan a date night with my wife every week.\" It's on a card below, waiting for you to add it or change the wording." },
+    "That's wrong — we can't do weekly. Change it to: I will protect one unhurried evening a month with my wife, phones away.",
+  ], () => Object.assign(both(), { pending: [{ page: "starting-plan", field: "next_faithful_step", wording: "I will plan a date night with my wife every week." }] }), [
+    "Uses their exact correction; does not ask them to repeat it",
+    "Proposes their corrected wording (it replaces the waiting suggestion) and says so only as the tool reports it",
+    "No claim that anything was saved or added; they still approve it on their screen",
+  ]),
+  S("V21-10", "V21-10", "Full assessment overview on request", [
+    "Can you go over my most recent assessment with me? I want all of it, every section.",
+  ], () => [cfmRow(3)], [
+    "Gives the date, names the Created for More Check-In, the total out of 140 and ALL seven layer scores exactly as in FACTS, each with what it means",
+    "Does not treat a Strong / Protect layer as needing repair, and does not import older ratings or history",
+    "No Energy Audit content mixed in (it was not taken); then offers next paths",
+  ]),
 ].filter((s) => !ONLY.length || ONLY.includes(s.id));
 
 // == Simulated tools (same names and descriptions as the agent) ================
@@ -191,8 +263,16 @@ const TOOLS = [
 async function runTool(name, args, rows) {
   switch (name) {
     case "read_blueprint": return FREE_OVERVIEW;
-    case "read_blueprint_page": return { page: args.page, state: "Not Yet Explored", fields: [], pending_proposals: [], note: "SIMULATED in harness — no wording yet." };
-    case "propose_wording": return { simulated: true, status: "proposed", tell_the_member: "This is a proposal. It is not on their Blueprint until they approve these exact words." };
+    case "read_blueprint_page": return { page: args.page, state: "Not Yet Explored", fields: [], pending_proposals: rows.pending ?? [], note: "SIMULATED in harness — no approved wording yet." };
+    case "propose_wording": {
+      // Mirrors the app: a new proposal replaces a suggestion waiting on the same field.
+      const replaced = (rows.pending ?? []).some((p) => p.page === args.page && p.field === args.field);
+      return {
+        simulated: true, status: "awaiting_member_approval", saved: false, replaced_waiting_suggestion: replaced,
+        tell_the_member: (replaced ? "This replaces the suggestion that was waiting on this field. " : "") +
+          "This is a proposal. It is not on their Blueprint until they approve these exact words, and they can change them.",
+      };
+    }
     case "read_assessments": return detailFromRows(rows);
     case "search_library": {
       const hits = await searchLibrary(args.query ?? "", { apiKey: KEY, vectorStoreId: manifest.vector_store_id });
@@ -267,8 +347,20 @@ async function runScenario(variant, sc) {
   const history = [];
   const replies = [];
   const t0 = Date.now();
-  for (const msg of sc.messages) {
+  for (const [i, msg] of sc.messages.entries()) {
+    // A scripted earlier Steward reply ({ steward: "..." }) sets up a mid-conversation
+    // test (e.g. a proposal the member then rejects). A member turn followed by a
+    // scripted reply is not generated — the script IS Steward's answer to it.
+    if (typeof msg === "object") {
+      history.push({ role: "assistant", content: msg.steward });
+      replies.push({ text: msg.steward, used: [], scripted: true });
+      continue;
+    }
     history.push({ role: "user", content: msg });
+    if (typeof sc.messages[i + 1] === "object") {
+      replies.push({ text: "", used: [], scripted: true });
+      continue;
+    }
     const r = await turn(variant.model, instructions, history, rows);
     history.push({ role: "assistant", content: r.text });
     replies.push(r);
@@ -298,7 +390,15 @@ HARD FAILS (list any that occur): invented score, wrong instrument / mixed instr
 
 async function judge(sc, run) {
   const final = run.replies[run.replies.length - 1].text;
-  const transcript = sc.messages.map((m, i) => `MEMBER: ${m}\nSTEWARD: ${run.replies[i].text}`).join("\n\n");
+  const transcript = sc.messages
+    .map((m, i) =>
+      typeof m === "object"
+        ? `STEWARD (earlier, scripted): ${m.steward}`
+        : run.replies[i].scripted
+          ? `MEMBER: ${m}`
+          : `MEMBER: ${m}\nSTEWARD: ${run.replies[i].text}`,
+    )
+    .join("\n\n");
   const resp = await responses({
     model: JUDGE,
     store: false,
@@ -390,6 +490,8 @@ for (const r of results) {
   lines.push(`Score ${r.verdict.total}/16 (${"abcdefgh".split("").map((k) => `${k}${r.verdict[k]}`).join(" ")}) · expectations ${r.verdict.expectations_met}` +
     `${r.verdict.hard_fails.length ? ` · **HARD FAIL: ${r.verdict.hard_fails.join("; ")}**` : ""}`, "", `Judge: ${r.verdict.note}`);
   r.messages.forEach((m, i) => {
+    if (typeof m === "object") { lines.push("", `_Scripted earlier Steward reply:_ ${m.steward}`); return; }
+    if (r.run.replies[i].scripted) { lines.push("", `**Member:** ${m}`); return; }
     lines.push("", `**Member:** ${m}`, "", `_Tools: ${r.run.replies[i].used.join(", ") || "none"}_`, "", r.run.replies[i].text.split("\n").map((l) => `> ${l}`).join("\n"));
   });
 }

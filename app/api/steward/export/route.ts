@@ -5,8 +5,7 @@ import { canExportStewardHistory } from "@/lib/steward/export-access";
 import { parseSessionStream, renderExport, type ExportConversation } from "@/lib/steward/conversation-export";
 import { assessmentSnapshot } from "@/lib/steward/assessments";
 import { blueprintOverview } from "@/lib/steward/agent-tools";
-import { getStewardConfigOrNull } from "@/lib/steward/config";
-import { assessmentLines, blueprintLines } from "@/steward/agent/lib/turn-context";
+import { INSTRUCTION_VERSION, assessmentLines, blueprintLines } from "@/steward/agent/lib/turn-context";
 import libraryManifest from "@/steward/library/manifest.json";
 
 // Exports the signed-in person's OWN Steward conversations as one Markdown file,
@@ -87,10 +86,9 @@ export async function GET(request: Request) {
     }),
   );
 
-  const [overview, snapshot, instructionVersion] = await Promise.all([
+  const [overview, snapshot] = await Promise.all([
     blueprintOverview(profile.id).catch(() => null),
     assessmentSnapshot(profile.id).catch(() => null),
-    getStewardConfigOrNull("agent.instruction_version").catch(() => null),
   ]);
 
   const exportedAt = new Date().toISOString();
@@ -98,7 +96,7 @@ export async function GET(request: Request) {
     exportedBy: `${profile.firstName} ${profile.lastName}`.trim() || profile.email,
     exportedAt,
     library: libraryManifest.label,
-    instructionVersion: typeof instructionVersion === "string" ? instructionVersion : null,
+    instructionVersion: INSTRUCTION_VERSION,
     context: [...blueprintLines(overview), "", ...assessmentLines(snapshot)].join("\n"),
     conversations,
   });

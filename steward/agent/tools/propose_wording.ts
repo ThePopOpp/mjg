@@ -18,7 +18,8 @@ export default defineTool({
     "Propose wording for one Blueprint field, in the member's own voice, for them to approve or change. This does " +
     "NOT save anything — it puts a suggestion in front of them. Never tell the member it is saved, added or " +
     "written down: it is not on their Blueprint until they approve these exact words. Propose one field at a time, " +
-    "and only after reading the page.",
+    "and only after reading the page. A new proposal for a field replaces any suggestion still waiting on it — use " +
+    "this to revise after they correct you, with the words they already gave.",
   inputSchema: z.object({
     page: z.string().describe('The page slug, e.g. "guardrails".'),
     field: z.string().describe('The field key from read_blueprint_page, e.g. "guardrails".'),

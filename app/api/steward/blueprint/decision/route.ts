@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 import { getCurrentProfile } from "@/lib/auth/server";
-import { approveWording, declineWording } from "@/lib/steward/blueprint-service";
+import { approveWording, declineWording, reviseWording } from "@/lib/steward/blueprint-service";
 
-// The member approves or declines proposed wording.
+// The member approves, declines, or rewrites proposed wording.
 //
 // THIS IS THE ONLY PATH ONTO A BLUEPRINT, and it is reachable only by a signed-
 // in member acting on their own record. The agent cannot call it: it has no
@@ -22,7 +22,8 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => ({}));
   const proposalId = typeof body?.proposalId === "string" ? body.proposalId : null;
-  const decision = body?.decision === "approve" || body?.decision === "decline" ? body.decision : null;
+  const decision =
+    body?.decision === "approve" || body?.decision === "decline" || body?.decision === "revise" ? body.decision : null;
 
   if (!proposalId || !decision) {
     return NextResponse.json({ error: "proposalId and decision are required." }, { status: 400 });
@@ -31,6 +32,40 @@ export async function POST(request: Request) {
   // Server-generated: a double-click must not approve twice, and the browser
   // has no business deciding what counts as the same action.
   const idempotencyKey = `member:${decision}:${proposalId}`;
+
+  if (decision === "revise") {
+    // The member rewrote the suggestion in their own words (Steward V2.1). The
+    // rewrite replaces the pending suggestion; it is approved only if they
+    // clicked "Add my version", and only through approveWording.
+    const wording = typeof body?.wording === "string" ? body.wording : "";
+    const digest = createHash("sha256").update(wording.trim()).digest("hex").slice(0, 16);
+    const revised = await reviseWording({
+      profileId: profile.id,
+      versionId: proposalId,
+      value: wording,
+      idempotencyKey: `${idempotencyKey}:${digest}`,
+    });
+    const newId = revised.versionId;
+    if (revised.receipt.persistence_status !== "confirmed" || !newId) {
+      return NextResponse.json({ revised: false, saved: false, error: revised.receipt.error });
+    }
+    if (body?.approve !== true) {
+      return NextResponse.json({ revised: true, saved: false, proposalId: newId });
+    }
+    const { receipt, sectionState } = await approveWording({
+      profileId: profile.id,
+      versionId: newId,
+      idempotencyKey: `member:approve:${newId}`,
+    });
+    return NextResponse.json({
+      revised: true,
+      saved: receipt.persistence_status === "confirmed",
+      status: receipt.persistence_status,
+      proposalId: newId,
+      sectionState,
+      error: receipt.error,
+    });
+  }
 
   if (decision === "decline") {
     const receipt = await declineWording({ profileId: profile.id, versionId: proposalId, idempotencyKey });
