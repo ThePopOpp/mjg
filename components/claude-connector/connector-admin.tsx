@@ -49,7 +49,7 @@ const TASK_TONE: Record<string, string> = {
 type ScopeDomain = { key: string; label: string };
 
 /** Activity filter options; values match mcp_tool_calls.client_label. */
-const CLIENT_FILTERS = ["Claude", "ChatGPT", "Agent", "Other"] as const;
+const CLIENT_FILTERS = ["Claude", "ChatGPT", "Codex", "Agent", "Other"] as const;
 type Level = "none" | "read" | "write";
 
 const when = (iso: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "—");

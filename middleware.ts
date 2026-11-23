@@ -1,7 +1,35 @@
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
+import { detectBot } from "@/lib/analytics/bots";
 
-export async function middleware(request: NextRequest) {
+// Crawlers never run the JS tracker, so this is the only place to see which AI
+// and search bots read which pages (→ analytics_bot_hits, /dashboard/analytics).
+// Fire-and-forget via waitUntil: it never delays or fails the response.
+function logBotHit(request: NextRequest, event: NextFetchEvent) {
+  const path = request.nextUrl.pathname;
+  if (request.method !== "GET" || path.startsWith("/api/") || path.startsWith("/_next/")) return;
+  const hit = detectBot(request.headers.get("user-agent"));
+  if (!hit) return;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return;
+  event.waitUntil(
+    fetch(`${url}/rest/v1/analytics_bot_hits`, {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        bot: hit.bot,
+        bot_kind: hit.kind,
+        host: (request.headers.get("host") || "").split(":")[0].toLowerCase() || null,
+        path: path.slice(0, 500),
+      }),
+    }).then(() => undefined, () => undefined),
+  );
+}
+
+export async function middleware(request: NextRequest, event: NextFetchEvent) {
+  logBotHit(request, event);
+
   let supabaseResponse = NextResponse.next({ request });
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

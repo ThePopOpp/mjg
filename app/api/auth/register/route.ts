@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { registerSelfServeAccount } from "@/lib/user-management/self-registration";
+import { recordProfileAttribution } from "@/lib/analytics/server";
 
 // Public, unauthenticated endpoint. The role is validated against SELF_SERVE_ROLES inside
 // registerSelfServeAccount — never trust `body.role` beyond passing it through that gate.
@@ -57,7 +58,18 @@ export async function POST(request: Request) {
     });
 
     countAttempt(ip); // an account was created
-    return NextResponse.json({ ok: true, ...result });
+
+    // Where this person came from (first visit + this session), for /dashboard/analytics.
+    const { profileId, ...publicResult } = result;
+    if (profileId) {
+      const attribution = body.attribution && typeof body.attribution === "object" ? body.attribution : {};
+      await recordProfileAttribution(
+        profileId,
+        { first: attribution.first ?? null, session: attribution.session ?? null },
+        request.headers.get("host"),
+      );
+    }
+    return NextResponse.json({ ok: true, ...publicResult });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Registration failed.";
     // "Already exists" is the email-enumeration answer, so it costs a slot too.

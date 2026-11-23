@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ROLES } from "@/lib/rbac/roles";
 import { cn } from "@/lib/utils";
+import { readAttribution } from "@/components/analytics/site-analytics";
 
 type Choice = typeof ROLES.PARTICIPANT | typeof ROLES.FACILITATOR;
 
@@ -82,7 +83,7 @@ export function RegisterForm({ next = null, email = "" }: { next?: string | null
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, role: choice }),
+        body: JSON.stringify({ ...form, role: choice, attribution: readAttribution() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error ?? "Registration failed.");

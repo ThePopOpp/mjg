@@ -10,7 +10,7 @@ export type CapGroup = "sms" | "email";
 /** One-person sends, by cap. dm_send counts as email until it has its own cap. */
 export const CAPPED_TOOLS: Record<CapGroup, readonly string[]> = {
   sms: ["sms_send"],
-  email: ["send_email", "send_template_email", "dm_send"],
+  email: ["send_email", "send_template_email", "dm_send", "lead_outreach_email"],
 };
 
 export function capGroupFor(tool: string): CapGroup | null {

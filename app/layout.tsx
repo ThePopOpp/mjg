@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { PwaRegister } from "@/components/pwa/pwa-register";
 import { PendingAssessmentClaimer } from "@/components/assessments/pending-assessment-claimer";
+import { SiteAnalytics } from "@/components/analytics/site-analytics";
+import { MetricoolTracker } from "@/components/analytics/metricool";
 
 export const metadata: Metadata = {
   title: "MJG Dashboard",
@@ -50,6 +52,8 @@ export default function RootLayout({
         {children}
         <PwaRegister />
         <PendingAssessmentClaimer />
+        <SiteAnalytics />
+        <MetricoolTracker />
       </body>
     </html>
   );

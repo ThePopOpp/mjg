@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { wakeAgents } from "@/lib/agents/wake";
 
 // The agent task queue (migration 202610260121). People hand work to agents;
 // agents claim it, do it through MJG's tools, and report back. MJG holds the
@@ -61,6 +62,8 @@ export async function createTask(input: { title: string; instructions?: string; 
     .single();
   if (error) throw error;
   await addEvent(data.id, "created", actor, agent ? `Assigned to ${agent.name}` : "Open to any agent");
+  // Agents creating tasks for each other wake the harness too (that's how a lead hands off work).
+  await wakeAgents("task.created", data, agent?.name ?? null);
   return data;
 }
 
@@ -154,7 +157,8 @@ export async function reportOnTask(
 /** A person settles a task: accept a review, send it back, or cancel it. */
 export async function resolveTask(input: { id: string; outcome: "done" | "failed" | "requeue" | "canceled"; note?: string }, actor: Actor) {
   const supabase = createSupabaseAdminClient();
-  const { data: task } = await supabase.from("agent_tasks").select("id, status").eq("id", input.id).maybeSingle();
+  const { data: task } = await supabase
+    .from("agent_tasks").select("id, status, title, priority, due_at, agent:mcp_tokens(name)").eq("id", input.id).maybeSingle();
   if (!task) throw new Error("Task not found.");
   if (["done", "canceled"].includes(task.status) && input.outcome !== "requeue") throw new Error(`This task is already ${task.status}.`);
   const now = new Date().toISOString();
@@ -165,6 +169,10 @@ export async function resolveTask(input: { id: string; outcome: "done" | "failed
   const { error } = await supabase.from("agent_tasks").update(patch).eq("id", input.id);
   if (error) throw error;
   await addEvent(input.id, input.outcome === "requeue" ? "comment" : input.outcome, actor, input.note ?? (input.outcome === "requeue" ? "Sent back to the queue" : null));
+  if (input.outcome === "requeue") {
+    const agent = (Array.isArray(task.agent) ? task.agent[0] : task.agent) as { name?: string } | null;
+    await wakeAgents("task.requeued", task, agent?.name ?? null);
+  }
   return { ok: true, status: patch.status };
 }
 

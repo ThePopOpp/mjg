@@ -5,6 +5,8 @@ import { PersonalNotifications } from "@/components/layout/personal-notification
 import { createAdminActionToken } from "@/lib/auth/action-token";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { ROLES, canAccessPortal } from "@/lib/rbac/roles";
+import { PERMISSIONS, can } from "@/lib/rbac/permissions";
+import { AnalyticsStaffFlag } from "@/components/analytics/site-analytics";
 
 export default async function DashboardLayout({
   children,
@@ -28,6 +30,8 @@ export default async function DashboardLayout({
   return (
     <DashboardShell actionToken={createAdminActionToken(profile)} profile={profile}>
       <PersonalNotifications />
+      {/* Staff browsing the public site shouldn't inflate the visitor numbers. */}
+      {can(profile.role, PERMISSIONS.VIEW_REPORTS) && <AnalyticsStaffFlag />}
       {children}
       {isSuperAdmin && (
         <ReviewFab me={{ email: (profile.email ?? "").toLowerCase(), name: [profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.email }} />

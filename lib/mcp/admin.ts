@@ -15,7 +15,7 @@ import { listTasks } from "@/lib/agents/tasks";
 // ChatGPT) with their own switches, and the daily send limits. Callers check
 // Super Admin.
 
-/** Activity filter: one AI client's calls ("Claude", "ChatGPT", "Other", "Agent"). */
+/** Activity filter: one AI client's calls ("Claude", "ChatGPT", "Codex", "Other", "Agent"). */
 export type ClientFilter = string | null;
 
 export async function getMcpOverview(options: { client?: ClientFilter } = {}) {

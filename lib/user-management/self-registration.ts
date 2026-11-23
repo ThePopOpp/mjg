@@ -34,6 +34,8 @@ export type SelfRegisterResult = {
   role: AppRole;
   /** True when the account still needs a Super Admin to grant challenge access. */
   needsChallengeAccess: boolean;
+  /** The new profile (for attribution); not sent back to the browser. */
+  profileId: string | null;
 };
 
 export async function registerSelfServeAccount(input: SelfRegisterInput): Promise<SelfRegisterResult> {
@@ -122,5 +124,6 @@ export async function registerSelfServeAccount(input: SelfRegisterInput): Promis
     // Facilitators can sign in immediately, but launching a challenge still requires a Super
     // Admin to grant facilitator_challenge_access (see lib/facilitator/experiences.ts).
     needsChallengeAccess: role === ROLES.FACILITATOR,
+    profileId,
   };
 }

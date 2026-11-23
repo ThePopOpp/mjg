@@ -6,6 +6,8 @@ import { COMMERCE_TOOLS } from "./commerce";
 import { CONTENT_TOOLS } from "./content";
 import { CORE_TOOLS } from "./core";
 import { CRM_PLUS_TOOLS } from "./crm-plus";
+import { LEAD_TOOLS } from "./leads";
+import { PROSPECT_TOOLS } from "./prospect";
 import { DASHBOARD_PLUS_TOOLS } from "./dashboard-plus";
 import { DEPLOY_TOOLS } from "./deploy";
 import { DEV_TOOLS } from "./dev";
@@ -50,6 +52,9 @@ export const TOOLS: ToolDef[] = [
   ...PEOPLE_PLUS_TOOLS,
   ...GROUP_PLUS_TOOLS,
   ...CRM_PLUS_TOOLS,
+  // Lead pipeline + prospecting research (Paperclip lead agents)
+  ...LEAD_TOOLS,
+  ...PROSPECT_TOOLS,
   ...SOCIAL_PLUS_TOOLS,
   ...OPS_PLUS_TOOLS,
   // Expansion plan Phase 3 · dashboard areas without tools (assessments first)

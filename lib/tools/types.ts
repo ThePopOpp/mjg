@@ -34,7 +34,9 @@ export type ToolDomain =
   /** People only — never granted to agent tokens (see PEOPLE_ONLY_DOMAINS). */
   | "deploy"
   | "data"
-  | "agent";
+  | "agent"
+  /** Lead research: Google Places, web search, public page reader (lib/tools/prospect.ts). */
+  | "prospect";
 
 export type ToolContext = {
   /** profiles.id of the person (or the agent's service profile) acting. */

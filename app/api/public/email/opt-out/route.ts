@@ -67,6 +67,9 @@ export async function POST(request: Request) {
       });
     }
 
+    // Contacts and leads (incl. prospecting leads emailed through lead_outreach_email).
+    await supabase.from("contacts").update({ email_opt_in: false }).ilike("email", email).eq("email_opt_in", true);
+
     // The Facilitator Welcome Series also keeps its own record, so an opt-out sticks
     // for someone who isn't a contact or account (e.g. a ForgedLife group leader).
     await supabase

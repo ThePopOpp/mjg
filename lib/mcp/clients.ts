@@ -1,15 +1,18 @@
-// Which AI client is on the other end of a connection. Claude and ChatGPT both
+// Which AI client is on the other end of a connection. Claude, ChatGPT and Codex
 // register themselves (dynamic client registration); the label comes from the
 // name they register with or, failing that, where they ask to be sent back to.
 // The migration that added client_label backfills with the same rule.
 
-export type ClientLabel = "Claude" | "ChatGPT" | "Other";
+export type ClientLabel = "Claude" | "ChatGPT" | "Codex" | "Other";
 
 /** Label for calls made with an agent token (no OAuth client). */
 export const AGENT_LABEL = "Agent";
 
 export function labelForClient(name: string | null | undefined, redirectUris: readonly string[] = []): ClientLabel {
   const hosts = redirectUris.join(" ");
+  // Codex (OpenAI's coding agent) before ChatGPT: its name can carry "OpenAI" too, and it
+  // gets its own switch — it isn't held behind the ChatGPT opt-in.
+  if (/codex/i.test(name ?? "")) return "Codex";
   if (/chatgpt|openai/i.test(name ?? "") || /chatgpt\.com|openai\.com/i.test(hosts)) return "ChatGPT";
   if (/claude|anthropic/i.test(name ?? "") || /claude\.ai|claude\.com|anthropic\.com/i.test(hosts)) return "Claude";
   return "Other";
