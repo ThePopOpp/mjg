@@ -6,5 +6,11 @@ _archive
 .claude
 .env*
 npm-debug.log*
-# NOTE: do NOT ignore docs/ — app/login/page.tsx imports logos from
-# @/docs/mjg-logos/*.png, so those assets must be in the build context.
+tmp
+# docs/ is reference material (specs, zips, PDFs — hundreds of MB) that would
+# bloat every Coolify build. Only two parts of it are used by the app:
+#   • docs/mjg-logos — app/login/page.tsx imports logos from @/docs/mjg-logos/*.png
+#   • docs/legal     — /privacy and /terms render these at runtime (Dockerfile COPYs it)
+docs
+!docs/mjg-logos
+!docs/legal
