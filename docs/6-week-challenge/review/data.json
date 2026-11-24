@@ -1,0 +1,514 @@
+{
+  "exported_at": "2026-11-10T23:16:00.337Z",
+  "types": [
+    {
+      "id": "60fb2b13-57d5-4031-b91f-e0a0a88a05aa",
+      "slug": "six-week-challenge-leader",
+      "name": "6 Week Challenge — Leader"
+    },
+    {
+      "id": "053e2260-fed4-457d-ae11-2236f72deabb",
+      "slug": "six-week-challenge-biweekly",
+      "name": "6 Week Challenge - Bi-Weekly"
+    }
+  ],
+  "emails": [
+    {
+      "track": "participant",
+      "slug": "6wc-00-challenge-accepted",
+      "name": "6WC · 00 · Challenge Accepted",
+      "status": "active",
+      "subject": "You said yes, John. Let's build.",
+      "preheader": "This is not about polished answers. It is about honest men building on purpose.",
+      "body": "Challenge Accepted\n\nHi John,\nI'm grateful you said yes to The Life You're Building 6-Week Challenge. This is not another thing to impress anyone with. It's an honest six-week journey for men willing to slow down, look at the life they're actually building, and begin stewarding it with more purpose.\nOver the next six weeks we'll look at the whole structure — faith and identity, purpose, family, fitness, fun, finances, guardrails, keystone rhythms, energy, and legacy. The point isn't to redesign your life overnight. It's to begin with enough honesty to take one faithful next step.\nThree things to do now:\n-Add all six dates to your calendar.\n-Reply with one sentence: \"My hope for these six weeks is...\" I really do want to hear from you.\n-Think of one man who may need this next. No pressure — just begin praying about who to invite into a future group.\nWhat kind of life am I actually building?\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-00-challenge-accepted.html",
+      "schedule": {}
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-01-welcome-what-to-expect",
+      "name": "6WC · 01· Welcome & What to Expect",
+      "status": "draft",
+      "subject": "Your guide is here, John. Start here.",
+      "preheader": "Take 20 honest minutes before we begin. Awareness is where stewardship starts.",
+      "body": "Welcome — Start Here\n\nHi John,\nOne week from now, we begin. Below is your Participant Guide. Before our first meeting, take 15–20 quiet minutes and complete the first steps. Don't rush them. The goal isn't to look impressive — it's to tell the truth about the life that's actually being built.\nBefore Week 1, please:\n-Watch the short invite video.\n-Download your Participant Guide.\n-Read the opening pages and group covenant.\n-Complete the BEFORE column of the Created for More Check-In.\nThe Check-In isn't a grade. It's a mirror and a map — it helps you see where you're aligned, where you may be drifting, and what needs attention next.\nCome to our first meeting ready to share one word that describes your current season and one hope you have for the next six weeks.\nDownload the Participant Guide\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-01-welcome-what-to-expect.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 2,
+          "label": "Welcome & What to Expect (~7 days before Week 1)",
+          "offset_value": -7,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-03-week-1-wake-up",
+      "name": "6WC · 03 · Week 1 — Wake Up",
+      "status": "active",
+      "subject": "Week 1: Wake Up — John, what are you building?",
+      "preheader": "Drift is subtle. Design is intentional. This week we start telling the truth.",
+      "body": "Week 1 — Wake Up\n\nHi John,\nThis week is Week 1: Wake Up. It's not about shame, panic, or a dramatic overhaul. It's about awareness. Most men don't decide to neglect what matters — drift usually happens quietly. One busy week becomes a busy season. One postponed conversation becomes distance.\nThe first step isn't to fix everything. The first step is to see clearly. Watch this week's video, then come ready to share:\n-One word that describes your current season.\n-One hope you have for these six weeks.\n-One area where you sense drift may be showing up.\nYou cannot steward what you refuse to examine.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-03-week-1-wake-up.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 4,
+          "label": "Week 1 Launch: Wake Up",
+          "offset_value": 0,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-48hrs-start-strong-reminder",
+      "name": "6WC · 48HRS · Start Strong Reminder",
+      "status": "draft",
+      "subject": "Two days out, John — your first 20 minutes matter",
+      "preheader": "Do not overthink it. Just answer what is actually true right now.",
+      "body": "Start Strong\n\nHi John,\nWe begin in two days. This is your friendly reminder to complete the BEFORE column of the Created for More Check-In and the Week 1 pre-work.\nSet a timer for 20 minutes. Put your phone away. Answer from current reality, not from what you wish were true. The first question is simple, but don't rush past it:\nWhat kind of life am I actually building?\nBring one word that describes your current season and one hope for these six weeks. You're not behind — you're beginning. And beginning with honesty is already a meaningful step.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-48hrs-start-strong-reminder.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 3,
+          "label": "Start Strong Reminder (~48h before Week 1)",
+          "offset_value": -2,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "leader",
+      "slug": "6wc-leader-final-30day",
+      "name": "6WC · Leader · 5 · Final Survey & 30-Day Follow-Up",
+      "status": "draft",
+      "subject": "You finished — capture the growth and set the 30-day",
+      "preheader": "Send the final survey and schedule the 30-day follow-up.",
+      "body": "You Finished the Six Weeks\n\nHi John,\nWell done. Now let's capture what happened — measurable growth and real stories — so you can encourage your men and, if you sense the call, multiply into more groups:\n-Send the final survey to the group.\n-Have each man complete the AFTER column of the Created for More Check-In and compare it to their BEFORE score.\n-Schedule the 30-day follow-up — reconnect, complete the 30-DAY column, and gather what actually lasted.\n-Ask who would recommend the group, and note the one or two ready to lead the next one.\nSchedule the 30-day follow-up\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-leader-final-30day.html",
+      "schedule": {
+        "six-week-challenge-leader": {
+          "step": 5,
+          "label": "Final Survey & 30-Day Follow-Up",
+          "offset_value": 90,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "leader",
+      "slug": "6wc-leader-midpoint-pulse",
+      "name": "6WC · Leader · 4 · Midpoint Pulse",
+      "status": "draft",
+      "subject": "Midpoint — how is your group landing?",
+      "preheader": "Take a pulse after Week 3 and adjust your support.",
+      "body": "Midpoint Check\n\nHi John,\nYou're halfway. Now is a good time to take a quiet pulse on how the group is landing and adjust your support for the second half:\n-Who is engaging, and who has gone quiet? Reach out personally to one or two men this week.\n-Is the discussion getting honest, or staying safe? Model a little more vulnerability if needed.\n-Are men actually taking their weekly action, or just talking? Gently raise the bar.\nTransformation comes first — never turn the room into a survey while men are sharing. Let the Check-In do the measuring, before and after.\nReach the man who's gone quiet before the second half begins.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-leader-midpoint-pulse.html",
+      "schedule": {
+        "six-week-challenge-leader": {
+          "step": 4,
+          "label": "Midpoint Pulse (after Week 3)",
+          "offset_value": 42,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "leader",
+      "slug": "6wc-leader-one-week-out",
+      "name": "6WC · Leader · 2 · One Week Out",
+      "status": "draft",
+      "subject": "One week out — send the welcome and the BEFORE Check-In",
+      "preheader": "Prep your men for Week 1.",
+      "body": "One Week Out\n\nHi John,\nYou're almost there. This week, prepare your men so Week 1 lands well:\n-Send the welcome with the guide.\n-Ask each man to complete the BEFORE column of the seven-layer Created for More Check-In and the Week 1 pre-work.\n-Read the leader guide once, then re-read Week 1.\nRemember the standard rhythm — about 75 minutes: welcome and prayer, a personal check-in round, the teaching video, guided discussion (depth over coverage), this week's action, and closing prayer. End on time.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-leader-one-week-out.html",
+      "schedule": {
+        "six-week-challenge-leader": {
+          "step": 2,
+          "label": "One Week Out",
+          "offset_value": 14,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "leader",
+      "slug": "6wc-leader-weekly-reminder",
+      "name": "6WC · Leader · 3 · Weekly Session Reminder",
+      "status": "draft",
+      "subject": "This week's session — a quick reminder",
+      "preheader": "Run the meeting, play the video, capture a debrief.",
+      "body": "Your Session This Week\n\nHi John,\nA quick reminder as you lead this week's meeting:\n-Play this week's teaching video (~10–12 min), then add your own story and the key lesson.\n-Use two or three primary questions — depth over coverage. Ask one at a time and allow silence.\n-Close with this week's action and prayer. End on time.\n-Afterward, capture a short debrief — a few notes on what happened and who to follow up with.\nFacilitate rather than perform. When you share honestly first, you give every man permission to do the same.\nThis reminder is reusable — resend it (or reschedule a copy) before each weekly session.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-leader-weekly-reminder.html",
+      "schedule": {
+        "six-week-challenge-leader": {
+          "step": 3,
+          "label": "Weekly Session Reminder (reuse each week)",
+          "offset_value": 20,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "leader",
+      "slug": "6wc-leader-welcome-recruit",
+      "name": "6WC · Leader · 1 · Welcome & Recruit",
+      "status": "draft",
+      "subject": "You're leading The Life You're Building — let's get your group set",
+      "preheader": "Set your dates, invite 8–12 men, and share the invitation video.",
+      "body": "Thank You for Stepping Up\n\nHi John,\nYou don't need to be a pastor, a counselor, or a polished speaker to lead this well. You need three things: a willingness to go first in honesty, the discipline to protect the structure of each meeting, and enough care to follow up with your men between sessions. Everything else is provided for you.\n3–4 weeks out — your setup:\n-Set all six dates and a location — same day and time each week. Predictability protects attendance.\n-Invite 8–12 men personally. A direct ask beats any announcement, and the short invitation video helps them say yes.\n-Order or print the Participant Guides.\nInvite men you respect and believe will engage honestly — not men you're trying to fix. The most powerful thing you bring isn't expertise. It's example.\nYou go first in honesty. That gives every man permission to do the same.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-leader-welcome-recruit.html",
+      "schedule": {
+        "six-week-challenge-leader": {
+          "step": 1,
+          "label": "Welcome & Recruit (setup)",
+          "offset_value": 0,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-04-week-1-followup",
+      "name": "6WC · 04 · Week 1 Follow-Up",
+      "status": "draft",
+      "subject": "Week 1 follow-up: one sentence, one conversation",
+      "preheader": "Keep your six-week intention where you can see it. Then have the conversation you named.",
+      "body": "Keep the Intention Visible\n\nHi John,\nThank you for showing up with honesty this week. Week 1 asked us to wake up to the life being built. Now the work moves from the room into real life. This week, take two simple actions:\n-Put your six-week intention somewhere visible — desk, mirror, phone lock screen, Bible, journal, or calendar.\n-Have one honest conversation with a spouse, friend, mentor, or accountability partner about the area that needs attention.\nDon't make the conversation perfect. Make it honest. Then reply to this email with your one-sentence intention — I want to hear from you, and I'll be praying it moves from an idea to a real step.\nTransformation begins with one honest step taken in the open.\nP.S. If someone came to mind during Week 1, write his name down. There may be a man who needs this challenge next.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-04-week-1-followup.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 5,
+          "label": "Week 1 Action Follow-Up",
+          "offset_value": 1,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-06-week-2-followup",
+      "name": "6WC · 06 · Week 2 Follow-Up",
+      "status": "draft",
+      "subject": "Week 2 follow-up: put it where you can see it",
+      "preheader": "A value you never protect may be more preference than priority.",
+      "body": "Put It Where You Can See It\n\nHi John,\nThis week you began drafting the foundation beneath your life — bedrock, mission, values, life verse, and daily purpose. Now make it visible.\nChoose one value, verse, phrase, or sentence from your pre-work and put it somewhere you'll see it every day this week. Then use it as a decision filter and ask:\nWhat would change if I lived from this instead of reaction, pressure, approval, or urgency?\nReply with the sentence or value you chose. I want to hear what's becoming clearer. You don't need your whole future mapped out — you need enough clarity to take the next faithful step.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-06-week-2-followup.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 7,
+          "label": "Week 2 Action Follow-Up",
+          "offset_value": 8,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-08-week-3-followup",
+      "name": "6WC · 08 · Week 3 Follow-Up",
+      "status": "draft",
+      "subject": "Week 3 follow-up: one pillar, seven days",
+      "preheader": "Trying to fix everything usually fixes nothing. Choose the next faithful step.",
+      "body": "One Pillar, Seven Days\n\nHi John,\nThis week you named one pillar that needs focused attention. Now make the first step small enough to take this week:\n-Family — schedule one conversation, walk, meal, apology, encouragement, or act of presence.\n-Fitness — choose one capacity rhythm: walk, workout, bedtime, appointment, meal plan, or recovery.\n-Fun — schedule one life-giving experience this week and one larger one to plan.\n-Finances — review one spending, saving, giving, or planning pattern and name what money should serve.\nReply with your focus pillar and first seven-day action. I want to hear what you're putting into motion.\nRepeated faithfulness becomes the architecture of character.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-08-week-3-followup.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 9,
+          "label": "Week 3 Action Follow-Up",
+          "offset_value": 15,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-09-midpoint-pulse",
+      "name": "6WC · 09 · Midpoint Pulse",
+      "status": "draft",
+      "subject": "We're halfway through, John. Tell me the truth.",
+      "preheader": "Honest feedback is a gift. What is landing, what is unclear, what would help?",
+      "body": "Tell Me the Truth\n\nHi John,\nWe're halfway through. Thank you for the honesty, effort, and courage you've brought so far. This isn't meant to be a lecture series — it's meant to create reflection, conversation, action, and transformation.\nI'd be grateful if you'd reply with a few lines:\n-What has resonated most so far?\n-What has been least clear or hardest to apply?\n-What would make the next three weeks more useful?\n-Who is one man who may need this kind of challenge?\nPlease tell me the truth. Encouragement helps. Friction helps too. I want this to genuinely serve men, families, churches, and communities.\nP.S. Nothing personal you share is used publicly without separate written permission. Feedback helps us build better; your story remains yours.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-09-midpoint-pulse.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 10,
+          "label": "Midpoint Pulse (after Week 3)",
+          "offset_value": 16,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-11-week-4-followup",
+      "name": "6WC · 11 · Week 4 Follow-Up",
+      "status": "draft",
+      "subject": "Week 4 follow-up: guardrails need witnesses",
+      "preheader": "Boundaries become stronger when someone else knows what they protect.",
+      "body": "Tell One Trusted Person\n\nHi John,\nThis week you drafted a guardrail. Now strengthen it by telling one trusted person what it is and what it protects — your spouse, a close friend, your accountability partner, a mentor, or someone from the group. Use this simple sentence:\n\"I am putting this guardrail in place because I want to protect ________.\"\nThat last blank matters. Guardrails aren't merely about avoiding failure — they're about protecting the life, relationships, purpose, and legacy God has entrusted to you.\nReply if you'd like to share your guardrail with me, or if there's a place you'd like prayer. I want to hear from you.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-11-week-4-followup.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 12,
+          "label": "Week 4 Action Follow-Up",
+          "offset_value": 22,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-13-week-5-followup",
+      "name": "6WC · 13 · Week 5 Follow-Up",
+      "status": "draft",
+      "subject": "Week 5 follow-up: test the rhythm",
+      "preheader": "The goal is not intensity. The goal is a repeatable rhythm that strengthens the structure.",
+      "body": "One Habit, One Renewal Rhythm\n\nHi John,\nThis week you named one keystone rhythm and one renewal rhythm. Now test them for seven days. Use this structure:\nAfter I ________, I will ________.\nMinimum version: if the full habit feels too big, I will at least ________.\nFor energy, choose one drain to reduce and one renewal rhythm to protect — sleep, movement, prayer, solitude, a walk, a Sabbath block, a phone boundary, or a conversation that restores perspective.\nReply with the habit and renewal rhythm you're testing. I want to hear what you're building. And if you miss once, don't spiral — recover quickly. One miss doesn't have to become drift.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-13-week-5-followup.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 14,
+          "label": "Week 5 Action Follow-Up",
+          "offset_value": 29,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-15-finish-strong",
+      "name": "6WC · 15 · Finish Strong Reminder",
+      "status": "draft",
+      "subject": "Tomorrow: finish strong, John",
+      "preheader": "Come ready to share what changed, what you are choosing, and who will help you keep going.",
+      "body": "Finish Strong\n\nHi John,\nTomorrow is our final meeting. Before we gather, please complete your Personal Blueprint and the AFTER column of the Created for More Check-In.\nCome ready to share three things in about three minutes:\n-What woke me up.\n-What I'm choosing.\n-My next 30-day step and who will help me keep it.\nDon't worry about making it polished. Honest is better than impressive. I'm grateful for the work you've put in.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-15-finish-strong.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 16,
+          "label": "Finish Strong Reminder (~24h before Week 6)",
+          "offset_value": 34,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-16-final-thankyou",
+      "name": "6WC · 16 · Final Thank-You & Next Step",
+      "status": "draft",
+      "subject": "You finished, John. Now keep building.",
+      "preheader": "The question now is not “Did I finish the study?” It is “How do I keep building?”",
+      "body": "Now Keep Building\n\nHi John,\nThank you for the honesty, courage, and effort you brought to these six weeks. You did something many men never slow down long enough to do: you looked honestly at the life you're building. You named drift. You clarified what matters. You chose guardrails, habits, and a next faithful step. That matters.\nWatch the closing video, then take these next steps:\n-Complete your Final Reflection and Feedback.\n-Schedule your 30-day commitment and review date.\n-Share your Blueprint with someone close to you.\n-Reply with one sentence: \"The biggest thing that changed for me was...\"\nYou were not created merely to keep up. You were created to steward a life that matters.\nComplete final feedback\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-16-final-thankyou.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 17,
+          "label": "Final Thank-You and Next Step",
+          "offset_value": 36,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-17-keep-building",
+      "name": "6WC · 17 · Keep Building",
+      "status": "draft",
+      "subject": "One week later: don't put the Blueprint in a drawer",
+      "preheader": "The first week after a challenge is where many men go quiet. Do not drift back quietly.",
+      "body": "Keep Building\n\nHi John,\nIt's been one week since we finished. This is the moment when a blueprint either becomes a lived structure or gets put in a drawer.\nPull out your Personal Blueprint today. Read your 30-day commitment. Then do one of these before the day ends:\n-Text your accountability person.\n-Schedule your protected rhythm.\n-Take the next step you named.\n-Have the conversation you postponed.\n-Move your guardrail from idea to practice.\nReply with one word: building. That lets me know you're still in motion. You don't need to prove anything — you need to keep practicing faithfulness.\nP.S. Know a man who should go through this next? Send him the invite link.\nInvite another man\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-17-keep-building.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 18,
+          "label": "Keep Building (7 days after Week 6)",
+          "offset_value": 42,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-18-do-not-drift",
+      "name": "6WC · 18 · Do Not Drift Back Quietly",
+      "status": "draft",
+      "subject": "Three weeks later: a miss is not failure",
+      "preheader": "Do not let one miss become drift. Recover quickly.",
+      "body": "Do Not Drift Back Quietly\n\nHi John,\nYou're about three weeks into your 30-day commitment. This is usually where real life tests the plan. Travel happens. Work expands. Energy dips. The guardrail gets inconvenient. The habit gets interrupted. So here's the reminder: a miss is not failure. The question is what you do next.\nTake five minutes today and answer honestly:\n-What's working?\n-What's resisting change?\n-What needs to be redesigned, not abandoned?\n-Who needs to hear from me?\nReply with one phrase: still building, need prayer, or need to redesign. I want to hear from you either way.\nTransformation is about recovering quickly and refusing to drift back quietly.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-18-do-not-drift.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 19,
+          "label": "Do Not Drift Back Quietly (21 days after Week 6)",
+          "offset_value": 56,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-19-30-day-checkin",
+      "name": "6WC · 19 · 30-Day Check-In",
+      "status": "draft",
+      "subject": "30-Day Check-In: what lasted, John?",
+      "preheader": "Movement is seen over time, not in a single score.",
+      "body": "What Lasted?\n\nHi John,\nIt's time for your 30-day follow-up. Before we meet, retake the Created for More Check-In and complete the 30-DAY column. Update your Blueprint Snapshot and review your 30-day commitment.\nDon't only look at the number. Compare it with the actions you took, conversations you had, guardrails you built, habits you tested, and rhythms that lasted. Come ready to share:\n-What lasted?\n-What needed redesign?\n-Who noticed a difference?\n-What is one story of change?\n-What is the next faithful step?\nConfirm your 30-day follow-up\nA lower score after reflection doesn't automatically mean failure. Sometimes deeper honesty creates a more accurate mirror. The real evidence is what changed and what's still being practiced.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-19-30-day-checkin.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 20,
+          "label": "30-Day Check-In: What Lasted?",
+          "offset_value": 65,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-20-multiply-it",
+      "name": "6WC · 20 · Multiply It",
+      "status": "draft",
+      "subject": "Who needs this next, John?",
+      "preheader": "The work you did was not only for you. A well-built life begins to overflow.",
+      "body": "Who Needs This Next?\n\nHi John,\nYou've walked through the six-week challenge and a 30-day follow-up. Now the question isn't only what changed in you — it's what your life will multiply from here.\nThere may be a man in your life who is quietly drifting, succeeding on a scoreboard that feels too small, or carrying pressure alone. Your invitation may be the thing that helps him begin. Choose one next step:\n-Invite one man to the next challenge.\n-Stay connected with your group and schedule a 90-day Blueprint review.\n-Join the book updates list for The Life You're Building.\n-Join ForgedLife for habits, prayer, challenges, and group follow-through.\n-Explore leading or hosting a future group, or bring this to your church or ministry.\nYou don't need to be an expert to encourage another man. You simply need to be honest about what helped you and willing to open the door.\nA well-built life overflows. Keep building.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-20-multiply-it.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 21,
+          "label": "Multiply It (35-45 days after Week 6)",
+          "offset_value": 70,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-week-2",
+      "name": "6WC · 05 · Week 2 — See the Blueprint",
+      "status": "draft",
+      "subject": "Week 2: See the Blueprint — identity before strategy",
+      "preheader": "Before we fix the visible structure, we ask what the life is rooted in.",
+      "body": "Week 2 — See the Blueprint\n\nHi John,\nThis week we move from awareness to foundation: Bedrock and Foundation. A blueprint can show where the walls go, but it can't tell you why the house is being built. That question comes first.\nThis week we'll ask:\n-What is my life rooted in?\n-Where do I receive worth?\n-What values am I willing to protect?\n-What mission or daily purpose should guide this season?\nWatch the Week 2 video, then complete the pre-work in your guide. Don't wait for perfect language — a rough, honest mission statement is more useful than a polished sentence that never shapes a decision. Bring one value or sentence you want to carry into this season.\nA strong life is built from the inside out.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-week-2.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 6,
+          "label": "Week 2 Launch: See the Blueprint",
+          "offset_value": 3,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-week-3",
+      "name": "6WC · 07 · Week 3 — Evaluate the Pillars",
+      "status": "draft",
+      "subject": "Week 3: Family. Fitness. Fun. Finances. One next step.",
+      "preheader": "The goal is not perfect balance. The goal is faithful alignment.",
+      "body": "Week 3 — Evaluate the Pillars\n\nHi John,\nThis week we move into the four visible pillars of the life you're building: Family, Fitness, Fun, and Finances. These aren't four unrelated categories — they're everyday areas of stewardship that support the whole structure. Neglect in one eventually affects the rest.\nWatch the Week 3 video, complete the pillar evaluation, and ask honestly:\n-Are the people closest to me receiving presence, or leftovers?\n-Is my body supporting the life I'm called to build?\n-Am I making room for joy, rest, and meaningful experiences?\n-Are my resources serving purpose, or carrying fear and comparison?\nBefore we meet, choose one focus pillar for the next 90 days — the one that would create the most positive ripple if strengthened. Bring one win, one concern, and one focus pillar.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-week-3.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 8,
+          "label": "Week 3 Launch: Evaluate the Pillars",
+          "offset_value": 10,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-week-4",
+      "name": "6WC · 10 · Week 4 — Install the Guardrails",
+      "status": "draft",
+      "subject": "Week 4: What boundary would protect what matters?",
+      "preheader": "A guardrail is a decision made before pressure, not after regret.",
+      "body": "Week 4 — Install the Guardrails\n\nHi John,\nThis week is Week 4: Install the Guardrails. A guardrail isn't restriction for its own sake — it's protection. It's a decision made before the moment of pressure, exhaustion, temptation, fear, comparison, or drift.\nWatch the Week 4 video, complete the guardrail reflection, and ask:\n-Where am I most vulnerable to drift right now?\n-What matters enough to protect before regret arrives?\n-What specific boundary would help me become the man I say I want to become?\nGood intentions aren't enough. A guardrail should be specific enough that you know whether you kept it. Bring one draft guardrail — you decide how much to share, but come prepared to be honest.\nGood intentions are not guardrails.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-week-4.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 11,
+          "label": "Week 4 Launch: Install the Guardrails",
+          "offset_value": 17,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-week-5",
+      "name": "6WC · 12 · Week 5 — Strengthen the Structure",
+      "status": "draft",
+      "subject": "Week 5: what small rhythm would create the biggest ripple?",
+      "preheader": "The life you are building is shaped less by occasional intention and more by repeated rhythms.",
+      "body": "Week 5 — Strengthen the Structure\n\nHi John,\nThis week we focus on two things that make change sustainable: keystone rhythms and energy. A keystone rhythm is a small rhythm that pulls more than one part of life toward alignment — a morning prayer rhythm, weekly planning time, a workout, a family dinner, a monthly financial review, a phone-free evening, or a check-in with another man.\nEnergy matters because you can't faithfully steward what matters while constantly running on empty. Physical, emotional, mental, and spiritual energy all need renewal.\nWatch the Week 5 video and complete the habit and energy snapshot. Bring one habit and one renewal rhythm you're willing to test for seven days.\nDon't build a fantasy routine. Build a rhythm you can actually practice.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-week-5.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 13,
+          "label": "Week 5 Launch: Strengthen the Structure",
+          "offset_value": 24,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "participant",
+      "slug": "6wc-participant-week-6",
+      "name": "6WC · 14 · Week 6 — Design My Life",
+      "status": "draft",
+      "subject": "Week 6: bring your Personal Blueprint",
+      "preheader": "The blueprint was never meant to sit in a drawer. It is meant to guide what you keep building.",
+      "body": "Week 6 — Design My Life\n\nHi John,\nThis week is Week 6: Design My Life. You've named current reality, drafted a foundation, evaluated the pillars, built a guardrail, and chosen habits and energy rhythms. Now you bring the structure together into one Personal Blueprint.\nWatch the Week 6 video, then complete these steps before we meet:\n-Review Weeks 1 through 5.\n-Complete your Personal Blueprint page.\n-Retake the Created for More Check-In and complete the AFTER column.\n-Choose your next 30-day commitment.\n-Prepare a three-minute share: what woke me up, what I'm choosing, and my next faithful step.\nThis week is not an ending. It is a commissioning.\n\n— Michael J. Gauthier\nmichaeljgauthier.com",
+      "html_file": "html/6wc-participant-week-6.html",
+      "schedule": {
+        "six-week-challenge-biweekly": {
+          "step": 15,
+          "label": "Week 6 Launch: Design My Life",
+          "offset_value": 31,
+          "offset_unit": "day",
+          "subject_override": null
+        }
+      }
+    },
+    {
+      "track": "leader",
+      "slug": "guide-start-new-challenge",
+      "name": "Guide · How to Start a New Challenge",
+      "status": "active",
+      "subject": "How to Start a New Challenge in the MJG Dashboard",
+      "preheader": "A quick step-by-step for launching the 6-Week Challenge.",
+      "body": "How to Start a New Challenge\n\nHi John,\n\nLaunching a challenge takes about two minutes — all from the Experiences page in the dashboard.\n\n1. Click \"Start New Challenge\" on the Experiences page.\n2. Pick the challenge: 6 Week Challenge (weekly) or 6 Week Challenge - Bi-Weekly (every other week, 12 weeks). Same emails, different pace.\n3. Add the men joining — a name and email for each.\n4. Send the invitations — Send now, or Schedule for later.\n5. Set the challenge start date — the actual Week 1 date and time. The 48-hour and 24-hour reminders fire before this automatically.\n6. Set Visibility — all facilitators, selected facilitators, or admins only. Optionally assign a facilitator.\n7. Keep \"Start the challenge\" on and click Start Challenge. (Turn it off to save a draft.)\n\nWhat happens automatically:\n- When someone accepts their invite, they instantly get the Challenge Accepted welcome email.\n- 48 and 24 hours before the start date, the two reminder emails go out on their own.\n- Every weekly (or bi-weekly) email then sends itself on schedule.\n- You can Edit, Pause, or Delete any challenge anytime.\n\nOpen Experiences: https://michaeljgauthier.com/dashboard/experiences\n\n— Michael J. Gauthier\nThe Stewardship Blueprint",
+      "html_file": "html/guide-start-new-challenge.html",
+      "schedule": {}
+    }
+  ]
+}

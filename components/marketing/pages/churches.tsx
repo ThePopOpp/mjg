@@ -83,6 +83,7 @@ export async function ChurchesPage() {
           <SectionIntro eyebrow={nextStep.eyebrow} title={nextStep.title} body={nextStep.body} center />
           <Actions center>
             <ButtonLink cta={nextStep.primaryCta} variant="gold" />
+            <ButtonLink cta={nextStep.secondaryCta} variant="ghost" />
           </Actions>
         </div>
       </Band>

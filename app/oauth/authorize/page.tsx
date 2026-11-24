@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ShieldCheck, TriangleAlert } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { isMcpEnabled } from "@/lib/mcp/auth";
 import { OAuthError, assertCanAuthorize, signConsent, validateAuthorizeRequest } from "@/lib/mcp/oauth";
@@ -17,7 +17,11 @@ type Search = Record<string, string | string[] | undefined>;
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl border bg-card p-7 shadow-sm">{children}</div>
+      <div className="w-full max-w-md rounded-2xl border bg-card p-7 shadow-sm">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icons/icon-192.png" alt="MJG" width={48} height={48} className="mb-5 h-12 w-12 rounded-xl" />
+        {children}
+      </div>
     </main>
   );
 }
@@ -55,7 +59,7 @@ export default async function AuthorizePage({ searchParams }: { searchParams: Pr
   try {
     await assertCanAuthorize(profile.id);
   } catch {
-    return <Problem title="Super Admins only" body={`You're signed in as ${profile.email}. Connecting Claude to MJG is limited to active Super Admins.`} />;
+    return <Problem title="Super Admins only" body={`You're signed in as ${profile.email}. Connecting ${request.clientName} to MJG is limited to active Super Admins.`} />;
   }
 
   const issuedAt = Date.now();
@@ -72,8 +76,7 @@ export default async function AuthorizePage({ searchParams }: { searchParams: Pr
 
   return (
     <Shell>
-      <ShieldCheck className="h-7 w-7 text-[#b88a4a]" aria-hidden />
-      <h1 className="mt-4 text-xl font-semibold">Connect {request.clientName} to MJG</h1>
+      <h1 className="text-xl font-semibold">Connect {request.clientName} to MJG</h1>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
         It will act as <span className="font-medium text-foreground">{profile.email}</span> with your Super Admin access: reading and changing
         website content, email, SMS, calls, people and project work.

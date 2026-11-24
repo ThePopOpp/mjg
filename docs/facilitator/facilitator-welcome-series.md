@@ -164,14 +164,14 @@ MJG | Stewardship Blueprint: Thanks for signing up to facilitate, {{first_name}}
 
 | Variable | Used in | Status |
 |---|---|---|
-| `{{handbook_url}}` | Email 1, welcome text | **Needed.** Publish *Facilitating Meaningful Bible Study and Group Conversations* at a permanent, branded URL |
+| `{{handbook_url}}` | Email 1, welcome text | **Ready:** `https://michaeljgauthier.com/facilitator-handbook` (Handbook v1, 17 pages). The link redirects to the PDF, so a v2 only changes the file it points to (`next.config.ts`) |
 | `{{assessment_url}}` | Email 2 | Confirm the Created for More Check-In URL |
 | `{{resources_url}}` | Email 3 | Confirm the destination page on MichaelJGauthier.com |
 | Instagram URL | All email footers | Confirm |
 | Facebook URL | All email footers | **Needed.** The full URL with numeric ID was referenced but not included in the brief |
 | LinkedIn URL | All email footers | Confirm |
-| Postal address | All email footers | **Needed.** Required by law; a PO box is fine |
-| Reply-to inbox | All emails | **Needed.** Set as `FACILITATOR_WELCOME_REPLY_TO` in Coolify |
+| Postal address | All email footers | **Needed.** Required by law. Mike prefers not to use a personal address: a PO box or a virtual mailbox works and keeps his home address private |
+| Reply-to inbox | All emails | Recommended: `hello@michaeljgauthier.com`, the address every MJG email already sends from. Leaving `FACILITATOR_WELCOME_REPLY_TO` unset sends replies there; someone must check it |
 
 ## Pre-launch test checklist
 
@@ -190,8 +190,8 @@ MJG | Stewardship Blueprint: Thanks for signing up to facilitate, {{first_name}}
 
 ## Open items for Mike
 
-1. Final handbook file
-2. Full Facebook URL, including the numeric ID
+1. ~~Final handbook file~~ Received (v1); hosted at `/facilitator-handbook`
+2. Full Facebook URL, including the numeric ID (plus Instagram and LinkedIn)
 3. Destination URLs for the Email 2 and Email 3 buttons
 4. Decision on the `/facebook` redirect
 5. Postal address for the email footer

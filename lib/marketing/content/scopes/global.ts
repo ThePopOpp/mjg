@@ -89,6 +89,7 @@ const nav = defineSection<NavContent>({
         href: "/about",
         links: [
           link("about", "About Michael", "/about"),
+          link("speaking", "Speaking & Podcasts", "/speaking"),
           link("mission", "Mission & Vision", "/mission"),
           link("join", "Join the Journey", "/join"),
           link("pricing", "Prices & Plans", "/steward/pricing"),
@@ -165,6 +166,7 @@ const footer = defineSection<FooterContent>({
         label: "Connect",
         links: [
           link("about", "About Michael", "/about"),
+          link("speaking", "Speaking & Podcasts", "/speaking"),
           link("mission", "Mission & Vision", "/mission"),
           link("contact", "Contact", "/contact"),
           link("join", "Join the Journey", "/join"),

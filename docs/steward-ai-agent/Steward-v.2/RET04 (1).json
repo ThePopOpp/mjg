@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""Static consistency: feature/test crosswalk, feature coverage, effective-current table, and test matrix. Not application testing."""
+import csv,re,pathlib,sys
+root=pathlib.Path(sys.argv[1] if len(sys.argv)>1 else pathlib.Path(__file__).resolve().parent.parent)
+
+def rows(path):
+    with (root/path).open(encoding='utf-8-sig',newline='') as f:return list(csv.DictReader(f))
+
+def expand(s):
+    out=set()
+    for token in (s or '').split(';'):
+        token=token.strip().replace('–','-').replace('—','-')
+        if not token:continue
+        m=re.fullmatch(r'([A-Za-z_]+)(\d+)-([A-Za-z_]*)(\d+)',token)
+        if m and m.group(3) in ('',m.group(1)):
+            prefix,start,_,end=m.groups()
+            out|={f'{prefix}{i:0{len(start)}d}' for i in range(int(start),int(end)+1)}
+        else:out.add(token)
+    return out
+
+cross=rows('MATRICES/Feature_Requirement_Test_Crosswalk.csv')
+coverage=rows('MATRICES/Feature_Requirement_Coverage.csv')
+tests=rows('TESTS/Acceptance_Test_Matrix.csv')
+expected={x['current_feature_id']:expand(x['associated_tests']) for x in cross}
+assert len(expected)==len(cross)==43
+assert len({x['feature_id'] for x in coverage})==len(coverage)==43
+actual_tests={t['test_id']:set(x.strip() for x in t['feature_ids'].split(';') if x.strip()) for t in tests}
+assert len(actual_tests)==len(tests)==193
+errors=[]
+for x in coverage:
+    fid=x['feature_id']
+    if fid not in expected or expand(x['test_ids'])!=expected[fid]:errors.append(('coverage',fid))
+for line in (root/'EFFECTIVE_CURRENT_REQUIREMENTS.md').read_text().splitlines():
+    m=re.match(r'\| (V2-F\d{3}) \|',line)
+    if m:
+        fid=m.group(1)
+        cols=line.split('|')
+        if fid not in expected or expand(cols[5])!=expected[fid]:errors.append(('effective',fid))
+for fid,tids in expected.items():
+    for tid in tids:
+        if tid not in actual_tests or fid not in actual_tests[tid]:errors.append(('reverse',fid,tid))
+for tid,fids in actual_tests.items():
+    for fid in fids:
+        if fid not in expected or tid not in expected[fid]:errors.append(('forward',fid,tid))
+if errors:
+    for e in errors[:70]:print('FAIL:',e)
+    sys.exit(f'FAIL: {len(errors)} test-index discrepancies')
+print('PASS: 43 features, 193 tests, reciprocal mappings, coverage CSV and effective-current table agree (static only).')

@@ -31,6 +31,7 @@ export const MARKETING_ROUTES: MarketingRoute[] = [
   { path: "/about", title: "About Michael", scope: "page:about", status: "live", priority: 0.7 },
   { path: "/mission", title: "Mission & Vision", scope: "page:mission", status: "live", priority: 0.6 },
   { path: "/contact", title: "Contact", scope: "page:contact", status: "live", priority: 0.6 },
+  { path: "/speaking", title: "Speaking & Podcasts", scope: "page:speaking", status: "live", priority: 0.7 },
   { path: "/resources", title: "Insights & Resources", scope: "page:resources", status: "live", priority: 0.7 },
 ];
 

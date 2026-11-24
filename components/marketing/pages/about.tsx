@@ -22,6 +22,7 @@ export async function AboutPage() {
             <Actions>
               <ButtonLink cta={hero.primaryCta} />
             </Actions>
+            <TextLink cta={hero.speakingLink} className="mt-5" />
           </div>
           {/* The cut-out portrait at the homepage's scale: no box, 320px. */}
           {/* Hidden on phones for now (owner's call); shown from md up. */}

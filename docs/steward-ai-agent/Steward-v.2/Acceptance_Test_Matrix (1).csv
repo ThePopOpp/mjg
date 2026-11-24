@@ -1,0 +1,25 @@
+# STEWARD V2.0 — PROPOSED CONSOLIDATED ENGINEERING HANDOFF
+
+**Candidate:** SV2-JEREMY-PROPOSED-D0.7.3-20261111  
+**Prepared:** November 11, 2026  
+**Status:** OWNER-REVIEW CANDIDATE; NOT ACCEPTED, NOT INSTALLED, NOT DEPLOYED  
+**Internal name:** Steward V2.0 | **Historical engineering handoff:** Steward V1.0 — Initial Full Build  
+**Source baseline:** SV2-DOCSET-D0.6.2-20260928 (frozen; unchanged in BASELINE_D0.6.2_UNCHANGED)
+
+This is one proposed implementation assignment with issue-specific source authority, not a competing runtime source collection. The approved direction on November 11 authorizes preparation of the package and the five product-direction changes; it does **not** certify individual design details, legal/privacy/rights approval, application implementation, testing, handoff transmission or release. The proposed masters are not active until exact owner acceptance and controlled installation.
+
+## Release-blocking evidence checklist (NOT SATISFIED by package)
+1. Owner acceptance of exact candidate + source/rights/offer manifest; Jeremy receipt separately recorded.
+2. Actual implementation versions: code commit, schema/RLS, prompt/model/serving corpus, feature flags, immutable config and migration.
+3. Authentication, MFA/recovery, cross-account and org isolation; secure participant selected sharing and withdrawal; actual backend tests.
+4. Provider contracts/configuration, approved ZDR-first/no automatic fallback, data retention/deletion/backup protections; legal/privacy/security reviews.
+5. Completed safety specialist review, SAFE negative tests, resource/fallback validity and operational stop-ship runbooks. No false monitoring/dispatch.
+6. Exact assessment scoring provenance, dated results interpretation, correct email/recovery and no invented zeros; UI regression.
+7. Actual approval/save receipts and export; STATE-001 and D02-001 reruns, historical FAIL/defect closure evidence separated.
+8. Payment/sandbox billing/assent and entitlement tests including old nonrenewing contracts, activation, refunds, grace, cancellation, no-card grants, no duplicate charges; qualified tax/subscription review.
+9. Current source allowlist with serving/output/export and Scripture rights review, including Free guide and Premium digital; print separately blocked.
+10. Organization access, facilitator scopes and ForgedLife mapping/consent/integrity and revocation tests before enabling those respective features.
+11. Observability without raw private-content learning, cost/latency/load/retry evidence and staffed support/incident response; measured rather than assumed capacity.
+12. Owner's separate exact release authorization after gates, staging evidence and applicable pilot limits.
+
+**Critical open conditions:** production release NOT AUTHORIZED; no real backend execution supplied, no provider/qualified review proof, no live billing permission; test status NOT RUN. Owner approval of five product directions is not an acceptance stamp for this handoff.

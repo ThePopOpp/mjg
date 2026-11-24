@@ -1,0 +1,2374 @@
+{
+  "library": {
+    "label": "D0.7.3-R1",
+    "vector_store_id": "vs_6af61b4ace408191b55946559ad80ed0",
+    "built_at": "2026-11-12T20:04:12.139Z",
+    "files": [
+      {
+        "file": "00_Control_Register.md",
+        "bytes": 138004,
+        "sha256": "2045f2950cd08c886893c7dd3e7538494668eaf6c19c489a8fe9f1c749591a37",
+        "openai_file_id": "file-R5whSLqgux7DnYfBpBARpn"
+      },
+      {
+        "file": "02_Framework_Blueprint_Assessments.md",
+        "bytes": 139528,
+        "sha256": "8b40b8a9e2fc7cbe52cea0dbaf43f56421cc8e99be9d2364afbf6419283b76a5",
+        "openai_file_id": "file-2p7TTKuMvHFqN2tSh2gnkJ"
+      },
+      {
+        "file": "03_Conversation_Sensitive_Safety.md",
+        "bytes": 75755,
+        "sha256": "7f972b7150c6f0268239cfb9cdd1972af34768c36bc4f559e005807cf3c47622",
+        "openai_file_id": "file-UZTEFCFWjryVALwxZ6o4qm"
+      },
+      {
+        "file": "04_Product_Journey_New_Features.md",
+        "bytes": 172631,
+        "sha256": "066eadd8571610745a0580f9dd31759d8e50ee7d5f03af2a84090cb549af0442",
+        "openai_file_id": "file-XXYTwanH6mZ9YKE9EZbz3p"
+      },
+      {
+        "file": "05_Data_Privacy_Security.md",
+        "bytes": 368491,
+        "sha256": "8d5aea4b1a592780e161bcf1787d8b48373b24dd5b463a2e342e098ec9cdbb32",
+        "openai_file_id": "file-3ED7bjHL9RgsAd84NE8qA2"
+      },
+      {
+        "file": "06_Safety_Support_Release.md",
+        "bytes": 258765,
+        "sha256": "cca7cb6a2165edd15526c6e71d992b6ba6dcab83d432bb6da59b6af78b8889e6",
+        "openai_file_id": "file-J3xfER8TXojVUkCKyya6Tf"
+      },
+      {
+        "file": "07_Commerce_Scripture_Rights.md",
+        "bytes": 412567,
+        "sha256": "21711e15a1b598b77906e841a61a2a9a6be80cd5170a329272ea29794570bf83",
+        "openai_file_id": "file-4U84XXZciYvWwzQGdZwZeG"
+      },
+      {
+        "file": "08_Engineering_Experience_Operations.md",
+        "bytes": 216173,
+        "sha256": "633d5598bd9ff9167357403825595ee384741e4c1e8be61277a5d415693db293",
+        "openai_file_id": "file-TMUprJFCZQh9mReJvDVWBs"
+      },
+      {
+        "file": "09_Test_Suite_Quality_Control.md",
+        "bytes": 255903,
+        "sha256": "1d7f1f3440bc6ef62970f55dbf1ed55a518fde7c5590af5b1fefb578be37a92d",
+        "openai_file_id": "file-GS8YddFMxmU2ECKEPEsre8"
+      },
+      {
+        "file": "10_Teaching_Reference_Library.md",
+        "bytes": 615306,
+        "sha256": "c408ec1e75516bd590994d4e9b978047f5d2158f75531af663df57e670d0c4d6",
+        "openai_file_id": "file-JP3ZCW567RrzG3vyhEMNeS"
+      },
+      {
+        "file": "11_Change_Impact_Decisions.md",
+        "bytes": 137546,
+        "sha256": "6c7155a5470fb8f8c252b07736fce9c9e64793f2fb12d060cc220a3a44796b09",
+        "openai_file_id": "file-X1D6uY5ico7Z2Gyz2YKRXG"
+      },
+      {
+        "file": "Statement-of-Faith.txt",
+        "bytes": 2633,
+        "sha256": "b587d8af30ad22d695e48d78608cc6cbbf05d928cd3c6527c58ca305ac9e4e87",
+        "openai_file_id": "file-K3oFPAUEVApF5hg3dRAFSe"
+      }
+    ]
+  },
+  "judge": "gpt-5.5",
+  "results": [
+    {
+      "variant": "gpt-6-sol (V2)",
+      "model": "gpt-6-sol",
+      "id": "V21-01",
+      "maps": "V21-01",
+      "title": "Fresh entry — decision help",
+      "messages": [
+        "I'm trying to decide whether to take a promotion that would mean more travel. Can you help me think it through?"
+      ],
+      "run": {
+        "snapshot": {
+          "check_in": {
+            "taken": "2026-11-19",
+            "days_ago": 0,
+            "version": "cfm-v3",
+            "total": 93,
+            "out_of": 140,
+            "stage": "Aware but Stretched",
+            "layers": [
+              {
+                "key": "bedrock",
+                "layer": "Bedrock — Faith & Identity",
+                "score": 18,
+                "out_of": 20,
+                "status": "Strong / Protect"
+              },
+              {
+                "key": "foundation",
+                "layer": "Foundation — Mission, Values & Purpose",
+                "score": 15,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "pillars",
+                "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+                "score": 12,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "guardrails",
+                "layer": "Guardrails — Boundaries That Protect What Matters",
+                "score": 10,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "habits",
+                "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+                "score": 11,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "energy",
+                "layer": "Energy — The Resource Beneath Every Other Resource",
+                "score": 13,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "legacy",
+                "layer": "Legacy — What Your Life Multiplies",
+                "score": 14,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              }
+            ],
+            "lowest": [
+              "Guardrails — Boundaries That Protect What Matters"
+            ],
+            "strongest": [
+              "Bedrock — Faith & Identity"
+            ],
+            "lowest_pillar": null,
+            "times_taken": 1
+          },
+          "energy_audit": {
+            "taken": "2026-11-07",
+            "days_ago": 12,
+            "total": 63,
+            "out_of": 100,
+            "result": "Running on Reserves",
+            "sources": [
+              {
+                "key": "physical",
+                "energy": "Physical Energy",
+                "score": 13,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "emotional",
+                "energy": "Emotional Energy",
+                "score": 14,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "mental",
+                "energy": "Mental Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              },
+              {
+                "key": "spiritual",
+                "energy": "Spiritual Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              }
+            ],
+            "lowest": [
+              "Physical Energy"
+            ],
+            "chosen_focus": "Physical Energy",
+            "times_taken": 1
+          }
+        },
+        "ratings": {
+          "check_in": [
+            {
+              "layer": "Bedrock — Faith & Identity",
+              "score": 18,
+              "statements": [
+                "5: I know who I am beneath my roles, titles, and achievements.",
+                "4: My daily choices flow from a settled identity, not from proving myself.",
+                "5: I return to my faith as a source of stability, not just a Sunday habit.",
+                "4: I can name the truth I stand on when life feels uncertain."
+              ]
+            },
+            {
+              "layer": "Foundation — Mission, Values & Purpose",
+              "score": 15,
+              "statements": [
+                "4: I have clarity about what matters most in this season.",
+                "4: My calendar reflects my stated priorities.",
+                "3: I could state my mission and values in a sentence if asked.",
+                "4: I am building my life around purpose, not just pressure or expectation."
+              ]
+            },
+            {
+              "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+              "score": 12,
+              "statements": [
+                "2: The people I love are receiving my presence, not just my provision.",
+                "4: My sleep, movement, and health support the life I want to build.",
+                "3: I make room for joy, rest, and meaningful experiences — not just obligation.",
+                "3: My finances serve my purpose and values, not fear or comparison."
+              ]
+            },
+            {
+              "layer": "Guardrails — Boundaries That Protect What Matters",
+              "score": 10,
+              "statements": [
+                "2: I have clear boundaries around my time, attention, and commitments.",
+                "3: I have limits in place that protect my integrity under pressure.",
+                "2: I say no to good things that would crowd out my best things.",
+                "3: Someone else knows my guardrails and helps me keep them."
+              ]
+            },
+            {
+              "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+              "score": 11,
+              "statements": [
+                "3: I have identified one or two habits that, if kept, would change everything else.",
+                "2: My mornings or evenings have a rhythm that supports who I am trying to become.",
+                "3: When a keystone habit slips, I notice quickly and recover instead of spiraling.",
+                "3: My habits are shaping my identity, not just filling my to-do list."
+              ]
+            },
+            {
+              "layer": "Energy — The Resource Beneath Every Other Resource",
+              "score": 13,
+              "statements": [
+                "3: I know where my physical, emotional, mental, and spiritual energy actually goes.",
+                "3: I have rhythms of renewal built in before I hit empty, not just after.",
+                "4: I recognize the difference between being busy and being depleted.",
+                "3: I am living on today's connection with God, not yesterday's."
+              ]
+            },
+            {
+              "layer": "Legacy — What Your Life Multiplies",
+              "score": 14,
+              "statements": [
+                "4: I am intentionally shaping what the next generation sees in me.",
+                "3: My time, money, and influence are aligned with what I want to leave behind.",
+                "3: I have had a real conversation about legacy with someone I love.",
+                "4: I am building something today that will outlast me."
+              ]
+            }
+          ],
+          "energy_audit": [
+            {
+              "energy": "Physical Energy",
+              "score": 13,
+              "statements": [
+                "3: I am intentional about sleep, movement, and nutrition, not just reactive to what's convenient.",
+                "2: I have enough physical capacity to be fully present for what matters most, most days.",
+                "3: I build real recovery into my week instead of resting only when I finally collapse.",
+                "2: I notice early signs of physical depletion instead of pushing through until I break down.",
+                "3: I see my body as capacity for my calling, not just something to maintain or ignore."
+              ]
+            },
+            {
+              "energy": "Emotional Energy",
+              "score": 14,
+              "statements": [
+                "3: I can regulate my emotions under pressure instead of reacting from stress or fatigue.",
+                "3: The people closest to me generally get my patience, not my leftover irritability.",
+                "2: I have people or practices that help me process stress instead of carrying it alone.",
+                "3: I can turn a setback into a challenge to rise to, instead of spiraling into fear or frustration.",
+                "3: I am investing in relationships that fill me, not only ones that drain me."
+              ]
+            },
+            {
+              "energy": "Mental Energy",
+              "score": 18,
+              "statements": [
+                "4: I can concentrate on one important thing at a time without constant fragmentation.",
+                "4: My use of phone, screens, and media leaves me clearer, not foggier.",
+                "3: I make time for quiet, undistracted thinking instead of filling every gap with noise.",
+                "4: I make decisions from a place of clarity more often than from exhaustion or urgency.",
+                "3: I protect blocks of focused time instead of letting every request interrupt me."
+              ]
+            },
+            {
+              "energy": "Spiritual Energy",
+              "score": 18,
+              "statements": [
+                "4: I have consistent rhythms of prayer, Scripture, or spiritual reflection.",
+                "3: My strength in hard seasons comes from more than willpower alone.",
+                "4: I sense when I am spiritually dry and know how to return to renewal.",
+                "4: My daily choices are shaped by purpose and calling, not only by pressure and demand.",
+                "3: I trust God with the outcomes I cannot control instead of carrying them alone."
+              ]
+            }
+          ]
+        },
+        "replies": [
+          {
+            "text": "Welcome. I'm Steward, your personal guide for designing and living a life that matters.\n\nI'm AI-powered and grounded in the Christian Stewardship Blueprint. A promotion could bring meaningful work and better pay; more travel could also cost time with people you care about and room to recover. Neither side should be dismissed.\n\nThe Blueprint’s idea of **Guardrails** is useful here: decide what you need to protect *before* the demands of a role become normal. For example, “I can travel twice a month, but I need most weekends at home” is more useful in a decision than hoping you’ll find balance later. Your November 7 Energy Audit showed physical energy at 13/25, so the recovery cost is worth taking seriously—but that result alone doesn’t decide the question.\n\nI’d make the next step a conversation with the employer about the actual travel pattern and how much control you’d have over it. Then you can weigh the opportunity against a real schedule, not a vague promise.\n\n**How many nights away would the role typically require each month, and can you influence when they happen?**",
+            "used": [
+              "search_library(\"Stewardship Blueprint decision filter governing values four pillars guardrails competing work travel family promotion finances energy discernment\")"
+            ],
+            "usage": {
+              "input_tokens": 9916,
+              "input_tokens_details": {
+                "cache_write_tokens": 3629,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 3629
+                },
+                "cached_tokens": 6284
+              },
+              "output_tokens": 311,
+              "output_tokens_details": {
+                "reasoning_tokens": 84
+              },
+              "total_tokens": 10227
+            }
+          }
+        ],
+        "seconds": 7.8
+      },
+      "verdict": {
+        "a": 2,
+        "b": 2,
+        "c": 2,
+        "d": 2,
+        "e": 2,
+        "f": 2,
+        "g": 2,
+        "h": 2,
+        "hard_fails": [],
+        "expectations_met": "3/3",
+        "note": "Strong reply: it starts with the required welcome/disclosure, goes directly to the promotion-versus-travel decision, uses Guardrails and the exact physical energy score appropriately, and gives one practical next step with one key question. Minor weakness: it lightly assumes better pay may be part of the promotion, though it frames that as possible rather than certain.",
+        "total": 16,
+        "words": 181
+      }
+    },
+    {
+      "variant": "gpt-6-sol (V2)",
+      "model": "gpt-6-sol",
+      "id": "V21-02",
+      "maps": "V21-02",
+      "title": "Returning — no re-welcome",
+      "messages": [
+        "Hi, I'd like to talk about my evenings.",
+        {
+          "steward": "Welcome. I'm Steward, your personal guide for designing and living a life that matters. I'm AI-powered and grounded in the Christian Stewardship Blueprint. What's happening with your evenings?"
+        },
+        "Work keeps spilling into them. I end up answering email until nine.",
+        "And then I'm too tired to talk with anyone at home."
+      ],
+      "run": {
+        "snapshot": {
+          "check_in": {
+            "taken": "2026-11-19",
+            "days_ago": 0,
+            "version": "cfm-v3",
+            "total": 93,
+            "out_of": 140,
+            "stage": "Aware but Stretched",
+            "layers": [
+              {
+                "key": "bedrock",
+                "layer": "Bedrock — Faith & Identity",
+                "score": 18,
+                "out_of": 20,
+                "status": "Strong / Protect"
+              },
+              {
+                "key": "foundation",
+                "layer": "Foundation — Mission, Values & Purpose",
+                "score": 15,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "pillars",
+                "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+                "score": 12,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "guardrails",
+                "layer": "Guardrails — Boundaries That Protect What Matters",
+                "score": 10,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "habits",
+                "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+                "score": 11,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "energy",
+                "layer": "Energy — The Resource Beneath Every Other Resource",
+                "score": 13,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "legacy",
+                "layer": "Legacy — What Your Life Multiplies",
+                "score": 14,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              }
+            ],
+            "lowest": [
+              "Guardrails — Boundaries That Protect What Matters"
+            ],
+            "strongest": [
+              "Bedrock — Faith & Identity"
+            ],
+            "lowest_pillar": null,
+            "times_taken": 1
+          },
+          "energy_audit": {
+            "taken": "2026-11-07",
+            "days_ago": 12,
+            "total": 63,
+            "out_of": 100,
+            "result": "Running on Reserves",
+            "sources": [
+              {
+                "key": "physical",
+                "energy": "Physical Energy",
+                "score": 13,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "emotional",
+                "energy": "Emotional Energy",
+                "score": 14,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "mental",
+                "energy": "Mental Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              },
+              {
+                "key": "spiritual",
+                "energy": "Spiritual Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              }
+            ],
+            "lowest": [
+              "Physical Energy"
+            ],
+            "chosen_focus": "Physical Energy",
+            "times_taken": 1
+          }
+        },
+        "ratings": {
+          "check_in": [
+            {
+              "layer": "Bedrock — Faith & Identity",
+              "score": 18,
+              "statements": [
+                "5: I know who I am beneath my roles, titles, and achievements.",
+                "4: My daily choices flow from a settled identity, not from proving myself.",
+                "5: I return to my faith as a source of stability, not just a Sunday habit.",
+                "4: I can name the truth I stand on when life feels uncertain."
+              ]
+            },
+            {
+              "layer": "Foundation — Mission, Values & Purpose",
+              "score": 15,
+              "statements": [
+                "4: I have clarity about what matters most in this season.",
+                "4: My calendar reflects my stated priorities.",
+                "3: I could state my mission and values in a sentence if asked.",
+                "4: I am building my life around purpose, not just pressure or expectation."
+              ]
+            },
+            {
+              "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+              "score": 12,
+              "statements": [
+                "2: The people I love are receiving my presence, not just my provision.",
+                "4: My sleep, movement, and health support the life I want to build.",
+                "3: I make room for joy, rest, and meaningful experiences — not just obligation.",
+                "3: My finances serve my purpose and values, not fear or comparison."
+              ]
+            },
+            {
+              "layer": "Guardrails — Boundaries That Protect What Matters",
+              "score": 10,
+              "statements": [
+                "2: I have clear boundaries around my time, attention, and commitments.",
+                "3: I have limits in place that protect my integrity under pressure.",
+                "2: I say no to good things that would crowd out my best things.",
+                "3: Someone else knows my guardrails and helps me keep them."
+              ]
+            },
+            {
+              "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+              "score": 11,
+              "statements": [
+                "3: I have identified one or two habits that, if kept, would change everything else.",
+                "2: My mornings or evenings have a rhythm that supports who I am trying to become.",
+                "3: When a keystone habit slips, I notice quickly and recover instead of spiraling.",
+                "3: My habits are shaping my identity, not just filling my to-do list."
+              ]
+            },
+            {
+              "layer": "Energy — The Resource Beneath Every Other Resource",
+              "score": 13,
+              "statements": [
+                "3: I know where my physical, emotional, mental, and spiritual energy actually goes.",
+                "3: I have rhythms of renewal built in before I hit empty, not just after.",
+                "4: I recognize the difference between being busy and being depleted.",
+                "3: I am living on today's connection with God, not yesterday's."
+              ]
+            },
+            {
+              "layer": "Legacy — What Your Life Multiplies",
+              "score": 14,
+              "statements": [
+                "4: I am intentionally shaping what the next generation sees in me.",
+                "3: My time, money, and influence are aligned with what I want to leave behind.",
+                "3: I have had a real conversation about legacy with someone I love.",
+                "4: I am building something today that will outlast me."
+              ]
+            }
+          ],
+          "energy_audit": [
+            {
+              "energy": "Physical Energy",
+              "score": 13,
+              "statements": [
+                "3: I am intentional about sleep, movement, and nutrition, not just reactive to what's convenient.",
+                "2: I have enough physical capacity to be fully present for what matters most, most days.",
+                "3: I build real recovery into my week instead of resting only when I finally collapse.",
+                "2: I notice early signs of physical depletion instead of pushing through until I break down.",
+                "3: I see my body as capacity for my calling, not just something to maintain or ignore."
+              ]
+            },
+            {
+              "energy": "Emotional Energy",
+              "score": 14,
+              "statements": [
+                "3: I can regulate my emotions under pressure instead of reacting from stress or fatigue.",
+                "3: The people closest to me generally get my patience, not my leftover irritability.",
+                "2: I have people or practices that help me process stress instead of carrying it alone.",
+                "3: I can turn a setback into a challenge to rise to, instead of spiraling into fear or frustration.",
+                "3: I am investing in relationships that fill me, not only ones that drain me."
+              ]
+            },
+            {
+              "energy": "Mental Energy",
+              "score": 18,
+              "statements": [
+                "4: I can concentrate on one important thing at a time without constant fragmentation.",
+                "4: My use of phone, screens, and media leaves me clearer, not foggier.",
+                "3: I make time for quiet, undistracted thinking instead of filling every gap with noise.",
+                "4: I make decisions from a place of clarity more often than from exhaustion or urgency.",
+                "3: I protect blocks of focused time instead of letting every request interrupt me."
+              ]
+            },
+            {
+              "energy": "Spiritual Energy",
+              "score": 18,
+              "statements": [
+                "4: I have consistent rhythms of prayer, Scripture, or spiritual reflection.",
+                "3: My strength in hard seasons comes from more than willpower alone.",
+                "4: I sense when I am spiritually dry and know how to return to renewal.",
+                "4: My daily choices are shaped by purpose and calling, not only by pressure and demand.",
+                "3: I trust God with the outcomes I cannot control instead of carrying them alone."
+              ]
+            }
+          ]
+        },
+        "replies": [
+          {
+            "text": "",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "Welcome. I'm Steward, your personal guide for designing and living a life that matters. I'm AI-powered and grounded in the Christian Stewardship Blueprint. What's happening with your evenings?",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "Email until nine leaves little room for the evening to be your own. Your Check-In today marked Guardrails as stretched; that fits what you’re describing, though the score doesn’t tell us *why* work is spilling over.\n\nIn the Blueprint, a guardrail is a decision made before the pressure arrives. For example, “I’ll check email once after dinner, then close it” is more usable than “I’ll try to work less.” But that only works if it respects your actual responsibilities.\n\nFor now, notice what keeps you replying after hours: genuinely time-sensitive requests, an expectation from others, or the pull of an unfinished inbox? **Are you expected to be available in the evenings, or is that still unclear?**",
+            "used": [
+              "search_library(\"Guardrails pre-decided specific boundaries protect what matters work email evenings; energy necessary withdrawals avoidable leaks\")"
+            ],
+            "usage": {
+              "input_tokens": 10435,
+              "input_tokens_details": {
+                "cache_write_tokens": 4102,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 4102
+                },
+                "cached_tokens": 6330
+              },
+              "output_tokens": 196,
+              "output_tokens_details": {
+                "reasoning_tokens": 42
+              },
+              "total_tokens": 10631
+            }
+          },
+          {
+            "text": "That’s the part that hurts: work isn’t only taking the hours until nine; it’s leaving you with little energy for the people at home. I wouldn’t treat that as a failure to care about them.\n\nThe guardrail we were talking about is meant to protect something specific. Here, that may be your capacity to be present, not just an earlier email cutoff. Since we don’t yet know what availability work requires, I wouldn’t suggest simply going offline.\n\nFor one evening, could you choose a clear last email check, then give yourself ten minutes away from the screen before joining anyone at home? It won’t solve the work pressure, but it may show whether a small transition helps—or whether the expectation to keep answering email is what needs a conversation at work.",
+            "used": [
+              "search_library(\"Guardrails pre-decided boundaries protect Family Energy work spills into evenings, necessary withdrawals vs avoidable leaks\")"
+            ],
+            "usage": {
+              "input_tokens": 10492,
+              "input_tokens_details": {
+                "cache_write_tokens": 3989,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 3989
+                },
+                "cached_tokens": 6500
+              },
+              "output_tokens": 235,
+              "output_tokens_details": {
+                "reasoning_tokens": 74
+              },
+              "total_tokens": 10727
+            }
+          }
+        ],
+        "seconds": 14.5
+      },
+      "verdict": {
+        "a": 2,
+        "b": 2,
+        "c": 2,
+        "d": 2,
+        "e": 2,
+        "f": 2,
+        "g": 2,
+        "h": 2,
+        "hard_fails": [],
+        "expectations_met": "3/3",
+        "note": "Strong reply: it stays with the actual evening spillover, names the cost at home, preserves uncertainty about work expectations, and offers a small non-forced experiment. No notable weakness beyond not explicitly reusing the exact Guardrails score in this final turn.",
+        "total": 16,
+        "words": 131
+      }
+    },
+    {
+      "variant": "gpt-6-sol (V2)",
+      "model": "gpt-6-sol",
+      "id": "V21-03",
+      "maps": "V21-03",
+      "title": "Confusion — change teaching method",
+      "messages": [
+        "What goes on the What I Stand On page?",
+        {
+          "steward": "What I Stand On holds your governing beliefs — the convictions about God, yourself and life that you treat as true, and that everything else on your Blueprint rests on. Values grow from them, and your direction grows from your values."
+        },
+        "I still don't get it. How is a belief different from a value?",
+        {
+          "steward": "A governing belief is a conviction you hold as true; a value is something you choose to honour because of what you believe. Beliefs sit underneath; values express them."
+        },
+        "Sorry, that still sounds the same to me."
+      ],
+      "run": {
+        "snapshot": {
+          "check_in": {
+            "taken": "2026-11-19",
+            "days_ago": 0,
+            "version": "cfm-v3",
+            "total": 93,
+            "out_of": 140,
+            "stage": "Aware but Stretched",
+            "layers": [
+              {
+                "key": "bedrock",
+                "layer": "Bedrock — Faith & Identity",
+                "score": 18,
+                "out_of": 20,
+                "status": "Strong / Protect"
+              },
+              {
+                "key": "foundation",
+                "layer": "Foundation — Mission, Values & Purpose",
+                "score": 15,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "pillars",
+                "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+                "score": 12,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "guardrails",
+                "layer": "Guardrails — Boundaries That Protect What Matters",
+                "score": 10,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "habits",
+                "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+                "score": 11,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "energy",
+                "layer": "Energy — The Resource Beneath Every Other Resource",
+                "score": 13,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "legacy",
+                "layer": "Legacy — What Your Life Multiplies",
+                "score": 14,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              }
+            ],
+            "lowest": [
+              "Guardrails — Boundaries That Protect What Matters"
+            ],
+            "strongest": [
+              "Bedrock — Faith & Identity"
+            ],
+            "lowest_pillar": null,
+            "times_taken": 1
+          },
+          "energy_audit": {
+            "taken": "2026-11-07",
+            "days_ago": 12,
+            "total": 63,
+            "out_of": 100,
+            "result": "Running on Reserves",
+            "sources": [
+              {
+                "key": "physical",
+                "energy": "Physical Energy",
+                "score": 13,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "emotional",
+                "energy": "Emotional Energy",
+                "score": 14,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "mental",
+                "energy": "Mental Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              },
+              {
+                "key": "spiritual",
+                "energy": "Spiritual Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              }
+            ],
+            "lowest": [
+              "Physical Energy"
+            ],
+            "chosen_focus": "Physical Energy",
+            "times_taken": 1
+          }
+        },
+        "ratings": {
+          "check_in": [
+            {
+              "layer": "Bedrock — Faith & Identity",
+              "score": 18,
+              "statements": [
+                "5: I know who I am beneath my roles, titles, and achievements.",
+                "4: My daily choices flow from a settled identity, not from proving myself.",
+                "5: I return to my faith as a source of stability, not just a Sunday habit.",
+                "4: I can name the truth I stand on when life feels uncertain."
+              ]
+            },
+            {
+              "layer": "Foundation — Mission, Values & Purpose",
+              "score": 15,
+              "statements": [
+                "4: I have clarity about what matters most in this season.",
+                "4: My calendar reflects my stated priorities.",
+                "3: I could state my mission and values in a sentence if asked.",
+                "4: I am building my life around purpose, not just pressure or expectation."
+              ]
+            },
+            {
+              "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+              "score": 12,
+              "statements": [
+                "2: The people I love are receiving my presence, not just my provision.",
+                "4: My sleep, movement, and health support the life I want to build.",
+                "3: I make room for joy, rest, and meaningful experiences — not just obligation.",
+                "3: My finances serve my purpose and values, not fear or comparison."
+              ]
+            },
+            {
+              "layer": "Guardrails — Boundaries That Protect What Matters",
+              "score": 10,
+              "statements": [
+                "2: I have clear boundaries around my time, attention, and commitments.",
+                "3: I have limits in place that protect my integrity under pressure.",
+                "2: I say no to good things that would crowd out my best things.",
+                "3: Someone else knows my guardrails and helps me keep them."
+              ]
+            },
+            {
+              "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+              "score": 11,
+              "statements": [
+                "3: I have identified one or two habits that, if kept, would change everything else.",
+                "2: My mornings or evenings have a rhythm that supports who I am trying to become.",
+                "3: When a keystone habit slips, I notice quickly and recover instead of spiraling.",
+                "3: My habits are shaping my identity, not just filling my to-do list."
+              ]
+            },
+            {
+              "layer": "Energy — The Resource Beneath Every Other Resource",
+              "score": 13,
+              "statements": [
+                "3: I know where my physical, emotional, mental, and spiritual energy actually goes.",
+                "3: I have rhythms of renewal built in before I hit empty, not just after.",
+                "4: I recognize the difference between being busy and being depleted.",
+                "3: I am living on today's connection with God, not yesterday's."
+              ]
+            },
+            {
+              "layer": "Legacy — What Your Life Multiplies",
+              "score": 14,
+              "statements": [
+                "4: I am intentionally shaping what the next generation sees in me.",
+                "3: My time, money, and influence are aligned with what I want to leave behind.",
+                "3: I have had a real conversation about legacy with someone I love.",
+                "4: I am building something today that will outlast me."
+              ]
+            }
+          ],
+          "energy_audit": [
+            {
+              "energy": "Physical Energy",
+              "score": 13,
+              "statements": [
+                "3: I am intentional about sleep, movement, and nutrition, not just reactive to what's convenient.",
+                "2: I have enough physical capacity to be fully present for what matters most, most days.",
+                "3: I build real recovery into my week instead of resting only when I finally collapse.",
+                "2: I notice early signs of physical depletion instead of pushing through until I break down.",
+                "3: I see my body as capacity for my calling, not just something to maintain or ignore."
+              ]
+            },
+            {
+              "energy": "Emotional Energy",
+              "score": 14,
+              "statements": [
+                "3: I can regulate my emotions under pressure instead of reacting from stress or fatigue.",
+                "3: The people closest to me generally get my patience, not my leftover irritability.",
+                "2: I have people or practices that help me process stress instead of carrying it alone.",
+                "3: I can turn a setback into a challenge to rise to, instead of spiraling into fear or frustration.",
+                "3: I am investing in relationships that fill me, not only ones that drain me."
+              ]
+            },
+            {
+              "energy": "Mental Energy",
+              "score": 18,
+              "statements": [
+                "4: I can concentrate on one important thing at a time without constant fragmentation.",
+                "4: My use of phone, screens, and media leaves me clearer, not foggier.",
+                "3: I make time for quiet, undistracted thinking instead of filling every gap with noise.",
+                "4: I make decisions from a place of clarity more often than from exhaustion or urgency.",
+                "3: I protect blocks of focused time instead of letting every request interrupt me."
+              ]
+            },
+            {
+              "energy": "Spiritual Energy",
+              "score": 18,
+              "statements": [
+                "4: I have consistent rhythms of prayer, Scripture, or spiritual reflection.",
+                "3: My strength in hard seasons comes from more than willpower alone.",
+                "4: I sense when I am spiritually dry and know how to return to renewal.",
+                "4: My daily choices are shaped by purpose and calling, not only by pressure and demand.",
+                "3: I trust God with the outcomes I cannot control instead of carrying them alone."
+              ]
+            }
+          ]
+        },
+        "replies": [
+          {
+            "text": "",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "What I Stand On holds your governing beliefs — the convictions about God, yourself and life that you treat as true, and that everything else on your Blueprint rests on. Values grow from them, and your direction grows from your values.",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "A governing belief is a conviction you hold as true; a value is something you choose to honour because of what you believe. Beliefs sit underneath; values express them.",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "You’re right — I kept giving you definitions instead of showing you the difference.\n\nImagine someone is offered extra work on their day off:\n\n- **Belief:** “My worth doesn’t depend on how much I accomplish.” That’s what they hold to be true.\n- **Value:** “Rest matters.” That’s what they choose to protect.\n- **Action:** They turn down the extra work this time. That’s what they do.\n\nThe belief answers **“What do I think is true?”** The value answers **“What matters enough to guide my choices?”** A person could hold that belief and choose a different value in a particular decision; they aren’t the same sentence in disguise.\n\nI also need to correct my earlier answer: *What I Stand On* is a Full Build page, not a page in your current Free Blueprint.",
+            "used": [
+              "search_library(\"What I Stand On governing beliefs difference beliefs values concrete examples foundation values faith identity\")"
+            ],
+            "usage": {
+              "input_tokens": 10545,
+              "input_tokens_details": {
+                "cache_write_tokens": 4146,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 4146
+                },
+                "cached_tokens": 6396
+              },
+              "output_tokens": 254,
+              "output_tokens_details": {
+                "reasoning_tokens": 78
+              },
+              "total_tokens": 10799
+            }
+          }
+        ],
+        "seconds": 7.2
+      },
+      "verdict": {
+        "a": 2,
+        "b": 2,
+        "c": 2,
+        "d": 2,
+        "e": 2,
+        "f": 2,
+        "g": 2,
+        "h": 2,
+        "hard_fails": [],
+        "expectations_met": "3/3",
+        "note": "Strong reply: it changes from abstract definitions to a concrete everyday example and clearly separates belief, value, and action without shame or homework. The only minor limitation is that the “why it matters” is mostly implied through the example rather than expanded.",
+        "total": 16,
+        "words": 132
+      }
+    },
+    {
+      "variant": "gpt-6-sol (V2)",
+      "model": "gpt-6-sol",
+      "id": "V21-04",
+      "maps": "V21-04",
+      "title": "Staffing pressure vs finances",
+      "messages": [
+        "I run a small business. My team is burned out and I should hire, but money is tight and payroll already scares me. What do I do?"
+      ],
+      "run": {
+        "snapshot": {
+          "check_in": {
+            "taken": "2026-11-19",
+            "days_ago": 0,
+            "version": "cfm-v3",
+            "total": 93,
+            "out_of": 140,
+            "stage": "Aware but Stretched",
+            "layers": [
+              {
+                "key": "bedrock",
+                "layer": "Bedrock — Faith & Identity",
+                "score": 18,
+                "out_of": 20,
+                "status": "Strong / Protect"
+              },
+              {
+                "key": "foundation",
+                "layer": "Foundation — Mission, Values & Purpose",
+                "score": 15,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "pillars",
+                "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+                "score": 12,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "guardrails",
+                "layer": "Guardrails — Boundaries That Protect What Matters",
+                "score": 10,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "habits",
+                "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+                "score": 11,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "energy",
+                "layer": "Energy — The Resource Beneath Every Other Resource",
+                "score": 13,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "legacy",
+                "layer": "Legacy — What Your Life Multiplies",
+                "score": 14,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              }
+            ],
+            "lowest": [
+              "Guardrails — Boundaries That Protect What Matters"
+            ],
+            "strongest": [
+              "Bedrock — Faith & Identity"
+            ],
+            "lowest_pillar": null,
+            "times_taken": 1
+          },
+          "energy_audit": {
+            "taken": "2026-11-07",
+            "days_ago": 12,
+            "total": 63,
+            "out_of": 100,
+            "result": "Running on Reserves",
+            "sources": [
+              {
+                "key": "physical",
+                "energy": "Physical Energy",
+                "score": 13,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "emotional",
+                "energy": "Emotional Energy",
+                "score": 14,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "mental",
+                "energy": "Mental Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              },
+              {
+                "key": "spiritual",
+                "energy": "Spiritual Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              }
+            ],
+            "lowest": [
+              "Physical Energy"
+            ],
+            "chosen_focus": "Physical Energy",
+            "times_taken": 1
+          }
+        },
+        "ratings": {
+          "check_in": [
+            {
+              "layer": "Bedrock — Faith & Identity",
+              "score": 18,
+              "statements": [
+                "5: I know who I am beneath my roles, titles, and achievements.",
+                "4: My daily choices flow from a settled identity, not from proving myself.",
+                "5: I return to my faith as a source of stability, not just a Sunday habit.",
+                "4: I can name the truth I stand on when life feels uncertain."
+              ]
+            },
+            {
+              "layer": "Foundation — Mission, Values & Purpose",
+              "score": 15,
+              "statements": [
+                "4: I have clarity about what matters most in this season.",
+                "4: My calendar reflects my stated priorities.",
+                "3: I could state my mission and values in a sentence if asked.",
+                "4: I am building my life around purpose, not just pressure or expectation."
+              ]
+            },
+            {
+              "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+              "score": 12,
+              "statements": [
+                "2: The people I love are receiving my presence, not just my provision.",
+                "4: My sleep, movement, and health support the life I want to build.",
+                "3: I make room for joy, rest, and meaningful experiences — not just obligation.",
+                "3: My finances serve my purpose and values, not fear or comparison."
+              ]
+            },
+            {
+              "layer": "Guardrails — Boundaries That Protect What Matters",
+              "score": 10,
+              "statements": [
+                "2: I have clear boundaries around my time, attention, and commitments.",
+                "3: I have limits in place that protect my integrity under pressure.",
+                "2: I say no to good things that would crowd out my best things.",
+                "3: Someone else knows my guardrails and helps me keep them."
+              ]
+            },
+            {
+              "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+              "score": 11,
+              "statements": [
+                "3: I have identified one or two habits that, if kept, would change everything else.",
+                "2: My mornings or evenings have a rhythm that supports who I am trying to become.",
+                "3: When a keystone habit slips, I notice quickly and recover instead of spiraling.",
+                "3: My habits are shaping my identity, not just filling my to-do list."
+              ]
+            },
+            {
+              "layer": "Energy — The Resource Beneath Every Other Resource",
+              "score": 13,
+              "statements": [
+                "3: I know where my physical, emotional, mental, and spiritual energy actually goes.",
+                "3: I have rhythms of renewal built in before I hit empty, not just after.",
+                "4: I recognize the difference between being busy and being depleted.",
+                "3: I am living on today's connection with God, not yesterday's."
+              ]
+            },
+            {
+              "layer": "Legacy — What Your Life Multiplies",
+              "score": 14,
+              "statements": [
+                "4: I am intentionally shaping what the next generation sees in me.",
+                "3: My time, money, and influence are aligned with what I want to leave behind.",
+                "3: I have had a real conversation about legacy with someone I love.",
+                "4: I am building something today that will outlast me."
+              ]
+            }
+          ],
+          "energy_audit": [
+            {
+              "energy": "Physical Energy",
+              "score": 13,
+              "statements": [
+                "3: I am intentional about sleep, movement, and nutrition, not just reactive to what's convenient.",
+                "2: I have enough physical capacity to be fully present for what matters most, most days.",
+                "3: I build real recovery into my week instead of resting only when I finally collapse.",
+                "2: I notice early signs of physical depletion instead of pushing through until I break down.",
+                "3: I see my body as capacity for my calling, not just something to maintain or ignore."
+              ]
+            },
+            {
+              "energy": "Emotional Energy",
+              "score": 14,
+              "statements": [
+                "3: I can regulate my emotions under pressure instead of reacting from stress or fatigue.",
+                "3: The people closest to me generally get my patience, not my leftover irritability.",
+                "2: I have people or practices that help me process stress instead of carrying it alone.",
+                "3: I can turn a setback into a challenge to rise to, instead of spiraling into fear or frustration.",
+                "3: I am investing in relationships that fill me, not only ones that drain me."
+              ]
+            },
+            {
+              "energy": "Mental Energy",
+              "score": 18,
+              "statements": [
+                "4: I can concentrate on one important thing at a time without constant fragmentation.",
+                "4: My use of phone, screens, and media leaves me clearer, not foggier.",
+                "3: I make time for quiet, undistracted thinking instead of filling every gap with noise.",
+                "4: I make decisions from a place of clarity more often than from exhaustion or urgency.",
+                "3: I protect blocks of focused time instead of letting every request interrupt me."
+              ]
+            },
+            {
+              "energy": "Spiritual Energy",
+              "score": 18,
+              "statements": [
+                "4: I have consistent rhythms of prayer, Scripture, or spiritual reflection.",
+                "3: My strength in hard seasons comes from more than willpower alone.",
+                "4: I sense when I am spiritually dry and know how to return to renewal.",
+                "4: My daily choices are shaped by purpose and calling, not only by pressure and demand.",
+                "3: I trust God with the outcomes I cannot control instead of carrying them alone."
+              ]
+            }
+          ]
+        },
+        "replies": [
+          {
+            "text": "Welcome. I'm Steward, your personal guide for designing and living a life that matters.\n\nI’m AI-powered and grounded in the Christian Stewardship Blueprint. You’re carrying two real responsibilities: protecting a burned-out team and making sure you can reliably pay them. “Hire now” and “keep pushing through” aren’t the only choices.\n\nThe Blueprint’s idea of **guardrails** is to decide what you will protect *before* pressure makes the decision for you. Here, that could mean not taking on new work at the cost of continued exhaustion—and not committing to permanent payroll until you understand whether the business can sustain it. Protecting people may require reducing or delaying work now, even while you investigate hiring.\n\nThis week, I’d do two things together: tell the team you see the overload and agree on what can be paused or renegotiated; then review a realistic cash-flow forecast, including the full cost of a hire, with your accountant or bookkeeper. That gives you a basis for a decision rather than asking either the team or your finances to absorb an unknown risk.\n\nThe question that would most change the answer is: **if you cut or delay lower-priority work for the next month, would the team still be overloaded?**",
+            "used": [
+              "search_library(\"Blueprint finances stewardship business hiring payroll tight resources guardrails protect people energy burnout decisions competing responsibilities\")"
+            ],
+            "usage": {
+              "input_tokens": 10483,
+              "input_tokens_details": {
+                "cache_write_tokens": 4188,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 4188
+                },
+                "cached_tokens": 6292
+              },
+              "output_tokens": 400,
+              "output_tokens_details": {
+                "reasoning_tokens": 144
+              },
+              "total_tokens": 10883
+            }
+          }
+        ],
+        "seconds": 8.3
+      },
+      "verdict": {
+        "a": 2,
+        "b": 1,
+        "c": 2,
+        "d": 2,
+        "e": 2,
+        "f": 2,
+        "g": 2,
+        "h": 2,
+        "hard_fails": [],
+        "expectations_met": "3/3",
+        "note": "Strongly balances care for the burned-out team with payroll stewardship and identifies the key unknown without inventing numbers. The main weakness is that it does not explicitly use the available assessment evidence, especially the low Guardrails score, so the personalization from known data is limited.",
+        "total": 15,
+        "words": 201
+      }
+    },
+    {
+      "variant": "gpt-6-sol (V2)",
+      "model": "gpt-6-sol",
+      "id": "V21-05",
+      "maps": "V21-05",
+      "title": "Fitness goal — why unknown",
+      "messages": [
+        "I've lost 15 pounds since the summer and I want to put a fitness goal on my Blueprint: get to 12% body fat."
+      ],
+      "run": {
+        "snapshot": {
+          "check_in": {
+            "taken": "2026-11-19",
+            "days_ago": 0,
+            "version": "cfm-v3",
+            "total": 93,
+            "out_of": 140,
+            "stage": "Aware but Stretched",
+            "layers": [
+              {
+                "key": "bedrock",
+                "layer": "Bedrock — Faith & Identity",
+                "score": 18,
+                "out_of": 20,
+                "status": "Strong / Protect"
+              },
+              {
+                "key": "foundation",
+                "layer": "Foundation — Mission, Values & Purpose",
+                "score": 15,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "pillars",
+                "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+                "score": 12,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "guardrails",
+                "layer": "Guardrails — Boundaries That Protect What Matters",
+                "score": 10,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "habits",
+                "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+                "score": 11,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "energy",
+                "layer": "Energy — The Resource Beneath Every Other Resource",
+                "score": 13,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "legacy",
+                "layer": "Legacy — What Your Life Multiplies",
+                "score": 14,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              }
+            ],
+            "lowest": [
+              "Guardrails — Boundaries That Protect What Matters"
+            ],
+            "strongest": [
+              "Bedrock — Faith & Identity"
+            ],
+            "lowest_pillar": null,
+            "times_taken": 1
+          },
+          "energy_audit": {
+            "taken": "2026-11-07",
+            "days_ago": 12,
+            "total": 63,
+            "out_of": 100,
+            "result": "Running on Reserves",
+            "sources": [
+              {
+                "key": "physical",
+                "energy": "Physical Energy",
+                "score": 13,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "emotional",
+                "energy": "Emotional Energy",
+                "score": 14,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "mental",
+                "energy": "Mental Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              },
+              {
+                "key": "spiritual",
+                "energy": "Spiritual Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              }
+            ],
+            "lowest": [
+              "Physical Energy"
+            ],
+            "chosen_focus": "Physical Energy",
+            "times_taken": 1
+          }
+        },
+        "ratings": {
+          "check_in": [
+            {
+              "layer": "Bedrock — Faith & Identity",
+              "score": 18,
+              "statements": [
+                "5: I know who I am beneath my roles, titles, and achievements.",
+                "4: My daily choices flow from a settled identity, not from proving myself.",
+                "5: I return to my faith as a source of stability, not just a Sunday habit.",
+                "4: I can name the truth I stand on when life feels uncertain."
+              ]
+            },
+            {
+              "layer": "Foundation — Mission, Values & Purpose",
+              "score": 15,
+              "statements": [
+                "4: I have clarity about what matters most in this season.",
+                "4: My calendar reflects my stated priorities.",
+                "3: I could state my mission and values in a sentence if asked.",
+                "4: I am building my life around purpose, not just pressure or expectation."
+              ]
+            },
+            {
+              "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+              "score": 12,
+              "statements": [
+                "2: The people I love are receiving my presence, not just my provision.",
+                "4: My sleep, movement, and health support the life I want to build.",
+                "3: I make room for joy, rest, and meaningful experiences — not just obligation.",
+                "3: My finances serve my purpose and values, not fear or comparison."
+              ]
+            },
+            {
+              "layer": "Guardrails — Boundaries That Protect What Matters",
+              "score": 10,
+              "statements": [
+                "2: I have clear boundaries around my time, attention, and commitments.",
+                "3: I have limits in place that protect my integrity under pressure.",
+                "2: I say no to good things that would crowd out my best things.",
+                "3: Someone else knows my guardrails and helps me keep them."
+              ]
+            },
+            {
+              "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+              "score": 11,
+              "statements": [
+                "3: I have identified one or two habits that, if kept, would change everything else.",
+                "2: My mornings or evenings have a rhythm that supports who I am trying to become.",
+                "3: When a keystone habit slips, I notice quickly and recover instead of spiraling.",
+                "3: My habits are shaping my identity, not just filling my to-do list."
+              ]
+            },
+            {
+              "layer": "Energy — The Resource Beneath Every Other Resource",
+              "score": 13,
+              "statements": [
+                "3: I know where my physical, emotional, mental, and spiritual energy actually goes.",
+                "3: I have rhythms of renewal built in before I hit empty, not just after.",
+                "4: I recognize the difference between being busy and being depleted.",
+                "3: I am living on today's connection with God, not yesterday's."
+              ]
+            },
+            {
+              "layer": "Legacy — What Your Life Multiplies",
+              "score": 14,
+              "statements": [
+                "4: I am intentionally shaping what the next generation sees in me.",
+                "3: My time, money, and influence are aligned with what I want to leave behind.",
+                "3: I have had a real conversation about legacy with someone I love.",
+                "4: I am building something today that will outlast me."
+              ]
+            }
+          ],
+          "energy_audit": [
+            {
+              "energy": "Physical Energy",
+              "score": 13,
+              "statements": [
+                "3: I am intentional about sleep, movement, and nutrition, not just reactive to what's convenient.",
+                "2: I have enough physical capacity to be fully present for what matters most, most days.",
+                "3: I build real recovery into my week instead of resting only when I finally collapse.",
+                "2: I notice early signs of physical depletion instead of pushing through until I break down.",
+                "3: I see my body as capacity for my calling, not just something to maintain or ignore."
+              ]
+            },
+            {
+              "energy": "Emotional Energy",
+              "score": 14,
+              "statements": [
+                "3: I can regulate my emotions under pressure instead of reacting from stress or fatigue.",
+                "3: The people closest to me generally get my patience, not my leftover irritability.",
+                "2: I have people or practices that help me process stress instead of carrying it alone.",
+                "3: I can turn a setback into a challenge to rise to, instead of spiraling into fear or frustration.",
+                "3: I am investing in relationships that fill me, not only ones that drain me."
+              ]
+            },
+            {
+              "energy": "Mental Energy",
+              "score": 18,
+              "statements": [
+                "4: I can concentrate on one important thing at a time without constant fragmentation.",
+                "4: My use of phone, screens, and media leaves me clearer, not foggier.",
+                "3: I make time for quiet, undistracted thinking instead of filling every gap with noise.",
+                "4: I make decisions from a place of clarity more often than from exhaustion or urgency.",
+                "3: I protect blocks of focused time instead of letting every request interrupt me."
+              ]
+            },
+            {
+              "energy": "Spiritual Energy",
+              "score": 18,
+              "statements": [
+                "4: I have consistent rhythms of prayer, Scripture, or spiritual reflection.",
+                "3: My strength in hard seasons comes from more than willpower alone.",
+                "4: I sense when I am spiritually dry and know how to return to renewal.",
+                "4: My daily choices are shaped by purpose and calling, not only by pressure and demand.",
+                "3: I trust God with the outcomes I cannot control instead of carrying them alone."
+              ]
+            }
+          ]
+        },
+        "replies": [
+          {
+            "text": "Welcome. I'm Steward, your personal guide for designing and living a life that matters.\n\nI'm AI-powered and grounded in the Christian Stewardship Blueprint. You’ve lost 15 pounds since the summer, and you want your Blueprint to reflect where you’re headed next.\n\nThe Blueprint treats Fitness as care for the body that supports your life—not just a number to reach. Your November 7 Energy Audit put Physical Energy at 13/25, “Running on reserves,” so I wouldn’t assume that getting leaner will also help you feel better. Whether 12% body fat is an appropriate target for you is worth checking with a qualified health professional.\n\nBefore I suggest wording for your Free Blueprint’s Starting Plan, what would reaching 12% serve for you—more energy, strength, confidence, or something else? I’ll use *your* reason rather than put one in your mouth.",
+            "used": [
+              "read_blueprint_page",
+              "read_blueprint_page",
+              "search_library(\"Stewardship Blueprint fitness goal Four Pillars fitness health body as stewardship purpose behind metric and Free My Starting Plan next faithful step\")"
+            ],
+            "usage": {
+              "input_tokens": 10744,
+              "input_tokens_details": {
+                "cache_write_tokens": 4452,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 4452
+                },
+                "cached_tokens": 6289
+              },
+              "output_tokens": 258,
+              "output_tokens_details": {
+                "reasoning_tokens": 75
+              },
+              "total_tokens": 11002
+            }
+          }
+        ],
+        "seconds": 7.8
+      },
+      "verdict": {
+        "a": 2,
+        "b": 2,
+        "c": 2,
+        "d": 2,
+        "e": 2,
+        "f": 2,
+        "g": 2,
+        "h": 2,
+        "hard_fails": [],
+        "expectations_met": "3/3",
+        "note": "Strong reply: it acknowledges the weight-loss progress, uses the Physical Energy score accurately, and asks for the purpose beneath the 12% metric before drafting. Minor weakness: the opening is a bit boilerplate, but it does not materially hurt the response.",
+        "total": 16,
+        "words": 137
+      }
+    },
+    {
+      "variant": "gpt-6-sol (V2)",
+      "model": "gpt-6-sol",
+      "id": "V21-06",
+      "maps": "V21-06",
+      "title": "Why given, first proposal rejected",
+      "messages": [
+        "I want a fitness line on my Blueprint.",
+        {
+          "steward": "Good — what is the fitness for? What does being strong make possible for you?"
+        },
+        "Honestly it's about my kids. I want the energy to coach their teams and to still be serving at church in my seventies, not sidelined.",
+        {
+          "steward": "Here's a suggestion for My Starting Plan: \"I will reach and maintain 12% body fat.\" It's on a card below — you can add it or change the wording."
+        },
+        "No, that's not it at all. That's not why I do this."
+      ],
+      "run": {
+        "snapshot": {
+          "check_in": {
+            "taken": "2026-11-19",
+            "days_ago": 0,
+            "version": "cfm-v3",
+            "total": 93,
+            "out_of": 140,
+            "stage": "Aware but Stretched",
+            "layers": [
+              {
+                "key": "bedrock",
+                "layer": "Bedrock — Faith & Identity",
+                "score": 18,
+                "out_of": 20,
+                "status": "Strong / Protect"
+              },
+              {
+                "key": "foundation",
+                "layer": "Foundation — Mission, Values & Purpose",
+                "score": 15,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "pillars",
+                "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+                "score": 12,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "guardrails",
+                "layer": "Guardrails — Boundaries That Protect What Matters",
+                "score": 10,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "habits",
+                "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+                "score": 11,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "energy",
+                "layer": "Energy — The Resource Beneath Every Other Resource",
+                "score": 13,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "legacy",
+                "layer": "Legacy — What Your Life Multiplies",
+                "score": 14,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              }
+            ],
+            "lowest": [
+              "Guardrails — Boundaries That Protect What Matters"
+            ],
+            "strongest": [
+              "Bedrock — Faith & Identity"
+            ],
+            "lowest_pillar": null,
+            "times_taken": 1
+          },
+          "energy_audit": {
+            "taken": "2026-11-07",
+            "days_ago": 12,
+            "total": 63,
+            "out_of": 100,
+            "result": "Running on Reserves",
+            "sources": [
+              {
+                "key": "physical",
+                "energy": "Physical Energy",
+                "score": 13,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "emotional",
+                "energy": "Emotional Energy",
+                "score": 14,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "mental",
+                "energy": "Mental Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              },
+              {
+                "key": "spiritual",
+                "energy": "Spiritual Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              }
+            ],
+            "lowest": [
+              "Physical Energy"
+            ],
+            "chosen_focus": "Physical Energy",
+            "times_taken": 1
+          }
+        },
+        "ratings": {
+          "check_in": [
+            {
+              "layer": "Bedrock — Faith & Identity",
+              "score": 18,
+              "statements": [
+                "5: I know who I am beneath my roles, titles, and achievements.",
+                "4: My daily choices flow from a settled identity, not from proving myself.",
+                "5: I return to my faith as a source of stability, not just a Sunday habit.",
+                "4: I can name the truth I stand on when life feels uncertain."
+              ]
+            },
+            {
+              "layer": "Foundation — Mission, Values & Purpose",
+              "score": 15,
+              "statements": [
+                "4: I have clarity about what matters most in this season.",
+                "4: My calendar reflects my stated priorities.",
+                "3: I could state my mission and values in a sentence if asked.",
+                "4: I am building my life around purpose, not just pressure or expectation."
+              ]
+            },
+            {
+              "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+              "score": 12,
+              "statements": [
+                "2: The people I love are receiving my presence, not just my provision.",
+                "4: My sleep, movement, and health support the life I want to build.",
+                "3: I make room for joy, rest, and meaningful experiences — not just obligation.",
+                "3: My finances serve my purpose and values, not fear or comparison."
+              ]
+            },
+            {
+              "layer": "Guardrails — Boundaries That Protect What Matters",
+              "score": 10,
+              "statements": [
+                "2: I have clear boundaries around my time, attention, and commitments.",
+                "3: I have limits in place that protect my integrity under pressure.",
+                "2: I say no to good things that would crowd out my best things.",
+                "3: Someone else knows my guardrails and helps me keep them."
+              ]
+            },
+            {
+              "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+              "score": 11,
+              "statements": [
+                "3: I have identified one or two habits that, if kept, would change everything else.",
+                "2: My mornings or evenings have a rhythm that supports who I am trying to become.",
+                "3: When a keystone habit slips, I notice quickly and recover instead of spiraling.",
+                "3: My habits are shaping my identity, not just filling my to-do list."
+              ]
+            },
+            {
+              "layer": "Energy — The Resource Beneath Every Other Resource",
+              "score": 13,
+              "statements": [
+                "3: I know where my physical, emotional, mental, and spiritual energy actually goes.",
+                "3: I have rhythms of renewal built in before I hit empty, not just after.",
+                "4: I recognize the difference between being busy and being depleted.",
+                "3: I am living on today's connection with God, not yesterday's."
+              ]
+            },
+            {
+              "layer": "Legacy — What Your Life Multiplies",
+              "score": 14,
+              "statements": [
+                "4: I am intentionally shaping what the next generation sees in me.",
+                "3: My time, money, and influence are aligned with what I want to leave behind.",
+                "3: I have had a real conversation about legacy with someone I love.",
+                "4: I am building something today that will outlast me."
+              ]
+            }
+          ],
+          "energy_audit": [
+            {
+              "energy": "Physical Energy",
+              "score": 13,
+              "statements": [
+                "3: I am intentional about sleep, movement, and nutrition, not just reactive to what's convenient.",
+                "2: I have enough physical capacity to be fully present for what matters most, most days.",
+                "3: I build real recovery into my week instead of resting only when I finally collapse.",
+                "2: I notice early signs of physical depletion instead of pushing through until I break down.",
+                "3: I see my body as capacity for my calling, not just something to maintain or ignore."
+              ]
+            },
+            {
+              "energy": "Emotional Energy",
+              "score": 14,
+              "statements": [
+                "3: I can regulate my emotions under pressure instead of reacting from stress or fatigue.",
+                "3: The people closest to me generally get my patience, not my leftover irritability.",
+                "2: I have people or practices that help me process stress instead of carrying it alone.",
+                "3: I can turn a setback into a challenge to rise to, instead of spiraling into fear or frustration.",
+                "3: I am investing in relationships that fill me, not only ones that drain me."
+              ]
+            },
+            {
+              "energy": "Mental Energy",
+              "score": 18,
+              "statements": [
+                "4: I can concentrate on one important thing at a time without constant fragmentation.",
+                "4: My use of phone, screens, and media leaves me clearer, not foggier.",
+                "3: I make time for quiet, undistracted thinking instead of filling every gap with noise.",
+                "4: I make decisions from a place of clarity more often than from exhaustion or urgency.",
+                "3: I protect blocks of focused time instead of letting every request interrupt me."
+              ]
+            },
+            {
+              "energy": "Spiritual Energy",
+              "score": 18,
+              "statements": [
+                "4: I have consistent rhythms of prayer, Scripture, or spiritual reflection.",
+                "3: My strength in hard seasons comes from more than willpower alone.",
+                "4: I sense when I am spiritually dry and know how to return to renewal.",
+                "4: My daily choices are shaped by purpose and calling, not only by pressure and demand.",
+                "3: I trust God with the outcomes I cannot control instead of carrying them alone."
+              ]
+            }
+          ]
+        },
+        "replies": [
+          {
+            "text": "",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "Good — what is the fitness for? What does being strong make possible for you?",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "Here's a suggestion for My Starting Plan: \"I will reach and maintain 12% body fat.\" It's on a card below — you can add it or change the wording.",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "You’re right. I turned your reason into a body-fat target you never asked for. I’m sorry.\n\nI’ve offered a different line for your Starting Plan, using what you told me: “I want to care for my fitness so I have the energy to coach my kids’ teams and still be serving at church in my seventies, not sidelined.”\n\nIt’s only a proposal, not on your Blueprint. You can change the wording or leave it unapproved.",
+            "used": [
+              "read_blueprint_page",
+              "propose_wording"
+            ],
+            "usage": {
+              "input_tokens": 6846,
+              "input_tokens_details": {
+                "cache_write_tokens": 305,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 305
+                },
+                "cached_tokens": 6538
+              },
+              "output_tokens": 128,
+              "output_tokens_details": {
+                "reasoning_tokens": 27
+              },
+              "total_tokens": 6974
+            }
+          }
+        ],
+        "seconds": 6.2
+      },
+      "verdict": {
+        "a": 2,
+        "b": 2,
+        "c": 2,
+        "d": 1,
+        "e": 2,
+        "f": 2,
+        "g": 2,
+        "h": 2,
+        "hard_fails": [],
+        "expectations_met": "3/3",
+        "note": "The reply strongly owns the mismatch, re-centers the participant’s stated why, and preserves approval/edit agency. It is intentionally concise, though it does not meaningfully develop trade-offs beyond restoring the purpose behind the fitness line.",
+        "total": 15,
+        "words": 75
+      }
+    },
+    {
+      "variant": "gpt-6-sol (V2)",
+      "model": "gpt-6-sol",
+      "id": "V21-08",
+      "maps": "V21-08",
+      "title": "Correction — honest about the pending card",
+      "messages": [
+        "Help me put a next step about my marriage on my Starting Plan.",
+        {
+          "steward": "Here's a suggestion for My Starting Plan: \"I will plan a date night with my wife every week.\" It's on a card below, waiting for you to add it or change the wording."
+        },
+        "That's wrong — we can't do weekly. Change it to: I will protect one unhurried evening a month with my wife, phones away."
+      ],
+      "run": {
+        "snapshot": {
+          "check_in": {
+            "taken": "2026-11-19",
+            "days_ago": 0,
+            "version": "cfm-v3",
+            "total": 93,
+            "out_of": 140,
+            "stage": "Aware but Stretched",
+            "layers": [
+              {
+                "key": "bedrock",
+                "layer": "Bedrock — Faith & Identity",
+                "score": 18,
+                "out_of": 20,
+                "status": "Strong / Protect"
+              },
+              {
+                "key": "foundation",
+                "layer": "Foundation — Mission, Values & Purpose",
+                "score": 15,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "pillars",
+                "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+                "score": 12,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "guardrails",
+                "layer": "Guardrails — Boundaries That Protect What Matters",
+                "score": 10,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "habits",
+                "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+                "score": 11,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "energy",
+                "layer": "Energy — The Resource Beneath Every Other Resource",
+                "score": 13,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "legacy",
+                "layer": "Legacy — What Your Life Multiplies",
+                "score": 14,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              }
+            ],
+            "lowest": [
+              "Guardrails — Boundaries That Protect What Matters"
+            ],
+            "strongest": [
+              "Bedrock — Faith & Identity"
+            ],
+            "lowest_pillar": null,
+            "times_taken": 1
+          },
+          "energy_audit": {
+            "taken": "2026-11-07",
+            "days_ago": 12,
+            "total": 63,
+            "out_of": 100,
+            "result": "Running on Reserves",
+            "sources": [
+              {
+                "key": "physical",
+                "energy": "Physical Energy",
+                "score": 13,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "emotional",
+                "energy": "Emotional Energy",
+                "score": 14,
+                "out_of": 25,
+                "level": "Running on reserves"
+              },
+              {
+                "key": "mental",
+                "energy": "Mental Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              },
+              {
+                "key": "spiritual",
+                "energy": "Spiritual Energy",
+                "score": 18,
+                "out_of": 25,
+                "level": "Running warm"
+              }
+            ],
+            "lowest": [
+              "Physical Energy"
+            ],
+            "chosen_focus": "Physical Energy",
+            "times_taken": 1
+          }
+        },
+        "ratings": {
+          "check_in": [
+            {
+              "layer": "Bedrock — Faith & Identity",
+              "score": 18,
+              "statements": [
+                "5: I know who I am beneath my roles, titles, and achievements.",
+                "4: My daily choices flow from a settled identity, not from proving myself.",
+                "5: I return to my faith as a source of stability, not just a Sunday habit.",
+                "4: I can name the truth I stand on when life feels uncertain."
+              ]
+            },
+            {
+              "layer": "Foundation — Mission, Values & Purpose",
+              "score": 15,
+              "statements": [
+                "4: I have clarity about what matters most in this season.",
+                "4: My calendar reflects my stated priorities.",
+                "3: I could state my mission and values in a sentence if asked.",
+                "4: I am building my life around purpose, not just pressure or expectation."
+              ]
+            },
+            {
+              "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+              "score": 12,
+              "statements": [
+                "2: The people I love are receiving my presence, not just my provision.",
+                "4: My sleep, movement, and health support the life I want to build.",
+                "3: I make room for joy, rest, and meaningful experiences — not just obligation.",
+                "3: My finances serve my purpose and values, not fear or comparison."
+              ]
+            },
+            {
+              "layer": "Guardrails — Boundaries That Protect What Matters",
+              "score": 10,
+              "statements": [
+                "2: I have clear boundaries around my time, attention, and commitments.",
+                "3: I have limits in place that protect my integrity under pressure.",
+                "2: I say no to good things that would crowd out my best things.",
+                "3: Someone else knows my guardrails and helps me keep them."
+              ]
+            },
+            {
+              "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+              "score": 11,
+              "statements": [
+                "3: I have identified one or two habits that, if kept, would change everything else.",
+                "2: My mornings or evenings have a rhythm that supports who I am trying to become.",
+                "3: When a keystone habit slips, I notice quickly and recover instead of spiraling.",
+                "3: My habits are shaping my identity, not just filling my to-do list."
+              ]
+            },
+            {
+              "layer": "Energy — The Resource Beneath Every Other Resource",
+              "score": 13,
+              "statements": [
+                "3: I know where my physical, emotional, mental, and spiritual energy actually goes.",
+                "3: I have rhythms of renewal built in before I hit empty, not just after.",
+                "4: I recognize the difference between being busy and being depleted.",
+                "3: I am living on today's connection with God, not yesterday's."
+              ]
+            },
+            {
+              "layer": "Legacy — What Your Life Multiplies",
+              "score": 14,
+              "statements": [
+                "4: I am intentionally shaping what the next generation sees in me.",
+                "3: My time, money, and influence are aligned with what I want to leave behind.",
+                "3: I have had a real conversation about legacy with someone I love.",
+                "4: I am building something today that will outlast me."
+              ]
+            }
+          ],
+          "energy_audit": [
+            {
+              "energy": "Physical Energy",
+              "score": 13,
+              "statements": [
+                "3: I am intentional about sleep, movement, and nutrition, not just reactive to what's convenient.",
+                "2: I have enough physical capacity to be fully present for what matters most, most days.",
+                "3: I build real recovery into my week instead of resting only when I finally collapse.",
+                "2: I notice early signs of physical depletion instead of pushing through until I break down.",
+                "3: I see my body as capacity for my calling, not just something to maintain or ignore."
+              ]
+            },
+            {
+              "energy": "Emotional Energy",
+              "score": 14,
+              "statements": [
+                "3: I can regulate my emotions under pressure instead of reacting from stress or fatigue.",
+                "3: The people closest to me generally get my patience, not my leftover irritability.",
+                "2: I have people or practices that help me process stress instead of carrying it alone.",
+                "3: I can turn a setback into a challenge to rise to, instead of spiraling into fear or frustration.",
+                "3: I am investing in relationships that fill me, not only ones that drain me."
+              ]
+            },
+            {
+              "energy": "Mental Energy",
+              "score": 18,
+              "statements": [
+                "4: I can concentrate on one important thing at a time without constant fragmentation.",
+                "4: My use of phone, screens, and media leaves me clearer, not foggier.",
+                "3: I make time for quiet, undistracted thinking instead of filling every gap with noise.",
+                "4: I make decisions from a place of clarity more often than from exhaustion or urgency.",
+                "3: I protect blocks of focused time instead of letting every request interrupt me."
+              ]
+            },
+            {
+              "energy": "Spiritual Energy",
+              "score": 18,
+              "statements": [
+                "4: I have consistent rhythms of prayer, Scripture, or spiritual reflection.",
+                "3: My strength in hard seasons comes from more than willpower alone.",
+                "4: I sense when I am spiritually dry and know how to return to renewal.",
+                "4: My daily choices are shaped by purpose and calling, not only by pressure and demand.",
+                "3: I trust God with the outcomes I cannot control instead of carrying them alone."
+              ]
+            }
+          ]
+        },
+        "replies": [
+          {
+            "text": "",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "Here's a suggestion for My Starting Plan: \"I will plan a date night with my wife every week.\" It's on a card below, waiting for you to add it or change the wording.",
+            "used": [],
+            "scripted": true
+          },
+          {
+            "text": "I got the weekly commitment wrong. I’ve replaced that waiting suggestion with your exact words:\n\n“I will protect one unhurried evening a month with my wife, phones away.”\n\nIt’s a proposal you can change; it isn’t on your Blueprint unless you approve it on your screen.",
+            "used": [
+              "read_blueprint_page",
+              "propose_wording"
+            ],
+            "usage": {
+              "input_tokens": 6647,
+              "input_tokens_details": {
+                "cache_write_tokens": 155,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 155
+                },
+                "cached_tokens": 6489
+              },
+              "output_tokens": 61,
+              "output_tokens_details": {
+                "reasoning_tokens": 0
+              },
+              "total_tokens": 6708
+            }
+          }
+        ],
+        "seconds": 4.7
+      },
+      "verdict": {
+        "a": 2,
+        "b": 2,
+        "c": 2,
+        "d": 1,
+        "e": 2,
+        "f": 2,
+        "g": 2,
+        "h": 2,
+        "hard_fails": [],
+        "expectations_met": "3/3",
+        "note": "Strong correction: it uses the member’s exact wording, clearly admits the prior weekly suggestion was wrong, and avoids claiming the item was saved. The only weakness is that it does not briefly name the why or trade-off behind the more sustainable monthly rhythm.",
+        "total": 15,
+        "words": 46
+      }
+    },
+    {
+      "variant": "gpt-6-sol (V2)",
+      "model": "gpt-6-sol",
+      "id": "V21-10",
+      "maps": "V21-10",
+      "title": "Full assessment overview on request",
+      "messages": [
+        "Can you go over my most recent assessment with me? I want all of it, every section."
+      ],
+      "run": {
+        "snapshot": {
+          "check_in": {
+            "taken": "2026-11-16",
+            "days_ago": 3,
+            "version": "cfm-v3",
+            "total": 93,
+            "out_of": 140,
+            "stage": "Aware but Stretched",
+            "layers": [
+              {
+                "key": "bedrock",
+                "layer": "Bedrock — Faith & Identity",
+                "score": 18,
+                "out_of": 20,
+                "status": "Strong / Protect"
+              },
+              {
+                "key": "foundation",
+                "layer": "Foundation — Mission, Values & Purpose",
+                "score": 15,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "pillars",
+                "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+                "score": 12,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "guardrails",
+                "layer": "Guardrails — Boundaries That Protect What Matters",
+                "score": 10,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "habits",
+                "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+                "score": 11,
+                "out_of": 20,
+                "status": "Stretched / Focus"
+              },
+              {
+                "key": "energy",
+                "layer": "Energy — The Resource Beneath Every Other Resource",
+                "score": 13,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              },
+              {
+                "key": "legacy",
+                "layer": "Legacy — What Your Life Multiplies",
+                "score": 14,
+                "out_of": 20,
+                "status": "Stable / Strengthen"
+              }
+            ],
+            "lowest": [
+              "Guardrails — Boundaries That Protect What Matters"
+            ],
+            "strongest": [
+              "Bedrock — Faith & Identity"
+            ],
+            "lowest_pillar": null,
+            "times_taken": 1
+          },
+          "energy_audit": null
+        },
+        "ratings": {
+          "check_in": [
+            {
+              "layer": "Bedrock — Faith & Identity",
+              "score": 18,
+              "statements": [
+                "5: I know who I am beneath my roles, titles, and achievements.",
+                "4: My daily choices flow from a settled identity, not from proving myself.",
+                "5: I return to my faith as a source of stability, not just a Sunday habit.",
+                "4: I can name the truth I stand on when life feels uncertain."
+              ]
+            },
+            {
+              "layer": "Foundation — Mission, Values & Purpose",
+              "score": 15,
+              "statements": [
+                "4: I have clarity about what matters most in this season.",
+                "4: My calendar reflects my stated priorities.",
+                "3: I could state my mission and values in a sentence if asked.",
+                "4: I am building my life around purpose, not just pressure or expectation."
+              ]
+            },
+            {
+              "layer": "The Four Pillars — Family, Fitness, Fun & Finances",
+              "score": 12,
+              "statements": [
+                "2: The people I love are receiving my presence, not just my provision.",
+                "4: My sleep, movement, and health support the life I want to build.",
+                "3: I make room for joy, rest, and meaningful experiences — not just obligation.",
+                "3: My finances serve my purpose and values, not fear or comparison."
+              ]
+            },
+            {
+              "layer": "Guardrails — Boundaries That Protect What Matters",
+              "score": 10,
+              "statements": [
+                "2: I have clear boundaries around my time, attention, and commitments.",
+                "3: I have limits in place that protect my integrity under pressure.",
+                "2: I say no to good things that would crowd out my best things.",
+                "3: Someone else knows my guardrails and helps me keep them."
+              ]
+            },
+            {
+              "layer": "Keystone Rhythms — Small Rhythms That Strengthen the Structure",
+              "score": 11,
+              "statements": [
+                "3: I have identified one or two habits that, if kept, would change everything else.",
+                "2: My mornings or evenings have a rhythm that supports who I am trying to become.",
+                "3: When a keystone habit slips, I notice quickly and recover instead of spiraling.",
+                "3: My habits are shaping my identity, not just filling my to-do list."
+              ]
+            },
+            {
+              "layer": "Energy — The Resource Beneath Every Other Resource",
+              "score": 13,
+              "statements": [
+                "3: I know where my physical, emotional, mental, and spiritual energy actually goes.",
+                "3: I have rhythms of renewal built in before I hit empty, not just after.",
+                "4: I recognize the difference between being busy and being depleted.",
+                "3: I am living on today's connection with God, not yesterday's."
+              ]
+            },
+            {
+              "layer": "Legacy — What Your Life Multiplies",
+              "score": 14,
+              "statements": [
+                "4: I am intentionally shaping what the next generation sees in me.",
+                "3: My time, money, and influence are aligned with what I want to leave behind.",
+                "3: I have had a real conversation about legacy with someone I love.",
+                "4: I am building something today that will outlast me."
+              ]
+            }
+          ],
+          "energy_audit": null
+        },
+        "replies": [
+          {
+            "text": "Welcome. I'm Steward, your personal guide for designing and living a life that matters.\n\nI'm AI-powered and grounded in the Christian Stewardship Blueprint. Here is your **most recent assessment in full**: the *Created for More Check-In*, version 3, taken **November 16, 2026**. You scored **93/140 — “Aware but Stretched.”** The assessment describes that as alignment in some areas alongside strain in others. It is a reflection tool, not a grade or a diagnosis.\n\nEach section is scored out of 20. Your ratings below are out of 5.\n\n1. **Bedrock — Faith & Identity: 18/20, Strong / Protect.** This asks what anchors your identity beneath roles and pressure. You rated knowing who you are beneath achievements **5**, making choices from a settled identity **4**, returning to faith for stability **5**, and naming the truth you stand on in uncertainty **4**. Your responses suggest this is working well; the guidance is to notice and protect what helps.\n\n2. **Foundation — Mission, Values & Purpose: 15/20, Stable / Strengthen.** This concerns clarity about the life you are building. You rated clarity about what matters this season **4**, a calendar reflecting your priorities **4**, being able to state your mission and values in a sentence **3**, and building around purpose rather than pressure **4**. That suggests meaningful alignment, with perhaps some room to clarify how you express your mission and values.\n\n3. **The Four Pillars — Family, Fitness, Fun & Finances: 12/20, Stretched / Focus.** These are everyday areas that need to bear weight. You rated loved ones receiving your presence, not just provision **2**; sleep, movement, and health supporting your life **4**; room for joy and rest **3**; and finances serving your values rather than fear or comparison **3**. Presence with loved ones stands out as a question worth exploring—not a diagnosis of your relationships. The four statements together make one section score, not four separate pillar scores.\n\n4. **Guardrails — Boundaries That Protect What Matters: 10/20, Stretched / Focus.** This is your lowest section. You rated clear limits around time, attention, and commitments **2**; limits protecting integrity under pressure **3**; saying no to good things that crowd out your best things **2**; and someone knowing and supporting your guardrails **3**. Guardrails matter because a specific boundary decided *before* pressure arrives can protect a priority when it is hardest to choose. The assessment suggests exploring whether good intentions need a clearer boundary—not assuming why this has been difficult.\n\n5. **Keystone Rhythms — Small Rhythms That Strengthen the Structure: 11/20, Stretched / Focus.** You rated identifying one or two especially helpful habits **3**, having a supportive morning or evening rhythm **2**, noticing and recovering when a rhythm slips **3**, and habits shaping your identity rather than just your to-do list **3**. The morning-or-evening response may be a useful place to look, but the score does not tell us what your days currently allow.\n\n6. **Energy — The Resource Beneath Every Other Resource: 13/20, Stable / Strengthen.** You rated knowing where your physical, emotional, mental, and spiritual energy goes **3**; renewing before you hit empty **3**; distinguishing busyness from depletion **4**; and living on today’s connection with God **3**. Recognising depletion is a strength here. The other responses may point toward one helpful renewal rhythm, depending on your circumstances.\n\n7. **Legacy — What Your Life Multiplies: 14/20, Stable / Strengthen.** Legacy here concerns what your life passes on through people while you are living, not just an estate plan. You rated shaping what the next generation sees **4**, aligning time, money, and influence with what you hope to leave **3**, having a real legacy conversation with someone you love **3**, and building something that will outlast you **4**. Your responses suggest meaningful intention, with room to make some of it more explicit.\n\nThe pattern I would **protect** is Bedrock, your strongest area—not turn it into another project. The tension worth understanding is that your answers about presence (**2**), saying no (**2**), and clear boundaries (**2**) may be connected. They may also reflect a demanding season rather than a lack of commitment; the numbers alone cannot tell us. Your **Energy Audit has not been taken**, and I have no earlier Check-In here to compare for a trend.\n\nWe can go next in any of three directions: explore what is sustaining your Bedrock, look more closely at a concern such as presence or guardrails, or use these reflections to begin your Free Personal Blueprint. **Which would be most useful to you?**",
+            "used": [
+              "read_assessments",
+              "search_library(\"Created for More Check-In version 3 Aware but Stretched section guidance Strong Protect Stable Strengthen Stretched Focus Bedrock Foundation Four Pillars Guardrails Keystone Rhythms Energy Legacy interpretation\")"
+            ],
+            "usage": {
+              "input_tokens": 12093,
+              "input_tokens_details": {
+                "cache_write_tokens": 5891,
+                "cache_write_tokens_details": {
+                  "ttl_12h_tokens": 0,
+                  "ttl_30m_tokens": 5891
+                },
+                "cached_tokens": 6199
+              },
+              "output_tokens": 1084,
+              "output_tokens_details": {
+                "reasoning_tokens": 65
+              },
+              "total_tokens": 13177
+            }
+          }
+        ],
+        "seconds": 12.6
+      },
+      "verdict": {
+        "a": 2,
+        "b": 2,
+        "c": 2,
+        "d": 2,
+        "e": 2,
+        "f": 2,
+        "g": 2,
+        "h": 2,
+        "hard_fails": [],
+        "expectations_met": "3/3",
+        "note": "Strong, accurate full overview: it names the correct assessment/date, exact total and all seven layer scores, includes statement-level evidence, and correctly notes that the Energy Audit was not taken. Minor weakness: the framework teaching and trade-off discussion are concise rather than deeply developed, but they are sufficient and well-aligned with the request.",
+        "total": 16,
+        "words": 744
+      }
+    }
+  ]
+}

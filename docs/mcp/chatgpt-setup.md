@@ -15,6 +15,7 @@ Recheck OpenAI's current plan limits before deciding — they have changed befor
 3. **Settings → Connectors → Create**:
    - Name: `MJG`
    - Description: `MJG (michaeljgauthier.com) website, blog, groups, participants, email, SMS and dashboard. High-risk actions return a preview; confirm with mjg_confirm.`
+   - Icon: upload the MJG app icon — download https://michaeljgauthier.com/icons/icon-192.png first (192×192 PNG, 3.3 KB — ChatGPT rejects icons over 10 KB, so not icon-512.png at 14.7 KB; the same icon the server advertises in its MCP `serverInfo.icons`). If the create form has no icon field, set it afterwards from the app's **Manage** menu (editable while the app is in developer mode).
    - URL: the connector URL from step 1
    - Authentication: **OAuth**. Let it discover the settings. If it asks for URLs: authorize `https://<domain>/oauth/authorize`, token `https://<domain>/api/oauth/token` (don't swap them). If it asks for a client registration method, choose dynamic registration (DCR).
 4. Sign in with your **MJG Super Admin** account when prompted. If the first attempt fails, retry once.

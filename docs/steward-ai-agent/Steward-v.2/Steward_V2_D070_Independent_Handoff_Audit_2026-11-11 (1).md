@@ -1,0 +1,10 @@
+# D0.7.3 — Targeted correction summary (owner review, NOT installed)
+
+1. **Recovered October Retreat:** All four original source files (48-page PDF, CHG-001, CHG-002, original RETF test definitions) included unmodified. RETF-01–30 added with exact original scenario/criteria to acceptance matrix, NOT RUN. Editorial and rights release gaps retained. YR01/YR02 added for actual annual narrative/season transitions.
+2. **Feature-test collision:** D0.7.2's 36 nonreciprocal links normalized in both CSVs; inappropriate F022/RET04–08 and F013/FIN03–04 mappings corrected on semantic grounds; other cross-cutting feature links reconciled. Bidirectional validator from supplied independent audit included; pass/fail result logged in validation report.
+3. **Commerce:** Ambiguous `$299 recurring` current label replaced with distinct new CHG-DEC09 recurring $299 initial/explicit $199 annual renewal **versus legacy nonrenewing $299**, preserving already approved M11 protections. Audit suggestion that every $299 offer is nonrenewing conflicts with approved CHG-DEC09-001; no existing product term was silently replaced.
+4. **Fixtures:** D072 fixture IDs/schema repaired. Actual response array populated from frozen AS01 example; seven group subtotal arithmetic explicitly conditional on confirmation of official instrument mapping. Conversion fixture now includes duplicate callback and refund, gross vs net counts; direct-entry fixture added. Static validator rewritten to verify all fixture files.
+5. **Direct entry:** `free_steward_first_conversation` includes verified direct-entry visitors even without CFM4, with separate assessment_origin; CV07 added.
+6. **Version labels:** Active current-facing files updated to D0.7.3 candidate identity. Historical snapshots, baseline D0.6.2 and exact doctrine untouched.
+
+Only named scope corrected. No user records, account/payment, deployment, tests of live AI, provider validation, legal or rights clearance performed. Owner must approve this exact candidate before handing it to Jeremy as authoritative engineering assignment; production requires separate gates.

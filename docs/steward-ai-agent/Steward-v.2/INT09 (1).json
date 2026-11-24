@@ -1,0 +1,12 @@
+# Synthetic acceptance fixture and executable-run contract
+
+The JSON fixtures and `run_fixture_checks.py` are **actually executable as DOCUMENT/FIXTURE consistency validation**. They do not run Steward AI, score against the authoritative instrument schema, simulate application entitlements, or demonstrate application PASS. Jeremy must connect them to the real deterministic instrument service and isolated staging/harness, then collect actual outputs and receipts.
+
+1. For each case, instantiate an isolated synthetic participant/session with unique fixture ID and explicitly declared properties; no real participant secrets or personal history.
+2. Supply exact instrument item-order mapping and authoritative scoring implementation; verify the fixture's expected total *and* each layer from source definitions. AS01 total 104 is arithmetic only; do not presume item grouping or section label mapping without the actual CFM4 version. AS06 uses 20 values for four groups and total 80, subject to exact instrument verification.
+3. Capture input/prompt/source/version hashes, model/provider settings, allowed record/entitlement/consent payloads, tool request/receipts, output, UI rendered result and reviewer. Fake controller events are marked `SIMULATED` and cannot prove backend operations.
+4. Check every `assertions` item against observed output, and preserve objective pass/fail separately from two-reviewer response-quality ratings. Score quality for specificity, source correctness, interpretation, why, practical next step, participant agency, action honesty and safe tone (0–2 each). Proposed >=14/16 threshold requires explicit owner acceptance; no critical failure can be averaged out.
+5. Verify cases with negative controls: omitted/mixed instrument results, conflicting retrieved source, denial of private church/ForgeLife access, stale context, refused reminders, failed idempotent save, late payment webhook, and canceled access.
+6. Record status `NOT RUN` until actual evidence exists; no generic `PASS` credit for a mere fixture parse. Existing historical reports remain unchanged.
+
+**Fixture coverage warning:** 14 selected cases now have parseable fixture/expected assertions. The remaining matrix cases remain `SPECIFICATION_ONLY`, not misrepresented as executable. Add exact runtime tool mocks and expected transcripts for all release-critical tests before deployment.

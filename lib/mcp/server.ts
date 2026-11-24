@@ -86,8 +86,28 @@ async function runTool(tool: ToolDef, args: unknown, ctx: ToolContext): Promise<
   return outcome.ok ? text(outcome.result ?? { ok: true }) : text(`Error: ${outcome.error}`, true);
 }
 
-export function createMcpServer(actor: McpActor): Server {
-  const server = new Server({ name: "mjg", title: "MJG", version: "1.0.0" }, { capabilities: { tools: {} }, instructions: INSTRUCTIONS });
+/**
+ * Who the server says it is. Clients that show server identity (ChatGPT, Claude,
+ * MCP Inspector) use the title, description and icons; the icons are the same
+ * MJG app icons as the PWA (public/icons), served from the site's public origin.
+ */
+export function serverIdentity(origin: string) {
+  return {
+    name: "mjg",
+    title: "MJG",
+    version: "1.0.0",
+    description: "Michael J. Gauthier / The Stewardship Blueprint: website, blog, groups, participants, contacts, email, SMS, social and dashboard.",
+    websiteUrl: origin,
+    icons: [
+      { src: `${origin}/icons/icon-512.png`, mimeType: "image/png", sizes: ["512x512"] },
+      { src: `${origin}/icons/icon-192.png`, mimeType: "image/png", sizes: ["192x192"] },
+      { src: `${origin}/favicon.svg`, mimeType: "image/svg+xml", sizes: ["any"] },
+    ],
+  };
+}
+
+export function createMcpServer(actor: McpActor, origin = "https://michaeljgauthier.com"): Server {
+  const server = new Server(serverIdentity(origin), { capabilities: { tools: {} }, instructions: INSTRUCTIONS });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [CONFIRM_DEFINITION, ...TOOLS.filter((t) => visibleTo(actor, t)).map(toMcpTool)],

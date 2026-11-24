@@ -107,6 +107,26 @@ export function SiteAnalytics() {
   return null;
 }
 
+/**
+ * A named interaction on the current page (video_play, cta_click, form_success).
+ * Same privacy rules as pageviews; the name must be one /api/analytics/collect
+ * accepts. Never throws.
+ */
+export function trackEvent(event: "video_play" | "cta_click" | "form_success") {
+  try {
+    const path = window.location.pathname;
+    if (SKIP.test(path) || optedOut()) return;
+    const session = read<{ sid: string; touch: Touch }>(window.sessionStorage, SESSION_KEY);
+    if (!session) return;
+    const body = JSON.stringify({ event, path, sid: session.sid, entry: false, touch: session.touch });
+    if (!navigator.sendBeacon?.("/api/analytics/collect", body)) {
+      void fetch("/api/analytics/collect", { method: "POST", body, keepalive: true }).catch(() => {});
+    }
+  } catch {
+    /* never break the page */
+  }
+}
+
 /** Marks this browser as staff so its visits aren't counted. Mounted in the dashboard layout. */
 export function AnalyticsStaffFlag() {
   useEffect(() => {

@@ -1,0 +1,77 @@
+{
+  "release_name": "Steward V2.1",
+  "package_id": "SV21-LQA-CANDIDATE-20261118",
+  "created_date": "2026-11-18",
+  "status": "candidate only; engineering/test/deploy NOT RUN",
+  "source_baseline": "Draft 0.6.2; frozen text preserved",
+  "live_export_labels_unverified": [
+    "steward-instructions-v3-assessments",
+    "D0.7.3-R1"
+  ],
+  "project_sources_updated": false,
+  "unchanged_excluded": [
+    "05_Data_Privacy_Security.md",
+    "06_Safety_Support_Release.md",
+    "07_Commerce_Scripture_Rights.md",
+    "10_Teaching_Reference_Library.md",
+    "Statement-of-Faith.txt"
+  ],
+  "changed_files": [
+    {
+      "file": "00_Control_Register.md",
+      "change": "full source + appended V2.1 amendment",
+      "baseline_sha256": "f7ec115c25d22a0d0586d346416a8713da62a29002b7270e196630995b6715c9",
+      "package_sha256": "ec1bdeb668dd60462cafd980f7639ac5e265092dcf338722ded3aba61cf189a3",
+      "baseline_bytes_preserved_as_prefix": true
+    },
+    {
+      "file": "02_Framework_Blueprint_Assessments.md",
+      "change": "full source + appended V2.1 amendment",
+      "baseline_sha256": "e0aa5488affb3b454a20a9e079424172534c847e22d1d35668560f13d4637fe8",
+      "package_sha256": "e32e6bc61afdbb9526f2a587cac493b099d430edc1be871351837ac07a8022d3",
+      "baseline_bytes_preserved_as_prefix": true
+    },
+    {
+      "file": "03_Conversation_Sensitive_Safety.md",
+      "change": "full source + appended V2.1 amendment",
+      "baseline_sha256": "c7bff30dcdf2ee4ad265deb1a20aea16ecb2eb16051a5cbbd3e232edbeff3736",
+      "package_sha256": "dac22e423148a3cf3bd978e92932561c06fcfc936a9ce5cf21ac54f5c331b68e",
+      "baseline_bytes_preserved_as_prefix": true
+    },
+    {
+      "file": "04_Product_Journey_New_Features.md",
+      "change": "full source + appended V2.1 amendment",
+      "baseline_sha256": "77aa2453e81e20f36bcf3a1ba051089530d17aed91c4df8d2097fe6a6eb7e7de",
+      "package_sha256": "0a2987b49fde1a30481dcf7dc3411454a02535f098bb299428f634864227c6ec",
+      "baseline_bytes_preserved_as_prefix": true
+    },
+    {
+      "file": "08_Engineering_Experience_Operations.md",
+      "change": "full source + appended V2.1 amendment",
+      "baseline_sha256": "012541cb2aaa90ab5e7bd9fec7b7137bc2bf66e7f4024b9f9d9d2ec250b085c2",
+      "package_sha256": "a54e8e886e1c6b216c71a822ff051934b736438125b1a63fd624ed7fc622b5bd",
+      "baseline_bytes_preserved_as_prefix": true
+    },
+    {
+      "file": "09_Test_Suite_Quality_Control.md",
+      "change": "full source + appended V2.1 amendment",
+      "baseline_sha256": "b5bd42f21d4292922301adf1f20e767f7eaa86de1f71391fe8a5fecab7c50dd1",
+      "package_sha256": "4aef145605628b4f093fda03c7b3917aa08f7fa070da77872d72af1b4fc572a9",
+      "baseline_bytes_preserved_as_prefix": true
+    },
+    {
+      "file": "11_Change_Impact_Decisions.md",
+      "change": "full source + appended V2.1 amendment",
+      "baseline_sha256": "e46d95e599e5ebda02af2a641167005358f98c584691fc7ff525ba1295510ada",
+      "package_sha256": "60220614c2867be1f35a2744fae16a1f8d0d03f4d93ccfc8361126a22ea7b2a0",
+      "baseline_bytes_preserved_as_prefix": true
+    },
+    {
+      "file": "Steward_V2_Response_Quality_Instructions.txt",
+      "change": "original owner-review draft + proposed delta",
+      "baseline_sha256": "8cb67c3861f851ce05c1c35e3de140b203a941649f9933ff28f96bef423989a9",
+      "package_sha256": "cf7838850a8098350a840ff8277dcd68258c344f9513ee5e40fce909b02472d9",
+      "baseline_bytes_preserved_as_prefix": true
+    }
+  ]
+}

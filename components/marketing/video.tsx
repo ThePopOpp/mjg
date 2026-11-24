@@ -116,12 +116,15 @@ export function ClickToPlay({
   label,
   ratio = "4/3",
   className,
+  onPlay,
 }: {
   embed: string;
   poster: MediaValue;
   label: string;
   ratio?: "4/3" | "16/9";
   className?: string;
+  /** Called once when the visitor presses play (analytics). */
+  onPlay?: () => void;
 }) {
   const [playing, setPlaying] = useState(false);
   const aspect = ratio === "4/3" ? "aspect-[4/3]" : "aspect-video";
@@ -147,7 +150,10 @@ export function ClickToPlay({
       {embed ? (
         <button
           type="button"
-          onClick={() => setPlaying(true)}
+          onClick={() => {
+            setPlaying(true);
+            onPlay?.();
+          }}
           aria-label={label}
           className="group absolute inset-0 flex items-center justify-center focus-visible:outline-none"
         >

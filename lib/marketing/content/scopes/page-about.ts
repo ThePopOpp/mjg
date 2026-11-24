@@ -4,17 +4,18 @@
 import { defineScope, defineSection, type Cta, type MediaValue } from "../kit";
 import { f, photo, seoSection } from "./shared";
 
-type Hero = { eyebrow: string; title: string; body: string; primaryCta: Cta; photo: MediaValue };
+type Hero = { eyebrow: string; title: string; body: string; primaryCta: Cta; speakingLink: Cta; photo: MediaValue };
 
 const hero = defineSection<Hero>({
   key: "hero",
   label: "Hero",
-  fields: [f.eyebrow(), f.title(), f.body(), f.cta("primaryCta", "Button"), f.media("photo", "Portrait")],
+  fields: [f.eyebrow(), f.title(), f.body(), f.cta("primaryCta", "Button"), f.cta("speakingLink", "Speaking link"), f.media("photo", "Portrait")],
   defaults: {
     eyebrow: "About Michael",
     title: "I’m Still Building, Too.",
     body: "I’m Michael J. Gauthier. I’m a husband, father, follower of Jesus, financial planner, business leader, and someone who is still learning to live what matters most.\n\nThe Stewardship Blueprint is not a theory I developed from a distance. It grew out of my own questions, successes, misplaced scoreboards, relationships, faith journey, and ongoing desire to steward the life God has entrusted to me.",
     primaryCta: { label: "Explore the Framework", href: "/stewardship-blueprint" },
+    speakingLink: { label: "Invite Michael to Speak →", href: "/speaking" },
     photo: photo("/marketing/brand/michael-gauthier.webp", "Michael J. Gauthier"),
   },
 });

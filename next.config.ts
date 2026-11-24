@@ -95,7 +95,16 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     // The old signup page; Join the Journey now lives at /join.
-    return [{ source: "/join-the-movement", destination: "/join", permanent: true }];
+    return [
+      { source: "/join-the-movement", destination: "/join", permanent: true },
+      // The link the Facilitator Welcome Series sends. Temporary (302) on purpose, so a
+      // new handbook version only changes the destination; the emailed link keeps working.
+      {
+        source: "/facilitator-handbook",
+        destination: "/facilitators/stewardship-blueprint-facilitator-handbook-v1.pdf",
+        permanent: false,
+      },
+    ];
   },
 
   async headers() {

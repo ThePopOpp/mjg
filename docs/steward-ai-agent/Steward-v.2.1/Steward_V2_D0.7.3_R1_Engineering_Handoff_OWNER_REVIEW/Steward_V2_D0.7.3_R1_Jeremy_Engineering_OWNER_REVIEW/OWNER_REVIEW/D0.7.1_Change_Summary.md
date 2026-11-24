@@ -1,0 +1,7 @@
+# D0.7.1 targeted change summary — owner review
+
+**Changed:** (1) Repaired feature-ID collision with `V2-F001...V2-F038` and preserved historical `P01–P15`, `S01–S12`; old D0.7.0 local IDs converted to explicit aliases; updated test matrix foreign keys. (2) Added one effective-current requirements projection and crosswalk, plus targeted master addenda without rewriting prior source history. (3) Registered original October Annual Retreat source/test unavailability with exact verification gates, preserved approved Free/Premium/print boundaries. (4) Added Compass-first implementation priorities, without changing confirmed Compass no-card benefit terms or bypassing pilot controls. (5) Added ten machine-readable synthetic fixtures and an executable fixture consistency validator; all application and model tests remain NOT RUN. (6) Clarified engineering-resolvable details versus owner-only decisions; rebuilt one non-self-referential package manifest.
+
+**Not changed:** original D0.6.2 twelve-file baseline; exact Statement of Faith; owner-approved commercial terms and Free/Full service boundary; protected privacy/security/safety/rights; existing historical evidence/failures. Existing D0.7.0 work remains except for stated repairs.
+
+**Unresolved evidence:** The independent audit document and original October retreat source/test files were not accessible among provided files. The report addresses user-enumerated findings but is **not** an assertion of full line-by-line audit closure.

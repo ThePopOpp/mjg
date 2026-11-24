@@ -1,0 +1,106 @@
+FORGEDLIFE
+Firestore shapes for the MJG integration
+Users, churches and groups as they exist today, one sample of each, and the contact document we are adding for consent. Samples are made up; ids are the real formats. Project: Firebase, Firestore in native mode, Cloud Functions 2nd gen. Timestamps are Firestore timestamps and will be sent as ISO 8601 strings in events.
+1. Users
+users/{uid}  (profile, readable by any signed-in user)
+The uid is the Firebase Auth uid (28 characters). This document carries no email and no phone by design: it is readable by every signed-in account for leaderboards and rosters. Contact details live in the self-only document in the next section. Fields marked app-only are not relevant to the integration and will not be sent.
+FieldTypeNotesdisplayNamestringOne display name. We do not collect first and last separately.avatarInitialsstringUp to 4 characters.genderstring"male" or "female"; set once.churchIDstringId of the church he belongs to, "" when none.churchNamestringDenormalized church name.homeChurchName / City / StatestringHis home church as typed or picked; may differ from churchID.profileImageURLstringFirebase Storage download URL, or absent.totalPointsAllTime, currentStreak, longestStreaknumberApp-only.earnedBadgeIdsarrayApp-only.partnerUIDstringAccountability partner uid, server-written. App-only.lastPlatform, lastAppVersion, lastOpenedAtstring, string, timestampLast app opened: "ios" or "android".activeDaysmap{ "2026": 142 } days in the app per year, server-written.joinDatetimestampAccount creation.updatedAttimestampLast profile write.
+Role in ForgedLife is not a field on the user. It is derived: he is an admin or a leader of a church when his uid is in that church's adminUIDs or leaderUIDs (section 2), and a group leader when he is a group's facilitatorUID (section 3). The event payload will carry the derived role.
+Sample:
+users/Ab3kR9xQ2mLp7Ts4Vw8YzC1dE6fG
+{
+  "displayName": "Michael Gauthier",
+  "avatarInitials": "MG",
+  "gender": "male",
+  "churchID": "compass",
+  "churchName": "Compass Christian Church",
+  "homeChurchName": "Compass Christian Church",
+  "homeChurchCity": "Mesa",
+  "homeChurchState": "AZ",
+  "profileImageURL": "https://firebasestorage.googleapis.com/v0/b/forgedlife-31e6b.appspot.com/o/profile_photos%2FAb3k...jpg?alt=media&token=...",
+  "lastPlatform": "ios",
+  "lastAppVersion": "1.5.0 (48)",
+  "lastOpenedAt": "2026-11-04T15:12:09Z",
+  "activeDays": { "2026": 14 },
+  "joinDate": "2026-10-02T18:40:00Z",
+  "updatedAt": "2026-11-04T15:12:09Z"
+}
+
+users/{uid}/private/contact  (new, readable by the owner only)
+Written by the app at sign-in (email, from Firebase Auth) and on the consent sheet (phone, consents). Only the owner and our Cloud Functions can read it. This is the source of the user fields in events.
+FieldTypeNotesemailstringCurrent sign-in email from Firebase Auth. Apple Hide My Email relays end in @privaterelay.appleid.com.emailVerifiedbooleanFrom Firebase Auth.emailIsRelaybooleanTrue for an Apple private relay address.signInProviderstring"password", "apple.com" or "google.com".phonestringE.164, optional, entered on the consent sheet.authorConsentsmapKeyed by author id. { granted, at, version, text, requested[], sms: { granted, at, version, text } }updatedAttimestamp
+Sample:
+users/Ab3kR9xQ2mLp7Ts4Vw8YzC1dE6fG/private/contact
+{
+  "email": "m.gauthier@example.com",
+  "emailVerified": true,
+  "emailIsRelay": false,
+  "signInProvider": "apple.com",
+  "phone": "+14805551234",
+  "authorConsents": {
+    "mjg": {
+      "granted": true,
+      "at": "2026-11-17T02:15:30Z",
+      "version": 1,
+      "text": "Share my name and email with Michael J. Gauthier so I can get the resources I pick below and updates about The Life You're Building. ...",
+      "requested": ["steward", "created_for_more_checkin"],
+      "sms": { "granted": true, "at": "2026-11-17T02:15:30Z", "version": 1, "text": "Mike's team may text me about this study. ..." }
+    }
+  },
+  "updatedAt": "2026-11-17T02:15:30Z"
+}
+
+2. Churches
+churches/{churchID}
+The id is a short slug or a random 20-character id. The join code is not on this document and is never sent.
+FieldTypeNotesnamestringUp to 120 characters.city, statestringState is a two-letter code.einstringOptional, ties the church to our public directory.timezonestringIANA zone, for example America/Phoenix.adminUIDsarray of uidChurch admins. The event carries only admins who consented, as {uid, name, email}.leaderUIDsarray of uidGroup leaders. Not sent.licensemap{ status: "active" | "trial" | "frozen", expiresAt? }. Not sent.logostringOptional data URL or Storage URL.studyIDsarrayOptional allow-list of studies. Not sent.archivedbooleanOptional.createdAt, updatedAttimestamp
+Not on the church today: website, email, phone, street address, denomination, description. We can add website and description to the console later if Mike's site wants them; we will leave them out of events until then.
+Sample:
+churches/compass
+{
+  "name": "Compass Christian Church",
+  "city": "Mesa",
+  "state": "AZ",
+  "ein": "",
+  "timezone": "America/Phoenix",
+  "adminUIDs": ["Qp7Lm2Xs9Vt4Rw1Zy6Bn3Ck8Df5Gh"],
+  "leaderUIDs": ["Ab3kR9xQ2mLp7Ts4Vw8YzC1dE6fG", "Hj4Nk8Pl2Qr6St0Uv3Wx7Yz1Ab5Cd"],
+  "license": { "status": "active" },
+  "createdAt": "2026-08-20T17:00:00Z",
+  "updatedAt": "2026-11-01T22:10:44Z"
+}
+
+3. Groups
+A study run has two layers. A campaign is the church's run of a study (the study, the start date, who it is for). A group is one leader's small group inside that run; groups are documents in our challenges collection. Events will send the group with the campaign's study and start date folded in.
+campaigns/{campaignID}  (a church's run of a study)
+FieldTypeNoteschurchIDstringprogramIDstringThe study id. Mike's study at Compass is a church-owned copy of The Life You're Building.namestringThe run's name.startDatetimestampKickoff.statusstring"open", "closed" or "ended".genderstring"male", "female" or "" (either).isPublicbooleanOpen to men outside the church.joinModestring"pick" (members pick a group) or "assign" (the church places them).
+challenges/{groupID}  (one leader's group)
+FieldTypeNotesnamestringdescriptionstringOptional.churchID, campaignIDstringThe church and the run.studyProgramIDstringThe study id.facilitatorUID, facilitatorNamestringThe leader. Sent as leader {uid, name, email} only when he consented.participantUIDsarray of uidMembers. Only the count is sent.pendingUIDsarray of uidWaiting list for a closed group. Not sent.genderstring"male" or "female".meetingWeekday, meetingHournumber1 (Sunday) to 7, and 0 to 23 in the church's timezone.locationstringFree text, up to 80 characters.capacitynumberSeats including the leader; 0 means unlimited.requiresApprovalbooleanTrue is a closed group (leader approves each request).openToChurchbooleanListed to the church's members. Maps to your public flag.startDate, endDate, durationDaystimestamp, timestamp, numberDuration in days (42 for the six-week study, 84 with the follow-on).isActivebooleanFalse once ended.deletedAttimestampPresent when the group was deleted; we send group.deleted.createdAt, updatedAttimestamp
+Sample:
+challenges/Kd82mNq4rT7vXz1bC5eF
+{
+  "name": "The Life You're Building",
+  "churchID": "compass",
+  "campaignID": "Yw3Hs8Lp1Qm6Rt9Uv2Xa",
+  "studyProgramID": "rf6vusym9j",
+  "facilitatorUID": "Ab3kR9xQ2mLp7Ts4Vw8YzC1dE6fG",
+  "facilitatorName": "Michael Gauthier",
+  "participantUIDs": ["Ab3kR9xQ2mLp7Ts4Vw8YzC1dE6fG", "Hj4Nk8Pl2Qr6St0Uv3Wx7Yz1Ab5Cd"],
+  "pendingUIDs": [],
+  "gender": "male",
+  "meetingWeekday": 4,
+  "meetingHour": 8,
+  "location": "Room 204",
+  "capacity": 12,
+  "requiresApproval": false,
+  "openToChurch": true,
+  "startDate": "2026-11-17T07:00:00Z",
+  "endDate": "2027-02-09T07:00:00Z",
+  "durationDays": 84,
+  "isActive": true,
+  "createdAt": "2026-11-03T20:05:00Z",
+  "updatedAt": "2026-11-04T01:30:00Z"
+}
+
+4. How the event payloads map
+FieldTypeNotesuser.uid, email, email_verifiedusers/{uid} id; private/contact email and emailVerified; plus email_is_relay.user.namedisplayName (one field).user.phoneprivate/contact phone when given.user.church_id, group_idschurchID; the ids of groups where he is in participantUIDs.user.role"church_admin", "leader", "member" or "none", derived.user.requested, consentauthorConsents.mjg.requested; { at, version, text }; sms_consent { at, version, text } when granted.church.*id, name, city, state, timezone, logo_url, admins (consented only), updated_at. Website, email, phone, address, denomination, description omitted until we collect them.group.*id, church_id, study_id, name, description, leader (consented only), audience (gender), meeting_weekday, meeting_hour, timezone (the church's), start_date, length_days, member_count, capacity, location, public (openToChurch), status, updated_at.

@@ -1,0 +1,42 @@
+# Feature-ID migration — repair of collision
+
+The historical Master11 P01–P15 and S01–S12 identifiers are **never repurposed**. D0.7.0 Coverage Matrix P01–P23 were local IDs with collisions; D0.7.1 assigns stable V2-F001 onward to *every* coverage row, including the previously R01–R15 rows. The `legacy_d070_id` column is a deprecated source alias; it is not a canonical ID. Tests reference new IDs and preserve their test_id unchanged. Other baseline references to original P01–P15 continue to refer to the original feature definitions. Use `Feature_Requirement_Test_Crosswalk.csv` and `Historical_Feature_ID_Registry.csv` to resolve every ID.
+
+- `R01` (D0.7.0 matrix only) → `V2-F001`; source link: `OI4;C03`.
+- `R02` (D0.7.0 matrix only) → `V2-F002`; source link: `CFM4;AG07`.
+- `R03` (D0.7.0 matrix only) → `V2-F003`; source link: `EA;AG07`.
+- `R04` (D0.7.0 matrix only) → `V2-F004`; source link: `X01;AG06`.
+- `R05` (D0.7.0 matrix only) → `V2-F005`; source link: `T01;E05`.
+- `R06` (D0.7.0 matrix only) → `V2-F006`; source link: `P07;P08`.
+- `R07` (D0.7.0 matrix only) → `V2-F007`; source link: `P07;P08`.
+- `R08` (D0.7.0 matrix only) → `V2-F008`; source link: `CHG-V2-PRINT-001`.
+- `R09` (D0.7.0 matrix only) → `V2-F009`; source link: `CHG-V2-ORG-001`.
+- `R10` (D0.7.0 matrix only) → `V2-F010`; source link: `CHG-V2-ORG-001`.
+- `R11` (D0.7.0 matrix only) → `V2-F011`; source link: `CHG-V2-ORG-001`.
+- `R12` (D0.7.0 matrix only) → `V2-F012`; source link: `T4 Page 7`.
+- `R13` (D0.7.0 matrix only) → `V2-F013`; source link: `T4 Page 7`.
+- `R14` (D0.7.0 matrix only) → `V2-F014`; source link: `T4 Page 9`.
+- `R15` (D0.7.0 matrix only) → `V2-F015`; source link: `LG`.
+- `P01` (D0.7.0 matrix only) → `V2-F016`; source link: `P01`.
+- `P02` (D0.7.0 matrix only) → `V2-F017`; source link: `P02`.
+- `P03` (D0.7.0 matrix only) → `V2-F018`; source link: `P03;S12`.
+- `P04` (D0.7.0 matrix only) → `V2-F019`; source link: `P04`.
+- `P05` (D0.7.0 matrix only) → `V2-F020`; source link: `P05`.
+- `P06` (D0.7.0 matrix only) → `V2-F021`; source link: `P06`.
+- `P07` (D0.7.0 matrix only) → `V2-F022`; source link: `P07;P08`.
+- `P08` (D0.7.0 matrix only) → `V2-F023`; source link: `P09;P13`.
+- `P09` (D0.7.0 matrix only) → `V2-F024`; source link: `P11;P12`.
+- `P10` (D0.7.0 matrix only) → `V2-F025`; source link: `P10`.
+- `P11` (D0.7.0 matrix only) → `V2-F026`; source link: `S01;S02;S03;S04;S05`.
+- `P12` (D0.7.0 matrix only) → `V2-F027`; source link: `X08;X09;X10`.
+- `P13` (D0.7.0 matrix only) → `V2-F028`; source link: `X16`.
+- `P14` (D0.7.0 matrix only) → `V2-F029`; source link: `X01`.
+- `P15` (D0.7.0 matrix only) → `V2-F030`; source link: `X05`.
+- `P16` (D0.7.0 matrix only) → `V2-F031`; source link: `X03;X04`.
+- `P17` (D0.7.0 matrix only) → `V2-F032`; source link: `P15;X12`.
+- `P18` (D0.7.0 matrix only) → `V2-F033`; source link: `X06`.
+- `P19` (D0.7.0 matrix only) → `V2-F034`; source link: `P14`.
+- `P20` (D0.7.0 matrix only) → `V2-F035`; source link: `X13`.
+- `P21` (D0.7.0 matrix only) → `V2-F036`; source link: `PRIV`.
+- `P22` (D0.7.0 matrix only) → `V2-F037`; source link: `SAF;RIGHTS`.
+- `P23` (D0.7.0 matrix only) → `V2-F038`; source link: `X06;OD-17`.

@@ -1,0 +1,10 @@
+# D0.7.3 validation protocol
+Run from package root:
+
+```bash
+python TESTS/check_bidirectional_traceability.py .
+python TESTS/run_fixture_checks.py
+python TESTS/check_d072_static.py
+```
+
+These are actual local static/fixture checks only, not a conversation, backend or release test. RETF-01..30 are preserved as separate original test-definition rows, all NOT RUN. YR01 and YR02 explicitly test annual narrative and next-season participant decisions instead of assigning unrelated Premium PDF tests. FIN03/FIN04 are not incorrectly attributed to Enough→Freedom→Multiplication; real FIN01/02 remain. `D072_PUBLIC_PARITY` has a frozen synthetic answer array, seven fixture arithmetic subtotals and explicit mapping-verification caveat; engineering must bind to official CFM4 scoring before certifying instrument accuracy. Conversion fixture covers duplicate event and refunded charge, with gross and net separated. CV07 covers direct-entry Free inclusion.

@@ -138,17 +138,18 @@ const receive = defineSection<Receive>({
   },
 });
 
-type NextStep = { eyebrow: string; title: string; body: string; primaryCta: Cta };
+type NextStep = { eyebrow: string; title: string; body: string; primaryCta: Cta; secondaryCta: Cta };
 
 const nextStep = defineSection<NextStep>({
   key: "nextStep",
   label: "Next Step",
-  fields: [f.eyebrow(), f.title(), f.body(), f.cta("primaryCta", "Button", true)],
+  fields: [f.eyebrow(), f.title(), f.body(), f.cta("primaryCta", "Button", true), f.cta("secondaryCta", "Second button")],
   defaults: {
     eyebrow: "Next Step",
     title: "Let’s Talk About Your Community.",
     body: "Tell us a little about your church or group, the audience you hope to serve, and the timing you are considering. We can discuss which current resources fit and which ideas belong to a future season.",
     primaryCta: { label: "Church / Group Inquiry →", href: "/contact?topic=church" },
+    secondaryCta: { label: "Invite Michael to Speak", href: "/speaking" },
   },
 });
 

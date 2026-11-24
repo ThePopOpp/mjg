@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+"""Backward-compatible D072 static check entrypoint; uses audited bidirectional normalized parser."""
+import pathlib,subprocess,sys
+root=pathlib.Path(__file__).resolve().parent.parent
+r=subprocess.run([sys.executable,str(root/'TESTS/check_bidirectional_traceability.py'),str(root)],capture_output=True,text=True)
+print(r.stdout+r.stderr,end='')
+if r.returncode:sys.exit(r.returncode)
+print('PASS: D072 compatibility entrypoint uses full D073 reciprocal traceability; static only')

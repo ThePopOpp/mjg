@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { authenticateMcpRequest, isAuthFailure } from "@/lib/mcp/auth";
 import { createMcpServer } from "@/lib/mcp/server";
-import { CORS_HEADERS, mcpUrls } from "@/lib/mcp/urls";
+import { CORS_HEADERS, mcpUrls, publicOrigin } from "@/lib/mcp/urls";
 
 // The MJG MCP endpoint (Streamable HTTP, stateless). Public URL: <origin>/mcp,
 // rewritten here in next.config.ts. Each request is authenticated, then served
@@ -30,7 +30,7 @@ async function handle(request: Request) {
   }
 
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
-  const server = createMcpServer(actor);
+  const server = createMcpServer(actor, publicOrigin(request));
   await server.connect(transport);
   try {
     const response = await transport.handleRequest(request, {
