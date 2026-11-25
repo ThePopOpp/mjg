@@ -70,7 +70,7 @@ const bio = defineSection<Bio>({
     eyebrow: "About Michael",
     title: "A Practical Voice at the Intersection of Faith, Life, and Leadership.",
     body: "Michael J. Gauthier, CFP®, is the founder of Strategic Income Group and creator of the Stewardship Blueprint, a faith-rooted, whole-life framework for building a life that matters. Drawing on more than two decades in financial planning, business leadership, family life, and Christian stewardship, Michael challenges people to look beyond traditional measures of success and consider how they are using what has been entrusted to them.\n\nHe is the author of *Truth in Financial Planning* and is writing *The Life You’re Building: How to Stop Drifting and Design a Life That Matters*. His approach is personal, practical, and grounded in the belief that faith should shape the life we actually live—not remain one compartment of it.",
-    photo: photo("/marketing/speaking/michael-gauthier-blue-suit.webp", "Michael J. Gauthier in a navy suit"),
+    photo: photo("/marketing/speaking/michael-gauthier-blue-suit-full.webp", "Michael J. Gauthier in a navy suit"),
     shortBioLabel: "Short Bio for Hosts",
     shortBio:
       "Michael J. Gauthier, CFP®, founded Strategic Income Group and created the Stewardship Blueprint to help people move from drift to intentional stewardship. He speaks about faith, purpose, leadership, money, family, guardrails, energy, generosity, and living legacy. He is the author of Truth in Financial Planning and is writing The Life You’re Building.",

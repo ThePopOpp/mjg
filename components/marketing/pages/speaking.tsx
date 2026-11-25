@@ -2,10 +2,10 @@
 // (editable in the dashboard); the page order follows Mike's brief: hero → featured
 // video → about → topics → formats → invitation form → link back to the framework.
 
+import Image from "next/image";
 import { getScopeContent } from "@/lib/marketing/content/read";
 import { pageSpeaking } from "@/lib/marketing/content/scopes/page-speaking";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
-import { MediaFrame } from "../media";
 import { Actions, Band, Eyebrow, Heading, PillCloud, Prose, SectionIntro, Split, TextLink, keepTogether } from "../primitives";
 import { SpeakingInquiryForm, SpeakingVideo, TrackedButton } from "../speaking";
 
@@ -53,18 +53,26 @@ export async function SpeakingPage() {
       </Band>
 
       {/* 03 · About Michael */}
-      <Band>
-        <Split align="center" className="md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-          <MediaFrame
-            media={bio.photo}
-            ratio="4/5"
-            rounded="rounded-2xl"
-            fit="contain"
-            sizes="(min-width: 768px) 380px, 80vw"
-            className="mx-auto w-full max-w-[380px] bg-muted/60"
-            imageClassName="object-bottom"
-          />
-          <div>
+      {/* Full-height cut-out standing on the section's bottom edge; his feet overlap the
+          line into the Topics band (z-10 keeps them above the next section). */}
+      <Band flush>
+        <div className="grid gap-10 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:gap-12">
+          <div className="relative z-10 order-last -mb-8 flex justify-center md:order-none md:-mb-10 md:items-end">
+            {bio.photo.src ? (
+              <div className="relative w-[230px] sm:w-[260px] md:w-[300px] lg:w-[350px]">
+                <span aria-hidden className="absolute -bottom-1 left-1/2 h-5 w-[70%] -translate-x-1/2 rounded-[50%] bg-black/25 blur-md" />
+                <Image
+                  src={bio.photo.src}
+                  alt={bio.photo.alt}
+                  width={479}
+                  height={1024}
+                  sizes="(min-width: 1024px) 350px, (min-width: 768px) 300px, 260px"
+                  className="relative h-auto w-full"
+                />
+              </div>
+            ) : null}
+          </div>
+          <div className="self-center md:pb-[72px]">
             <SectionIntro eyebrow={bio.eyebrow} title={bio.title} body={bio.body} />
             {bio.shortBio ? (
               <div className="mt-8 rounded-xl border-l-4 border-gold bg-muted/60 p-5 sm:p-6">
@@ -73,7 +81,7 @@ export async function SpeakingPage() {
               </div>
             ) : null}
           </div>
-        </Split>
+        </div>
       </Band>
 
       {/* 04 · Topics */}
