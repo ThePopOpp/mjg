@@ -1,201 +1,39 @@
-import Link from "next/link";
-import { Activity, CheckCircle2, Church, CircleUserRound, MailCheck, UsersRound, MessageSquareText, MessagesSquare, CornerUpLeft } from "lucide-react";
-import { MetricCard } from "@/components/dashboard/metric-card";
-import { SectionHeader } from "@/components/dashboard/section-header";
-import { StatusBadge } from "@/components/dashboard/status-badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getPilotDashboardData, getPilotMetrics } from "@/lib/dashboard/pilot-data";
-import { getCheckInSubmissionStats, listCheckInSubmissions } from "@/lib/check-in/submissions";
-import { getInvitationCounts, getRecentInvitations } from "@/lib/user-management/repository";
-import { InvitationStats } from "@/components/dashboard/invitation-stats";
-import { getSectionSeen } from "@/lib/dashboard/section-seen";
 import { getCurrentProfile } from "@/lib/auth/server";
-import { getMyOpenTasks } from "@/lib/project-manager/my-tasks";
-import { getDmStats } from "@/lib/direct-messages/data";
-import { MyTasksCard } from "@/components/dashboard/my-tasks-card";
-import { StatCardRow } from "@/components/dashboard/stat-card-row";
-import { CollapsibleSection } from "@/components/dashboard/collapsible-section";
 import { FacilitatorDashboard } from "@/components/facilitator/facilitator-dashboard";
 import { ParticipantDashboard } from "@/components/participant/participant-dashboard";
+import { OverviewBoard } from "@/components/dashboard/overview/overview-board";
+import { getOverviewLayout } from "@/lib/dashboard/overview/store";
+import { fireDueReminders } from "@/lib/dashboard/overview/items";
 import { ROLES, isFacilitatorRole } from "@/lib/rbac/roles";
 
+// The dashboard home. Staff get the customizable Overview (components/dashboard/overview):
+// every card can be dragged, hidden or added from Add Card, starting from the Standard
+// layout (the original sections plus the new rows) or Blank with the setup wizard.
+// Each card loads its own data from /api/dashboard/widgets/[source], so hidden cards
+// cost nothing.
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
-  const profileForRole = await getCurrentProfile();
+  const profile = await getCurrentProfile();
   // Facilitators (and church admins, who get everything a facilitator has) and participants
   // get scoped dashboards rather than the admin overview.
-  if (profileForRole && isFacilitatorRole(profileForRole.role)) {
-    return <FacilitatorDashboard profile={profileForRole} />;
+  if (profile && isFacilitatorRole(profile.role)) {
+    return <FacilitatorDashboard profile={profile} />;
   }
-  if (profileForRole?.role === ROLES.PARTICIPANT) {
-    return <ParticipantDashboard profile={profileForRole} />;
+  if (profile?.role === ROLES.PARTICIPANT) {
+    return <ParticipantDashboard profile={profile} />;
   }
+  if (!profile) return null;
 
-  const [data, profile, checkInStats, recentCheckIns, invStats, recentInvitations] = await Promise.all([getPilotDashboardData(), getCurrentProfile(), getCheckInSubmissionStats(), listCheckInSubmissions(6), getInvitationCounts(), getRecentInvitations()]);
-  const pilotMetrics = getPilotMetrics(data);
-  const myTasks = profile
-    ? await getMyOpenTasks({ id: profile.id, role: profile.role, email: profile.email })
-    : [];
-  const myName = profile ? [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim() : "";
-  const dmStats = profile ? await getDmStats(profile.id) : { unread: 0, activeConversations: 0, awaitingReply: 0 };
-  const dmCards = [
-    { label: "Unread messages", value: dmStats.unread, detail: dmStats.unread ? "New for you" : "All caught up", icon: MessageSquareText },
-    { label: "Active conversations", value: dmStats.activeConversations, detail: "Open threads", icon: MessagesSquare },
-    { label: "Awaiting your reply", value: dmStats.awaitingReply, detail: dmStats.awaitingReply ? "Needs a response" : "Nothing pending", icon: CornerUpLeft },
-  ];
-  const metrics = [
-    { label: "Total participants", value: String(data.participants.length), detail: "Created for More records", icon: UsersRound },
-    { label: "Check-In completed", value: String(checkInStats.count), detail: checkInStats.averageScore != null ? `Average score ${checkInStats.averageScore}` : "Created for More", icon: CheckCircle2 },
-    { label: "7-day journey started", value: String(pilotMetrics.journeyStarted), detail: "Email journey records", icon: MailCheck },
-    { label: "Pastor/Elder responses", value: String(pilotMetrics.pastorElderResponses), detail: "Reviewer survey responses", icon: Church },
-    { label: "Inner Circle accepted", value: String(pilotMetrics.innerCircle), detail: "Accepted invitations", icon: CircleUserRound },
-    { label: "Follow-up permission", value: String(pilotMetrics.followUpPermission), detail: "Follow-up ready", icon: Activity },
-  ];
-  // check_in_submissions has no PostgREST relationship to participants to embed, so resolve
-  // each check-in's wave from the participants we already loaded, keyed by participant_id.
-  // Per-section "new since last seen" — badge is gold normally, red when the count grew.
-  const sectionSeen = profile ? await getSectionSeen(profile.id) : {};
-  const recentNew = checkInStats.count > (sectionSeen.recent_check_ins ?? 0);
-  const waveNew = data.participants.length > (sectionSeen.wave_summary ?? 0);
-  const pipelineNew = checkInStats.count > (sectionSeen.pipeline ?? 0);
-
-  const waveByParticipant = new Map<string, string | null>(data.participants.map((p: any) => [p.id, p.wave ?? p.source ?? null]));
-  const waveRows = ["wave_0", "wave_1", "wave_2", "wave_3"].map((wave) => ({
-    wave,
-    invited: data.participants.filter((row: any) => row.wave === wave || row.source === wave).length,
-    optedIn: data.participants.filter((row: any) => (row.wave === wave || row.source === wave) && row.email_journey_opt_in).length,
-    completed: data.checkIns.filter((row: any) => waveByParticipant.get(row.participant_id) === wave).length,
-    survey: data.surveys.filter((row: any) => row.participants?.wave === wave).length,
-  }));
+  // The saved layout is cleaned against the REAL role, so previewing another role with
+  // "View as" never deletes cards; the board hides cards the viewed role can't use.
+  const [{ layout }] = await Promise.all([getOverviewLayout(profile.id, profile.primaryRole), fireDueReminders(profile.id).catch(() => undefined)]);
 
   return (
-    <div className="space-y-6">
-      <SectionHeader
-        eyebrow="Created for More pilot"
-        title="Dashboard overview"
-        description="Track participant progress, stewardship check-ins, surveys, and follow-up interest from one admin workspace."
-      />
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">Invitations</h2>
-          <Link href="/dashboard/user-management" className="text-sm font-medium text-primary hover:underline">Manage →</Link>
-        </div>
-        <InvitationStats counts={invStats} invitations={recentInvitations} />
-      </div>
-
-      <MyTasksCard tasks={myTasks} name={myName} />
-
-      <div className="space-y-4 border-t pt-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Direct Messages</h2>
-          <Link href="/dashboard/direct-messages" className="text-xs font-medium text-primary hover:underline">Open Messages</Link>
-        </div>
-        <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {dmCards.map((c) => (
-            <Link
-              key={c.label}
-              href="/dashboard/direct-messages"
-              className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-5 py-4 text-left shadow-sm transition hover:border-primary/40 hover:shadow"
-            >
-              <div className="space-y-0.5">
-                <p className="text-sm font-medium text-muted-foreground">{c.label}</p>
-                <p className="text-3xl font-semibold tabular-nums">{c.value}</p>
-                <p className="text-xs text-muted-foreground">{c.detail}</p>
-              </div>
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-primary">
-                <c.icon className="h-5 w-5" aria-hidden />
-              </span>
-            </Link>
-          ))}
-        </StatCardRow>
-      </div>
-
-      <div className="space-y-4 border-t pt-6">
-        <h2 className="text-lg font-semibold tracking-tight">Community</h2>
-        <StatCardRow className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {metrics.map((metric) => (
-            <MetricCard key={metric.label} {...metric} />
-          ))}
-        </StatCardRow>
-
-        <CollapsibleSection
-          title="Recent Check-Ins"
-          count={checkInStats.count}
-          sectionKey="recent_check_ins"
-          isNew={recentNew}
-          detailHref="/dashboard/check-in-results"
-          detailLabel="View all check-ins"
-        >
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="pl-5">Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead>Stage</TableHead>
-                <TableHead>When</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentCheckIns.map((ci) => (
-                <TableRow key={ci.id}>
-                  <TableCell className="pl-5 font-medium">{ci.name || "—"}</TableCell>
-                  <TableCell className="text-muted-foreground">{ci.email || "—"}</TableCell>
-                  <TableCell className="tabular-nums">{ci.total_score ?? "—"}</TableCell>
-                  <TableCell>{ci.stage || "—"}</TableCell>
-                  <TableCell className="whitespace-nowrap text-muted-foreground">{new Date(ci.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}</TableCell>
-                </TableRow>
-              ))}
-              {!recentCheckIns.length ? <TableRow><TableCell colSpan={5} className="pl-5 text-muted-foreground">No check-ins yet.</TableCell></TableRow> : null}
-            </TableBody>
-          </Table>
-        </CollapsibleSection>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
-        <CollapsibleSection className="min-w-0" title="Wave summary" count={data.participants.length} sectionKey="wave_summary" isNew={waveNew} detailHref="/dashboard/participants" detailLabel="View participants">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="pl-5">Wave</TableHead>
-                <TableHead>Invited</TableHead>
-                <TableHead>Opted in</TableHead>
-                <TableHead>Check-In</TableHead>
-                <TableHead>Survey</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {waveRows.map((row) => (
-                <TableRow key={row.wave}>
-                  <TableCell className="pl-5 font-medium">{row.wave}</TableCell>
-                  <TableCell>{row.invited}</TableCell>
-                  <TableCell>{row.optedIn}</TableCell>
-                  <TableCell>{row.completed}</TableCell>
-                  <TableCell>{row.survey}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CollapsibleSection>
-
-        <CollapsibleSection className="min-w-0" title="Pipeline status" count={checkInStats.count} sectionKey="pipeline" isNew={pipelineNew} detailHref="/dashboard/reports" detailLabel="View reports">
-          <div className="space-y-3 px-5 pb-5">
-            {[
-              ["Check-In completed", checkInStats.count],
-              ["Survey completed", pilotMetrics.surveyCompleted],
-              ["Inner Circle accepted", pilotMetrics.innerCircle],
-              ["Follow-up permission", pilotMetrics.followUpPermission],
-            ].map(([item, value]) => (
-              <div key={item} className="flex items-center justify-between rounded-md border p-3">
-                <span className="font-medium">{item}</span>
-                <StatusBadge status={String(value)} />
-              </div>
-            ))}
-            {data.error ? <p className="text-sm text-destructive">{data.error}</p> : null}
-          </div>
-        </CollapsibleSection>
-      </div>
-    </div>
+    <OverviewBoard
+      initialLayout={layout}
+      role={profile.role}
+      profile={{ id: profile.id, firstName: profile.firstName, lastName: profile.lastName, email: profile.email, avatarUrl: profile.avatarUrl }}
+    />
   );
 }

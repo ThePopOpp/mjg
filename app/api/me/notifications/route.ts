@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireActiveProfile } from "@/lib/user-management/auth";
 import { listMyUnread, markMineRead } from "@/lib/notifications/personal";
+import { fireDueReminders } from "@/lib/dashboard/overview/items";
 
 // The signed-in person's own dashboard notifications (lib/notifications/personal.ts).
 export const dynamic = "force-dynamic";
@@ -8,6 +9,8 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     const me = await requireActiveProfile(request);
+    // Dashboard reminders become notifications when due (no scheduled job needed).
+    await fireDueReminders(me.id).catch(() => undefined);
     return NextResponse.json({ notifications: await listMyUnread(me.id) });
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Not allowed." }, { status: 401 });

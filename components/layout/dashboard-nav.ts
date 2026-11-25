@@ -43,7 +43,8 @@ import {
   MapPinned,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { PERMISSIONS, type Permission } from "@/lib/rbac/permissions";
+import { PERMISSIONS, can, type Permission } from "@/lib/rbac/permissions";
+import { ROLES, type AppRole } from "@/lib/rbac/roles";
 
 export type NavLeaf = { href: string; label: string; icon: LucideIcon; permission?: Permission };
 export type NavGroup = { kind: "group"; label: string; icon: LucideIcon; items: NavLeaf[] };
@@ -178,3 +179,25 @@ export const churchAdminNav: NavEntry[] = facilitatorNav.flatMap((entry): NavEnt
       ]
     : [entry],
 );
+
+/** The sidebar a role gets: facilitators, participants and church admins have their own. */
+export function navForRole(role: AppRole): NavEntry[] {
+  return role === ROLES.FACILITATOR ? facilitatorNav
+    : role === ROLES.PARTICIPANT ? participantNav
+    : role === ROLES.CHURCH_ADMIN ? churchAdminNav
+    : dashboardNav;
+}
+
+/** Permission-filtered nav: items the role can't see are dropped, then empty groups. */
+export function visibleNav(role: AppRole): NavEntry[] {
+  return navForRole(role)
+    .map((entry): NavEntry | null => {
+      if (entry.kind === "group") {
+        const items = entry.items.filter((it) => !it.permission || can(role, it.permission));
+        if (items.length === 1) return { kind: "item", ...items[0] };
+        return items.length ? { ...entry, items } : null;
+      }
+      return !entry.permission || can(role, entry.permission) ? entry : null;
+    })
+    .filter((e): e is NavEntry => e !== null);
+}

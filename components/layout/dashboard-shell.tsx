@@ -8,14 +8,14 @@ import { DashboardActionTokenProvider } from "@/components/layout/dashboard-acti
 import { DmUnreadProvider, useDmUnread } from "@/components/direct-messages/dm-unread";
 import { InstallAppButton } from "@/components/pwa/install-app-button";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
+import { CommandSearch, openDashboardSearch } from "@/components/dashboard/overview/command-search";
 import { ViewAsBanner, ViewAsSwitcher } from "@/components/layout/view-as";
-import { churchAdminNav, dashboardNav, facilitatorNav, participantNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
+import { visibleNav, type NavEntry, type NavGroup, type NavLeaf } from "@/components/layout/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { UserAvatar } from "@/components/ui/user-avatar";
-import { ROLES, ROLE_LABELS } from "@/lib/rbac/roles";
-import { can } from "@/lib/rbac/permissions";
+import { ROLE_LABELS } from "@/lib/rbac/roles";
 import { cn } from "@/lib/utils";
 import type { DashboardProfile } from "@/lib/auth/server";
 
@@ -31,24 +31,9 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
   const displayName = `${profile.firstName} ${profile.lastName}`.trim() || profile.email;
   const pathname = usePathname();
 
-  // Facilitators and participants get their own scoped sidebars; everyone else gets the admin nav.
-  const navForRole =
-    profile.role === ROLES.FACILITATOR ? facilitatorNav
-    : profile.role === ROLES.PARTICIPANT ? participantNav
-    : profile.role === ROLES.CHURCH_ADMIN ? churchAdminNav
-    : dashboardNav;
-
-  // Permission-filter: drop items the role can't see; drop now-empty groups.
-  const visibleEntries: NavEntry[] = navForRole
-    .map((entry): NavEntry | null => {
-      if (entry.kind === "group") {
-        const items = entry.items.filter((it) => !it.permission || can(profile.role, it.permission));
-        if (items.length === 1) return { kind: "item", ...items[0] };
-        return items.length ? { ...entry, items } : null;
-      }
-      return !entry.permission || can(profile.role, entry.permission) ? entry : null;
-    })
-    .filter((e): e is NavEntry => e !== null);
+  // Facilitators and participants get their own scoped sidebars; everyone else gets the admin nav,
+  // permission-filtered (shared with the Overview "All Features" panel).
+  const visibleEntries: NavEntry[] = visibleNav(profile.role);
 
   const isActive = (href: string) => (href === "/dashboard" ? pathname === "/dashboard" : pathname === href || pathname.startsWith(`${href}/`));
   const groupActive = (g: NavGroup) => g.items.some((it) => isActive(it.href));
@@ -196,7 +181,20 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
 
             <div className="relative hidden w-full max-w-xl sm:block">
               <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input className="pl-9" placeholder="Search participants, waves, tags..." />
+              {/* Opens the dashboard-wide search palette (Ctrl/⌘ K). */}
+              <Input
+                readOnly
+                className="cursor-pointer pl-9"
+                placeholder="Search features, people, bookings…  (Ctrl K)"
+                aria-label="Search the dashboard"
+                onClick={() => openDashboardSearch()}
+                onKeyDown={(e) => {
+                  if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
+                    e.preventDefault();
+                    openDashboardSearch(e.key);
+                  } else if (e.key === "Enter") openDashboardSearch();
+                }}
+              />
             </div>
             <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
               {/* Install prompt takes room on small screens — desktop/tablet only */}
@@ -235,6 +233,7 @@ export function DashboardShell({ actionToken, children, profile }: DashboardShel
       </div>
 
       <MobileBottomNav role={profile.role} entries={visibleEntries} />
+      <CommandSearch role={profile.role} />
     </div>
     </DmUnreadProvider>
   );
