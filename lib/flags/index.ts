@@ -11,6 +11,8 @@ import { ROLES, normalizeAppRole } from "@/lib/rbac/roles";
 
 export const FLAGS = {
   PLAN_BUILDER_PREMIUM: "plan_builder.premium",
+  LEADERSHIP_PUBLIC: "leadership_check_in.public",
+  LEADERSHIP_STEWARD: "leadership_check_in.steward",
 } as const;
 
 export type FeatureFlagKey = (typeof FLAGS)[keyof typeof FLAGS];

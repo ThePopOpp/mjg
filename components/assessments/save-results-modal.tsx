@@ -23,6 +23,7 @@ export function SaveResultsModal({
   assessment,
   onSaveAsGuest,
   guestEmail,
+  steward = true,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -31,8 +32,10 @@ export function SaveResultsModal({
   /** Resolves to an error message, or null once saved. */
   onSaveAsGuest: (name: string, email: string) => Promise<string | null>;
   guestEmail: string | null;
+  /** false: no Steward wording or hand-off (an assessment whose Steward mode isn't released). */
+  steward?: boolean;
 }) {
-  const next = encodeURIComponent(stewardHandoffHref(assessment));
+  const next = encodeURIComponent(steward ? stewardHandoffHref(assessment) : "/dashboard");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [saving, setSaving] = useState(false);
@@ -57,9 +60,11 @@ export function SaveResultsModal({
           <DialogTitle className="text-pretty font-serif text-2xl">{guestEmail ? "Your results are saved" : "Save your results"}</DialogTitle>
           <DialogDescription className="mx-auto max-w-[22rem] text-pretty text-sm leading-6">
             {guestEmail ? (
-              <>Saved under <strong className="text-foreground">{guestEmail}</strong>. Sign in or create a free account with that email to talk with Steward about them.</>
-            ) : (
+              <>Saved under <strong className="text-foreground">{guestEmail}</strong>. Sign in or create a free account with that email to {steward ? "talk with Steward about them" : "see them in your dashboard"}.</>
+            ) : steward ? (
               <>Enter your name and email to keep your {label} results, so Steward can use them to guide your conversations.</>
+            ) : (
+              <>Enter your name and email to keep your {label} results.</>
             )}
           </DialogDescription>
         </div>
@@ -102,18 +107,18 @@ export function SaveResultsModal({
 
 /** Once saved, counts down and opens Steward about these results — once per page
  *  visit, so going back to review answers doesn't send them again. */
-function useStewardHandoff(saved: boolean, assessment: string) {
+function useStewardHandoff(saved: boolean, assessment: string, enabled = true) {
   const router = useRouter();
   const href = stewardHandoffHref(assessment);
   const [left, setLeft] = useState<number | null>(null);
   const started = useRef(false);
 
   useEffect(() => {
-    if (!saved || started.current) return;
+    if (!enabled || !saved || started.current) return;
     started.current = true;
     router.prefetch(href);
     setLeft(STEWARD_HANDOFF_SECONDS);
-  }, [saved, href, router]);
+  }, [enabled, saved, href, router]);
 
   useEffect(() => {
     if (left === null) return;
@@ -129,9 +134,19 @@ function useStewardHandoff(saved: boolean, assessment: string) {
 }
 
 /** One line under the results: saved to the account (then on to Steward), or not yet. */
-export function AutosaveNote({ status, onSignIn, onRetry, assessment }: { status: AutosaveStatus; onSignIn: () => void; onRetry: () => void; assessment: string }) {
-  const handoff = useStewardHandoff(status === "saved", assessment);
+export function AutosaveNote({ status, onSignIn, onRetry, assessment, steward = true }: { status: AutosaveStatus; onSignIn: () => void; onRetry: () => void; assessment: string; steward?: boolean }) {
+  const handoff = useStewardHandoff(status === "saved", assessment, steward);
   if (status === "idle") return null;
+  if (!steward && (status === "saved" || status === "guest-saved")) {
+    return (
+      <div className="flex flex-col items-center justify-between gap-3 rounded-lg border border-[#b88a4a]/40 bg-[#b88a4a]/[0.06] px-4 py-3 text-sm sm:flex-row">
+        <p className="flex items-center gap-2 text-muted-foreground">
+          <Check className="h-4 w-4 shrink-0 text-[#b88a4a]" /> {status === "saved" ? "Saved to your account." : "Saved under your email. Create a free account with it to keep them in your dashboard."}
+        </p>
+        {status === "guest-saved" ? <Button size="sm" variant="outline" className="shrink-0" onClick={onSignIn}>Create account</Button> : null}
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col items-center justify-between gap-3 rounded-lg border border-[#b88a4a]/40 bg-[#b88a4a]/[0.06] px-4 py-3 text-sm sm:flex-row">
       {status === "saving" ? (

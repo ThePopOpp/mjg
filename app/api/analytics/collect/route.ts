@@ -8,7 +8,7 @@ import { cleanPath, countryFrom, deviceFromUA, resolveTouch, visitorHash, type T
 
 // Pageviews, plus the interactions the speaking page reports (components/analytics/site-analytics trackEvent).
 // The dashboard's read functions count event = 'pageview' only, so these never inflate traffic numbers.
-const EVENTS = new Set(["pageview", "video_play", "cta_click", "form_success"]);
+const EVENTS = new Set(["pageview", "video_play", "cta_click", "form_success", "assessment_start", "assessment_complete"]);
 
 export async function POST(request: Request) {
   const done = () => new NextResponse(null, { status: 204 });

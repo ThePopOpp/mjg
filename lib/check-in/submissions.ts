@@ -37,12 +37,12 @@ export async function listCheckInSubmissions(limit = 200): Promise<CheckInSubmis
 }
 
 /** Aggregate stats for the dashboard cards. */
-export async function getCheckInSubmissionStats(): Promise<{ count: number; averageScore: number | null; last7: number }> {
+export async function getCheckInSubmissionStats(assessment = "created-for-more"): Promise<{ count: number; averageScore: number | null; last7: number }> {
   const supabase = createSupabaseAdminClient();
   const { data } = await supabase
     .from("check_in_submissions")
     .select("total_score,created_at")
-    .eq("assessment", "created-for-more")
+    .eq("assessment", assessment)
     .limit(2000);
   const rows = data ?? [];
   const scores = rows.map((r) => r.total_score).filter((n): n is number => typeof n === "number");

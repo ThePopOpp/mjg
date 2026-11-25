@@ -24,6 +24,19 @@ import {
   tankLevelFor,
   type EnergySource,
 } from "@/lib/energy-audit/energy-audit";
+import {
+  ALL_TIED_NOTE,
+  CATEGORY_NOTE,
+  DISCLAIMER,
+  ASSESSMENT_KEY as LEADERSHIP_KEY,
+  LAYERS as LEADERSHIP_LAYERS,
+  LAYER_MAX as LEADERSHIP_LAYER_MAX,
+  MAX_SCORE as LEADERSHIP_MAX,
+  REFLECTION_QUESTIONS as LEADERSHIP_REFLECTIONS,
+  SCORE_BANDS as LEADERSHIP_BANDS,
+  layerStatusFor as leadershipStatusFor,
+} from "@/lib/leadership-check-in/leadership-check-in";
+import { stewardReadsLeadership } from "@/lib/leadership-check-in/switches";
 
 // WHAT STEWARD KNOWS ABOUT A MEMBER'S CHECK-INS.
 //
@@ -73,18 +86,21 @@ export type AssessmentRow = {
   created_at: string;
 };
 
-async function memberEmail(profileId: string): Promise<string | null> {
+async function memberIdentity(profileId: string): Promise<{ email: string | null; role: string | null }> {
   const db = createSupabaseAdminClient();
-  const { data } = await db.from("profiles").select("email").eq("id", profileId).maybeSingle();
+  const { data } = await db.from("profiles").select("email,role").eq("id", profileId).maybeSingle();
   const email = (data?.email as string | null)?.trim().toLowerCase();
-  return email || null;
+  return { email: email || null, role: (data?.role as string | null) ?? null };
 }
 
 async function memberRows(profileId: string): Promise<Row[]> {
   const db = createSupabaseAdminClient();
-  const email = await memberEmail(profileId);
+  const { email, role } = await memberIdentity(profileId);
   const select = "id,assessment,total_score,stage,layer_scores,lowest_pillar,answers,details,created_at";
-  const assessments = ["created-for-more", ENERGY_AUDIT_ASSESSMENT];
+  // Leadership Check-In results reach Steward only where Leadership Mode is switched on
+  // for this member (kit Phase 2; super admins and listed test accounts while it is off).
+  const leadership = await stewardReadsLeadership(profileId, role);
+  const assessments = ["created-for-more", ENERGY_AUDIT_ASSESSMENT, ...(leadership ? [LEADERSHIP_KEY] : [])];
   const [linked, byEmail] = await Promise.all([
     db.from("check_in_submissions").select(select).in("assessment", assessments).eq("profile_id", profileId)
       .order("created_at", { ascending: false }).limit(HISTORY * 4),
@@ -249,6 +265,74 @@ function energyDetail(row: Row) {
   };
 }
 
+// == Leadership Check-In ======================================================
+// Its own scale of meaning: never compare these totals with Created for More.
+
+function leadershipLayers(row: Row) {
+  const scores = new Map((row.layer_scores ?? []).map((l) => [l.key, Number(l.score) || 0]));
+  return LEADERSHIP_LAYERS.map((layer) => {
+    const score = scores.get(layer.key) ?? 0;
+    const status = leadershipStatusFor(score);
+    return { key: layer.key, layer: `${layer.title} — ${layer.subtitle}`, score, out_of: LEADERSHIP_LAYER_MAX, status: `${status.label} / ${status.action}` };
+  });
+}
+
+function leadershipSnapshot(row: Row) {
+  const layers = leadershipLayers(row);
+  const low = Math.min(...layers.map((l) => l.score));
+  const high = Math.max(...layers.map((l) => l.score));
+  const version = row.details?.version;
+  return {
+    taken: day(row.created_at),
+    days_ago: daysAgo(row.created_at),
+    version: typeof version === "string" ? version : null,
+    total: row.total_score,
+    out_of: LEADERSHIP_MAX,
+    result: row.stage,
+    layers,
+    lowest: layers.filter((l) => l.score === low).map((l) => l.layer),
+    strongest: layers.filter((l) => l.score === high).map((l) => l.layer),
+    all_layers_tied: high === low,
+    pillar_scores: (row.details?.pillar_scores ?? null) as Record<string, number> | null,
+    not_comparable_with: "Created for More Check-In",
+  };
+}
+
+function leadershipDetail(row: Row) {
+  const snapshot = leadershipSnapshot(row);
+  const answers = row.answers ?? {};
+  const band = LEADERSHIP_BANDS.find((b) => b.label === row.stage);
+  const reflections = (row.details?.reflections ?? {}) as Record<string, string>;
+  const lowKeys = snapshot.layers.filter((l) => snapshot.lowest.includes(l.layer)).map((l) => l.key);
+  return {
+    ...snapshot,
+    result_copy: band?.copy ?? null,
+    disclaimer: DISCLAIMER,
+    category_note: CATEGORY_NOTE,
+    all_tied_note: snapshot.all_layers_tied ? ALL_TIED_NOTE : null,
+    layers: LEADERSHIP_LAYERS.map((layer, i) => ({
+      ...snapshot.layers[i],
+      suggested_action: layer.action,
+      scripture: layer.scripture,
+      statements: layer.statements.map((statement, j) => ({
+        statement: statement.text,
+        pillar: statement.pillar ?? null,
+        rating: answers[`${layer.key}:${j}`] ?? null,
+      })),
+    })),
+    suggested_for_lowest: snapshot.all_layers_tied
+      ? null
+      : lowKeys.map((key) => {
+          const layer = LEADERSHIP_LAYERS.find((l) => l.key === key)!;
+          return { layer: layer.title, action: layer.action, scripture: layer.scripture };
+        }),
+    // Their own words, only when they wrote something. Private: quote back only to them.
+    their_reflections: Object.keys(reflections).length
+      ? Object.entries(reflections).map(([i, answer]) => ({ question: LEADERSHIP_REFLECTIONS[Number(i)] ?? null, answer }))
+      : null,
+  };
+}
+
 // == Public shapes ============================================================
 
 function trend(rows: Row[]) {
@@ -271,9 +355,12 @@ export async function assessmentSnapshot(profileId: string) {
 export function snapshotFromRows(rows: AssessmentRow[]) {
   const checkIns = rows.filter((r) => r.assessment === "created-for-more");
   const audits = rows.filter((r) => r.assessment === ENERGY_AUDIT_ASSESSMENT);
+  const leaders = rows.filter((r) => r.assessment === LEADERSHIP_KEY);
   return {
     check_in: checkIns[0] ? { ...checkInSnapshot(checkIns[0]), times_taken: checkIns.length } : null,
     energy_audit: audits[0] ? { ...energySnapshot(audits[0]), times_taken: audits.length } : null,
+    // Only present when Leadership Mode is on for this member (memberRows filters otherwise).
+    ...(leaders[0] ? { leadership_check_in: { ...leadershipSnapshot(leaders[0]), times_taken: leaders.length } } : {}),
   };
 }
 
@@ -286,8 +373,10 @@ export async function assessmentDetail(profileId: string) {
 export function detailFromRows(rows: AssessmentRow[]) {
   const checkIns = rows.filter((r) => r.assessment === "created-for-more");
   const audits = rows.filter((r) => r.assessment === ENERGY_AUDIT_ASSESSMENT);
+  const leaders = rows.filter((r) => r.assessment === LEADERSHIP_KEY);
   return {
     self_reported: true,
+    ...(leaders[0] ? { leadership_check_in: { ...leadershipDetail(leaders[0]), history: leaders.length > 1 ? trend(leaders) : null } } : {}),
     check_in: checkIns[0]
       ? { ...checkInDetail(checkIns[0]), history: checkIns.length > 1 ? trend(checkIns) : null }
       : null,

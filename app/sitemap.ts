@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { getPublishedPosts } from "@/lib/content/blog";
 import { liveMarketingRoutes } from "@/lib/marketing/routes";
 import { publicSiteUrl } from "@/lib/public-site/static-pages";
+import { leadershipFlagOn } from "@/lib/leadership-check-in/switches";
+import { FLAGS } from "@/lib/flags";
 
 // Live marketing pages (lib/marketing/routes.ts) plus published articles.
 // Preview pages are left out until they are marked live.
@@ -15,6 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly",
     priority: route.priority,
   }));
+
+  // Released by its switch, not the route list (migration 202611250149).
+  if (await leadershipFlagOn(FLAGS.LEADERSHIP_PUBLIC).catch(() => false)) {
+    pages.push({ url: `${site}/leadership-check-in`, changeFrequency: "weekly", priority: 0.8 });
+  }
 
   const posts = await getPublishedPosts().catch(() => []);
   const articles: MetadataRoute.Sitemap = posts

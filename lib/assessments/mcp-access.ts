@@ -11,6 +11,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 export const BUILT_IN_ASSESSMENTS = [
   { key: "created-for-more", title: "Created for More Check-In", description: "The public 7-layer Stewardship Blueprint check-in (out of 140)." },
   { key: "energy-audit", title: "Energy Audit", description: "4 energies x 5 statements; where the person is running low." },
+  { key: "leadership-check-in", title: "Leadership Check-In", description: "The 7-layer leadership reflection for business and ministry leaders (out of 140). Not comparable with Created for More." },
 ] as const;
 
 export type BuiltInAssessmentKey = (typeof BUILT_IN_ASSESSMENTS)[number]["key"];

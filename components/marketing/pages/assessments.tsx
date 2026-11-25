@@ -4,6 +4,8 @@
 import { getScopeContent } from "@/lib/marketing/content/read";
 import { pageAssessments } from "@/lib/marketing/content/scopes/page-assessments";
 import { pageHome } from "@/lib/marketing/content/scopes/page-home";
+import { leadershipFlagOn } from "@/lib/leadership-check-in/switches";
+import { FLAGS } from "@/lib/flags";
 import { cn } from "@/lib/utils";
 import { CheckInDemo } from "../check-in-demo";
 import { MediaFrame } from "../media";
@@ -42,7 +44,11 @@ function Details({ a, variant = "primary" }: { a: Assessment; variant?: "primary
 }
 
 export async function AssessmentsPage() {
-  const [{ hero, checkIn, energy, values, next }, home] = await Promise.all([getScopeContent(pageAssessments), getScopeContent(pageHome)]);
+  const [{ hero, checkIn, energy, leadership, values, next }, home, leadershipLive] = await Promise.all([
+    getScopeContent(pageAssessments),
+    getScopeContent(pageHome),
+    leadershipFlagOn(FLAGS.LEADERSHIP_PUBLIC).catch(() => false),
+  ]);
 
   return (
     <>
@@ -74,6 +80,15 @@ export async function AssessmentsPage() {
               <MediaFrame media={energy.image} ratio="4/3" sizes="(min-width: 1024px) 480px, 100vw" />
             </Split>
           </article>
+
+          {/* Leadership Check-In — only once released */}
+          {leadershipLive ? (
+            <article className="rounded-2xl border bg-card p-6 shadow-sm sm:p-8">
+              <div className="max-w-2xl">
+                <Details a={leadership} />
+              </div>
+            </article>
+          ) : null}
 
           {/* 3 · Values — upcoming, so a dashed card and no visual */}
           <article className={cn("rounded-2xl border border-dashed border-[#d8c9a6] bg-card/60 p-6 sm:p-8 dark:border-gold/30")}>

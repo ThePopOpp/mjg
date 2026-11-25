@@ -75,6 +75,23 @@ const energy = defineSection<Assessment>({
   },
 });
 
+// Shown only while the leadership_check_in.public switch is on (migration 202611250149).
+const leadership = defineSection<Assessment>({
+  key: "leadership",
+  label: "Leadership Check-In (shown when released)",
+  fields: assessmentFields,
+  defaults: {
+    label: "For Leaders",
+    status: "Complimentary",
+    statusTone: "live",
+    title: "The Leadership Check-In",
+    body: "For business owners, entrepreneurs, executives, managers, ministry leaders and anyone entrusted with influence. Reflect on how your faith, values and leadership decisions align with the life and organization you are building, and identify your next faithful step.",
+    facts: "~5–8 min\n28 statements\n7 layers",
+    cta: { label: "Take the Leadership Check-In", href: "/leadership-check-in" },
+    image: { src: "", alt: "" },
+  },
+});
+
 const values = defineSection<Assessment>({
   key: "values",
   label: "Assessment 3 · Values",
@@ -122,6 +139,7 @@ export const pageAssessments = defineScope({
     hero,
     checkIn,
     energy,
+    leadership,
     values,
     next,
   },

@@ -19,7 +19,7 @@ type Source =
 const SUBMISSION_LIST = "id,name,email,total_score,stage,strongest_layer,lowest_layer,lowest_pillar,layer_scores,chosen_pathways,created_at";
 
 async function sourceFor(key: string): Promise<Source> {
-  if (key === "created-for-more" || key === ENERGY_AUDIT_ASSESSMENT) return { kind: "submission", assessment: key };
+  if (key === "created-for-more" || key === ENERGY_AUDIT_ASSESSMENT || key === "leadership-check-in") return { kind: "submission", assessment: key };
   if (key === "check-in") return { kind: "pilot_check_in" };
   const form = await getFormBySlug(key);
   if (form?.kind === "survey" || key === "general" || key === "pastor-elder") return { kind: "survey", surveyType: surveyTypeForSlug(key) };

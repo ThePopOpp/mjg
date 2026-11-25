@@ -13,7 +13,7 @@ import type { ToolDef } from "./types";
 // RESULTS are readable only where a Super Admin turned on "Readable by MCP" for
 // that assessment (default off) — every result tool goes through mcpResultsGate.
 
-const KEY = { type: "string", description: "Assessment key from assessments_list: created-for-more, energy-audit, check-in, or a survey slug." };
+const KEY = { type: "string", description: "Assessment key from assessments_list: created-for-more, energy-audit, leadership-check-in, check-in, or a survey slug." };
 const RESERVED = new Set(["general", "pastor-elder", "check-in", ...BUILT_IN_ASSESSMENTS.map((a) => a.key)]);
 
 type Summary = { key: string; title: string; kind: "built_in" | PilotFormKind; status: string; description: string | null; mcpReadable: boolean; publishedAt?: string | null; updatedAt?: string };
@@ -107,7 +107,7 @@ const get: ToolDef = {
     const readable = await getMcpReadableMap();
     if (isBuiltInAssessment(a.key)) {
       const info = BUILT_IN_ASSESSMENTS.find((b) => b.key === a.key)!;
-      const stats = a.key === "energy-audit" ? await getEnergyAuditStats() : await getCheckInSubmissionStats();
+      const stats = a.key === "energy-audit" ? await getEnergyAuditStats() : await getCheckInSubmissionStats(a.key);
       return { ...info, kind: "built_in", definedIn: "code", mcpReadable: readable.get(a.key) === true, stats };
     }
     return formView(await requireForm(a.key), readable.get(a.key) === true);

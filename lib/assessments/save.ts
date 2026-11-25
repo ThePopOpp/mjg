@@ -6,6 +6,8 @@ import { scoreEnergyAudit } from "@/lib/energy-audit/energy-audit";
 import { alertCheckIn } from "@/lib/notifications/check-in-alert";
 import { alertEnergyAudit } from "@/lib/notifications/energy-audit-alert";
 import { getAssessment } from "@/lib/assessments/registry";
+import { createDashboardNotification } from "@/lib/notifications/notify";
+import { MAX_SCORE as LEADERSHIP_MAX, scoreLeadership } from "@/lib/leadership-check-in/leadership-check-in";
 
 // Saves a completed assessment to the member's account — called the moment the
 // results are shown (no "Send my results" press needed), and when a signed-out
@@ -159,6 +161,19 @@ async function afterFirstSave(key: string, row: { id: string; name: string | nul
       }
     }
     await alertCheckIn({ name: row.name, email: row.email, score, participantId });
+    return;
+  }
+
+  if (key === "leadership-check-in") {
+    // A dashboard notification only — no participant record (this is not the pilot),
+    // and never the optional reflections.
+    const score = scoreLeadership(row.answers);
+    await createDashboardNotification({
+      type: "check_in_completed",
+      title: "New Leadership Check-In",
+      message: `${row.name?.trim() || row.email || "Someone"} scored ${score.total}/${LEADERSHIP_MAX} — ${score.band.label}`,
+      metadata: { assessment: key, submission_id: row.id, total: score.total, band: score.band.label },
+    });
     return;
   }
 

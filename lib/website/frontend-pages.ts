@@ -36,6 +36,7 @@ export const CODE_OWNED_PAGES: CodeOwnedPage[] = [
   { slug: "resources", label: "Resources", path: "/resources", source: "components/marketing/pages/resources.tsx", group: "Marketing site" },
   { slug: "contact", label: "Contact", path: "/contact", source: "components/marketing/pages/contact.tsx", group: "Marketing site" },
   { slug: "speaking", label: "Speaking & Podcasts", path: "/speaking", source: "components/marketing/pages/speaking.tsx", group: "Marketing site" },
+  { slug: "leadership-check-in", label: "Leadership Check-In", path: "/leadership-check-in", source: "components/marketing/pages/leadership-check-in.tsx", group: "Marketing site" },
   { slug: "events", label: "Events", path: "/events", source: "app/events", group: "Marketing site" },
   { slug: "book", label: "Booking", path: "/book", source: "app/book", group: "Marketing site" },
   { slug: "created-for-more", label: "Created for More", path: "/created-for-more", source: "main/created-for-more.html", group: "Marketing site" },

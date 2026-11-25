@@ -112,7 +112,7 @@ export function SiteAnalytics() {
  * Same privacy rules as pageviews; the name must be one /api/analytics/collect
  * accepts. Never throws.
  */
-export function trackEvent(event: "video_play" | "cta_click" | "form_success") {
+export function trackEvent(event: "video_play" | "cta_click" | "form_success" | "assessment_start" | "assessment_complete") {
   try {
     const path = window.location.pathname;
     if (SKIP.test(path) || optedOut()) return;

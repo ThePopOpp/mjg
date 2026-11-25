@@ -13,6 +13,7 @@ export const STEWARD_HANDOFF_SECONDS = 6;
 const OPENERS: Record<string, string> = {
   "created-for-more": "I just finished the Created for More Check-In. Can we talk about what my results mean for me?",
   "energy-audit": "I just finished the Energy Audit. Can we talk about what my results mean for me?",
+  "leadership-check-in": "I just finished the Leadership Check-In. Can we talk about what my results mean for how I lead?",
 };
 
 export function stewardHandoffHref(assessment: string) {

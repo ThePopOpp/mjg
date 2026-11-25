@@ -7,6 +7,7 @@ import { pageContact } from "./scopes/page-contact";
 import { pageMission } from "./scopes/page-mission";
 import { pageResources } from "./scopes/page-resources";
 import { pageSpeaking } from "./scopes/page-speaking";
+import { pageLeadershipCheckIn } from "./scopes/page-leadership-check-in";
 import { globalFooter, globalFramework, globalJoinForm, globalNav } from "./scopes/global";
 import { pageAssessments, pageCheckIn } from "./scopes/page-assessments";
 import { pagePersonalBlueprint, pageStewardshipBlueprint } from "./scopes/page-blueprint";
@@ -24,7 +25,7 @@ export const SCOPES: Record<string, ScopeDef> = Object.fromEntries(
   [
     globalNav, globalFooter, globalFramework, globalJoinForm, pageHome, pageBook, pageStewardshipBlueprint, pagePersonalBlueprint, pageAssessments, pageCheckIn,
     pageStart, pageLearn, pageStudies, pageJoin, pageChurches, pageLeadAGroup, pageMeetSteward,
-    pageAbout, pageMission, pageContact, pageResources, pageSpeaking,
+    pageAbout, pageMission, pageContact, pageResources, pageSpeaking, pageLeadershipCheckIn,
   ].map((s) => [s.key, s as unknown as ScopeDef]),
 );
 

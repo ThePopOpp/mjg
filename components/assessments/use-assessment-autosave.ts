@@ -209,5 +209,6 @@ export function useAssessmentAutosave({
     setGuest(null);
   }, [assessment]);
 
-  return { status, submissionId, modalOpen, setModalOpen, retry, newAttempt, saveAsGuest, guestEmail: guest?.email ?? null };
+  // attemptId: set once results are ready; a later "send" step can use it to reach the same row.
+  return { status, submissionId, attemptId: attemptRef.current, modalOpen, setModalOpen, retry, newAttempt, saveAsGuest, guestEmail: guest?.email ?? null };
 }

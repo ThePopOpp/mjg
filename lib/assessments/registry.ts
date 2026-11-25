@@ -1,6 +1,7 @@
 import { checkInDetails, completeAnswers, scoreCheckIn } from "@/lib/check-in/created-for-more";
 import { SECTIONS, answerKey, isComplete, isRating, scoreEnergyAudit } from "@/lib/energy-audit/energy-audit";
 import { ENERGY_AUDIT_ASSESSMENT } from "@/lib/energy-audit/submissions";
+import { ASSESSMENT_KEY as LEADERSHIP_KEY, ASSESSMENT_LABEL as LEADERSHIP_LABEL, ASSESSMENT_PATH as LEADERSHIP_PATH, leadershipColumns, leadershipDetails, parseResponses, scoreLeadership } from "@/lib/leadership-check-in/leadership-check-in";
 
 // Every assessment whose results save to check_in_submissions and reach Steward.
 //
@@ -87,14 +88,33 @@ const energyAudit: AssessmentDefinition = {
   },
 };
 
+const leadership: AssessmentDefinition = {
+  key: LEADERSHIP_KEY,
+  label: LEADERSHIP_LABEL,
+  path: LEADERSHIP_PATH,
+  cleanAnswers(raw) {
+    // Strict: all 28 present once, each a whole number 1–5.
+    const parsed = parseResponses(raw);
+    return parsed.ok ? parsed.answers : null;
+  },
+  columns(answers) {
+    return leadershipColumns(scoreLeadership(answers));
+  },
+  details(answers) {
+    return leadershipDetails(scoreLeadership(answers));
+  },
+};
+
 export const ASSESSMENTS: Record<string, AssessmentDefinition> = {
   [createdForMore.key]: createdForMore,
   [energyAudit.key]: energyAudit,
+  [leadership.key]: leadership,
 };
 
 export function getAssessment(key: string): AssessmentDefinition | null {
   return Object.prototype.hasOwnProperty.call(ASSESSMENTS, key) ? ASSESSMENTS[key] : null;
 }
 
-/** Assessment keys Steward reads (lib/steward/assessments.ts). */
+/** Assessment keys Steward reads (lib/steward/assessments.ts). The Leadership Check-In
+ *  is read only where its Steward switch is on for the member (lib/leadership-check-in/switches.ts). */
 export const STEWARD_ASSESSMENTS = Object.keys(ASSESSMENTS);
