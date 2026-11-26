@@ -129,6 +129,7 @@ export const dashboardNav: NavEntry[] = [
       { href: "/dashboard/cms", label: "CMS", icon: PanelsTopLeft, permission: PERMISSIONS.MANAGE_CMS },
       { href: "/dashboard/cms/editor", label: "Editor", icon: SquarePen, permission: PERMISSIONS.MANAGE_CMS },
       { href: "/dashboard/blog-posts", label: "Blog Posts", icon: FileText, permission: PERMISSIONS.REVIEW_CONTENT },
+      { href: "/dashboard/annual-retreat", label: "Annual Retreat", icon: BookMarked, permission: PERMISSIONS.MANAGE_CMS },
     ],
   },
   { kind: "item", href: "/dashboard/guide", label: "Team Guide", icon: BookOpen },

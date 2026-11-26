@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
-import type { NavContent } from "@/lib/marketing/content/scopes/global";
+import type { NavContent, NavTopLink } from "@/lib/marketing/content/scopes/global";
 import { cn } from "@/lib/utils";
 import { CONTAINER, buttonClass } from "./primitives";
 import { MarketingThemeToggle } from "./theme-toggle";
@@ -32,6 +32,8 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
   const pathname = normalize(usePathname() ?? "/");
   const [megaOpen, setMegaOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  // Which top-level dropdown (a link with sub-links, e.g. Steward) is open.
+  const [linkOpen, setLinkOpen] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const megaId = useId();
@@ -54,6 +56,7 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
   useEffect(() => {
     setMegaOpen(false);
     setAccountOpen(false);
+    setLinkOpen(null);
     setMobileOpen(false);
   }, [pathname]);
 
@@ -62,6 +65,7 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
       if (e.key === "Escape") {
         setMegaOpen(false);
         setAccountOpen(false);
+        setLinkOpen(null);
         setMobileOpen(false);
       }
     }
@@ -69,6 +73,7 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
       if (!navRef.current?.contains(e.target as Node)) {
         setMegaOpen(false);
         setAccountOpen(false);
+        setLinkOpen(null);
       }
     }
     function onResize() {
@@ -125,11 +130,23 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
               <ChevronDown className={cn("h-4 w-4 transition-transform", megaOpen && "rotate-180")} aria-hidden />
             </button>
           </div>
-          {nav.links.map((l) => (
-            <Link key={l.id} href={l.href} className={itemClass(matches(pathname, l.href))}>
-              {l.label}
-            </Link>
-          ))}
+          {nav.links.map((l) =>
+            l.links?.length ? (
+              <LinkDropdown
+                key={l.id}
+                link={l}
+                open={linkOpen === l.id}
+                setOpen={(v) => setLinkOpen((cur) => (v ? l.id : cur === l.id ? null : cur))}
+                active={matches(pathname, l.href) || l.links.some((s) => matches(pathname, s.href))}
+                pathname={pathname}
+                itemClass={itemClass}
+              />
+            ) : (
+              <Link key={l.id} href={l.href} className={itemClass(matches(pathname, l.href))}>
+                {l.label}
+              </Link>
+            ),
+          )}
           <div className="relative" onMouseEnter={hover(setAccountOpen, true)} onMouseLeave={hover(setAccountOpen, false)}>
             <button
               type="button"
@@ -253,6 +270,19 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
                 <Link href={l.href} className="block py-3.5 text-[17px] font-semibold no-underline">
                   {l.label}
                 </Link>
+                {l.links?.length ? (
+                  <ul className="-mt-1 pb-2 pl-4">
+                    {l.links
+                      .filter((s) => s.href !== l.href)
+                      .map((s) => (
+                        <li key={s.id}>
+                          <Link href={s.href} className="block py-2 text-[15px] text-muted-foreground no-underline">
+                            {s.label}
+                          </Link>
+                        </li>
+                      ))}
+                  </ul>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -274,5 +304,55 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
         </div>
       ) : null}
     </header>
+  );
+}
+
+/** A top-level item with sub-links (e.g. Steward → Meet Steward, Prices & Plans). Opens on hover or click. */
+function LinkDropdown({
+  link,
+  open,
+  setOpen,
+  active,
+  pathname,
+  itemClass,
+}: {
+  link: NavTopLink;
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  active: boolean;
+  pathname: string;
+  itemClass: (active: boolean) => string;
+}) {
+  const id = useId();
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hover = (v: boolean) => () => {
+    if (timer.current) clearTimeout(timer.current);
+    if (v) setOpen(true);
+    else timer.current = setTimeout(() => setOpen(false), 140);
+  };
+  return (
+    <div className="relative" onMouseEnter={hover(true)} onMouseLeave={hover(false)}>
+      <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)} className={itemClass(active)}>
+        {link.label}
+        <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} aria-hidden />
+      </button>
+      {open ? (
+        <div id={id} className="absolute left-0 top-full z-10 pt-2">
+          <ul className="min-w-[200px] rounded-[10px] border bg-background p-1.5 shadow-[0_18px_48px_rgba(20,20,20,0.12)]">
+            {(link.links ?? []).map((s) => (
+              <li key={s.id}>
+                <Link
+                  href={s.href}
+                  aria-current={matches(pathname, s.href) ? "page" : undefined}
+                  className={cn(ACCOUNT_ITEM, matches(pathname, s.href) && "font-semibold text-gold-deep dark:text-gold-light")}
+                >
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
   );
 }

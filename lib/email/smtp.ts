@@ -13,6 +13,11 @@ export type SendEmailInput = {
    * Blueprint"). The address is always the configured, authenticated one.
    */
   fromName?: string;
+  /**
+   * Extra message headers, e.g. List-Unsubscribe / List-Unsubscribe-Post for
+   * marketing mail. Header names are restricted to safe characters.
+   */
+  headers?: Record<string, string>;
   attachments?: Array<{
     filename: string;
     content: Buffer;
@@ -75,6 +80,8 @@ async function sendViaResend(input: SendEmailInput): Promise<SmtpResult> {
   if (input.text) body.text = input.text;
   if (input.cc) body.cc = Array.isArray(input.cc) ? input.cc : [input.cc];
   if (input.bcc) body.bcc = Array.isArray(input.bcc) ? input.bcc : [input.bcc];
+  const headers = safeHeaders(input.headers);
+  if (headers) body.headers = headers;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -92,6 +99,16 @@ async function sendViaResend(input: SendEmailInput): Promise<SmtpResult> {
 
   const data = (await response.json()) as { id: string };
   return { ok: true, skipped: false, messageId: data.id };
+}
+
+/** Only well-formed header names and single-line values get through. */
+function safeHeaders(headers?: Record<string, string>) {
+  if (!headers) return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(headers)) {
+    if (/^[A-Za-z][A-Za-z0-9-]{0,60}$/.test(k) && typeof v === "string") out[k] = v.replace(/[\r\n]+/g, " ").slice(0, 900);
+  }
+  return Object.keys(out).length ? out : undefined;
 }
 
 /** A display name that is safe inside an address header: quoted, no newlines. */
@@ -139,6 +156,7 @@ export async function sendSmtpEmail(input: SendEmailInput): Promise<SmtpResult> 
     html: input.html,
     text: input.text,
     replyTo: input.replyTo || from,
+    headers: safeHeaders(input.headers),
     attachments: input.attachments,
   });
 

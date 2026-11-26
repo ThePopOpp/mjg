@@ -17,6 +17,7 @@ const PUBLIC_PAGES: FrontendPage[] = [
   { slug: "contact", label: "Contact", url: "/contact" },
   { slug: "speaking", label: "Speaking & Podcasts", url: "/speaking" },
   { slug: "leadership-check-in", label: "Leadership Check-In", url: "/leadership-check-in" },
+  { slug: "annual-retreat", label: "Annual Retreat Guide", url: "/annual-retreat" },
   { slug: "events", label: "Events", url: "/events" },
   { slug: "book", label: "Booking", url: "/book" },
 ];

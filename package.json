@@ -18,6 +18,7 @@
     "test:mcp": "node --experimental-strip-types --no-warnings --conditions=react-server --import ./scripts/test-loader.mjs --test lib/mcp/mcp.test.mjs lib/mcp/phase3.test.mjs lib/mcp/church.test.mjs lib/tools/leads-prospect.test.mjs",
     "test:check-in": "node --experimental-strip-types --no-warnings --test lib/check-in/created-for-more.test.mjs",
     "test:overview": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --test lib/dashboard/overview/overview.test.mjs",
+    "test:annual-retreat": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --test lib/annual-retreat/annual-retreat.test.mjs",
     "test:leadership": "node --experimental-strip-types --no-warnings --test lib/leadership-check-in/leadership-check-in.test.mjs",
     "test:facilitator-welcome": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --test lib/facilitator-welcome/series.test.mjs",
     "test:groups": "node --experimental-strip-types --no-warnings --import ./scripts/test-loader.mjs --test lib/facilitator-groups/groups.test.mjs",

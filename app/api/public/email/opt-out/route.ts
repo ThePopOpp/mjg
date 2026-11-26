@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { unsubscribeFromRetreat } from "@/lib/annual-retreat/server";
 
 export async function POST(request: Request) {
   try {
@@ -77,6 +78,10 @@ export async function POST(request: Request) {
       .update({ unsubscribed_at: now })
       .ilike("email", email)
       .is("unsubscribed_at", null);
+
+    // The Annual Retreat follow-ups: stop the series, cancel anything pending, and
+    // record the opt-out on the contact (consent_events), which the line above doesn't.
+    await unsubscribeFromRetreat(email, { ip, userAgent: ua, via: "email_preferences" });
 
     return NextResponse.json({ ok: true });
   } catch (error) {

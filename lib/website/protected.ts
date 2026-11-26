@@ -41,6 +41,7 @@ export const PROTECTED_ROUTES = [
   "/contact",
   "/speaking",
   "/leadership-check-in",
+  "/annual-retreat",
   "/resources",
   "/events",
   "/book",

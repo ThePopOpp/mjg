@@ -7,10 +7,12 @@ import { defineScope, defineSection, type ContentField, type Cta } from "../kit"
 
 export type NavLink = { id: string; label: string; href: string };
 export type NavColumn = { id: string; label: string; href: string; links: NavLink[] };
+/** A top-level link; with sub-links it opens a small dropdown instead (e.g. Steward → Prices & Plans). */
+export type NavTopLink = NavLink & { links?: NavLink[] };
 export type NavContent = {
   discoverLabel: string;
   columns: NavColumn[];
-  links: NavLink[];
+  links: NavTopLink[];
   accountLabel: string;
   accountLinks: NavLink[];
   secondaryCta: Cta;
@@ -41,7 +43,27 @@ const nav = defineSection<NavContent>({
         { key: "links", label: "Links", kind: "list", stableIds: true, maxItems: 8, itemLabel: "Link", fields: linkFields },
       ],
     },
-    { key: "links", label: "Top-level links", kind: "list", stableIds: true, maxItems: 4, itemLabel: "Link", fields: linkFields },
+    {
+      key: "links",
+      label: "Top-level links",
+      kind: "list",
+      stableIds: true,
+      maxItems: 4,
+      itemLabel: "Link",
+      fields: [
+        ...linkFields,
+        {
+          key: "links",
+          label: "Dropdown links (optional)",
+          kind: "list",
+          stableIds: true,
+          maxItems: 6,
+          itemLabel: "Link",
+          fields: linkFields,
+          help: "Add links here to turn this item into a dropdown.",
+        },
+      ],
+    },
     { key: "accountLabel", label: "Account menu label", kind: "text", required: true, maxLength: 30 },
     { key: "accountLinks", label: "Account links", kind: "list", stableIds: true, maxItems: 4, itemLabel: "Link", fields: linkFields },
     { key: "secondaryCta", label: "Secondary button", kind: "cta", required: true },
@@ -92,11 +114,16 @@ const nav = defineSection<NavContent>({
           link("speaking", "Speaking & Podcasts", "/speaking"),
           link("mission", "Mission & Vision", "/mission"),
           link("join", "Join the Journey", "/join"),
-          link("pricing", "Prices & Plans", "/steward/pricing"),
         ],
       },
     ],
-    links: [link("steward", "Steward", "/meet-steward"), link("contact", "Contact", "/contact")],
+    links: [
+      {
+        ...link("steward", "Steward", "/meet-steward"),
+        links: [link("meet-steward", "Meet Steward", "/meet-steward"), link("pricing", "Prices & Plans", "/steward/pricing")],
+      },
+      { ...link("contact", "Contact", "/contact"), links: [] },
+    ],
     accountLabel: "My Account",
     accountLinks: [link("login", "Login", "/login"), link("register", "Register", "/register")],
     secondaryCta: { label: "Get Started", href: "/start" },
