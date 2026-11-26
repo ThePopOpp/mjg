@@ -307,7 +307,10 @@ export function MarketingNav({ nav }: { nav: NavContent }) {
   );
 }
 
-/** A top-level item with sub-links (e.g. Steward → Meet Steward, Prices & Plans). Opens on hover or click. */
+/**
+ * A top-level link with sub-links (e.g. Steward → Steward, Prices & Plans).
+ * The label stays a normal link; hovering or keyboard-focusing it reveals the sub-links.
+ */
 function LinkDropdown({
   link,
   open,
@@ -331,11 +334,29 @@ function LinkDropdown({
     else timer.current = setTimeout(() => setOpen(false), 140);
   };
   return (
-    <div className="relative" onMouseEnter={hover(true)} onMouseLeave={hover(false)}>
-      <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)} className={itemClass(active)}>
+    <div
+      className="relative"
+      onMouseEnter={hover(true)}
+      onMouseLeave={hover(false)}
+      onFocus={hover(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) hover(false)();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") setOpen(false);
+      }}
+    >
+      <Link
+        href={link.href}
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-controls={id}
+        aria-current={matches(pathname, link.href) ? "page" : undefined}
+        onClick={() => setOpen(false)}
+        className={itemClass(active)}
+      >
         {link.label}
-        <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} aria-hidden />
-      </button>
+      </Link>
       {open ? (
         <div id={id} className="absolute left-0 top-full z-10 pt-2">
           <ul className="min-w-[200px] rounded-[10px] border bg-background p-1.5 shadow-[0_18px_48px_rgba(20,20,20,0.12)]">

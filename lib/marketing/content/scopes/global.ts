@@ -120,7 +120,7 @@ const nav = defineSection<NavContent>({
     links: [
       {
         ...link("steward", "Steward", "/meet-steward"),
-        links: [link("meet-steward", "Meet Steward", "/meet-steward"), link("pricing", "Prices & Plans", "/steward/pricing")],
+        links: [link("meet-steward", "Steward", "/meet-steward"), link("pricing", "Prices & Plans", "/steward/pricing")],
       },
       { ...link("contact", "Contact", "/contact"), links: [] },
     ],
